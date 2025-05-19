@@ -27,7 +27,9 @@ export default function Login() {
 
   const isFormEsqueceuSenhaFilled = emailEsqueceuSenha.trim() !== "";
 
-  const SetaStatusTela = (tipoTela: string) => {
+  type TipoTela = "login" | "cadastro" | "esqueci";
+
+  const SetaStatusTela = (tipoTela: TipoTela) => {
     const estadosIniciais = {
       login: () => {
         setDisplayTelaLogin(true);
