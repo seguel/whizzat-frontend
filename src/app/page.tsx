@@ -6,8 +6,8 @@ export default function Home() {
   return (
     <div>
       <Header />
-      <main className="p-4">
-        <div className="flex flex-col items-center justify-center w-full px-4 py-6">
+      <main className="p-1">
+        <div className="flex flex-col items-center justify-center w-full px-4 py-4">
           <div className="w-full max-w-[792px] flex flex-col items-center text-center gap-6 ">
             <div className=" text-black text-center font-extralight leading-normal">
               <p className="text-[32px] md:text-[50px]">
