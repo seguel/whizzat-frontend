@@ -3,10 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+} from "@heroicons/react/24/solid";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [repeteSenha, setRepeteSenha] = useState("");
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
   const [emailEsqueceuSenha, setEmailEsqueceuSenha] = useState("");
@@ -17,13 +22,20 @@ export default function Login() {
 
   const [loadingLogin, setLoadingLogin] = useState(false);
   const [loadingCadastro, setLoadingCadastro] = useState(false);
+  const [loadingReenvio, setLoadingReenvio] = useState(false);
+  const [erroCadastro, setErroCadastro] = useState("");
+  const [erroLogin, setErroLogin] = useState("");
+  const [erroEnvio, setErroEnvio] = useState("");
+  const [sucessoCadastro, setSucessoCadastro] = useState("");
+  const [sucessoEnvio, setSucessoEnvio] = useState("");
 
   const isFormFilled = email.trim() !== "" && senha.trim() !== "";
   const isFormCreateFilled =
     nome.trim() !== "" &&
     sobrenome.trim() !== "" &&
     email.trim() !== "" &&
-    senha.trim() !== "";
+    senha.trim() !== "" &&
+    repeteSenha.trim() !== "";
 
   const isFormEsqueceuSenhaFilled = emailEsqueceuSenha.trim() !== "";
 
@@ -87,7 +99,7 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => SetaStatusTela("login")}
-                  className="hover:underline text-[#808080] text-[12px] md:text-[16px]"
+                  className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                 >
                   Entrar
                 </button>
@@ -95,15 +107,33 @@ export default function Login() {
                 <button
                   type="button"
                   onClick={() => SetaStatusTela("cadastro")}
-                  className="hover:underline text-[#808080] text-[12px] md:text-[16px]"
+                  className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                 >
                   Criar Conta
                 </button>
               </div>
 
-              {/* Formulário */}
+              {/* Reenvio de senha */}
 
-              <form className="flex flex-col gap-2 w-full max-w-[340px] mt-5">
+              <form
+                className="flex flex-col gap-2 w-full max-w-[340px] mt-5"
+                onSubmit={(e) => {
+                  e.preventDefault();
+
+                  setErroEnvio("");
+                  setSucessoEnvio("");
+                  setLoadingReenvio(true);
+
+                  setTimeout(() => {
+                    setLoadingReenvio(false);
+                    setSucessoEnvio("Email enviado com sucesso.");
+                  }, 2000);
+
+                  setTimeout(() => {
+                    setSucessoEnvio("");
+                  }, 6000);
+                }}
+              >
                 <label className="text-[#010608] text-[14px] mb-1">
                   E-mail
                 </label>
@@ -114,23 +144,60 @@ export default function Login() {
                   placeholder="Digite seu e-mail"
                   className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                 />
-
-                <button
-                  type="submit"
-                  className={`py-2 mt-3 rounded-[8px] font-medium transition ${
-                    isFormEsqueceuSenhaFilled
-                      ? "bg-[#A9DCF3] text-black hover:bg-[#A9DCF4]"
-                      : "bg-[#F0F0F0] text-[#BBB] cursor-not-allowed"
-                  }`}
-                  disabled={!isFormEsqueceuSenhaFilled}
-                >
-                  Reenviar Senha
-                </button>
+                {erroEnvio ? (
+                  <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-2 text-sm flex items-center gap-2">
+                    <ExclamationCircleIcon className="w-6 h-6 text-red-700" />
+                    {erroEnvio}
+                  </div>
+                ) : sucessoEnvio ? (
+                  <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded relative mt-2 text-sm flex items-center gap-2">
+                    <CheckCircleIcon className="w-6 h-6 text-green-700" />
+                    {sucessoEnvio}
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    className={`py-2 mt-3 rounded-[8px] font-medium transition ${
+                      isFormEsqueceuSenhaFilled
+                        ? "bg-[#A9DCF3] text-black hover:bg-[#A9DCF4] cursor-pointer"
+                        : "bg-[#F0F0F0] text-[#BBB] cursor-not-allowed"
+                    }`}
+                    disabled={!isFormEsqueceuSenhaFilled}
+                  >
+                    {loadingReenvio ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <svg
+                          className="animate-spin h-5 w-5 text-black"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          ></path>
+                        </svg>
+                        <span>Carregando...</span>
+                      </div>
+                    ) : (
+                      "Reenviar Senha"
+                    )}
+                  </button>
+                )}
               </form>
             </>
           ) : (
             <>
-              {/* Formulário */}
+              {/* Formulário Login */}
               {displayTelaLogin ? (
                 <>
                   {/* Título e link */}
@@ -141,7 +208,7 @@ export default function Login() {
                     <button
                       type="button"
                       onClick={() => SetaStatusTela("cadastro")}
-                      className="hover:underline text-[#808080] text-[12px] md:text-[16px]"
+                      className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                     >
                       Criar Conta
                     </button>
@@ -151,6 +218,7 @@ export default function Login() {
                     onSubmit={(e) => {
                       e.preventDefault();
                       setLoadingLogin(true);
+                      setErroLogin("");
 
                       setTimeout(() => {
                         setLoadingLogin(false);
@@ -180,44 +248,50 @@ export default function Login() {
                       placeholder="Digite sua senha"
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                     />
-
-                    <button
-                      type="submit"
-                      className={`py-2 mt-3 rounded-[8px] font-medium transition ${
-                        isFormFilled && !loadingLogin
-                          ? "bg-[#A9DCF3] text-black hover:bg-[#A9DCF4] cursor-pointer"
-                          : "bg-[#F0F0F0] text-[#BBB] cursor-not-allowed"
-                      }`}
-                      disabled={!isFormFilled || loadingLogin}
-                    >
-                      {loadingLogin ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <svg
-                            className="animate-spin h-5 w-5 text-black"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                            ></path>
-                          </svg>
-                          <span>Carregando...</span>
-                        </div>
-                      ) : (
-                        "Entrar"
-                      )}
-                    </button>
+                    {erroLogin ? (
+                      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-2 text-sm flex items-center gap-2">
+                        <ExclamationCircleIcon className="w-6 h-6 text-red-700" />
+                        {erroLogin}
+                      </div>
+                    ) : (
+                      <button
+                        type="submit"
+                        className={`py-2 mt-3 rounded-[8px] font-medium transition ${
+                          isFormFilled && !loadingLogin
+                            ? "bg-[#A9DCF3] text-black hover:bg-[#A9DCF4] cursor-pointer"
+                            : "bg-[#F0F0F0] text-[#BBB] cursor-not-allowed"
+                        }`}
+                        disabled={!isFormFilled || loadingLogin}
+                      >
+                        {loadingLogin ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <svg
+                              className="animate-spin h-5 w-5 text-black"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                              ></path>
+                            </svg>
+                            <span>Carregando...</span>
+                          </div>
+                        ) : (
+                          "Entrar"
+                        )}
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => SetaStatusTela("esqueci")}
@@ -229,12 +303,12 @@ export default function Login() {
                 </>
               ) : (
                 <>
-                  {/* Título e link */}
+                  {/* Formulario Cadastro */}
                   <div className="flex items-center justify-between w-full font-semibold mt-2">
                     <button
                       type="button"
                       onClick={() => SetaStatusTela("login")}
-                      className="hover:underline text-[#808080] text-[12px] md:text-[16px]"
+                      className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                     >
                       Entrar
                     </button>
@@ -246,13 +320,29 @@ export default function Login() {
                     className="flex flex-col gap-2 w-full max-w-[340px]"
                     onSubmit={(e) => {
                       e.preventDefault();
+
+                      if (senha !== repeteSenha) {
+                        setErroCadastro("As senhas não coincidem.");
+                        setSucessoCadastro("");
+
+                        // Limpa erro após 2 segundos
+                        setTimeout(() => {
+                          setErroCadastro("");
+                        }, 4000);
+
+                        return;
+                      }
+
+                      setErroCadastro("");
                       setLoadingCadastro(true);
+                      setSucessoCadastro(
+                        "Cadastro efetuado com sucesso, acesse seu e-mail para ativar o cadastro."
+                      );
 
                       setTimeout(() => {
                         setLoadingCadastro(false);
-                        alert("Cadastro realizado com sucesso!");
-                        // Você pode limpar os campos ou redirecionar aqui
-                      }, 2000);
+                        setSucessoCadastro("");
+                      }, 4000);
                     }}
                   >
                     {/* Nome e Sobrenome */}
@@ -311,49 +401,60 @@ export default function Login() {
                     </label>
                     <input
                       type="password"
-                      value={senha}
-                      onChange={(e) => setSenha(e.target.value)}
+                      value={repeteSenha}
+                      onChange={(e) => setRepeteSenha(e.target.value)}
                       placeholder="Repita sua senha"
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
                     />
-
-                    <button
-                      type="submit"
-                      className={`py-2 mt-3 rounded-[8px] font-medium transition ${
-                        isFormCreateFilled && !loadingCadastro
-                          ? "bg-[#A9DCF3] text-black hover:bg-[#A9DCF4]"
-                          : "bg-[#F0F0F0] text-[#BBB] cursor-not-allowed"
-                      }`}
-                      disabled={!isFormCreateFilled || loadingCadastro}
-                    >
-                      {loadingCadastro ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <svg
-                            className="animate-spin h-5 w-5 text-black"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                            ></path>
-                          </svg>
-                          <span>Carregando...</span>
-                        </div>
-                      ) : (
-                        "Cadastrar Conta"
-                      )}
-                    </button>
+                    {erroCadastro ? (
+                      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-2 text-sm flex items-center gap-2">
+                        <ExclamationCircleIcon className="w-6 h-6 text-red-700" />
+                        {erroCadastro}
+                      </div>
+                    ) : sucessoCadastro ? (
+                      <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded relative mt-2 text-sm flex items-center gap-2">
+                        <CheckCircleIcon className="w-10 h-10 text-green-700" />
+                        {sucessoCadastro}
+                      </div>
+                    ) : (
+                      <button
+                        type="submit"
+                        className={`py-2 mt-3 rounded-[8px] font-medium transition ${
+                          isFormCreateFilled && !loadingCadastro
+                            ? "bg-[#A9DCF3] text-black hover:bg-[#A9DCF4] cursor-pointer"
+                            : "bg-[#F0F0F0] text-[#BBB] cursor-not-allowed"
+                        }`}
+                        disabled={!isFormCreateFilled || loadingCadastro}
+                      >
+                        {loadingCadastro ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <svg
+                              className="animate-spin h-5 w-5 text-black"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                              ></path>
+                            </svg>
+                            <span>Carregando...</span>
+                          </div>
+                        ) : (
+                          "Cadastrar Conta"
+                        )}
+                      </button>
+                    )}
                   </form>
                 </>
               )}
