@@ -158,7 +158,6 @@ export default function Login() {
               {/* Formulário login */}
               {displayTelaLogin ? (
                 <>
-                  {/* Título e link */}
                   <div className="flex items-center justify-between w-full font-semibold mt-2">
                     <span className="text-[16px] md:text-[24px] text-[#010608]">
                       Entrar
