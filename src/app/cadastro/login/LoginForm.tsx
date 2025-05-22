@@ -95,7 +95,6 @@ export default function Login() {
         setErroLogin(data.message || "Erro ao logar");
         setTimeout(() => {
           setErroLogin("");
-          setLoadingLogin(false);
         }, 3000);
         throw new Error(data.message || "Erro ao logar");
       }
@@ -109,7 +108,6 @@ export default function Login() {
       } else {
         toast.error("Erro desconhecido ao fazer login.");
       }
-      setLoadingLogin(false);
     } finally {
       //setLoadingLogin(false);
     }
