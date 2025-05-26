@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
@@ -55,6 +55,10 @@ export default function Login() {
   const isLoginValid = email && senha;
   const isCadastroValid = nome && sobrenome && email && senha && repeteSenha;
 
+  useEffect(() => {
+    LimpaTela();
+  }, []);
+
   type TipoTela = "login" | "cadastro" | "esqueci";
 
   const SetaStatusTela = (tipoTela: TipoTela) => {
@@ -80,6 +84,20 @@ export default function Login() {
     }
   };
 
+  const LimpaTela = () => {
+    setLoadingLogin(false);
+    setErroLogin("");
+    setEmail("");
+    setSenha("");
+    setEmailEsqueceuSenha("");
+
+    setErroCadastro("");
+    setLoadingCadastro(false);
+    setNome("");
+    setSobrenome("");
+    setRepeteSenha("");
+  };
+
   const handleLogin = async () => {
     setLoadingLogin(true);
     try {
@@ -95,13 +113,19 @@ export default function Login() {
         setErroLogin(data.message || "Erro ao logar");
         setTimeout(() => {
           setErroLogin("");
+          setLoadingLogin(false);
         }, 3000);
         throw new Error(data.message || "Erro ao logar");
       }
 
-      Cookies.set("token", data.access_token, { expires: 7 });
+      const expirationTime = new Date(new Date().getTime() + 30 * 60 * 1000);
+      Cookies.set("token", data.access_token, { expires: expirationTime });
+
       toast.success("Login bem-sucedido!");
-      setTimeout(() => router.push("/dashboard"), 1500);
+      setTimeout(() => {
+        LimpaTela();
+        router.push("/dashboard");
+      }, 1000);
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -116,6 +140,10 @@ export default function Login() {
   const handleCadastro = async () => {
     if (senha !== repeteSenha) {
       setErroCadastro("As senhas não coincidem.");
+      setTimeout(() => {
+        setErroCadastro("");
+        setLoadingCadastro(false);
+      }, 3000);
       return;
     }
 
@@ -134,19 +162,36 @@ export default function Login() {
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || "Erro ao cadastrar");
+      if (!res.ok) {
+        setErroCadastro(data.message || "Erro ao cadastrar");
+        setTimeout(() => {
+          setErroCadastro("");
+          setLoadingCadastro(false);
+        }, 3000);
+        throw new Error(data.message || "Erro ao cadastrar");
+      }
 
+      setLoadingCadastro(false);
       setSucessoCadastro(
         "Cadastro efetuado com sucesso, acesse seu e-mail para ativar o cadastro."
       );
+
+      setTimeout(() => {
+        LimpaTela();
+      }, 1000);
+
+      setTimeout(() => {
+        setSucessoCadastro("");
+      }, 6000);
     } catch (error: unknown) {
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error("Erro desconhecido ao fazer cadastro.");
       }
-    } finally {
       setLoadingCadastro(false);
+    } finally {
+      //setLoadingCadastro(false);
     }
   };
 

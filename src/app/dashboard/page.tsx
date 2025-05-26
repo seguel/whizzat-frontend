@@ -13,7 +13,8 @@ export default async function DashboardPage() {
   const data = await fetchWithAuth<{ usuario: Usuario }>("/auth/perfil");
 
   if (!data || !data.usuario) {
-    redirect("/cadastro/login");
+    //redirect("/cadastro/login");
+    redirect("/");
   }
 
   const { usuario } = data;
