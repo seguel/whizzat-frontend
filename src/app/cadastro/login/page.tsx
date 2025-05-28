@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
-import { getAuthToken } from "../../lib/auth"; // ajuste o caminho conforme necessário
 import LoginPage from "./LoginForm";
+import { isUserAuthenticated } from "../../lib/auth";
 
 export default async function Home() {
-  const token = await getAuthToken();
+  const isAuthenticated = await isUserAuthenticated();
 
-  if (token) {
-    redirect("/dashboard");
+  if (isAuthenticated) {
+    redirect("/cadastro/perfil");
   }
 
   return <LoginPage />;

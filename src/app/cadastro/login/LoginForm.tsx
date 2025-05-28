@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
+//import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -13,21 +13,17 @@ import {
   ExclamationCircleIcon,
 } from "@heroicons/react/24/solid";
 
-//import { useAuthRedirect } from "../../hooks/useAuthRedirect";
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Login() {
   const router = useRouter();
-
-  //useAuthRedirect();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [repeteSenha, setRepeteSenha] = useState("");
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
-  const [emailEsqueceuSenha, setEmailEsqueceuSenha] = useState("");
+  //const [emailEsqueceuSenha, setEmailEsqueceuSenha] = useState("");
 
   const [displayTelaLogin, setDisplayTelaLogin] = useState(true);
   const [displayTelasqueceuSenha, setDisplayTelaEsqueceuSenha] =
@@ -50,7 +46,7 @@ export default function Login() {
     senha.trim() !== "" &&
     repeteSenha.trim() !== "";
 
-  const isFormEsqueceuSenhaFilled = emailEsqueceuSenha.trim() !== "";
+  const isFormEsqueceuSenhaFilled = email.trim() !== "";
 
   const isLoginValid = email && senha;
   const isCadastroValid = nome && sobrenome && email && senha && repeteSenha;
@@ -89,13 +85,17 @@ export default function Login() {
     setErroLogin("");
     setEmail("");
     setSenha("");
-    setEmailEsqueceuSenha("");
+    //setEmailEsqueceuSenha("");
+    setErroEnvio("");
 
     setErroCadastro("");
     setLoadingCadastro(false);
     setNome("");
     setSobrenome("");
     setRepeteSenha("");
+
+    setSucessoEnvio("");
+    setLoadingReenvio(false);
   };
 
   const handleLogin = async () => {
@@ -103,6 +103,7 @@ export default function Login() {
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
       });
@@ -118,13 +119,13 @@ export default function Login() {
         throw new Error(data.message || "Erro ao logar");
       }
 
-      const expirationTime = new Date(new Date().getTime() + 30 * 60 * 1000);
-      Cookies.set("token", data.access_token, { expires: expirationTime });
+      /* const expirationTime = new Date(new Date().getTime() + 30 * 60 * 1000);
+      Cookies.set("token", data.access_token, { expires: expirationTime }); */
 
       toast.success("Login bem-sucedido!");
       setTimeout(() => {
         LimpaTela();
-        router.push("/dashboard");
+        router.push("/cadastro/perfil");
       }, 1000);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -195,6 +196,46 @@ export default function Login() {
     }
   };
 
+  const handleEsqueciSenha = async () => {
+    setLoadingReenvio(true);
+
+    try {
+      const res = await fetch(`${API_URL}/auth/request-password-reset`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErroEnvio(data.message || "Erro ao logar");
+        setTimeout(() => {
+          setErroEnvio("");
+          setLoadingReenvio(false);
+        }, 3000);
+        throw new Error(data.message || "Erro ao logar");
+      }
+
+      /* const expirationTime = new Date(new Date().getTime() + 30 * 60 * 1000);
+      Cookies.set("token", data.access_token, { expires: expirationTime }); */
+
+      setSucessoEnvio(data.message);
+      setTimeout(() => {
+        LimpaTela();
+      }, 6000);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Erro desconhecido ao fazer login.");
+      }
+      setLoadingReenvio(false);
+    } finally {
+      //setLoadingLogin(false);
+    }
+  };
+
   return (
     <main className="flex items-center justify-center min-h-screen px-4 bg-white">
       <div className="flex flex-col sm:flex-row w-full max-w-[800px] h-auto sm:h-[550px] bg-[#E6FEF6] shadow-[0px_20px_40px_0px_rgba(2,227,149,0.25)] rounded-lg overflow-hidden">
@@ -251,18 +292,7 @@ export default function Login() {
                 onSubmit={(e) => {
                   e.preventDefault();
 
-                  setErroEnvio("");
-                  setSucessoEnvio("");
-                  setLoadingReenvio(true);
-
-                  setTimeout(() => {
-                    setLoadingReenvio(false);
-                    setSucessoEnvio("Email enviado com sucesso.");
-                  }, 2000);
-
-                  setTimeout(() => {
-                    setSucessoEnvio("");
-                  }, 6000);
+                  if (isFormEsqueceuSenhaFilled) handleEsqueciSenha();
                 }}
               >
                 <label className="text-[#010608] text-[14px] mb-1">
@@ -270,8 +300,8 @@ export default function Login() {
                 </label>
                 <input
                   type="email"
-                  value={emailEsqueceuSenha}
-                  onChange={(e) => setEmailEsqueceuSenha(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Digite seu e-mail"
                   className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                 />
