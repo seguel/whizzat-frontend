@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -12,20 +12,24 @@ import {
 const RedefinirSenha = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get("token");
 
+  const [token, setToken] = useState<string | null>(null);
   const [novaSenha, setNovaSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [erroReset, setErroReset] = useState("");
   const [mensagemSucesso, setMensagemSucesso] = useState("");
 
-  //const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-
   const isPassValid = novaSenha.trim() !== "";
+
+  // ✅ Lê token da URL *após* renderização inicial
+  useEffect(() => {
+    if (!searchParams) return;
+    const t = searchParams.get("token");
+    setToken(t);
+  }, [searchParams]);
 
   const handleSubmit = async () => {
     if (!token) {
-      //setStatus("error");
       setErroReset("Token inválido ou ausente.");
       setTimeout(() => {
         setErroReset("");
@@ -35,7 +39,6 @@ const RedefinirSenha = () => {
     }
 
     if (novaSenha.length < 6) {
-      //setStatus("error");
       setErroReset("A senha deve ter pelo menos 6 caracteres.");
       setTimeout(() => {
         setErroReset("");
@@ -52,7 +55,7 @@ const RedefinirSenha = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password`,
         {
           method: "POST",
-          credentials: "include", // ✅ envia o cookie
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token, novaSenha }),
         }
@@ -61,16 +64,13 @@ const RedefinirSenha = () => {
       const data = await res.json();
 
       if (res.ok) {
-        //setStatus("success");
         setMensagemSucesso(data.message || "Senha redefinida com sucesso.");
         setTimeout(() => router.push("/cadastro/login"), 3000);
       } else {
-        //setStatus("error");
         setErroReset(data.message || "Erro ao redefinir a senha.");
         setLoading(false);
       }
     } catch {
-      //setStatus("error");
       setErroReset("Erro ao redefinir a senha. Tente novamente.");
       setLoading(false);
     } finally {
@@ -81,22 +81,16 @@ const RedefinirSenha = () => {
   return (
     <main className="flex items-center justify-center min-h-screen px-4 bg-white">
       <div className="flex flex-col sm:flex-row w-full max-w-[800px] h-auto sm:h-[550px] bg-[#E6FEF6] shadow-[0px_20px_40px_0px_rgba(2,227,149,0.25)] rounded-lg overflow-hidden">
-        {/* Lado esquerdo - Formulário */}
         <div className="w-full sm:w-1/2 h-auto sm:h-full flex flex-col justify-center items-center px-3 py-10 gap-2">
-          {/* Logo */}
-          <div>
-            <Link href="/">
-              <Image
-                src="/assets/logofull.jpeg"
-                alt="Logo grande"
-                width={180}
-                height={40}
-                className="hidden sm:block"
-              />
-            </Link>
-          </div>
-
-          {/* Logo pequeno (mobile) */}
+          <Link href="/">
+            <Image
+              src="/assets/logofull.jpeg"
+              alt="Logo grande"
+              width={180}
+              height={40}
+              className="hidden sm:block"
+            />
+          </Link>
           <Link href="/">
             <Image
               src="/assets/logomobile.jpeg"
@@ -106,8 +100,6 @@ const RedefinirSenha = () => {
               className="block sm:hidden"
             />
           </Link>
-
-          {/* Título e link */}
 
           <form
             className="flex flex-col gap-2 w-full max-w-[340px] mt-1"
