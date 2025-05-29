@@ -61,6 +61,7 @@ const ConfirmarEmail = () => {
     };
 
     activateAccount();
+
   }, [router, searchParams]);
 
   const handleResend = async () => {
