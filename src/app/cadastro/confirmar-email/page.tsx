@@ -21,8 +21,11 @@ const ConfirmarEmail = () => {
   const [resendSuccess, setResendSuccess] = useState("");
 
   useEffect(() => {
+    if (!searchParams) return;
+
     const token = searchParams.get("token");
     const emailFromParams = searchParams.get("email");
+
     if (emailFromParams) setEmail(emailFromParams);
 
     if (!token) {
@@ -58,7 +61,8 @@ const ConfirmarEmail = () => {
     };
 
     activateAccount();
-  }, []);
+
+  }, [router, searchParams]);
 
   const handleResend = async () => {
     setResendLoading(true);
