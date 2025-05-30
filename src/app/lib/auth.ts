@@ -1,17 +1,16 @@
-import { headers } from "next/headers";
-
 export async function isUserAuthenticated(): Promise<boolean> {
-  const headersList = await headers(); // ✅
-  const cookie = headersList.get("cookie") ?? "";
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth/protected`,
+      {
+        method: "POST",
+        credentials: "include", // ✅ envia cookies HttpOnly
+      }
+    );
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/protected`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      cookie,
-    },
-    cache: "no-store",
-  });
-
-  return res.ok;
+    return res.ok;
+  } catch (err) {
+    console.error("Erro ao verificar autenticação:", err);
+    return false;
+  }
 }
