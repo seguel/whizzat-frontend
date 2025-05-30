@@ -7,7 +7,7 @@ export async function isUserAuthenticated(): Promise<boolean> {
         credentials: "include",
       }
     );
-
+    console.log(res);
     return res.ok;
   } catch (err) {
     console.error("Erro ao verificar autenticação:", err);
