@@ -1,6 +1,6 @@
 import Image from "next/image";
 import ProfileCard from "../../components/perfil/ProfileCard";
-//import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { isUserAuthenticated } from "../../lib/auth";
 import LogoutButton from "../../components/perfil/logoutButton";
 
@@ -8,7 +8,7 @@ export default async function PerfilPage() {
   const isAuthenticated = await isUserAuthenticated();
 
   if (!isAuthenticated) {
-    //redirect("/");
+    redirect("/");
   }
 
   return (
