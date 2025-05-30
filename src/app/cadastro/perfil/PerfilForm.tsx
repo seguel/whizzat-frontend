@@ -2,7 +2,7 @@ import Image from "next/image";
 import ProfileCard from "../../components/perfil/ProfileCard";
 import LogoutButton from "../../components/perfil/logoutButton";
 
-export default async function PerfilPage() {
+export default async function PerfilForm() {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 py-12">
       {/* Botão de Logout com SVG */}
