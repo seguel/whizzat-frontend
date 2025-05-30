@@ -1,16 +1,18 @@
-export async function isUserAuthenticated(): Promise<boolean> {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/auth/protected`,
-      {
-        method: "POST",
-        credentials: "include", // ✅ envia cookies HttpOnly
-      }
-    );
+import { cookies } from "next/headers";
 
-    return res.ok;
-  } catch (err) {
-    console.error("Erro ao verificar autenticação:", err);
-    return false;
-  }
+export async function isUserAuthenticated(): Promise<boolean> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  if (!token) return false;
+
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/protected`, {
+    method: "POST",
+    headers: {
+      Cookie: `token=${token}`,
+    },
+    cache: "no-store",
+  });
+
+  return res.ok;
 }
