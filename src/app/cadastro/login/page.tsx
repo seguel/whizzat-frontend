@@ -12,7 +12,6 @@ export default function LoginPageWrapper() {
   useEffect(() => {
     const check = async () => {
       const authenticated = await isUserAuthenticated();
-      console.log(authenticated);
       if (authenticated) {
         router.replace("/cadastro/perfil");
       } else {
