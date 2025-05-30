@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import LoginPage from "./LoginForm";
 import { isUserAuthenticated } from "../../lib/auth";
 
-export default async function Home() {
+export default async function Page() {
   const isAuthenticated = await isUserAuthenticated();
 
   if (isAuthenticated) {
