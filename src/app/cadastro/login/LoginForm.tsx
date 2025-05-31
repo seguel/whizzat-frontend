@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-//import Cookies from "js-cookie";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+// import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,15 +15,16 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-export default function Login() {
+function LoginInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/cadastro/perfil";
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [repeteSenha, setRepeteSenha] = useState("");
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
-  //const [emailEsqueceuSenha, setEmailEsqueceuSenha] = useState("");
 
   const [displayTelaLogin, setDisplayTelaLogin] = useState(true);
   const [displayTelasqueceuSenha, setDisplayTelaEsqueceuSenha] =
@@ -47,7 +48,6 @@ export default function Login() {
     repeteSenha.trim() !== "";
 
   const isFormEsqueceuSenhaFilled = email.trim() !== "";
-
   const isLoginValid = email && senha;
   const isCadastroValid = nome && sobrenome && email && senha && repeteSenha;
 
@@ -74,7 +74,7 @@ export default function Login() {
     };
 
     if (estadosIniciais[tipoTela]) {
-      estadosIniciais[tipoTela](); // executa a função correta
+      estadosIniciais[tipoTela]();
     } else {
       console.warn("Tipo de tela desconhecido:", tipoTela);
     }
@@ -85,7 +85,6 @@ export default function Login() {
     setErroLogin("");
     setEmail("");
     setSenha("");
-    //setEmailEsqueceuSenha("");
     setErroEnvio("");
 
     setErroCadastro("");
@@ -98,15 +97,12 @@ export default function Login() {
     setLoadingReenvio(false);
   };
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const redirectTo = searchParams.get("redirect") || "/cadastro/perfil";
-
   const handleLogin = async () => {
     setLoadingLogin(true);
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
-        credentials: "include", // ← IMPORTANTE
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
       });
@@ -121,7 +117,7 @@ export default function Login() {
 
       setTimeout(() => {
         LimpaTela();
-        router.replace(redirectTo); // ← redireciona para rota vinda da URL
+        router.replace(redirectTo);
       }, 1000);
     } catch (error: unknown) {
       toast.error(
@@ -186,8 +182,6 @@ export default function Login() {
         toast.error("Erro desconhecido ao fazer cadastro.");
       }
       setLoadingCadastro(false);
-    } finally {
-      //setLoadingCadastro(false);
     }
   };
 
@@ -204,16 +198,13 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErroEnvio(data.message || "Erro ao logar");
+        setErroEnvio(data.message || "Erro ao enviar");
         setTimeout(() => {
           setErroEnvio("");
           setLoadingReenvio(false);
         }, 3000);
-        throw new Error(data.message || "Erro ao logar");
+        throw new Error(data.message || "Erro ao enviar");
       }
-
-      /* const expirationTime = new Date(new Date().getTime() + 30 * 60 * 1000);
-      Cookies.set("token", data.access_token, { expires: expirationTime }); */
 
       setSucessoEnvio(data.message);
       setTimeout(() => {
@@ -223,11 +214,9 @@ export default function Login() {
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
-        toast.error("Erro desconhecido ao fazer login.");
+        toast.error("Erro desconhecido ao solicitar redefinição de senha.");
       }
       setLoadingReenvio(false);
-    } finally {
-      //setLoadingLogin(false);
     }
   };
 
@@ -617,5 +606,13 @@ export default function Login() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <LoginInner />
+    </Suspense>
   );
 }
