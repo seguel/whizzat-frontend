@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isUserAuthenticated } from "../../lib/auth";
 import LoginPage from "./LoginForm";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 // Componente que lida com a lógica usando useSearchParams
 function AuthCheck() {
@@ -34,7 +35,7 @@ function AuthCheck() {
 // Componente exportado com Suspense
 export default function Page() {
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <AuthCheck />
     </Suspense>
   );
