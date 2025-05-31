@@ -16,6 +16,7 @@ export default function LogoutButton() {
 
       if (res.ok) {
         router.push("/"); // redireciona para login ou home
+        router.refresh();
       } else {
         console.error("Erro ao fazer logout");
       }
