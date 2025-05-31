@@ -98,12 +98,15 @@ export default function Login() {
     setLoadingReenvio(false);
   };
 
+  const searchParams = new URLSearchParams(window.location.search);
+  const redirectTo = searchParams.get("redirect") || "/cadastro/perfil";
+
   const handleLogin = async () => {
     setLoadingLogin(true);
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
-        credentials: "include",
+        credentials: "include", // ← IMPORTANTE
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
       });
@@ -112,29 +115,21 @@ export default function Login() {
 
       if (!res.ok) {
         setErroLogin(data.message || "Erro ao logar");
-        setTimeout(() => {
-          setErroLogin("");
-          setLoadingLogin(false);
-        }, 3000);
-        throw new Error(data.message || "Erro ao logar");
+        setLoadingLogin(false);
+        return;
       }
 
-      /* const expirationTime = new Date(new Date().getTime() + 30 * 60 * 1000);
-      Cookies.set("token", data.access_token, { expires: expirationTime }); */
-
-      toast.success("Login bem-sucedido!");
       setTimeout(() => {
         LimpaTela();
-        router.push("/cadastro/perfil");
+        router.replace(redirectTo); // ← redireciona para rota vinda da URL
       }, 1000);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Erro desconhecido ao fazer login.");
-      }
-    } finally {
-      //setLoadingLogin(false);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro desconhecido ao fazer login."
+      );
+      setLoadingLogin(false);
     }
   };
 
