@@ -12,6 +12,7 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/24/solid";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -611,7 +612,7 @@ function LoginInner() {
 
 export default function Login() {
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <LoginInner />
     </Suspense>
   );
