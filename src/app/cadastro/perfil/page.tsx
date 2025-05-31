@@ -1,25 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { isUserAuthenticated } from "../../lib/auth";
+import { useAuthGuard } from "../../lib/hooks/useAuthGuard";
 import PerfilForm from "./PerfilForm";
 
 export default function PerfilPage() {
-  const router = useRouter();
-  const [checked, setChecked] = useState(false);
+  const { isReady } = useAuthGuard("/cadastro/login");
 
-  useEffect(() => {
-    isUserAuthenticated().then((auth) => {
-      if (!auth) {
-        router.replace("/login");
-      } else {
-        setChecked(true);
-      }
-    });
-  }, [router]);
-
-  if (!checked) return null; // ou um spinner
+  if (!isReady) return null; // ou <LoadingSpinner />
 
   return <PerfilForm />;
 }
