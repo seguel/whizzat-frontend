@@ -113,6 +113,11 @@ function LoginInner() {
       if (!res.ok) {
         setErroLogin(data.message || "Erro ao logar");
         setLoadingLogin(false);
+
+        setTimeout(() => {
+          setErroLogin("");
+          setLoadingLogin(false);
+        }, 3000);
         return;
       }
 
