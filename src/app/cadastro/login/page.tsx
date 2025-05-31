@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { isUserAuthenticated } from "../../lib/auth";
 import LoginPage from "./LoginForm";
 
-export default function Page() {
+// Componente que lida com a lógica usando useSearchParams
+function AuthCheck() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/cadastro/perfil";
@@ -25,7 +26,16 @@ export default function Page() {
     check();
   }, [router, redirectTo]);
 
-  if (loading) return null; // ou <LoadingSpinner />
+  if (loading) return null; // Ou um componente de carregamento
 
   return <LoginPage />;
+}
+
+// Componente exportado com Suspense
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <AuthCheck />
+    </Suspense>
+  );
 }
