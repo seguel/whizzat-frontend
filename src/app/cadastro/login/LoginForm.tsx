@@ -13,10 +13,12 @@ import {
   ExclamationCircleIcon,
 } from "@heroicons/react/24/solid";
 import LoadingSpinner from "../../components/LoadingSpinner";
+import { useTranslation } from "react-i18next";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 function LoginInner() {
+  const { t, i18n } = useTranslation("common");
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/cadastro/perfil";
@@ -104,14 +106,22 @@ function LoginInner() {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": i18n.language,
+        },
         body: JSON.stringify({ email, senha }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setErroLogin(data.message || "Erro ao logar");
+        if (data.message == "Credenciais inválidas")
+          setErroLogin(t("login_erro_senha"));
+        else if (data.message == "Email e senha são obrigatórios")
+          setErroLogin(t("login_erro_campos"));
+        else setErroLogin(data.message || "Erro ao logar");
+
         setLoadingLogin(false);
 
         setTimeout(() => {
@@ -137,7 +147,7 @@ function LoginInner() {
 
   const handleCadastro = async () => {
     if (senha !== repeteSenha) {
-      setErroCadastro("As senhas não coincidem.");
+      setErroCadastro(t("login_cadastro_erro_repete_senha"));
       setTimeout(() => {
         setErroCadastro("");
         setLoadingCadastro(false);
@@ -149,7 +159,10 @@ function LoginInner() {
     try {
       const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": i18n.language,
+        },
         body: JSON.stringify({
           primeiro_nome: nome,
           ultimo_nome: sobrenome,
@@ -170,9 +183,7 @@ function LoginInner() {
       }
 
       setLoadingCadastro(false);
-      setSucessoCadastro(
-        "Cadastro efetuado com sucesso, acesse seu e-mail para ativar o cadastro."
-      );
+      setSucessoCadastro(t("login_cadastro_sucesso"));
 
       setTimeout(() => {
         LimpaTela();
@@ -197,7 +208,10 @@ function LoginInner() {
     try {
       const res = await fetch(`${API_URL}/auth/request-password-reset`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": i18n.language,
+        },
         body: JSON.stringify({ email }),
       });
 
@@ -212,7 +226,7 @@ function LoginInner() {
         throw new Error(data.message || "Erro ao enviar");
       }
 
-      setSucessoEnvio(data.message);
+      setSucessoEnvio(t("login_esqueceu_sucesso"));
       setTimeout(() => {
         LimpaTela();
       }, 6000);
@@ -263,7 +277,7 @@ function LoginInner() {
                   onClick={() => SetaStatusTela("login")}
                   className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                 >
-                  Entrar
+                  {t("login_mnu_entrar")}
                 </button>
 
                 <button
@@ -271,7 +285,7 @@ function LoginInner() {
                   onClick={() => SetaStatusTela("cadastro")}
                   className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                 >
-                  Criar Conta
+                  {t("login_mnu_criar")}
                 </button>
               </div>
 
@@ -286,13 +300,13 @@ function LoginInner() {
                 }}
               >
                 <label className="text-[#010608] text-[14px] mb-1">
-                  E-mail
+                  {t("login_email")}
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Digite seu e-mail"
+                  placeholder={t("login_placehold_email")}
                   className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                 />
                 {erroEnvio ? (
@@ -337,10 +351,10 @@ function LoginInner() {
                             d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                           ></path>
                         </svg>
-                        <span>Carregando...</span>
+                        <span>{t("login_carregando")}</span>
                       </div>
                     ) : (
-                      "Reenviar Senha"
+                      t("login_esqueceu_btn_reenviar")
                     )}
                   </button>
                 )}
@@ -354,14 +368,14 @@ function LoginInner() {
                   {/* Título e link */}
                   <div className="flex items-center justify-between w-full font-semibold mt-2">
                     <span className="text-[16px] md:text-[24px] text-[#010608]">
-                      Entrar
+                      {t("login_mnu_entrar")}
                     </span>
                     <button
                       type="button"
                       onClick={() => SetaStatusTela("cadastro")}
                       className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                     >
-                      Criar Conta
+                      {t("login_mnu_criar")}
                     </button>
                   </div>
                   <form
@@ -372,24 +386,24 @@ function LoginInner() {
                     }}
                   >
                     <label className="text-[#010608] text-[14px] mb-1">
-                      E-mail
+                      {t("login_email")}
                     </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Digite seu e-mail"
+                      placeholder={t("login_placehold_email")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                     />
 
                     <label className="text-[#010608] text-[14px] mb-1">
-                      Senha
+                      {t("login_senha")}
                     </label>
                     <input
                       type="password"
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
-                      placeholder="Digite sua senha"
+                      placeholder={t("login_placehold_senha")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                     />
                     {erroLogin ? (
@@ -429,10 +443,10 @@ function LoginInner() {
                                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                               ></path>
                             </svg>
-                            <span>Carregando...</span>
+                            <span>{t("login_carregando")}</span>
                           </div>
                         ) : (
-                          "Entrar"
+                          t("login_btn_entrar")
                         )}
                       </button>
                     )}
@@ -441,7 +455,7 @@ function LoginInner() {
                       onClick={() => SetaStatusTela("esqueci")}
                       className="text-[#808080] hover:underline bg-transparent border-none p-0 m-0 cursor-pointer text-[14px] mt-3"
                     >
-                      Esqueceu sua senha?
+                      {t("login_link_esqueceu_senha")}
                     </button>
                   </form>
                 </>
@@ -454,10 +468,10 @@ function LoginInner() {
                       onClick={() => SetaStatusTela("login")}
                       className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                     >
-                      Entrar
+                      {t("login_mnu_entrar")}
                     </button>
                     <span className="text-[16px] md:text-[24px] text-[#010608]">
-                      Criar Conta
+                      {t("login_mnu_criar")}
                     </span>
                   </div>
                   <form
@@ -471,61 +485,61 @@ function LoginInner() {
                     <div className="flex gap-2">
                       <div className="w-1/2">
                         <label className="text-[#010608] text-[14px] mb-1 block">
-                          Nome
+                          {t("login_cadastro_nome")}
                         </label>
                         <input
                           type="text"
                           value={nome}
                           onChange={(e) => setNome(e.target.value)}
-                          placeholder="Primeiro nome"
+                          placeholder={t("login_cadastro_placehold_nome")}
                           className="border border-[#7DCBED] rounded-[8px] px-3 py-1 w-full bg-white focus:outline-none"
                         />
                       </div>
 
                       <div className="w-1/2">
                         <label className="text-[#010608] text-[14px] mb-1 block">
-                          Sobrenome
+                          {t("login_cadastro_sobrenome")}
                         </label>
                         <input
                           type="text"
                           value={sobrenome}
                           onChange={(e) => setSobrenome(e.target.value)}
-                          placeholder="Último nome"
+                          placeholder={t("login_cadastro_placehold_sobrenome")}
                           className="border border-[#7DCBED] rounded-[8px] px-3 py-1 w-full bg-white focus:outline-none"
                         />
                       </div>
                     </div>
 
                     <label className="text-[#010608] text-[14px] mt-2">
-                      E-mail
+                      {t("login_email")}
                     </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Digite seu melhor e-mail"
+                      placeholder={t("login_placehold_email")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
                     />
 
                     <label className="text-[#010608] text-[14px] mt-2">
-                      Senha
+                      {t("login_senha")}
                     </label>
                     <input
                       type="password"
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
-                      placeholder="Crie uma senha"
+                      placeholder={t("login_cadastro_placehold_senha")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
                     />
 
                     <label className="text-[#010608] text-[14px] mt-2">
-                      Repetir Senha
+                      {t("login_cadastro_repete_senha")}
                     </label>
                     <input
                       type="password"
                       value={repeteSenha}
                       onChange={(e) => setRepeteSenha(e.target.value)}
-                      placeholder="Repita sua senha"
+                      placeholder={t("login_cadastro_placehold_repete_senha")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
                     />
                     {erroCadastro ? (
@@ -570,10 +584,10 @@ function LoginInner() {
                                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                               ></path>
                             </svg>
-                            <span>Carregando...</span>
+                            <span>{t("login_carregando")}</span>
                           </div>
                         ) : (
-                          "Cadastrar Conta"
+                          t("login_cadastro_btn")
                         )}
                       </button>
                     )}
