@@ -45,6 +45,8 @@ const en = {
     btn: "Register Account",
     sucesso:
       "Registration successful. Please check your email to activate your account.",
+    senha_invalida:
+      "Password must be between 8 and 16 characters, and include an uppercase letter, lowercase letter, number, and special character.",
   },
   redefinir: {
     senha_erro: "Password must be at least 6 characters.",
