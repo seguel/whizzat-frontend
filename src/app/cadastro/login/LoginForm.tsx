@@ -60,6 +60,11 @@ function LoginInner() {
 
   type TipoTela = "login" | "cadastro" | "esqueci";
 
+  interface ConstraintError {
+    property: string;
+    constraints?: { [type: string]: string };
+  }
+
   const SetaStatusTela = (tipoTela: TipoTela) => {
     const estadosIniciais = {
       login: () => {
@@ -116,11 +121,7 @@ function LoginInner() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.message == "Credenciais inválidas")
-          setErroLogin(t("login_erro_senha"));
-        else if (data.message == "Email e senha são obrigatórios")
-          setErroLogin(t("login_erro_campos"));
-        else setErroLogin(data.message || "Erro ao logar");
+        setErroLogin(data.message || "Erro ao logar");
 
         setLoadingLogin(false);
 
@@ -147,7 +148,7 @@ function LoginInner() {
 
   const handleCadastro = async () => {
     if (senha !== repeteSenha) {
-      setErroCadastro(t("login_cadastro_erro_repete_senha"));
+      setErroCadastro(t("cadastro.erro_repete_senha"));
       setTimeout(() => {
         setErroCadastro("");
         setLoadingCadastro(false);
@@ -174,16 +175,31 @@ function LoginInner() {
       const data = await res.json();
 
       if (!res.ok) {
-        setErroCadastro(data.message || "Erro ao cadastrar");
+        let mensagemErro = "Erro ao cadastrar";
+
+        if (Array.isArray(data.message)) {
+          // Tentamos extrair as mensagens de erro dos "constraints"
+          mensagemErro = data.message
+            .map((err: ConstraintError) => {
+              const constraints = err.constraints;
+              return constraints ? Object.values(constraints).join(", ") : null;
+            })
+            .filter(Boolean)
+            .join(" - ");
+        } else if (typeof data.message === "string") {
+          mensagemErro = data.message;
+        }
+
+        setErroCadastro(mensagemErro);
         setTimeout(() => {
           setErroCadastro("");
           setLoadingCadastro(false);
         }, 3000);
-        throw new Error(data.message || "Erro ao cadastrar");
+        return;
       }
 
       setLoadingCadastro(false);
-      setSucessoCadastro(t("login_cadastro_sucesso"));
+      setSucessoCadastro(t("cadastro.sucesso"));
 
       setTimeout(() => {
         LimpaTela();
@@ -194,9 +210,9 @@ function LoginInner() {
       }, 6000);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        toast.error(error.message);
+        console.log(error);
       } else {
-        toast.error("Erro desconhecido ao fazer cadastro.");
+        console.log("Erro desconhecido ao fazer cadastro.");
       }
       setLoadingCadastro(false);
     }
@@ -226,7 +242,7 @@ function LoginInner() {
         throw new Error(data.message || "Erro ao enviar");
       }
 
-      setSucessoEnvio(t("login_esqueceu_sucesso"));
+      setSucessoEnvio(t("esqueceu.sucesso"));
       setTimeout(() => {
         LimpaTela();
       }, 6000);
@@ -277,7 +293,7 @@ function LoginInner() {
                   onClick={() => SetaStatusTela("login")}
                   className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                 >
-                  {t("login_mnu_entrar")}
+                  {t("login.mnu_entrar")}
                 </button>
 
                 <button
@@ -285,7 +301,7 @@ function LoginInner() {
                   onClick={() => SetaStatusTela("cadastro")}
                   className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                 >
-                  {t("login_mnu_criar")}
+                  {t("login.mnu_criar")}
                 </button>
               </div>
 
@@ -300,13 +316,13 @@ function LoginInner() {
                 }}
               >
                 <label className="text-[#010608] text-[14px] mb-1">
-                  {t("login_email")}
+                  {t("login.email")}
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t("login_placehold_email")}
+                  placeholder={t("login.placehold_email")}
                   className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                 />
                 {erroEnvio ? (
@@ -351,10 +367,10 @@ function LoginInner() {
                             d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                           ></path>
                         </svg>
-                        <span>{t("login_carregando")}</span>
+                        <span>{t("login.carregando")}</span>
                       </div>
                     ) : (
-                      t("login_esqueceu_btn_reenviar")
+                      t("esqueceu.btn_reenviar")
                     )}
                   </button>
                 )}
@@ -368,14 +384,14 @@ function LoginInner() {
                   {/* Título e link */}
                   <div className="flex items-center justify-between w-full font-semibold mt-2">
                     <span className="text-[16px] md:text-[24px] text-[#010608]">
-                      {t("login_mnu_entrar")}
+                      {t("login.mnu_entrar")}
                     </span>
                     <button
                       type="button"
                       onClick={() => SetaStatusTela("cadastro")}
                       className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                     >
-                      {t("login_mnu_criar")}
+                      {t("login.mnu_criar")}
                     </button>
                   </div>
                   <form
@@ -386,24 +402,24 @@ function LoginInner() {
                     }}
                   >
                     <label className="text-[#010608] text-[14px] mb-1">
-                      {t("login_email")}
+                      {t("login.email")}
                     </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t("login_placehold_email")}
+                      placeholder={t("login.placehold_email")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                     />
 
                     <label className="text-[#010608] text-[14px] mb-1">
-                      {t("login_senha")}
+                      {t("login.senha")}
                     </label>
                     <input
                       type="password"
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
-                      placeholder={t("login_placehold_senha")}
+                      placeholder={t("login.placehold_senha")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 focus:outline-none bg-white"
                     />
                     {erroLogin ? (
@@ -443,10 +459,10 @@ function LoginInner() {
                                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                               ></path>
                             </svg>
-                            <span>{t("login_carregando")}</span>
+                            <span>{t("login.carregando")}</span>
                           </div>
                         ) : (
-                          t("login_btn_entrar")
+                          t("login.btn_entrar")
                         )}
                       </button>
                     )}
@@ -455,7 +471,7 @@ function LoginInner() {
                       onClick={() => SetaStatusTela("esqueci")}
                       className="text-[#808080] hover:underline bg-transparent border-none p-0 m-0 cursor-pointer text-[14px] mt-3"
                     >
-                      {t("login_link_esqueceu_senha")}
+                      {t("login.link_esqueceu_senha")}
                     </button>
                   </form>
                 </>
@@ -468,10 +484,10 @@ function LoginInner() {
                       onClick={() => SetaStatusTela("login")}
                       className="hover:underline text-[#808080] text-[12px] md:text-[16px] cursor-pointer"
                     >
-                      {t("login_mnu_entrar")}
+                      {t("login.mnu_entrar")}
                     </button>
                     <span className="text-[16px] md:text-[24px] text-[#010608]">
-                      {t("login_mnu_criar")}
+                      {t("login.mnu_criar")}
                     </span>
                   </div>
                   <form
@@ -485,61 +501,61 @@ function LoginInner() {
                     <div className="flex gap-2">
                       <div className="w-1/2">
                         <label className="text-[#010608] text-[14px] mb-1 block">
-                          {t("login_cadastro_nome")}
+                          {t("cadastro.nome")}
                         </label>
                         <input
                           type="text"
                           value={nome}
                           onChange={(e) => setNome(e.target.value)}
-                          placeholder={t("login_cadastro_placehold_nome")}
+                          placeholder={t("cadastro.placehold_nome")}
                           className="border border-[#7DCBED] rounded-[8px] px-3 py-1 w-full bg-white focus:outline-none"
                         />
                       </div>
 
                       <div className="w-1/2">
                         <label className="text-[#010608] text-[14px] mb-1 block">
-                          {t("login_cadastro_sobrenome")}
+                          {t("cadastro.sobrenome")}
                         </label>
                         <input
                           type="text"
                           value={sobrenome}
                           onChange={(e) => setSobrenome(e.target.value)}
-                          placeholder={t("login_cadastro_placehold_sobrenome")}
+                          placeholder={t("cadastro.placehold_sobrenome")}
                           className="border border-[#7DCBED] rounded-[8px] px-3 py-1 w-full bg-white focus:outline-none"
                         />
                       </div>
                     </div>
 
                     <label className="text-[#010608] text-[14px] mt-2">
-                      {t("login_email")}
+                      {t("login.email")}
                     </label>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t("login_placehold_email")}
+                      placeholder={t("login.placehold_email")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
                     />
 
                     <label className="text-[#010608] text-[14px] mt-2">
-                      {t("login_senha")}
+                      {t("login.senha")}
                     </label>
                     <input
                       type="password"
                       value={senha}
                       onChange={(e) => setSenha(e.target.value)}
-                      placeholder={t("login_cadastro_placehold_senha")}
+                      placeholder={t("cadastro.placehold_senha")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
                     />
 
                     <label className="text-[#010608] text-[14px] mt-2">
-                      {t("login_cadastro_repete_senha")}
+                      {t("cadastro.repete_senha")}
                     </label>
                     <input
                       type="password"
                       value={repeteSenha}
                       onChange={(e) => setRepeteSenha(e.target.value)}
-                      placeholder={t("login_cadastro_placehold_repete_senha")}
+                      placeholder={t("cadastro.placehold_repete_senha")}
                       className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
                     />
                     {erroCadastro ? (
@@ -584,10 +600,10 @@ function LoginInner() {
                                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                               ></path>
                             </svg>
-                            <span>{t("login_carregando")}</span>
+                            <span>{t("login.carregando")}</span>
                           </div>
                         ) : (
-                          t("login_cadastro_btn")
+                          t("cadastro.btn")
                         )}
                       </button>
                     )}

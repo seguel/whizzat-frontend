@@ -21,6 +21,7 @@ export default function LanguageSwitcher() {
   const handleChange = (lang: typeof selected) => {
     setSelected(lang);
     i18n.changeLanguage(lang.code);
+    document.cookie = `lang=${lang.code}; path=/`;
   };
 
   return (

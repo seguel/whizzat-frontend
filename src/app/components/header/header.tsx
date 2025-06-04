@@ -14,17 +14,17 @@ export default function Header() {
 
   const menuItems = [
     {
-      label: t("header_mnu_primeiro"),
+      label: t("header.mnu_primeiro"),
       href: "/funciona",
       icon: <LuBlocks size={20} />,
     },
     {
-      label: t("header_mnu_segundo"),
+      label: t("header.mnu_segundo"),
       href: "/sobre",
       icon: <LuUsers size={20} />,
     },
     {
-      label: t("header_mnu_terceiro"),
+      label: t("header.mnu_terceiro"),
       href: "/cadastro/login",
       icon: <LuLogIn size={20} />,
     },
@@ -35,21 +35,23 @@ export default function Header() {
       {/* Logo */}
       <div className="flex items-center">
         {/* Logo grande (desktop) */}
-        <Image
-          src="/assets/logofull.jpeg"
-          alt="Logo grande"
-          width={244}
-          height={46}
-          className="hidden sm:block"
-        />
-        {/* Logo pequeno (mobile) */}
-        <Image
-          src="/assets/logomobile.jpeg"
-          alt="Logo pequeno"
-          width={120}
-          height={24}
-          className="block sm:hidden"
-        />
+        <Link href="/">
+          <Image
+            src="/assets/logofull.jpeg"
+            alt="Logo grande"
+            width={244}
+            height={46}
+            className="hidden sm:block"
+          />
+          {/* Logo pequeno (mobile) */}
+          <Image
+            src="/assets/logomobile.jpeg"
+            alt="Logo pequeno"
+            width={120}
+            height={24}
+            className="block sm:hidden"
+          />
+        </Link>
       </div>
 
       {/* Menu */}
