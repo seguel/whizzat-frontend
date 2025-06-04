@@ -54,6 +54,11 @@ function LoginInner() {
   const isLoginValid = email && senha;
   const isCadastroValid = nome && sobrenome && email && senha && repeteSenha;
 
+  const isValidPassword = (password: string): boolean => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,16}$/;
+    return regex.test(password);
+  };
+
   useEffect(() => {
     LimpaTela();
   }, []);
@@ -153,6 +158,15 @@ function LoginInner() {
         setErroCadastro("");
         setLoadingCadastro(false);
       }, 3000);
+      return;
+    }
+
+    if (!isValidPassword(senha)) {
+      setErroCadastro(t("cadastro.senha_invalida"));
+      setTimeout(() => {
+        setErroCadastro("");
+        setLoadingCadastro(false);
+      }, 8000);
       return;
     }
 
