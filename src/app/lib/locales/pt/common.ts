@@ -46,6 +46,8 @@ const pt = {
     btn: "Cadastrar Conta",
     sucesso:
       "Cadastro efetuado com sucesso, acesse seu e-mail para ativar o cadastro.",
+    senha_invalida:
+      "A senha deve ter entre 8 e 16 caracteres, com letra maiúscula, minúscula, número e caractere especial.",
   },
   redefinir: {
     senha_erro: "A senha deve ter pelo menos 6 caracteres.",
