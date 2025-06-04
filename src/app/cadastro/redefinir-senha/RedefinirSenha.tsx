@@ -8,8 +8,10 @@ import {
   CheckCircleIcon,
   ExclamationCircleIcon,
 } from "@heroicons/react/24/solid";
+import { useTranslation } from "react-i18next";
 
 const RedefinirSenha = () => {
+  const { t, i18n } = useTranslation("common");
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -20,17 +22,23 @@ const RedefinirSenha = () => {
   const [mensagemSucesso, setMensagemSucesso] = useState("");
 
   const isPassValid = novaSenha.trim() !== "";
+  // const [language, setLanguage] = useState<string | null>(null);
 
-  // ✅ Lê token da URL *após* renderização inicial
+  //Lê token da URL *após* renderização inicial
   useEffect(() => {
     if (!searchParams) return;
-    const t = searchParams.get("token");
-    setToken(t);
-  }, [searchParams]);
+    const tkn = searchParams.get("token");
+    const lng = searchParams.get("lng");
+    setToken(tkn);
+    // setLanguage(lng);
+    if (lng) {
+      i18n.changeLanguage(lng);
+    }
+  }, [searchParams, i18n]);
 
   const handleSubmit = async () => {
     if (!token) {
-      setErroReset("Token inválido ou ausente.");
+      setErroReset(t("redefinir.token_invalido"));
       setTimeout(() => {
         setErroReset("");
         setLoading(false);
@@ -39,7 +47,7 @@ const RedefinirSenha = () => {
     }
 
     if (novaSenha.length < 6) {
-      setErroReset("A senha deve ter pelo menos 6 caracteres.");
+      setErroReset(t("redefinir.senha_erro"));
       setTimeout(() => {
         setErroReset("");
         setLoading(false);
@@ -56,7 +64,10 @@ const RedefinirSenha = () => {
         {
           method: "POST",
           credentials: "include",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Accept-Language": i18n.language,
+          },
           body: JSON.stringify({ token, novaSenha }),
         }
       );
@@ -64,14 +75,14 @@ const RedefinirSenha = () => {
       const data = await res.json();
 
       if (res.ok) {
-        setMensagemSucesso(data.message || "Senha redefinida com sucesso.");
+        setMensagemSucesso(data.message);
         setTimeout(() => router.push("/cadastro/login"), 3000);
       } else {
-        setErroReset(data.message || "Erro ao redefinir a senha.");
+        setErroReset(data.message);
         setLoading(false);
       }
     } catch {
-      setErroReset("Erro ao redefinir a senha. Tente novamente.");
+      setErroReset(t("redefinir.erro_geral"));
       setLoading(false);
     } finally {
       setTimeout(() => setErroReset(""), 4000);
@@ -109,13 +120,13 @@ const RedefinirSenha = () => {
             }}
           >
             <label className="text-[#010608] text-[14px] mt-2">
-              Nova Senha
+              {t("redefinir.nova_senha")}
             </label>
             <input
               type="password"
               value={novaSenha}
               onChange={(e) => setNovaSenha(e.target.value)}
-              placeholder="Digite sua nova senha"
+              placeholder={t("redefinir.nova_senha_placehold")}
               className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
             />
 
@@ -161,10 +172,10 @@ const RedefinirSenha = () => {
                         d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                       ></path>
                     </svg>
-                    <span>Redefinindo...</span>
+                    <span>{t("redefinir.redefinir_carregando")}</span>
                   </div>
                 ) : (
-                  "Redefinir Senha"
+                  t("redefinir.btn_redefinir")
                 )}
               </button>
             )}

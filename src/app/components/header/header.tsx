@@ -4,42 +4,58 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { LuBlocks, LuUsers, LuLogIn } from "react-icons/lu";
+import LanguageSwitcher from "../LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
-const menuItems = [
-  { label: "Como Funciona", href: "/funciona", icon: <LuBlocks size={20} /> },
-  { label: "Sobre Nós", href: "/sobre", icon: <LuUsers size={20} /> },
-  {
-    label: "Comece Agora",
-    href: "/cadastro/login",
-    icon: <LuLogIn size={20} />,
-  },
-];
 export default function Header() {
+  const { t } = useTranslation("common");
+
   const [active, setActive] = useState("/");
+
+  const menuItems = [
+    {
+      label: t("header.mnu_primeiro"),
+      href: "/funciona",
+      icon: <LuBlocks size={20} />,
+    },
+    {
+      label: t("header.mnu_segundo"),
+      href: "/sobre",
+      icon: <LuUsers size={20} />,
+    },
+    {
+      label: t("header.mnu_terceiro"),
+      href: "/cadastro/login",
+      icon: <LuLogIn size={20} />,
+    },
+  ];
 
   return (
     <header className="w-full flex items-center justify-between px-6 py-4">
       {/* Logo */}
       <div className="flex items-center">
         {/* Logo grande (desktop) */}
-        <Image
-          src="/assets/logofull.jpeg"
-          alt="Logo grande"
-          width={244}
-          height={46}
-          className="hidden sm:block"
-        />
-        {/* Logo pequeno (mobile) */}
-        <Image
-          src="/assets/logomobile.jpeg"
-          alt="Logo pequeno"
-          width={120}
-          height={24}
-          className="block sm:hidden"
-        />
+        <Link href="/">
+          <Image
+            src="/assets/logofull.jpeg"
+            alt="Logo grande"
+            width={244}
+            height={46}
+            className="hidden sm:block"
+          />
+          {/* Logo pequeno (mobile) */}
+          <Image
+            src="/assets/logomobile.jpeg"
+            alt="Logo pequeno"
+            width={120}
+            height={24}
+            className="block sm:hidden"
+          />
+        </Link>
       </div>
 
       {/* Menu */}
+
       <nav className="flex gap-1">
         {menuItems.map((item) => (
           <Link
@@ -71,6 +87,8 @@ export default function Header() {
             </Link>
           ))}
         </div>
+
+        <LanguageSwitcher />
       </nav>
     </header>
   );

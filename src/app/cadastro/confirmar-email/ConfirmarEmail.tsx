@@ -7,11 +7,14 @@ import {
   ExclamationCircleIcon,
   EnvelopeIcon,
 } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 
 const ConfirmarEmail = () => {
+  const { t, i18n } = useTranslation("common");
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [isReady, setIsReady] = useState(false); // ✅ controlar renderização
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     "loading"
   );
@@ -25,12 +28,22 @@ const ConfirmarEmail = () => {
 
     const token = searchParams.get("token");
     const emailFromParams = searchParams.get("email");
+    const lng = searchParams.get("lng");
 
     if (emailFromParams) setEmail(emailFromParams);
 
+    const setIdiomaEContinuar = async () => {
+      if (lng) {
+        await i18n.changeLanguage(lng); // ✅ aguarda mudança de idioma
+      }
+      setIsReady(true); // ✅ libera renderização
+    };
+
+    setIdiomaEContinuar();
+
     if (!token) {
       setStatus("error");
-      setMessage("Token não encontrado.");
+      setMessage(t("confirma_email.token_invalido"));
       return;
     }
 
@@ -40,7 +53,10 @@ const ConfirmarEmail = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/auth/activate`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "Accept-Language": lng || i18n.language,
+            },
             body: JSON.stringify({ token }),
           }
         );
@@ -56,12 +72,12 @@ const ConfirmarEmail = () => {
         }
       } catch {
         setStatus("error");
-        setMessage("Erro ao ativar a conta. Token inválido ou expirado.");
+        setMessage(t("confirma_email.erro_geral"));
       }
     };
 
     activateAccount();
-  }, [router, searchParams]);
+  }, [router, searchParams, i18n]);
 
   const handleResend = async () => {
     setResendLoading(true);
@@ -72,7 +88,10 @@ const ConfirmarEmail = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/auth/resend-activation`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Accept-Language": i18n.language,
+          },
           body: JSON.stringify({ email }),
         }
       );
@@ -80,28 +99,32 @@ const ConfirmarEmail = () => {
       const data = await res.json();
 
       if (res.ok) {
-        setResendSuccess("Link reenviado com sucesso. Verifique seu e-mail.");
+        setResendSuccess(t("confirma_email.reenvio_link_sucesso"));
       } else {
         throw new Error(data.message || "Erro ao reenviar.");
       }
     } catch {
-      setResendSuccess("Erro ao reenviar o link. Tente novamente.");
+      setResendSuccess(t("confirma_email.reenvio_link_erro"));
     } finally {
       setResendLoading(false);
     }
   };
 
+  if (!isReady) {
+    return null; // ou um loader, se preferir
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
       <div className="bg-white w-full max-w-md rounded shadow-md p-8 text-center space-y-4">
         <h1 className="text-2xl font-bold text-gray-800">
-          Confirmação de E-mail
+          {t("confirma_email.titulo")}
         </h1>
 
         {status === "loading" && (
           <div className="flex justify-center items-center space-x-2">
             <EnvelopeIcon className="w-6 h-6 text-blue-500 animate-pulse" />
-            <p className="text-gray-600">Confirmando seu e-mail...</p>
+            <p className="text-gray-600">{t("confirma_email.confirmando")}</p>
           </div>
         )}
 
@@ -110,7 +133,7 @@ const ConfirmarEmail = () => {
             <CheckCircleIcon className="w-10 h-10 text-green-500" />
             <p className="text-green-600 font-medium">{message}</p>
             <p className="text-sm text-gray-500">
-              Redirecionando para o login...
+              {t("confirma_email.redirecionando")}
             </p>
           </div>
         )}
@@ -132,8 +155,8 @@ const ConfirmarEmail = () => {
                   }`}
                 >
                   {resendLoading
-                    ? "Reenviando..."
-                    : "Reenviar link de ativação"}
+                    ? t("confirma_email.reenviar")
+                    : t("confirma_email.btn_reenviar")}
                 </button>
                 {resendSuccess && (
                   <p className="text-sm text-green-600">{resendSuccess}</p>
@@ -141,7 +164,7 @@ const ConfirmarEmail = () => {
               </>
             ) : (
               <p className="text-sm text-gray-600">
-                Para reenviar o link, acesse a página de login.
+                {t("confirma_email.info")}
               </p>
             )}
           </div>

@@ -1,8 +1,27 @@
-//import Image from "next/image";
+"use client";
+
+import { useEffect, useState } from "react";
 import Header from "./components/header/header";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 export default function Home() {
+  const { t, i18n } = useTranslation("common");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      const onInit = () => setReady(true);
+      i18n.on("initialized", onInit);
+      return () => {
+        i18n.off("initialized", onInit);
+      };
+    }
+  }, [i18n]);
+
+  if (!ready) return null; // ou um loading spinner opcional
   return (
     <div>
       <Header />
@@ -11,35 +30,41 @@ export default function Home() {
           <div className="w-full max-w-[792px] flex flex-col items-center text-center gap-6 ">
             <div className=" text-black text-center font-extralight leading-normal">
               <p className="text-[32px] md:text-[50px]">
-                As melhores oportunidades
+                {t("home.titulo")}
+                {/* As melhores oportunidades */}
               </p>
               <p className="text-[24px] md:text-[35px]">
-                para as melhores pessoas e empresas
+                {t("home.subtitulo")}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row justify-between gap-6 mt-10 w-full">
               {/* Empresa */}
               <div className="flex flex-col items-center rounded-lg p-4 flex-1 text-center">
-                <p className="text-lg mb-2 text-[#18678A]">Empresa</p>
+                <p className="text-lg mb-2 text-[#18678A]">
+                  {t("home.pefil_empresa")}
+                </p>
                 <p className="text-sm text-[#636363]">
-                  Os melhores especialistas e os profissionais certos para sua
-                  empresa.
+                  {t("home.pefil_empresa_texto")}
                 </p>
               </div>
 
               {/* Candidato */}
               <div className="flex flex-col items-center rounded-lg p-4 flex-1 text-center">
-                <p className="text-lg mb-2 text-[#18678A]">Candidato</p>
+                <p className="text-lg mb-2 text-[#18678A]">
+                  {t("home.pefil_candidato")}
+                </p>
                 <p className="text-sm text-[#636363]">
-                  Acesso às oportunidades que combinam com seu perfil.
+                  {t("home.pefil_candidato_texto")}
                 </p>
               </div>
 
               {/* Especialista */}
               <div className="flex flex-col items-center rounded-lg p-4 flex-1 text-center">
-                <p className="text-lg mb-2 text-[#18678A]">Especialista</p>
+                <p className="text-lg mb-2 text-[#18678A]">
+                  {t("home.pefil_especialista")}
+                </p>
                 <p className="text-sm text-[#636363]">
-                  Visibilidade como profissional para empresas em crescimento.
+                  {t("home.pefil_especialista_texto")}
                 </p>
               </div>
             </div>
@@ -47,7 +72,7 @@ export default function Home() {
               href="/cadastro/login"
               className="flex w-[140px] h-[36px] px-4 py-2 flex-col items-center justify-center text-sm leading-normal transition rounded-[20px] bg-[#A9DCF3] font-bold"
             >
-              Comece Agora
+              {t("header.mnu_terceiro")}
             </Link>
             <div className="flex items-center justify-center gap-4 sm:gap-6">
               {/* Ícone 1: Instagram */}
