@@ -24,6 +24,11 @@ const RedefinirSenha = () => {
   const isPassValid = novaSenha.trim() !== "";
   // const [language, setLanguage] = useState<string | null>(null);
 
+  const isValidPassword = (password: string): boolean => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,16}$/;
+    return regex.test(password);
+  };
+
   //Lê token da URL *após* renderização inicial
   useEffect(() => {
     if (!searchParams) return;
@@ -46,12 +51,12 @@ const RedefinirSenha = () => {
       return;
     }
 
-    if (novaSenha.length < 6) {
-      setErroReset(t("redefinir.senha_erro"));
+    if (!isValidPassword(novaSenha)) {
+      setErroReset(t("cadastro.senha_invalida"));
       setTimeout(() => {
         setErroReset("");
         setLoading(false);
-      }, 3000);
+      }, 8000);
       return;
     }
 
