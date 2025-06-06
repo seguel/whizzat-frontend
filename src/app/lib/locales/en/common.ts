@@ -69,6 +69,48 @@ const en = {
     btn_reenviar: "Resend activation link",
     info: "To resend the link, go to the login page.",
   },
+  perfil: {
+    titulo_primeiro: "Hello, welcome to WeChek!",
+    titulo_segundo: "To get started, choose a profile option",
+    titulo_terceiro:
+      "But don't worry, you can create another profile after accessing WeChek",
+    card_candidato: "I’m a Candidate",
+    card_candidato_descricao:
+      "I’m looking for the best professional opportunity",
+    card_recrutador: "I’m a Recruiter",
+    card_recrutador_descricao:
+      "I’m looking for the best candidate for a position",
+    card_avaliador: "I’m an Evaluator",
+    card_avaliador_descricao:
+      "I want to evaluate candidates in exchange for benefits",
+    btn_sair: "Logout",
+    selecionado_candidato_titulo: "Hello, Candidate",
+    selecionado_candidato_descricao_curta: "I’m a Candidate",
+    selecionado_candidato_cor: "green",
+    selecionado_candidato_cor_css: "green",
+    selecionado_recrutador_titulo: "Hello, Recruiter",
+    selecionado_recrutador_descricao_curta: "I’m a Recruiter",
+    selecionado_recrutador_cor: "blue",
+    selecionado_recrutador_cor_css: "blue",
+    selecionado_avaliador_titulo: "Hello, Evaluator",
+    selecionado_avaliador_descricao_curta: "I’m an Evaluator",
+    selecionado_avaliador_cor: "purple",
+    selecionado_avaliador_cor_css: "purple",
+    selecionado_titulo_primeiro:
+      "We will only ask for information that is necessary.",
+    selecionado_titulo_segundo:
+      "Our policy is to ask only what is strictly necessary, so don’t worry.",
+    selecionado_titulo_terceiro:
+      "As you interact with WeChek, we’ll ask for more info — but only when it’s essential.",
+    selecionado_titulo_quarto:
+      "On WeChek, user profiles are identified by colors.",
+    selecionado_titulo_quinto: "For the",
+    selecionado_titulo_sexto: "profile, the dominant color is",
+    btn_voltar: "Back",
+    btn_pular_tutorial: "Skip tutorial",
+    btn_avancar: "Next",
+    selecionado_invalido: "Invalid profile",
+  },
 };
 
 export default en;
