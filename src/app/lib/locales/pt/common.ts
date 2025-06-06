@@ -70,6 +70,49 @@ const pt = {
     btn_reenviar: "Reenviar link de ativação",
     info: "Para reenviar o link, acesse a página de login.",
   },
+  perfil: {
+    titulo_primeiro: "Olá, seja bem vindo(a) ao WeChek!",
+    titulo_segundo: "Para iniciar, escolha uma opção de perfil",
+    titulo_terceiro:
+      "Mas fique tranquilo(a), você pode criar outro perfil após acessar o WeChek",
+    card_candidato: "Sou um(a) Candidato(a)",
+    card_candidato_descricao:
+      "Estou à procura da melhor oportunidade profissional",
+    card_recrutador: "Sou um(a) Recrutador(a)",
+    card_recrutador_descricao:
+      "Estou à procura do melhor candidato para uma vaga",
+    card_avaliador: "Sou um(a) Avaliador(a)",
+    card_avaliador_descricao:
+      "Desejo avaliar candidatos para receber benefícios",
+    btn_sair: "Sair",
+    selecionado_candidato_titulo: "Olá, Candidato(a)",
+    selecionado_candidato_descricao_curta: "Sou um(a) Candidato(a)",
+    selecionado_candidato_cor: "verde",
+    selecionado_candidato_cor_css: "green",
+    selecionado_recrutador_titulo: "Olá, Recrutador(a)",
+    selecionado_recrutador_descricao_curta: "Sou um(a) Recrutador(a)",
+
+    selecionado_recrutador_cor: "azul",
+    selecionado_recrutador_cor_css: "blue",
+    selecionado_avaliador_titulo: "Olá, Avaliador(a)",
+    selecionado_avaliador_descricao_curta: "Sou um(a) Avaliador(a)",
+    selecionado_avaliador_cor: "roxo",
+    selecionado_avaliador_cor_css: "purple",
+    selecionado_titulo_primeiro:
+      "Nós só vamos pedir os dados que forem necessários.",
+    selecionado_titulo_segundo:
+      "Nossa política é somente perguntar o que for estritamente necessário então fique tranquilo(a).",
+    selecionado_titulo_terceiro:
+      "À medida que você for efetuando ações no WeChek, vamos pedindo informações, claro se isso for indispensável.",
+    selecionado_titulo_quarto:
+      "No WeChek os perfis de usuário são identificados por cores.",
+    selecionado_titulo_quinto: "No perfil de",
+    selecionado_titulo_sexto: "a cor predominante é",
+    btn_voltar: "Voltar",
+    btn_pular_tutorial: "Pular tutorial",
+    btn_avancar: "Avançar",
+    selecionado_invalido: "Perfil inválido",
+  },
 };
 
 export default pt;

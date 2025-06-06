@@ -1,7 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 export default function LogoutButton() {
+  const { t } = useTranslation("common");
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -29,7 +31,7 @@ export default function LogoutButton() {
     <button
       onClick={handleLogout}
       className="absolute top-4 right-4 p-2 hover:opacity-80 cursor-pointer"
-      title="Sair"
+      title={t("perfil.btn_sair")}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

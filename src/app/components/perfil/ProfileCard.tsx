@@ -1,36 +1,39 @@
 "use client";
 import Image from "next/image";
 import React from "react";
+import Link from "next/link";
 
 interface ProfileCardProps {
   title: string;
   description: string;
   imageSrc: string;
-  onClick?: () => void;
+  href: string;
 }
 
 const ProfileCard: React.FC<ProfileCardProps> = ({
   title,
   description,
   imageSrc,
-  onClick,
+  href,
 }) => (
-  <div
-    onClick={onClick}
-    className="bg-white rounded-xl shadow hover:shadow-md cursor-pointer transition p-4 flex flex-col items-center text-center w-full sm:w-58"
+  <Link
+    href={href}
+    className="block hover:shadow-lg transition rounded-xl p-4 text-center bg-white"
   >
-    <Image
-      src={imageSrc}
-      alt={title}
-      width={97}
-      height={97}
-      objectFit="cover"
-      className="mb-4 rounded-full"
-      priority
-    />
+    {/* Centraliza só a imagem */}
+    <div className="flex justify-center">
+      <Image
+        src={imageSrc}
+        alt={title}
+        width={97}
+        height={97}
+        className="mb-4 rounded-full"
+        priority
+      />
+    </div>
     <h3 className="font-semibold text-gray-800">{title}</h3>
     <p className="text-sm text-gray-500">{description}</p>
-  </div>
+  </Link>
 );
 
 export default ProfileCard;
