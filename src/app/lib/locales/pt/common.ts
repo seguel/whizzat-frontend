@@ -1,4 +1,10 @@
 const pt = {
+  notfound: {
+    primeira_linha: "Página não encontrada",
+    segunda_linha:
+      "A página que você tentou acessar não existe ou o perfil informado é inválido.",
+    btn_voltar: "Voltar à página inicial",
+  },
   header: {
     mnu_primeiro: "Como Funciona",
     mnu_segundo: "Sobre Nós",

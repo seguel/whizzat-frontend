@@ -1,4 +1,10 @@
 const en = {
+  notfound: {
+    primeira_linha: "Page not found",
+    segunda_linha:
+      "The page you tried to access does not exist or the profile provided is invalid.",
+    btn_voltar: "Back to homepage",
+  },
   header: {
     mnu_primeiro: "How It Works",
     mnu_segundo: "About Us",
