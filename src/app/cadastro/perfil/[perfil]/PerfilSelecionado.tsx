@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import LogoutButton from "../../../components/perfil/logoutButton";
 
 const profiles = {
   candidato: {
@@ -26,7 +27,7 @@ export default function PerfilSelecionadoPage({
 }: {
   perfil: PerfilKey;
 }) {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const { avatar, ilustracao } = profiles[perfil];
   const titulo = t(`perfil.selecionado_${perfil}_titulo`);
   const descricaoCurta = t(`perfil.selecionado_${perfil}_descricao_curta`);
@@ -37,7 +38,7 @@ export default function PerfilSelecionadoPage({
   const borderClass = `border-${cor_css}-400`;
   const bgClass = `bg-${cor_css}-400`;
   const textClass = `text-${cor_css}-300`;
-  const hoverTextClass = `hover:text-${cor_css}-300`;
+  // const hoverTextClass = `hover:text-${cor_css}-300`;
   const hoverBgClass = `hover:bg-${cor_css}-400`;
 
   const router = useRouter();
@@ -45,6 +46,9 @@ export default function PerfilSelecionadoPage({
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-gray-50 px-6 py-10">
+      {/* Botão de Logout com SVG */}
+      <LogoutButton color={cor_css} />
+
       {/* Conteúdo principal */}
       <div className="flex flex-1 flex-col lg:flex-row items-center justify-center gap-12">
         {/* Ilustração */}
@@ -117,19 +121,53 @@ export default function PerfilSelecionadoPage({
       <div className="flex justify-between items-center mt-10">
         <button
           onClick={() => router.back()}
-          className={`px-6 py-1 rounded-full border ${borderClass} font-semibold  ${hoverBgClass} transition`}
+          className={`px-6 py-1 rounded-full border ${borderClass} font-semibold  ${hoverBgClass} transition cursor-pointer`}
         >
           {t("perfil.btn_voltar")}
         </button>
         <div className="flex gap-4">
-          <button
-            className={`text-sm  font-semibold hover:underline ${hoverTextClass}`}
+          {/* <button
+            className={`text-sm  cursor-pointer font-semibold hover:underline ${hoverTextClass}`}
           >
             {t("perfil.btn_pular_tutorial")}
-          </button>
+          </button> */}
           <button
-            onClick={() => router.push("/cadastro/proximo")}
-            className={`px-6 py-1 rounded-full ${bgClass} font-semibold ${hoverBgClass} transition`}
+            onClick={async () => {
+              // 1. Mapear para o ID do perfil
+              const perfilMap: Record<string, number> = {
+                candidato: 1,
+                recrutador: 2,
+                avaliador: 3,
+              };
+
+              const id_perfil = perfilMap[perfil];
+
+              try {
+                const res = await fetch(
+                  `${process.env.NEXT_PUBLIC_API_URL}/users/perfil`,
+                  {
+                    method: "PATCH",
+                    credentials: "include", // envia o cookie
+                    headers: {
+                      "Content-Type": "application/json",
+                      "Accept-Language": i18n.language,
+                    },
+                    body: JSON.stringify({ id_perfil }),
+                  }
+                );
+
+                if (!res.ok) {
+                  console.error("Erro ao atualizar perfil do usuário.");
+                  return;
+                }
+
+                // 3. Redirecionar após sucesso
+                router.push(`/dashboard?perfil=${perfil}`);
+              } catch (err) {
+                console.error("Erro ao enviar requisição:", err);
+              }
+            }}
+            className={`px-6 py-1 rounded-full ${bgClass} font-semibold ${hoverBgClass} transition cursor-pointer`}
           >
             {t("perfil.btn_avancar")}
           </button>
