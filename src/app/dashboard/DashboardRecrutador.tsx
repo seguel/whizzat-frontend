@@ -8,7 +8,7 @@ import TalentPoolPanel from "../components/perfil/TalentPoolPanel";
 import { ProfileType } from "../components/perfil/ProfileContext";
 
 import LoadingOverlay from "../components/LoadingOverlay";
-import SemEmpresa from "./SemEmpresa";
+import SemDados from "./SemDados";
 
 interface Props {
   perfil: ProfileType;
@@ -64,7 +64,7 @@ export default function DashboardRecrutador({ perfil }: Props) {
         {hasEmpresa === null && <LoadingOverlay />}
 
         {!hasEmpresa ? (
-          <SemEmpresa />
+          <SemDados tipo="empresa" />
         ) : (
           <>
             <main className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">

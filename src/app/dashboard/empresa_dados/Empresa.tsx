@@ -186,7 +186,9 @@ export default function Empresa({ perfil }: Props) {
                     </h3>
                     <button
                       onClick={() =>
-                        router.push(`/dashboard/vagas?perfil=${perfil}&op=N`)
+                        router.push(
+                          `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresaSelecionada.empresa_id}`
+                        )
                       }
                       className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                     >

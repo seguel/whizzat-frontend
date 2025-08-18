@@ -1,30 +1,36 @@
 import JobCard from "./JobCard";
 
 interface Job {
+  empresa_id: number;
+  vaga_id: number;
   logo: string;
-  score: number;
-  title: string;
-  company: string;
-  location: string;
-  deadline: string;
+  nome_empresa: string;
+  nome_vaga: string;
+  localizacao: string;
+  data_cadastro: string;
+  qtde_dias_aberta: number;
+  prazo: string;
   pcd?: boolean;
 }
 
 interface JobListProps {
   title: string;
   jobs: Job[];
+  colorClass?: string; // cor da faixa
 }
 
-export default function JobList({ title, jobs }: JobListProps) {
+export default function JobList({ title, jobs, colorClass }: JobListProps) {
   return (
     <section>
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <a href="#" className="text-sm text-purple-600 hover:underline">
-          Ver mais
-        </a>
+      {/* Cabeçalho */}
+      <div
+        className={`px-4 py-1 rounded-full font-semibold text-sm ${colorClass}`}
+      >
+        {title}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+      {/* Lista */}
+      <div className="flex flex-col gap-3 mt-2">
         {jobs.map((job, idx) => (
           <JobCard key={idx} {...job} />
         ))}

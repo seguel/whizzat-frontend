@@ -5,14 +5,15 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
 type PerfilKey = (typeof validPerfis)[number];
 
-export default function Page({
+export default async function Page({
   searchParams,
 }: {
-  searchParams: { perfil?: string; op?: string; id?: string };
+  searchParams: { perfil?: string; op?: string; vagaid?: string; id?: string };
 }) {
   const perfil = searchParams.perfil;
   const op = searchParams.op as "N" | "E" | undefined;
-  const id = searchParams.id;
+  const vagaid = searchParams.vagaid ?? undefined; // ✅ assegura serializável
+  const id = searchParams.id ?? undefined;
 
   if (!perfil) {
     redirect("?perfil=candidato");
@@ -22,5 +23,12 @@ export default function Page({
     notFound();
   }
 
-  return <MiddlewarePage perfil={perfil as ProfileType} op={op} id={id} />;
+  return (
+    <MiddlewarePage
+      perfil={perfil as ProfileType}
+      op={op}
+      vagaId={vagaid}
+      empresaId={id}
+    />
+  );
 }

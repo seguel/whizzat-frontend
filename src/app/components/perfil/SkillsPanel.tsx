@@ -1,3 +1,4 @@
+"use client";
 import {
   Radar,
   RadarChart,
@@ -7,17 +8,39 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { skill: "Lógica de Programação", value: 90 },
-  { skill: "Comunicação", value: 65 },
-  { skill: "Fit Cult", value: 80 },
-  { skill: "Colaboração", value: 60 },
-  { skill: "Adaptabilidade", value: 70 },
-];
+type Skill = {
+  nome?: string;
+  peso: number; // escala de 1 a 10
+};
 
-export default function SkillsPanel() {
+type SkillsPanelProps = {
+  skills?: Skill[];
+};
+
+export default function SkillsPanel({ skills }: SkillsPanelProps) {
+  // Conversão dos dados para o gráfico
+  const radarData = (skills ?? []).map((skill) => ({
+    skill: skill.nome,
+    value: skill.peso / 10,
+  }));
+
+  // Cálculo da média para o score (em % de 100)
+  const media =
+    skills && skills.length > 0
+      ? Math.round(
+          (skills.reduce((sum, skill) => sum + skill.peso / 10, 0) /
+            skills.length) *
+            10
+        )
+      : 0;
+
+  // Para o círculo: cálculo do dashoffset
+  const dashArray = 314; // circunferência de r=50 => 2πr ≈ 314
+  const dashOffset = dashArray - (media / 100) * dashArray;
+
   return (
-    <aside className="bg-white rounded-xl p-4 shadow-sm w-full md:max-w-xs">
+    <aside className="bg-white rounded-xl p-3 shadow-sm w-full md:max-w-[280px]">
+      {/* Score circular */}
       <div className="flex flex-col items-center">
         <svg className="w-28 h-28" viewBox="0 0 120 120">
           <circle
@@ -25,7 +48,7 @@ export default function SkillsPanel() {
             cy="60"
             r="50"
             fill="none"
-            stroke="#d1fae5"
+            stroke="#e5e7eb" // cinza claro
             strokeWidth="10"
           />
           <circle
@@ -33,11 +56,12 @@ export default function SkillsPanel() {
             cy="60"
             r="50"
             fill="none"
-            stroke="#10b981"
+            stroke="#9333EA"
             strokeWidth="10"
-            strokeDasharray="251"
-            strokeDashoffset="50"
+            strokeDasharray={dashArray}
+            strokeDashoffset={dashOffset}
             transform="rotate(-90 60 60)"
+            strokeLinecap="round"
           />
           <text
             x="60"
@@ -45,30 +69,34 @@ export default function SkillsPanel() {
             textAnchor="middle"
             className="text-[13px] fill-gray-500 font-semibold"
           >
-            Seu Score
+            Score Médio
           </text>
           <text
             x="60"
             y="78"
             textAnchor="middle"
-            className="text-lg fill-green-600 font-bold"
+            className="text-lg fill-purple-600 font-bold"
           >
-            82
+            {media}
           </text>
         </svg>
       </div>
-      <div className="mt-6">
-        <h3 className="text-sm font-semibold text-center mb-2">Suas Skills</h3>
-        <ResponsiveContainer width="100%" height={220}>
-          <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
+
+      {/* Radar Chart */}
+      <div className="mt-4">
+        <h3 className="text-sm font-semibold text-center mb-2">
+          Distribuição de skills
+        </h3>
+        <ResponsiveContainer width="100%" height={240}>
+          <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
             <PolarGrid />
             <PolarAngleAxis dataKey="skill" tick={{ fontSize: 10 }} />
-            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} />
+            <PolarRadiusAxis angle={30} domain={[0, 10]} tick={false} />
             <Radar
               name="skills"
               dataKey="value"
-              stroke="#10b981"
-              fill="#6ee7b7"
+              stroke="#9333EA"
+              fill="#D8B4FE"
               fillOpacity={0.6}
             />
           </RadarChart>

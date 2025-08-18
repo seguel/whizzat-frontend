@@ -10,11 +10,17 @@ import { useVagasRouter } from "../../lib/hooks/useVagasRouter";
 interface Props {
   perfil: ProfileType;
   op?: "N" | "E";
-  id?: string;
+  vagaId?: string;
+  empresaId?: string;
 }
 
-export default function Middleware({ perfil, op, id }: Props) {
-  const { isLoading, componente } = useVagasRouter({ perfil, op, id });
+export default function Middleware({ perfil, op, vagaId, empresaId }: Props) {
+  const { isLoading, componente } = useVagasRouter({
+    perfil,
+    op,
+    vagaId,
+    empresaId,
+  });
 
   if (isLoading) return <LoadingOverlay />;
 

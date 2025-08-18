@@ -9,6 +9,7 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
+import { getFileUrl } from "../../util/getFileUrl";
 
 interface EmpresaDadosProps {
   perfil: ProfileType;
@@ -207,7 +208,13 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
         }
 
         const data = await response.json(); // <- Aqui pega o retorno da empresa salva
-        setEmpresaPublicada(data); // <- Aqui salva os dados no estado
+        const empresaComUrls = {
+          ...data,
+          logoUrl: getFileUrl(data.logo),
+          capaUrl: getFileUrl(data.imagem_fundo),
+        };
+
+        setEmpresaPublicada(empresaComUrls);
 
         // Limpa o localStorage se necessário
         localStorage.removeItem("empresaForm");

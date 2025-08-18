@@ -98,12 +98,12 @@ const pt = {
     selecionado_recrutador_titulo: "Olá, Recrutador(a)",
     selecionado_recrutador_descricao_curta: "Sou um(a) Recrutador(a)",
 
-    selecionado_recrutador_cor: "azul",
-    selecionado_recrutador_cor_css: "blue",
+    selecionado_recrutador_cor: "roxo",
+    selecionado_recrutador_cor_css: "purple",
     selecionado_avaliador_titulo: "Olá, Avaliador(a)",
     selecionado_avaliador_descricao_curta: "Sou um(a) Avaliador(a)",
-    selecionado_avaliador_cor: "roxo",
-    selecionado_avaliador_cor_css: "purple",
+    selecionado_avaliador_cor: "azul",
+    selecionado_avaliador_cor_css: "blue",
     selecionado_titulo_primeiro:
       "Nós só vamos pedir os dados que forem necessários.",
     selecionado_titulo_segundo:

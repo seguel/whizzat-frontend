@@ -3,11 +3,12 @@ import VagasDados from "../../dashboard/vagas/VagaDados";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { useAuthGuard } from "./useAuthGuard";
 import Vagas from "../../dashboard/vagas/ListaVagas";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
 interface Options {
   perfil: ProfileType;
   op?: "N" | "E";
-  vagaId: string;
+  vagaId?: string;
   empresaId?: string;
 }
 
@@ -18,9 +19,11 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
   const { isReady } = useAuthGuard("/cadastro/login");
   const [hasEmpresa, setHasEmpresa] = useState<boolean | null>(null);
 
+  // Busca se há empresa vinculada ao perfil
   useEffect(() => {
     const perfilId =
       perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+
     const fetchVinculo = async () => {
       try {
         const res = await fetch(
@@ -42,10 +45,15 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
     fetchVinculo();
   }, [perfil]);
 
+  // Cadastro ou edição de vaga
   if (isCadastro || isEdicao) {
+    const isLoading = hasEmpresa === null || !isReady;
+
     return {
-      isLoading: false,
-      componente: (
+      isLoading,
+      componente: isLoading ? (
+        <LoadingOverlay />
+      ) : (
         <VagasDados
           perfil={perfil}
           hasEmpresa={hasEmpresa}
@@ -56,9 +64,14 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
     };
   }
 
+  // Visualização de lista de vagas
   const isLoading = !isReady || hasEmpresa === null;
 
-  const componente = <Vagas perfil={perfil} hasEmpresa={hasEmpresa} />;
+  const componente = isLoading ? (
+    <LoadingOverlay />
+  ) : (
+    <Vagas perfil={perfil} hasEmpresa={hasEmpresa} />
+  );
 
   return { isLoading, componente };
 }
