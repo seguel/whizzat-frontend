@@ -139,7 +139,7 @@ function LoginInner() {
 
       setTimeout(() => {
         LimpaTela();
-        router.replace(redirectTo);
+        router.replace(data.redirectTo || redirectTo);
       }, 1000);
     } catch (error: unknown) {
       toast.error(

@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import PerfilSelecionadoPage from "./PerfilSelecionado";
 
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
@@ -11,9 +12,7 @@ export default async function Page({
   const { perfil } = await params;
 
   if (!validPerfis.includes(perfil as PerfilKey)) {
-    return (
-      <div className="text-center mt-10 text-red-500">Perfil inválido</div>
-    );
+    notFound();
   }
 
   return <PerfilSelecionadoPage perfil={perfil as PerfilKey} />;
