@@ -2,7 +2,11 @@
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 
-export default function LogoutButton() {
+type LogoutButtonProps = {
+  color?: string; // nova prop opcional
+};
+
+export default function LogoutButton({ color = "black" }: LogoutButtonProps) {
   const { t } = useTranslation("common");
   const router = useRouter();
 
@@ -43,7 +47,7 @@ export default function LogoutButton() {
         <g clipPath="url(#clip0_1029_27508)">
           <path
             d="M24.7012 20V16H14.7012V12H24.7012V8L30.7012 14L24.7012 20ZM22.7012 18V26H12.7012V32L0.701172 26V0H22.7012V10H20.7012V2H4.70117L12.7012 6V24H20.7012V18H22.7012Z"
-            fill="black"
+            fill={color} // aplica a cor recebida
           />
         </g>
         <defs>
