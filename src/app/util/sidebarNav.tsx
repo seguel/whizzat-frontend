@@ -12,7 +12,7 @@ import {
 type ProfileType = "candidato" | "recrutador" | "avaliador";
 
 interface NavItem {
-  icon: JSX.Element;
+  icon: JSX.Element; // icon é agora obrigatório
   label: string;
   route?: string;
   badge?: number;
