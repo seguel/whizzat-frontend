@@ -5,11 +5,13 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
 type PerfilKey = (typeof validPerfis)[number];
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams?: Record<string, string | string[] | undefined>;
-}) {
+type SearchParams = {
+  perfil?: string | string[];
+  op?: "N" | "E" | string[];
+  id?: string | string[];
+};
+
+export default function Page({ searchParams }: { searchParams: SearchParams }) {
   const perfil = Array.isArray(searchParams?.perfil)
     ? searchParams.perfil[0]
     : searchParams?.perfil;
