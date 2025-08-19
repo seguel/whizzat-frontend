@@ -8,11 +8,17 @@ type PerfilKey = (typeof validPerfis)[number];
 export default function Page({
   searchParams,
 }: {
-  searchParams: { perfil?: string; op?: string; id?: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  const perfil = searchParams.perfil;
-  const op = searchParams.op as "N" | "E" | undefined;
-  const id = searchParams.id;
+  const perfil = Array.isArray(searchParams?.perfil)
+    ? searchParams.perfil[0]
+    : searchParams?.perfil;
+  const op = Array.isArray(searchParams?.op)
+    ? (searchParams.op[0] as "N" | "E")
+    : (searchParams?.op as "N" | "E" | undefined);
+  const id = Array.isArray(searchParams?.id)
+    ? searchParams.id[0]
+    : searchParams?.id;
 
   if (!perfil) {
     redirect("?perfil=candidato");
