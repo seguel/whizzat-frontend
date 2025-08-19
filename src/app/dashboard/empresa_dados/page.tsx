@@ -11,7 +11,12 @@ type SearchParams = {
   id?: string | string[];
 };
 
-export default function Page({ searchParams }: { searchParams: SearchParams }) {
+export default function Page({
+  searchParams,
+}: {
+  searchParams?: SearchParams;
+}) {
+  // Normaliza os parâmetros para string simples
   const perfil = Array.isArray(searchParams?.perfil)
     ? searchParams.perfil[0]
     : searchParams?.perfil;
