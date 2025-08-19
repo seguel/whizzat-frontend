@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound, redirect } from "next/navigation";
 import MiddlewarePage from "./middleware";
 import { ProfileType } from "../../components/perfil/ProfileContext";
@@ -5,40 +6,31 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
 type PerfilKey = (typeof validPerfis)[number];
 
-// Criamos um tipo só para o que nos interessa
-type SearchParams = {
+type SearchParamsType = {
   perfil?: string;
-  op?: "N" | "E";
+  op?: string;
   id?: string;
 };
 
-// ⚡ solução: deixar o Next tipar PageProps sozinho e só forçar cast dentro da função
-export default function Page({
+// Next 15 espera searchParams do tipo Promise<any> | undefined
+export default async function Page({
   searchParams,
 }: {
-  searchParams?: SearchParams | Promise<SearchParams>;
+  searchParams?: Promise<SearchParamsType>;
 }) {
-  // se o Next passar um Promise (caso async), a gente trata
-  const resolveParams = (sp: typeof searchParams): SearchParams | undefined => {
-    if (!sp) return undefined;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (typeof (sp as Promise<any>).then === "function") {
-      // nesse caso o Next trataria como assíncrono,
-      // mas para a nossa page síncrona podemos ignorar e forçar {} vazio
-      return {};
-    }
-    return sp as SearchParams;
-  };
+  // Garante que sempre teremos objeto, await se Promise
+  const params: SearchParamsType = searchParams ? await searchParams : {};
 
-  const params = resolveParams(searchParams);
-  const perfil = params?.perfil;
-  const op = params?.op;
-  const id = params?.id;
+  const perfil = params.perfil ?? "candidato";
+  const op = params.op as "N" | "E" | undefined;
+  const id = params.id ?? undefined;
 
+  // Redireciona se perfil não definido
   if (!perfil) {
     redirect("?perfil=candidato");
   }
 
+  // Valida se o perfil é válido
   if (!validPerfis.includes(perfil as PerfilKey)) {
     notFound();
   }
