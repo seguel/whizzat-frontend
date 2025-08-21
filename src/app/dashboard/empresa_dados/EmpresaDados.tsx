@@ -56,8 +56,8 @@ interface EmpresaData {
   website?: string;
   telefone?: string;
   apresentacao?: string;
-  capaPreview?: string;
-  logoPreview?: string;
+  logo?: string;
+  imagem_fundo?: string;
 }
 
 export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
@@ -208,13 +208,14 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
         }
 
         const data = await response.json(); // <- Aqui pega o retorno da empresa salva
-        const empresaComUrls = {
+        /* const empresaComUrls = {
           ...data,
           logoUrl: getFileUrl(data.logo),
           capaUrl: getFileUrl(data.imagem_fundo),
-        };
+        }; */
 
-        setEmpresaPublicada(empresaComUrls);
+        console.log(data);
+        setEmpresaPublicada(data);
 
         // Limpa o localStorage se necessário
         localStorage.removeItem("empresaForm");
@@ -293,7 +294,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                     type="text"
                     name="nome"
                     placeholder="Empresa"
-                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                     defaultValue={empresa?.nome_empresa ?? form.nome}
                     onChange={handleChange}
                   />
@@ -312,7 +313,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                     type="url"
                     name="site"
                     placeholder="Website"
-                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                     defaultValue={empresa?.website ?? form.site}
                     onChange={handleChange}
                   />
@@ -331,7 +332,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                     type="email"
                     name="email"
                     placeholder="Email"
-                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                     defaultValue={empresa?.email ?? form.email}
                     onChange={handleChange}
                   />
@@ -414,7 +415,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="w-full md:w-32 py-2 rounded-full text-shadow-white bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                    className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                   >
                     Avançar
                   </button>
@@ -437,7 +438,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                       type="text"
                       name="localizacao"
                       placeholder="Informe o local de sua empresa"
-                      className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                       value={form.localizacao}
                       onChange={handleChange}
                     />
@@ -453,13 +454,13 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                     <button
                       onClick={prevStep}
                       type="button"
-                      className="w-full md:w-32 py-2 rounded-full bg-gray-300 text-center cursor-pointer"
+                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                     >
                       Voltar
                     </button>
                     <button
                       type="submit"
-                      className="w-full md:w-32 py-2 rounded-full bg-purple-600 text-white text-center cursor-pointer"
+                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                     >
                       Avançar
                     </button>
@@ -484,7 +485,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                     <textarea
                       name="apresentacao"
                       placeholder="Apresente sua empresa"
-                      className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                       rows={6}
                       value={form.apresentacao || ""}
                       onChange={(e) =>
@@ -549,13 +550,13 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                   <div className="flex justify-between">
                     <button
                       onClick={prevStep}
-                      className="w-full md:w-32 py-2 rounded-full bg-gray-300 cursor-pointer"
+                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                     >
                       Voltar
                     </button>
                     <button
                       type="submit"
-                      className="w-full md:w-32 py-2 rounded-full bg-purple-600 text-white cursor-pointer"
+                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                     >
                       Avançar
                     </button>
@@ -611,15 +612,15 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                   <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto px-4 md:px-8 pb-4">
                     <button
                       onClick={prevStep}
-                      className="w-full md:w-32 py-2 rounded-full bg-gray-300 text-center cursor-pointer"
+                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                     >
                       Voltar
                     </button>
                     <button
                       type="submit"
-                      className={`px-6 py-2 rounded-full text-white font-semibold flex items-center gap-2 ${
+                      className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
                         isFormValid(form)
-                          ? "bg-purple-600 hover:bg-purple-700"
+                          ? " bg-purple-100 hover:bg-purple-200"
                           : "bg-gray-300 cursor-not-allowed"
                       }`}
                     >
@@ -641,9 +642,9 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                 {/* Capa e logo */}
 
                 <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0">
-                  {empresaPublicada.capaPreview ? (
+                  {empresaPublicada.imagem_fundo ? (
                     <Image
-                      src={empresaPublicada.capaPreview}
+                      src={getFileUrl(empresaPublicada.imagem_fundo)}
                       alt="Imagem de capa"
                       width={64}
                       height={64}
@@ -658,9 +659,9 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
 
                   {/* Logo sobreposto */}
                   <div className="absolute left-6 top-full -translate-y-2/3 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-full shadow-md flex items-center justify-center overflow-hidden border-4 border-white z-10">
-                    {empresaPublicada.logoPreview ? (
+                    {empresaPublicada.logo ? (
                       <Image
-                        src={empresaPublicada.logoPreview}
+                        src={getFileUrl(empresaPublicada.logo)}
                         alt="Logo da empresa"
                         width={64}
                         height={64}
