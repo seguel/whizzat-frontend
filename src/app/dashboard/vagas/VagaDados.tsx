@@ -14,6 +14,8 @@ import SkillsPanel from "../../components/perfil/SkillsPanel";
 import { addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "react-hot-toast";
+import { getFileUrl } from "../../util/getFileUrl";
+import Image from "next/image";
 
 interface Props {
   perfil: ProfileType;
@@ -55,6 +57,7 @@ interface VagasForm {
   qtde_posicao: string;
   lista_skills: SkillAvaliacao[];
   data_cadastro: string;
+  logo: string;
 }
 
 interface VagaData {
@@ -73,6 +76,7 @@ interface VagaData {
   qtde_posicao: number;
   skills: SkillAvaliacao[];
   data_cadastro: string;
+  logo: string;
 }
 
 function useLocalStorage<T>(key: string, initialValue: T) {
@@ -114,6 +118,7 @@ export default function VagaDados({
     qtde_posicao: "",
     lista_skills: [],
     data_cadastro: "",
+    logo: "",
   });
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -125,7 +130,7 @@ export default function VagaDados({
   const [quantidadeVagas, setQuantidadeVagas] = useState(0);
 
   const [empresas, setEmpresas] = useState<
-    { empresa_id: number; nome_empresa: string }[]
+    { empresa_id: number; nome_empresa: string; logo: string }[]
   >([]);
   const [modalidades, setModalidades] = useState<
     { modalidade_trabalho_id: number; modalidade: string }[]
@@ -158,12 +163,6 @@ export default function VagaDados({
   } | null>(null);
 
   useEffect(() => {
-    if (empresaId && form.empresa_id !== empresaId) {
-      setForm((prev) => ({ ...prev, empresa_id: empresaId }));
-    }
-  }, [empresaId]);
-
-  useEffect(() => {
     if (!vagaId) return;
 
     const fetchVaga = async () => {
@@ -191,8 +190,6 @@ export default function VagaDados({
   }, [vagaId]);
 
   useEffect(() => {
-    //if (vagaId) return;
-
     setLoadingVagaEmpresa(true);
     const perfilId =
       perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
@@ -243,6 +240,22 @@ export default function VagaDados({
 
     fetchSelectData();
   }, [perfil]);
+
+  useEffect(() => {
+    if (!empresaId || empresas.length === 0) return;
+
+    const empresaSelecionada = empresas.find(
+      (e) => e.empresa_id.toString() === empresaId.toString()
+    );
+
+    if (empresaSelecionada) {
+      setForm((prev) => ({
+        ...prev,
+        empresa_id: empresaId,
+        logo: empresaSelecionada.logo,
+      }));
+    }
+  }, [empresaId, empresas]);
 
   if ((vagaId || empresaId) && loadingVagaEmpresa) {
     return <LoadingOverlay />;
@@ -418,6 +431,19 @@ export default function VagaDados({
     }));
   };
 
+  const handleEmpresaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const empresaSelecionada = empresas.find(
+      (e) => e.empresa_id.toString() === selectedId
+    );
+
+    setForm((prev) => ({
+      ...prev,
+      empresa_id: selectedId,
+      logo: empresaSelecionada?.logo ?? "",
+    }));
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar
@@ -485,7 +511,7 @@ export default function VagaDados({
                         Empresa:
                         <select
                           className={`
-                          border border-purple-600 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-500
+                          border border-purple-600 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-300
                           ${
                             empresaId
                               ? "bg-gray-100 cursor-not-allowed opacity-80"
@@ -494,7 +520,7 @@ export default function VagaDados({
                         `}
                           name="empresa_id"
                           value={empresaId ?? form.empresa_id ?? ""}
-                          onChange={handleChange_dinamicos}
+                          onChange={handleEmpresaChange}
                           disabled={!!empresaId}
                         >
                           <option value="">Selecione a empresa</option>
@@ -515,7 +541,7 @@ export default function VagaDados({
                         <input
                           name="nome_vaga"
                           type="text"
-                          className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                          className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
                           placeholder="nome da vaga"
                           defaultValue={vaga?.nome_vaga ?? form.nome_vaga}
                           onChange={handleChange_dinamicos}
@@ -533,7 +559,7 @@ export default function VagaDados({
                         <input
                           name="local_vaga"
                           type="text"
-                          className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                          className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
                           placeholder="local da vaga"
                           defaultValue={vaga?.local_vaga ?? form.local_vaga}
                           onChange={handleChange_dinamicos}
@@ -634,7 +660,7 @@ export default function VagaDados({
                           maxLength={5000}
                           rows={9}
                           defaultValue={vaga?.descricao ?? form.descricao}
-                          className="border rounded-md px-3 py-2 resize-none border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                          className="border rounded-md px-3 py-2 resize-none border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
                           placeholder="Descrição da vaga"
                           onChange={handleChange_dinamicos}
                         />
@@ -670,7 +696,7 @@ export default function VagaDados({
                           <input
                             name="qtde_dias_aberta"
                             type="text"
-                            className="border rounded-md w-12 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            className="border rounded-md w-12 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300"
                             value={
                               vaga?.qtde_dias_aberta ??
                               form.qtde_dias_aberta ??
@@ -732,7 +758,7 @@ export default function VagaDados({
                           <input
                             name="qtde_posicao"
                             type="text"
-                            className="border rounded-md w-12 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-500"
+                            className="border rounded-md w-12 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300"
                             value={
                               vaga?.qtde_posicao ??
                               form.qtde_posicao ??
@@ -772,7 +798,7 @@ export default function VagaDados({
                     <div className="col-span-1 mt-4 md:col-span-2 flex justify-center md:justify-end">
                       <button
                         type="submit"
-                        className="w-full md:w-32 py-2 rounded-full text-white bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                       >
                         Avançar
                       </button>
@@ -943,13 +969,13 @@ export default function VagaDados({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full bg-gray-300 text-center cursor-pointer"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                         >
                           Voltar
                         </button>
                         <button
                           type="submit"
-                          className="w-full md:w-32 py-2 rounded-full bg-purple-600 text-white text-center cursor-pointer"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                         >
                           Avançar
                         </button>
@@ -980,7 +1006,20 @@ export default function VagaDados({
                               <div className="flex flex-row sm:flex-1 gap-4 items-center">
                                 {/* Logo */}
                                 <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
-                                  Logo
+                                  {form.logo ? (
+                                    <Image
+                                      src={getFileUrl(form?.logo)}
+                                      alt="Logo da empresa"
+                                      width={64}
+                                      height={64}
+                                      className="w-full h-full object-cover"
+                                      unoptimized // opcional, se estiver usando imagens externas sem loader
+                                    />
+                                  ) : (
+                                    <div className="text-xs text-gray-400 text-center px-2">
+                                      Sem logo
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* Título e empresa */}
@@ -1120,15 +1159,15 @@ export default function VagaDados({
                       <div className="flex flex-col md:flex-row justify-between gap-2 mt-6">
                         <button
                           onClick={prevStep}
-                          className="w-full md:w-32 py-2 rounded-full bg-gray-300 text-center cursor-pointer"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                         >
                           Voltar
                         </button>
                         <button
                           type="submit"
-                          className={`px-6 py-2 rounded-full text-white font-semibold flex items-center justify-center gap-2 ${
+                          className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
                             isFormValid(form)
-                              ? "bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                              ? "text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                               : "bg-gray-300 cursor-not-allowed"
                           }`}
                         >
@@ -1161,7 +1200,22 @@ export default function VagaDados({
                             <div className="flex flex-row sm:flex-1 gap-4 items-center">
                               {/* Logo */}
                               <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
-                                Logo
+                                {vagaPublicada?.empresa?.logo ? (
+                                  <Image
+                                    src={getFileUrl(
+                                      vagaPublicada?.empresa?.logo
+                                    )}
+                                    alt="Logo da empresa"
+                                    width={64}
+                                    height={64}
+                                    className="w-full h-full object-cover"
+                                    unoptimized // opcional, se estiver usando imagens externas sem loader
+                                  />
+                                ) : (
+                                  <div className="text-xs text-gray-400 text-center px-2">
+                                    Sem logo
+                                  </div>
+                                )}
                               </div>
 
                               {/* Título e empresa */}

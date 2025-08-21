@@ -7,6 +7,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation"; // App Router
+import { getFileUrl } from "../../util/getFileUrl";
 
 interface Props {
   perfil: ProfileType;
@@ -18,8 +19,8 @@ interface EmpresaData {
   email?: string;
   telefone?: string;
   apresentacao?: string;
-  capaPreview?: string;
-  logoPreview?: string;
+  logo?: string;
+  imagem_fundo?: string;
 }
 
 export default function Empresa({ perfil }: Props) {
@@ -47,6 +48,7 @@ export default function Empresa({ perfil }: Props) {
         const data = await res.json();
         if (Array.isArray(data)) {
           setEmpresas(data);
+          console.log(data);
           if (data.length === 1) {
             setEmpresaSelecionada(data[0]);
           }
@@ -121,9 +123,9 @@ export default function Empresa({ perfil }: Props) {
               {/* Capa e logo */}
               <div className="w-full space-y-6 min-h-[100%] flex flex-col">
                 <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0">
-                  {empresaSelecionada.capaPreview ? (
+                  {empresaSelecionada.imagem_fundo ? (
                     <Image
-                      src={empresaSelecionada.capaPreview}
+                      src={getFileUrl(empresaSelecionada.imagem_fundo)}
                       alt="Imagem de capa"
                       width={64}
                       height={64}
@@ -144,9 +146,9 @@ export default function Empresa({ perfil }: Props) {
 
                   {/* Logo sobreposto */}
                   <div className="absolute left-6 top-full -translate-y-2/3 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-full shadow-md flex items-center justify-center overflow-hidden border-4 border-white z-10">
-                    {empresaSelecionada.logoPreview ? (
+                    {empresaSelecionada.logo ? (
                       <Image
-                        src={empresaSelecionada.logoPreview}
+                        src={getFileUrl(empresaSelecionada.logo)}
                         alt="Logo da empresa"
                         width={64}
                         height={64}
@@ -224,9 +226,9 @@ export default function Empresa({ perfil }: Props) {
                   >
                     {/* Logo */}
                     <div className="w-full flex justify-center mb-4">
-                      {empresa.logoPreview ? (
+                      {empresa.logo ? (
                         <Image
-                          src={empresa.logoPreview}
+                          src={getFileUrl(empresa.logo)}
                           alt="Logo da empresa"
                           width={64}
                           height={64}
@@ -234,12 +236,6 @@ export default function Empresa({ perfil }: Props) {
                           unoptimized // opcional, se estiver usando imagens externas sem loader
                         />
                       ) : (
-                        /* <img
-
-                        src={empresa.logoPreview}
-                        alt="Logo"
-                        className="w-16 h-16 object-contain"
-                      /> */
                         <div className="w-16 h-16 flex items-center justify-center bg-gray-100 text-gray-400 rounded-full text-xs text-center">
                           Sem logo
                         </div>
