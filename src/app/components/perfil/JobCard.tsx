@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import { getFileUrl } from "../../util/getFileUrl";
 
 interface JobCardProps {
   empresa_id: number;
@@ -28,11 +30,20 @@ export default function JobCard({
         {/* Logo e Badge PCD */}
         <div className="flex flex-col items-center sm:items-start mr-3 sm:mr-4 flex-shrink-0">
           <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white overflow-hidden">
-            <img
-              src={logo}
-              alt="logo"
-              className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
-            />
+            {logo ? (
+              <Image
+                src={getFileUrl(logo)}
+                alt="Logo da empresa"
+                width={64}
+                height={64}
+                className="w-full h-full object-cover"
+                unoptimized // opcional, se estiver usando imagens externas sem loader
+              />
+            ) : (
+              <div className="text-xs text-gray-400 text-center px-2">
+                Sem logo
+              </div>
+            )}
           </div>
           {pcd && (
             <span className="mt-1 sm:mt-2 inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">

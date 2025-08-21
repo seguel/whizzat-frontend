@@ -42,7 +42,7 @@ interface Job {
 export default function ListaVagas({ perfil, hasEmpresa }: Props) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [hasVagas, setHasVaga] = useState<boolean>(true);
+  const [hasVagas, setHasVaga] = useState<boolean>(false);
 
   const [sugeridos, setSugeridos] = useState<Job[]>([]);
   const [escolhidos, setEscolhidos] = useState<Job[]>([]);
@@ -102,7 +102,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
           sugeridosRes.json(),
         ]);
 
-        setHasVaga(true);
+        if (sugeridosData.length > 0) setHasVaga(true);
 
         setEmpresas(empresasData);
         setSkills(skillsData);
