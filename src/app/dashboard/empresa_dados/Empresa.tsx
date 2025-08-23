@@ -7,7 +7,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation"; // App Router
-import { getFileUrl } from "../../util/getFileUrl";
+// import { getFileUrl } from "../../util/getFileUrl";
 
 interface Props {
   perfil: ProfileType;
@@ -125,7 +125,7 @@ export default function Empresa({ perfil }: Props) {
                 <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0">
                   {empresaSelecionada.imagem_fundo ? (
                     <Image
-                      src={getFileUrl(empresaSelecionada.imagem_fundo)}
+                      src={empresaSelecionada.imagem_fundo}
                       alt="Imagem de capa"
                       width={64}
                       height={64}
@@ -148,7 +148,7 @@ export default function Empresa({ perfil }: Props) {
                   <div className="absolute left-6 top-full -translate-y-2/3 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-full shadow-md flex items-center justify-center overflow-hidden border-4 border-white z-10">
                     {empresaSelecionada.logo ? (
                       <Image
-                        src={getFileUrl(empresaSelecionada.logo)}
+                        src={empresaSelecionada.logo}
                         alt="Logo da empresa"
                         width={64}
                         height={64}
@@ -228,7 +228,7 @@ export default function Empresa({ perfil }: Props) {
                     <div className="w-full flex justify-center mb-4">
                       {empresa.logo ? (
                         <Image
-                          src={getFileUrl(empresa.logo)}
+                          src={empresa.logo}
                           alt="Logo da empresa"
                           width={64}
                           height={64}

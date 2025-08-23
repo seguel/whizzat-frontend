@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getFileUrl } from "../../util/getFileUrl";
+// import { getFileUrl } from "../../util/getFileUrl";
 
 interface JobCardProps {
   empresa_id: number;
@@ -32,7 +32,7 @@ export default function JobCard({
           <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white overflow-hidden">
             {logo ? (
               <Image
-                src={getFileUrl(logo)}
+                src={logo}
                 alt="Logo da empresa"
                 width={64}
                 height={64}
