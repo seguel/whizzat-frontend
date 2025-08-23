@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { ProfileType } from "./ProfileContext";
-import { getNavItems } from "../../util/sidebarNav";
-import { usePathname } from "next/navigation";
+import { getNavItems, NavItem } from "../../util/sidebarNav";
 
 interface SidebarProps {
   profile: ProfileType;
@@ -18,6 +18,7 @@ export default function Sidebar({
   isDrawerOpen = false,
   setIsDrawerOpen,
 }: SidebarProps) {
+  const router = useRouter();
   const pathname = usePathname();
   const navItems = getNavItems(profile);
 
@@ -28,10 +29,9 @@ export default function Sidebar({
     function handleResize() {
       setIsMobile(window.innerWidth < 768);
       if (window.innerWidth >= 768 && setIsDrawerOpen) {
-        setIsDrawerOpen(false); // Fecha o drawer no desktop
+        setIsDrawerOpen(false);
       }
     }
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -40,60 +40,103 @@ export default function Sidebar({
   const actualCollapsed = isMobile ? false : collapsed;
 
   const profileColorMap: Record<ProfileType, string> = {
-    candidato: "bg-green-100", // ativo
-    recrutador: "bg-purple-100", // ativo
-    avaliador: "bg-blue-100", // ativo
+    candidato: "bg-green-100",
+    recrutador: "bg-purple-100",
+    avaliador: "bg-blue-100",
   };
 
-  const navContent = (
-    <nav className="flex flex-col gap-2 px-2 flex-1">
-      {navItems.map((item, idx) => {
-        const itemPath = item.route ? item.route.split("?")[0] : "#";
-        const isActive = pathname === itemPath;
+  const handleLogout = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+      // fecha o drawer no mobile
+      setIsDrawerOpen?.(false);
 
-        return (
-          <Link href={item.route ?? "#"} key={idx}>
-            <div
-              className={`relative flex items-center p-2 rounded cursor-pointer transition-all
+      if (res.ok) {
+        router.push("/");
+        router.refresh();
+      } else {
+        console.error("Erro ao fazer logout");
+      }
+    } catch (err) {
+      console.error("Erro ao se comunicar com o backend", err);
+    }
+  };
+
+  const renderItem = (item: NavItem, idx: number) => {
+    // Itens de link: calculamos ativo
+    if (item.route) {
+      const itemPath = item.route.split("?")[0];
+      const isActive = pathname === itemPath;
+
+      return (
+        <Link href={item.route} key={idx}>
+          <div
+            onClick={() => isMobile && setIsDrawerOpen?.(false)}
+            className={`relative flex items-center p-2 rounded cursor-pointer transition-all
               ${actualCollapsed ? "justify-center" : "gap-3"}
-              ${
-                isActive
-                  ? profileColorMap[profile] // cor de fundo do perfil
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              <div className="relative">
-                {item.icon}
-                {actualCollapsed && item.badge && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-              {!actualCollapsed && (
-                <span
-                  className={`text-sm flex-1 ${
-                    isActive ? "font-semibold text-gray-900" : "text-gray-700"
-                  }`}
-                >
-                  {item.label}
-                </span>
-              )}
-              {!actualCollapsed && item.badge && (
-                <span className="bg-red-500 text-white text-xs rounded-full px-2">
+              ${isActive ? profileColorMap[profile] : "hover:bg-gray-100"}`}
+          >
+            <div className="relative">
+              {item.icon}
+              {actualCollapsed && item.badge && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
                   {item.badge}
                 </span>
               )}
             </div>
-          </Link>
-        );
-      })}
+            {!actualCollapsed && (
+              <span
+                className={`text-sm flex-1 ${
+                  isActive ? "font-semibold text-gray-900" : "text-gray-700"
+                }`}
+              >
+                {item.label}
+              </span>
+            )}
+            {!actualCollapsed && item.badge && (
+              <span className="bg-red-500 text-white text-xs rounded-full px-2">
+                {item.badge}
+              </span>
+            )}
+          </div>
+        </Link>
+      );
+    }
+
+    // Itens de ação (ex: logout)
+    return (
+      <button
+        key={idx}
+        type="button"
+        onClick={() => {
+          if (item.action === "logout") handleLogout();
+        }}
+        className={`w-full text-left relative flex items-center p-2 rounded transition-all cursor-pointer
+          ${actualCollapsed ? "justify-center" : "gap-3"} hover:bg-gray-100`}
+      >
+        <div className="relative">{item.icon}</div>
+        {!actualCollapsed && (
+          <span className="text-sm flex-1">{item.label}</span>
+        )}
+      </button>
+    );
+  };
+
+  const navContent = (
+    <nav className="flex flex-col gap-2 px-2 flex-1">
+      {navItems.map(renderItem)}
     </nav>
   );
 
   return (
     <>
-      {/* Sidebar padrão no desktop */}
+      {/* Sidebar desktop */}
       <div
         className="hidden md:flex flex-col bg-white h-full transition-all"
         style={{ width: actualCollapsed ? 84 : 200 }}
@@ -122,15 +165,13 @@ export default function Sidebar({
         {navContent}
       </div>
 
-      {/* Drawer no mobile */}
+      {/* Drawer mobile */}
       {isDrawerOpen && (
         <div className="fixed inset-0 z-50 flex">
-          {/* Overlay */}
           <div
             className="absolute inset-0 bg-black/10 backdrop-blur-sm"
             onClick={() => setIsDrawerOpen?.(false)}
           />
-          {/* Menu lateral */}
           <div
             className="relative z-50 bg-white h-full shadow-lg flex flex-col"
             style={{ width: "14rem" }}
