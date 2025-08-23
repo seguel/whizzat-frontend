@@ -9,7 +9,7 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
-import { getFileUrl } from "../../util/getFileUrl";
+// import { getFileUrl } from "../../util/getFileUrl";
 
 interface EmpresaDadosProps {
   perfil: ProfileType;
@@ -644,7 +644,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                 <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0">
                   {empresaPublicada.imagem_fundo ? (
                     <Image
-                      src={getFileUrl(empresaPublicada.imagem_fundo)}
+                      src={empresaPublicada.imagem_fundo}
                       alt="Imagem de capa"
                       width={64}
                       height={64}
@@ -661,7 +661,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                   <div className="absolute left-6 top-full -translate-y-2/3 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-full shadow-md flex items-center justify-center overflow-hidden border-4 border-white z-10">
                     {empresaPublicada.logo ? (
                       <Image
-                        src={getFileUrl(empresaPublicada.logo)}
+                        src={empresaPublicada.logo}
                         alt="Logo da empresa"
                         width={64}
                         height={64}
