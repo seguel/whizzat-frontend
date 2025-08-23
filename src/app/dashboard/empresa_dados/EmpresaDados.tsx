@@ -620,7 +620,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                       type="submit"
                       className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
                         isFormValid(form)
-                          ? " bg-purple-100 hover:bg-purple-200"
+                          ? " bg-purple-100 hover:bg-purple-200  cursor-pointer"
                           : "bg-gray-300 cursor-not-allowed"
                       }`}
                     >
