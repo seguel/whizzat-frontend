@@ -40,43 +40,54 @@ export default function Sidebar({
   const actualCollapsed = isMobile ? false : collapsed;
 
   const profileColorMap: Record<ProfileType, string> = {
-    candidato: "bg-green-100",
-    recrutador: "bg-blue-100",
-    avaliador: "bg-purple-100",
+    candidato: "bg-green-100", // ativo
+    recrutador: "bg-purple-100", // ativo
+    avaliador: "bg-blue-100", // ativo
   };
 
   const navContent = (
     <nav className="flex flex-col gap-2 px-2 flex-1">
-      {navItems.map((item, idx) => (
-        <Link href={item.route ?? "#"} key={idx}>
-          <div
-            className={`relative flex items-center p-2 rounded cursor-pointer transition-all
-      ${actualCollapsed ? "justify-center" : "gap-3"}
-      ${
-        !isMobile && pathname === item.route
-          ? profileColorMap[profile]
-          : "hover:bg-gray-100"
-      }`}
-          >
-            <div className="relative">
-              {item.icon}
-              {actualCollapsed && item.badge && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
+      {navItems.map((item, idx) => {
+        const itemPath = item.route ? item.route.split("?")[0] : "#";
+        const isActive = pathname === itemPath;
+
+        return (
+          <Link href={item.route ?? "#"} key={idx}>
+            <div
+              className={`relative flex items-center p-2 rounded cursor-pointer transition-all
+              ${actualCollapsed ? "justify-center" : "gap-3"}
+              ${
+                isActive
+                  ? profileColorMap[profile] // cor de fundo do perfil
+                  : "hover:bg-gray-100"
+              }`}
+            >
+              <div className="relative">
+                {item.icon}
+                {actualCollapsed && item.badge && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
+              </div>
+              {!actualCollapsed && (
+                <span
+                  className={`text-sm flex-1 ${
+                    isActive ? "font-semibold text-gray-900" : "text-gray-700"
+                  }`}
+                >
+                  {item.label}
+                </span>
+              )}
+              {!actualCollapsed && item.badge && (
+                <span className="bg-red-500 text-white text-xs rounded-full px-2">
                   {item.badge}
                 </span>
               )}
             </div>
-            {!actualCollapsed && (
-              <span className="text-sm flex-1">{item.label}</span>
-            )}
-            {!actualCollapsed && item.badge && (
-              <span className="bg-red-500 text-white text-xs rounded-full px-2">
-                {item.badge}
-              </span>
-            )}
-          </div>
-        </Link>
-      ))}
+          </Link>
+        );
+      })}
     </nav>
   );
 
