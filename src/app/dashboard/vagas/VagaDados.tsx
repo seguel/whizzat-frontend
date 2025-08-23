@@ -14,7 +14,7 @@ import SkillsPanel from "../../components/perfil/SkillsPanel";
 import { addDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "react-hot-toast";
-import { getFileUrl } from "../../util/getFileUrl";
+// import { getFileUrl } from "../../util/getFileUrl";
 import Image from "next/image";
 
 interface Props {
@@ -1008,7 +1008,7 @@ export default function VagaDados({
                                 <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
                                   {form.logo ? (
                                     <Image
-                                      src={getFileUrl(form?.logo)}
+                                      src={form?.logo}
                                       alt="Logo da empresa"
                                       width={64}
                                       height={64}
@@ -1202,9 +1202,7 @@ export default function VagaDados({
                               <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
                                 {vagaPublicada?.empresa?.logo ? (
                                   <Image
-                                    src={getFileUrl(
-                                      vagaPublicada?.empresa?.logo
-                                    )}
+                                    src={vagaPublicada?.empresa?.logo}
                                     alt="Logo da empresa"
                                     width={64}
                                     height={64}
