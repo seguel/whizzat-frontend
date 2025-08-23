@@ -2,7 +2,6 @@
 "use client";
 
 import { Menu } from "lucide-react";
-//import { useProfile } from "./ProfileContext";
 import { useSearchParams, useRouter } from "next/navigation";
 
 interface TopBarProps {
@@ -10,22 +9,43 @@ interface TopBarProps {
   onStartLoading?: () => void;
 }
 
+// Mapa de cores por perfil (igual usamos no menu lateral)
+const profileColorMap: Record<
+  string,
+  { bg: string; text: string; ring: string; avatar: string }
+> = {
+  candidato: {
+    bg: "bg-green-100",
+    text: "text-green-900",
+    ring: "focus:ring-green-500",
+    avatar: "bg-green-300",
+  },
+  recrutador: {
+    bg: "bg-purple-100",
+    text: "text-purple-900",
+    ring: "focus:ring-purple-500",
+    avatar: "bg-purple-300",
+  },
+  avaliador: {
+    bg: "bg-blue-100",
+    text: "text-blue-900",
+    ring: "focus:ring-blue-500",
+    avatar: "bg-blue-300",
+  },
+};
+
 export default function TopBar({
   setIsDrawerOpen,
   onStartLoading,
 }: TopBarProps) {
-  //const { profile } = useProfile();
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentProfile = searchParams.get("perfil") || "candidato";
 
-  /* const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newProfile = e.target.value;
-    router.push(`?perfil=${newProfile}`);
-  }; */
+  const colors = profileColorMap[currentProfile] || profileColorMap.candidato;
 
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    onStartLoading?.(); // dispara o loading antes da navegação
+    onStartLoading?.();
     const newProfile = e.target.value;
     router.push(`?perfil=${newProfile}`);
   }
@@ -48,15 +68,19 @@ export default function TopBar({
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 bg-green-100 text-green-900 px-3 py-1.5 rounded-full shadow-sm">
-          <span className="bg-green-300 rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold">
+        <div
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full shadow-sm ${colors.bg} ${colors.text}`}
+        >
+          <span
+            className={`rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold ${colors.avatar}`}
+          >
             JP
           </span>
 
           <select
             value={currentProfile}
             onChange={handleChange}
-            className="bg-transparent text-sm px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            className={`bg-transparent text-sm px-2 py-1 rounded-md focus:outline-none focus:ring-2 ${colors.ring}`}
           >
             <option value="candidato">Candidato(a)</option>
             <option value="recrutador">Recrutador(a)</option>
