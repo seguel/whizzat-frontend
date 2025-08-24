@@ -37,7 +37,7 @@ export default function Header() {
         {/* Logo grande (desktop) */}
         <Link href="/">
           <Image
-            src="/assets/logofull.jpeg"
+            src="/assets/logofull_whizzat.png"
             alt="Logo grande"
             width={244}
             height={46}

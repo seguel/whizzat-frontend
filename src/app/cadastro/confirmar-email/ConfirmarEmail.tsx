@@ -8,6 +8,7 @@ import {
   EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
+import Image from "next/image";
 
 const ConfirmarEmail = () => {
   const { t, i18n } = useTranslation("common");
@@ -117,6 +118,13 @@ const ConfirmarEmail = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
       <div className="bg-white w-full max-w-md rounded shadow-md p-8 text-center space-y-4">
+        <Image
+          src="/assets/logofull_whizzat.png"
+          alt="Logo grande"
+          width={180}
+          height={40}
+          className="mx-auto"
+        />
         <h1 className="text-2xl font-bold text-gray-800">
           {t("confirma_email.titulo")}
         </h1>
