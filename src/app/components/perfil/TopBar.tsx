@@ -47,7 +47,7 @@ export default function TopBar({
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     onStartLoading?.();
     const newProfile = e.target.value;
-    router.push(`?perfil=${newProfile}`);
+    router.push(`/dashboard?perfil=${newProfile}`);
   }
 
   return (

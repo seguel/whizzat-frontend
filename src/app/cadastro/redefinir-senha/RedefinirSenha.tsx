@@ -100,22 +100,14 @@ const RedefinirSenha = () => {
         <div className="w-full sm:w-1/2 h-auto sm:h-full flex flex-col justify-center items-center px-3 py-10 gap-2">
           <Link href="/">
             <Image
-              src="/assets/logofull.jpeg"
-              alt="Logo grande"
-              width={180}
-              height={40}
-              className="hidden sm:block"
-            />
+                            src="/assets/logofull_whizzat.png"
+                            alt="Logo grande"
+                            width={180}
+                            height={40}
+                            
+                          />
           </Link>
-          <Link href="/">
-            <Image
-              src="/assets/logomobile.jpeg"
-              alt="Logo pequeno"
-              width={100}
-              height={24}
-              className="block sm:hidden"
-            />
-          </Link>
+          
 
           <form
             className="flex flex-col gap-2 w-full max-w-[340px] mt-1"
