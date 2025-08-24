@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeftCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Image from "next/image";
 
 export default function NotFound() {
   const { t, i18n } = useTranslation("common");
@@ -26,6 +27,13 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center p-6">
+      <Image
+        src="/assets/logofull_whizzat.png"
+        alt="Logo grande"
+        width={244}
+        height={46}
+        className="mx-auto mb-5"
+      />
       <h1 className="text-4xl font-bold text-red-600 mb-4">404</h1>
       <h2 className="text-xl font-semibold text-gray-800 mb-2">
         {t("notfound.primeira_linha")}

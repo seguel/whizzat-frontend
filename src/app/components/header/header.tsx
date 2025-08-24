@@ -45,10 +45,10 @@ export default function Header() {
           />
           {/* Logo pequeno (mobile) */}
           <Image
-            src="/assets/logomobile.jpeg"
+            src="/assets/logofull_whizzat.png"
             alt="Logo pequeno"
-            width={120}
-            height={24}
+            width={100}
+            height={100}
             className="block sm:hidden"
           />
         </Link>
