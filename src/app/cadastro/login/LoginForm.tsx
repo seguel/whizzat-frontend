@@ -279,25 +279,17 @@ function LoginInner() {
           <div>
             <Link href="/">
               <Image
-                src="/assets/logofull.jpeg"
+                src="/assets/logofull_whizzat.png"
                 alt="Logo grande"
                 width={180}
                 height={40}
-                className="hidden sm:block"
+                
               />
             </Link>
           </div>
 
           {/* Logo pequeno (mobile) */}
-          <Link href="/">
-            <Image
-              src="/assets/logomobile.jpeg"
-              alt="Logo pequeno"
-              width={100}
-              height={24}
-              className="block sm:hidden"
-            />
-          </Link>
+          
           {displayTelasqueceuSenha ? (
             <>
               {/* Título e link */}

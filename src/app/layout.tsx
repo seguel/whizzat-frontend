@@ -23,6 +23,11 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Whizzat - Conectando oportunidades a pessoas",
   description: "Whizzat - Conectando oportunidades a pessoas",
+  icons: {
+    icon: "/favicon_whizzat.svg", // ícone padrão
+    shortcut: "/favicon_whizzat.svg", // fallback
+    apple: "/favicon_whizzat.svg", // iOS
+  },
 };
 
 export default function RootLayout({
