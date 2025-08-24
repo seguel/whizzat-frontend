@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ProfileType } from "./ProfileContext";
 import { getNavItems, NavItem } from "../../util/sidebarNav";
+import Image from "next/image";
 
 interface SidebarProps {
   profile: ProfileType;
@@ -142,7 +143,23 @@ export default function Sidebar({
         style={{ width: actualCollapsed ? 84 : 200 }}
       >
         <div className="flex items-center justify-between p-4">
-          <span className="text-2xl font-bold text-green-600">WC</span>
+          {actualCollapsed ? (
+            <Image
+              src="/assets/whizzat_icone.png"
+              alt="icone whizzat"
+              width={30}
+              height={30}
+              className="block"
+            />
+          ) : (
+            <Image
+              src="/assets/logofull_whizzat.png"
+              alt="logo whizzat"
+              width={100}
+              height={100}
+              className="hidden sm:block"
+            />
+          )}
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="text-gray-500 hover:text-green-600 transition-transform duration-200 cursor-pointer"
@@ -177,7 +194,12 @@ export default function Sidebar({
             style={{ width: "14rem" }}
           >
             <div className="flex items-center justify-between p-4">
-              <span className="text-2xl font-bold text-green-600">WC</span>
+              <Image
+                src="/assets/logofull_whizzat.png"
+                alt="icone whizzat"
+                width={100}
+                height={100}
+              />
               <button
                 onClick={() => setIsDrawerOpen?.(false)}
                 aria-label="Fechar menu"
