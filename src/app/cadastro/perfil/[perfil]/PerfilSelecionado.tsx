@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import LogoutButton from "../../../components/perfil/logoutButton";
@@ -45,12 +46,27 @@ export default function PerfilSelecionadoPage({
   //const data = profiles[perfil];
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-gray-50 px-6 py-10">
-      {/* Botão de Logout com SVG */}
-      <LogoutButton color={cor_css} />
+    <div className="min-h-screen flex flex-col justify-between bg-gray-100">
+      {/* Header fixo no topo */}
+      <header className="w-full bg-gray-100 sticky top-0 z-50 px-4">
+        <div className=" flex items-center justify-between py-4 ">
+          {/* Logo */}
+          <Link href="/">
+            <Image
+              src="/assets/logofull_whizzat.png"
+              alt="Logo grande"
+              width={160}
+              height={40}
+            />
+          </Link>
+
+          {/* Botão de Logout */}
+          <LogoutButton color={cor_css} />
+        </div>
+      </header>
 
       {/* Conteúdo principal */}
-      <div className="flex flex-1 flex-col lg:flex-row items-center justify-center gap-12">
+      <div className="flex flex-1 flex-col lg:flex-row items-center justify-center px-6 gap-12">
         {/* Ilustração */}
         <div className="w-[300px] h-auto">
           <Image
@@ -118,7 +134,7 @@ export default function PerfilSelecionadoPage({
       </div>
 
       {/* Botões */}
-      <div className="flex justify-between items-center mt-10">
+      <div className="flex justify-between items-center mt-10 mb-10 px-5">
         <button
           onClick={() => router.back()}
           className={`px-6 py-1 rounded-full border ${borderClass} font-semibold  ${hoverBgClass} transition cursor-pointer`}

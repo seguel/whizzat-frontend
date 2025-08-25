@@ -76,10 +76,10 @@ const en = {
     info: "To resend the link, go to the login page.",
   },
   perfil: {
-    titulo_primeiro: "Hello, welcome to WeChek!",
+    titulo_primeiro: "Hello, welcome to whizzat!",
     titulo_segundo: "To get started, choose a profile option",
     titulo_terceiro:
-      "But don't worry, you can create another profile after accessing WeChek",
+      "But don't worry, you can create another profile after accessing Whizzat",
     card_candidato: "I’m a Candidate",
     card_candidato_descricao:
       "I’m looking for the best professional opportunity",
@@ -107,9 +107,9 @@ const en = {
     selecionado_titulo_segundo:
       "Our policy is to ask only what is strictly necessary, so don’t worry.",
     selecionado_titulo_terceiro:
-      "As you interact with WeChek, we’ll ask for more info — but only when it’s essential.",
+      "As you interact with Whizzat, we’ll ask for more info — but only when it’s essential.",
     selecionado_titulo_quarto:
-      "On WeChek, user profiles are identified by colors.",
+      "On Whizzat, user profiles are identified by colors.",
     selecionado_titulo_quinto: "For the",
     selecionado_titulo_sexto: "profile, the dominant color is",
     btn_voltar: "Back",
