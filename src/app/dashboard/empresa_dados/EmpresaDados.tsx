@@ -9,7 +9,7 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
-// import { getFileUrl } from "../../util/getFileUrl";
+import { useRouter } from "next/navigation";
 
 interface EmpresaDadosProps {
   perfil: ProfileType;
@@ -61,6 +61,8 @@ interface EmpresaData {
 }
 
 export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
+  const router = useRouter();
+
   const [step, setStep] = useState(1);
   const [form, setForm] = useLocalStorage<EmpresaForm>("empresaForm", {
     nome: "",
@@ -694,7 +696,14 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
                     <h3 className="text-lg font-semibold text-gray-800">
                       Vagas
                     </h3>
-                    <button className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer">
+                    <button
+                      onClick={() =>
+                        router.push(
+                          `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresaPublicada.empresa_id}`
+                        )
+                      }
+                      className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                    >
                       Cadastrar Vaga
                     </button>
                   </div>

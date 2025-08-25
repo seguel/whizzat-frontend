@@ -675,6 +675,7 @@ export default function VagaDados({
                       <label className="flex flex-col text-sm text-gray-700">
                         Quantos dias a vaga ficará disponível?
                         <div className="flex items-center gap-2 mt-1">
+                          {/* Botão de diminuir */}
                           <button
                             type="button"
                             onClick={() => {
@@ -693,23 +694,39 @@ export default function VagaDados({
                           >
                             -
                           </button>
+
+                          {/* Input que permite digitar */}
                           <input
                             name="qtde_dias_aberta"
-                            type="text"
-                            className="border rounded-md w-12 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300"
-                            value={
-                              vaga?.qtde_dias_aberta ??
-                              form.qtde_dias_aberta ??
-                              diasDisponiveis
-                            }
-                            onChange={handleChange_dinamicos}
-                            readOnly
+                            type="number"
+                            min={1}
+                            max={60}
+                            className="border rounded-md w-16 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300
+             [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
+             [&::-moz-appearance]:textfield"
+                            value={diasDisponiveis}
+                            onChange={(e) => {
+                              let valor = parseInt(e.target.value || "1", 10);
+                              if (isNaN(valor)) valor = 1;
+                              if (valor > 60) valor = 60;
+                              if (valor < 1) valor = 1;
+
+                              setDiasDisponiveis(valor);
+                              handleChange_dinamicos({
+                                target: {
+                                  name: "qtde_dias_aberta",
+                                  value: valor.toString(),
+                                },
+                              } as React.ChangeEvent<HTMLInputElement>);
+                            }}
                           />
+
+                          {/* Botão de aumentar */}
                           <button
                             type="button"
                             onClick={() => {
                               setDiasDisponiveis((prev) => {
-                                const novoValor = prev + 1;
+                                const novoValor = Math.min(prev + 1, 60);
                                 handleChange_dinamicos({
                                   target: {
                                     name: "qtde_dias_aberta",
@@ -725,8 +742,7 @@ export default function VagaDados({
                           </button>
                         </div>
                         {showErrors &&
-                          (!form.qtde_dias_aberta ||
-                            form.qtde_dias_aberta == "0") && (
+                          (!diasDisponiveis || diasDisponiveis === 0) && (
                             <p className="text-sm text-red-600 mt-1">
                               Campo obrigatório.
                             </p>
@@ -737,6 +753,7 @@ export default function VagaDados({
                       <label className="flex flex-col text-sm text-gray-700">
                         Quantidade de vagas para este cargo:
                         <div className="flex items-center gap-2 mt-1">
+                          {/* Botão de diminuir */}
                           <button
                             type="button"
                             onClick={() => {
@@ -755,22 +772,39 @@ export default function VagaDados({
                           >
                             -
                           </button>
+
+                          {/* Input que permite digitar */}
                           <input
                             name="qtde_posicao"
-                            type="text"
-                            className="border rounded-md w-12 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300"
-                            value={
-                              vaga?.qtde_posicao ??
-                              form.qtde_posicao ??
-                              quantidadeVagas
-                            }
-                            readOnly
+                            type="number"
+                            min={0}
+                            max={100}
+                            className="border rounded-md w-16 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300
+             [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
+             [&::-moz-appearance]:textfield"
+                            value={quantidadeVagas}
+                            onChange={(e) => {
+                              let valor = parseInt(e.target.value || "0", 10);
+                              if (isNaN(valor)) valor = 0;
+                              if (valor > 100) valor = 100;
+                              if (valor < 0) valor = 0;
+
+                              setQuantidadeVagas(valor);
+                              handleChange_dinamicos({
+                                target: {
+                                  name: "qtde_posicao",
+                                  value: valor.toString(),
+                                },
+                              } as React.ChangeEvent<HTMLInputElement>);
+                            }}
                           />
+
+                          {/* Botão de aumentar */}
                           <button
                             type="button"
                             onClick={() => {
                               setQuantidadeVagas((prev) => {
-                                const novoValor = prev + 1;
+                                const novoValor = Math.min(prev + 1, 100);
                                 handleChange_dinamicos({
                                   target: {
                                     name: "qtde_posicao",
@@ -786,7 +820,7 @@ export default function VagaDados({
                           </button>
                         </div>
                         {showErrors &&
-                          (!form.qtde_posicao || form.qtde_posicao == "0") && (
+                          (!quantidadeVagas || quantidadeVagas === 0) && (
                             <p className="text-sm text-red-600 mt-1">
                               Campo obrigatório.
                             </p>
