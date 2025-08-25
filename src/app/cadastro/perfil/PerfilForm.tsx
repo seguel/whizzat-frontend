@@ -1,32 +1,48 @@
 "use client";
 
-import Image from "next/image";
 import ProfileCard from "../../components/perfil/ProfileCard";
 import LogoutButton from "../../components/perfil/logoutButton";
 import { useTranslation } from "react-i18next";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function PerfilForm() {
   const { t } = useTranslation("common");
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4 py-12">
-      {/* Botão de Logout com SVG */}
-      <LogoutButton />
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Header fixo no topo */}
+      <header className="w-full px-4">
+        <div className="flex items-center justify-between w-full py-4">
+          {/* Logo */}
+          <Link href="/">
+            <Image
+              src="/assets/logofull_whizzat.png"
+              alt="Logo grande"
+              width={160}
+              height={60}
+            />
+          </Link>
 
-      <div className="max-w-6xl w-full flex flex-col lg:flex-row items-center gap-8 lg:gap-1">
-        {/* Ilustração */}
-        <div className="hidden sm:block flex-shrink-0 w-full max-w-xs sm:max-w-sm lg:max-[30%]">
+          {/* Botão de Logout */}
+          <LogoutButton />
+        </div>
+      </header>
+
+      {/* Conteúdo principal */}
+      <main className="flex-1 w-full flex flex-col lg:flex-row items-center gap-8 max-w-6xl mx-auto px-6 py-12">
+        {/* Ilustração à esquerda */}
+        <div className="hidden sm:block flex-shrink-0 w-full max-w-xs sm:max-w-sm">
           <Image
             src="/assets/imagem_perfil.png"
             alt="Pessoa com laptop"
             width={330}
             height={456}
-            //className="w-full h-auto"
             priority
           />
         </div>
 
-        {/* Conteúdo */}
+        {/* Texto + Cards */}
         <div className="flex-1 space-y-6 text-center lg:text-left">
           <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800">
             {t("perfil.titulo_primeiro")}
@@ -34,7 +50,7 @@ export default function PerfilForm() {
           <p className="text-gray-700">{t("perfil.titulo_segundo")}</p>
 
           {/* Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <ProfileCard
               title={t("perfil.card_candidato")}
               description={t("perfil.card_candidato_descricao")}
@@ -57,7 +73,7 @@ export default function PerfilForm() {
 
           <p className="text-gray-600 mt-6">{t("perfil.titulo_terceiro")}</p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

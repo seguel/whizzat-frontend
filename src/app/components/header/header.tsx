@@ -39,8 +39,8 @@ export default function Header() {
           <Image
             src="/assets/logofull_whizzat.png"
             alt="Logo grande"
-            width={244}
-            height={46}
+            width={160}
+            height={60}
             className="hidden sm:block"
           />
           {/* Logo pequeno (mobile) */}
