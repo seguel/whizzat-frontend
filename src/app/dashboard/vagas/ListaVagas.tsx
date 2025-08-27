@@ -7,6 +7,7 @@ import TopBar from "../../components/perfil/TopBar";
 import SemDados from "../SemDados";
 import JobList from "../../components/perfil/JobList";
 import LoadingOverlay from "../../components/LoadingOverlay";
+import { useRouter } from "next/navigation";
 
 interface Props {
   perfil: ProfileType;
@@ -40,6 +41,7 @@ interface Job {
 }
 
 export default function ListaVagas({ perfil, hasEmpresa }: Props) {
+  const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [hasVagas, setHasVaga] = useState<boolean>(false);
@@ -104,7 +106,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
 
         if (sugeridosData.length > 0) setHasVaga(true);
 
-        setEmpresas(empresasData);
+        setEmpresas(empresasData.empresas);
         setSkills(skillsData);
         setSugeridos(sugeridosData);
         setEscolhidos(sugeridosData);
@@ -140,35 +142,48 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
             {hasVagas ? (
               <>
                 {/* Filtros */}
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <select
-                    value={filtroEmpresa}
-                    onChange={(e) => setFiltroEmpresa(e.target.value)}
-                    className="text-sm sm:text-base border border-purple-400 rounded px-2 py-1 sm:px-3 sm:py-2 focus:outline-none focus:ring-1 focus:ring-purple-500 w-auto"
-                  >
-                    <option value="">Todas as empresas</option>
-                    {empresas.map((empresa) => (
-                      <option
-                        key={empresa.empresa_id}
-                        value={empresa.empresa_id}
-                      >
-                        {empresa.nome_empresa}
-                      </option>
-                    ))}
-                  </select>
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                  {/* Grupo de filtros (lado esquerdo) */}
+                  <div className="flex flex-wrap gap-4">
+                    <select
+                      value={filtroEmpresa}
+                      onChange={(e) => setFiltroEmpresa(e.target.value)}
+                      className="text-sm sm:text-base border border-purple-400 rounded px-2 py-1 sm:px-3 sm:py-2 focus:outline-none focus:ring-1 focus:ring-purple-500 w-auto"
+                    >
+                      <option value="">Todas as empresas</option>
+                      {empresas.map((empresa) => (
+                        <option
+                          key={empresa.empresa_id}
+                          value={empresa.empresa_id}
+                        >
+                          {empresa.nome_empresa}
+                        </option>
+                      ))}
+                    </select>
 
-                  <select
-                    value={filtroSkill}
-                    onChange={(e) => setFiltroSkill(e.target.value)}
-                    className="text-sm sm:text-base border border-purple-400 rounded px-2 py-1 sm:px-3 sm:py-2 focus:outline-none focus:ring-1 focus:ring-purple-500 w-auto"
+                    <select
+                      value={filtroSkill}
+                      onChange={(e) => setFiltroSkill(e.target.value)}
+                      className="text-sm sm:text-base border border-purple-400 rounded px-2 py-1 sm:px-3 sm:py-2 focus:outline-none focus:ring-1 focus:ring-purple-500 w-auto"
+                    >
+                      <option value="">Todas as Skills</option>
+                      {skills.map((sk) => (
+                        <option key={sk.skill_id} value={sk.skill}>
+                          {sk.skill}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Botão alinhado à direita */}
+                  <button
+                    onClick={() =>
+                      router.push(`/dashboard/vagas?perfil=${perfil}&op=N`)
+                    }
+                    className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                   >
-                    <option value="">Todas as Skills</option>
-                    {skills.map((sk) => (
-                      <option key={sk.skill_id} value={sk.skill}>
-                        {sk.skill}
-                      </option>
-                    ))}
-                  </select>
+                    + Cadastrar Vagas
+                  </button>
                 </div>
 
                 {/* Grid de vagas */}

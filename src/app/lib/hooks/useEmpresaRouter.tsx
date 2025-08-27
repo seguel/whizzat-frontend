@@ -16,11 +16,13 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
   const isEdicao = op === "E" && id;
 
   const { isReady } = useAuthGuard("/cadastro/login");
-  const [hasEmpresa, setHasEmpresa] = useState<boolean | null>(null);
+  const [hasEmpresa, setHasEmpresa] = useState<boolean | null>(false);
+  const [userId, setUserId] = useState<string>(""); // <-- aqui
 
   useEffect(() => {
     const perfilId =
       perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+
     const fetchVinculo = async () => {
       try {
         const res = await fetch(
@@ -32,7 +34,9 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
         );
 
         const data = await res.json();
-        setHasEmpresa(data.length > 0);
+
+        setUserId(data.usuario_id); // <-- usa state agora
+        setHasEmpresa(data.empresas.length > 0);
       } catch (error) {
         console.error("Erro ao verificar vínculo:", error);
         setHasEmpresa(false);
@@ -42,10 +46,20 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
     fetchVinculo();
   }, [perfil]);
 
-  if (isCadastro || isEdicao) {
+  // só renderiza depois que userId estiver definido
+  if (!userId) {
+    return {
+      isLoading: true,
+      componente: <div>Carregando...</div>, // pode trocar por um loader/spinner
+    };
+  }
+
+  if (isCadastro || isEdicao || !hasEmpresa) {
     return {
       isLoading: false,
-      componente: <EmpresaDados perfil={perfil} empresaId={id ?? null} />,
+      componente: (
+        <EmpresaDados perfil={perfil} empresaId={id ?? null} userId={userId} />
+      ),
     };
   }
 
@@ -54,7 +68,7 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
   const componente = hasEmpresa ? (
     <Empresa perfil={perfil} />
   ) : (
-    <EmpresaDados perfil={perfil} />
+    <EmpresaDados perfil={perfil} userId={userId} />
   );
 
   return { isLoading, componente };
