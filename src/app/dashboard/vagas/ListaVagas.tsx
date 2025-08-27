@@ -8,24 +8,13 @@ import SemDados from "../SemDados";
 import JobList from "../../components/perfil/JobList";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { useRouter } from "next/navigation";
+import Select from "react-select";
+import { ImSpinner2 } from "react-icons/im";
 
 interface Props {
   perfil: ProfileType;
   hasEmpresa: boolean | null;
 }
-
-/* interface VagaAPI {
-  id: number;
-  logo_url: string;
-  nome_vaga: string;
-  nome_empresa: string;
-  cidade: string;
-  estado: string;
-  pais: string;
-  data_cadastro: string;
-  qtde_dias_aberta: number;
-  pcd?: boolean;
-} */
 
 interface Job {
   empresa_id: number;
@@ -44,6 +33,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isFiltering, setIsFiltering] = useState(false);
   const [hasVagas, setHasVaga] = useState<boolean>(false);
 
   const [sugeridos, setSugeridos] = useState<Job[]>([]);
@@ -59,15 +49,40 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
 
   const [filtroEmpresa, setFiltroEmpresa] = useState("");
   const [filtroSkill, setFiltroSkill] = useState("");
-  /* 
-  function calcularPrazo(dataCadastro: string, dias: number) {
-    const data = new Date(dataCadastro);
-    data.setDate(data.getDate() + dias);
-    return data.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-    });
-  } */
+  const [hasVagasFiltro, setHasVagasFiltro] = useState<boolean | null>(null);
+
+  // Função para buscar vagas com os filtros aplicados
+  const handleFiltrar = async () => {
+    try {
+      setIsFiltering(true);
+
+      const perfilId =
+        perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+
+      // Se não selecionar, envia "todos"
+      const empresaParam = filtroEmpresa || "todos";
+      const skillParam = filtroSkill || "todos";
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/empresas/vagas-sugeridos/${perfilId}?empresaId=${empresaParam}&skill=${skillParam}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      setSugeridos(data);
+      setEscolhidos(data);
+      setAvaliacao(data);
+      setHasVagasFiltro(data.length > 0);
+    } catch (error) {
+      console.error("Erro ao filtrar vagas:", error);
+    } finally {
+      setIsFiltering(false);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -80,10 +95,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
         const [empresasRes, skillsRes, sugeridosRes] = await Promise.all([
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/empresas/vinculo/${perfilId}`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
+            { method: "GET", credentials: "include" }
           ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/`, {
             method: "GET",
@@ -91,10 +103,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
           }),
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/empresas/vagas-sugeridos/${perfilId}`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
+            { method: "GET", credentials: "include" }
           ),
         ]);
 
@@ -103,14 +112,12 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
           skillsRes.json(),
           sugeridosRes.json(),
         ]);
-
-        if (sugeridosData.length > 0) setHasVaga(true);
-
         setEmpresas(empresasData.empresas);
         setSkills(skillsData);
         setSugeridos(sugeridosData);
         setEscolhidos(sugeridosData);
         setAvaliacao(sugeridosData);
+        setHasVaga(sugeridosData.length > 0);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
       } finally {
@@ -121,9 +128,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
     fetchSelectData();
   }, [perfil]);
 
-  if (loading) {
-    return <LoadingOverlay />;
-  }
+  if (loading) return <LoadingOverlay />;
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -142,75 +147,148 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
             {hasVagas ? (
               <>
                 {/* Filtros */}
-                <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                  {/* Grupo de filtros (lado esquerdo) */}
-                  <div className="flex flex-wrap gap-4">
-                    <select
-                      value={filtroEmpresa}
-                      onChange={(e) => setFiltroEmpresa(e.target.value)}
-                      className="text-sm sm:text-base border border-purple-400 rounded px-2 py-1 sm:px-3 sm:py-2 focus:outline-none focus:ring-1 focus:ring-purple-500 w-auto"
-                    >
-                      <option value="">Todas as empresas</option>
-                      {empresas.map((empresa) => (
-                        <option
-                          key={empresa.empresa_id}
-                          value={empresa.empresa_id}
-                        >
-                          {empresa.nome_empresa}
-                        </option>
-                      ))}
-                    </select>
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 w-full">
+                  {/* Grupo de filtros à esquerda */}
+                  <div className="flex flex-col sm:flex-row sm:items-end gap-2 sm:gap-4 flex-1 w-full">
+                    {/* Filtro Empresa */}
+                    <div className="w-full sm:w-[250px]">
+                      <Select
+                        isClearable
+                        placeholder="Todas as empresas"
+                        value={
+                          filtroEmpresa
+                            ? {
+                                value: filtroEmpresa,
+                                label:
+                                  empresas.find(
+                                    (e) =>
+                                      String(e.empresa_id) === filtroEmpresa
+                                  )?.nome_empresa || "",
+                              }
+                            : { value: "", label: "Todas as empresas" }
+                        }
+                        onChange={(option) =>
+                          setFiltroEmpresa(option ? String(option.value) : "")
+                        }
+                        options={[
+                          { value: "", label: "Todas as empresas" },
+                          ...empresas.map((empresa) => ({
+                            value: String(empresa.empresa_id),
+                            label: empresa.nome_empresa,
+                          })),
+                        ]}
+                        className="text-sm sm:text-base"
+                      />
+                    </div>
 
-                    <select
-                      value={filtroSkill}
-                      onChange={(e) => setFiltroSkill(e.target.value)}
-                      className="text-sm sm:text-base border border-purple-400 rounded px-2 py-1 sm:px-3 sm:py-2 focus:outline-none focus:ring-1 focus:ring-purple-500 w-auto"
-                    >
-                      <option value="">Todas as Skills</option>
-                      {skills.map((sk) => (
-                        <option key={sk.skill_id} value={sk.skill}>
-                          {sk.skill}
-                        </option>
-                      ))}
-                    </select>
+                    {/* Filtro Skill + Botão Filtrar */}
+                    <div className="flex flex-col sm:flex-row sm:items-end gap-2 w-full sm:w-auto">
+                      <div className="w-full sm:w-[250px]">
+                        <Select
+                          isClearable
+                          placeholder="Todas as Skills"
+                          value={
+                            filtroSkill
+                              ? {
+                                  value: filtroSkill,
+                                  label:
+                                    skills.find((s) => s.skill === filtroSkill)
+                                      ?.skill || "",
+                                }
+                              : { value: "", label: "Todas as Skills" }
+                          }
+                          onChange={(option) =>
+                            setFiltroSkill(option ? String(option.value) : "")
+                          }
+                          options={[
+                            { value: "", label: "Todas as Skills" },
+                            ...skills.map((sk) => ({
+                              value: sk.skill,
+                              label: sk.skill,
+                            })),
+                          ]}
+                          className="text-sm sm:text-base"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleFiltrar}
+                        disabled={isFiltering}
+                        className="w-full sm:w-auto px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                      >
+                        {isFiltering ? (
+                          <ImSpinner2 className="animate-spin" />
+                        ) : (
+                          "Filtrar"
+                        )}
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Botão alinhado à direita */}
-                  <button
-                    onClick={() =>
-                      router.push(`/dashboard/vagas?perfil=${perfil}&op=N`)
-                    }
-                    className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
-                  >
-                    + Cadastrar Vagas
-                  </button>
+                  {/* Botão Cadastrar Vagas à direita */}
+                  <div className="flex-shrink-0 w-full sm:w-auto">
+                    <button
+                      onClick={() =>
+                        router.push(`/dashboard/vagas?perfil=${perfil}&op=N`)
+                      }
+                      className="w-full sm:w-auto px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                    >
+                      + Cadastrar Vagas
+                    </button>
+                  </div>
                 </div>
 
-                {/* Grid de vagas */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {sugeridos.length > 0 && (
-                    <JobList
-                      title={`Candidatos sugeridos: ${sugeridos.length}`}
-                      jobs={sugeridos}
-                      colorClass="bg-purple-100 text-purple-700"
-                    />
-                  )}
+                {hasVagasFiltro || hasVagasFiltro === null ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {sugeridos.length > 0 && (
+                      <JobList
+                        title={`Candidatos sugeridos: ${sugeridos.length}`}
+                        jobs={sugeridos}
+                        colorClass="bg-purple-100 text-purple-700"
+                      />
+                    )}
 
-                  {escolhidos.length > 0 && (
-                    <JobList
-                      title={`Candidatos escolhidos: ${escolhidos.length}`}
-                      jobs={escolhidos}
-                      colorClass="bg-purple-200 text-purple-800"
-                    />
-                  )}
-                  {avaliacao.length > 0 && (
-                    <JobList
-                      title={`Candidatos em avaliação: ${avaliacao.length}`}
-                      jobs={avaliacao}
-                      colorClass="bg-purple-300 text-purple-900"
-                    />
-                  )}
-                </div>
+                    {escolhidos.length > 0 && (
+                      <JobList
+                        title={`Candidatos escolhidos: ${escolhidos.length}`}
+                        jobs={escolhidos}
+                        colorClass="bg-purple-200 text-purple-800"
+                      />
+                    )}
+                    {avaliacao.length > 0 && (
+                      <JobList
+                        title={`Candidatos em avaliação: ${avaliacao.length}`}
+                        jobs={avaliacao}
+                        colorClass="bg-purple-300 text-purple-900"
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-12 w-12 text-gray-400 mb-3"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <h2 className="text-lg sm:text-xl font-medium text-gray-700">
+                      Nenhuma vaga disponível com os critérios selecionados.
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Tente ajustar os filtros ou limpar a seleção para ver mais
+                      resultados.
+                    </p>
+                  </div>
+                )}
               </>
             ) : (
               <SemDados tipo="vaga" />
