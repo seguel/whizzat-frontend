@@ -22,6 +22,7 @@ interface Props {
   hasEmpresa: boolean | null;
   empresaId: string | null;
   vagaId: string | null;
+  userId?: string;
 }
 interface SkillAvaliacao {
   skill_id: number;
@@ -98,15 +99,17 @@ function useLocalStorage<T>(key: string, initialValue: T) {
 
   return [storedValue, setStoredValue] as const;
 }
+
 export default function VagaDados({
   perfil,
   hasEmpresa,
   empresaId,
   vagaId,
+  userId,
 }: Props) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [step, setStep] = useState(1);
-  const [form, setForm] = useLocalStorage<VagasForm>("vagasForm", {
+  const [form, setForm] = useLocalStorage<VagasForm>(`vagasForm_${userId}`, {
     empresa_id: "",
     nome_vaga: "",
     descricao: "",
@@ -227,7 +230,7 @@ export default function VagaDados({
             skillsRes.json(),
           ]);
 
-        setEmpresas(empresasData);
+        setEmpresas(empresasData.empresas);
         setModalidades(modalidadesData);
         setPeriodos(periodosData);
         setSkills(skillsData);
@@ -364,7 +367,7 @@ export default function VagaDados({
         setVagaPublicada(data); // <- Aqui salva os dados no estado
 
         // Limpa o localStorage se necessário
-        localStorage.removeItem("vagasForm");
+        localStorage.removeItem(`vagasForm_${userId}`);
 
         setIsSubmitting(false);
         toast.success(`Vaga "${data.nome_vaga}" publicada com sucesso!`, {
