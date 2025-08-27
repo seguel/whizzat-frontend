@@ -46,11 +46,10 @@ export default function Empresa({ perfil }: Props) {
           }
         );
         const data = await res.json();
-        if (Array.isArray(data)) {
-          setEmpresas(data);
-          console.log(data);
-          if (data.length === 1) {
-            setEmpresaSelecionada(data[0]);
+        if (Array.isArray(data.empresas)) {
+          setEmpresas(data.empresas);
+          if (data.empresas.length === 1) {
+            setEmpresaSelecionada(data.empresas[0]);
           }
         }
       } catch (error) {

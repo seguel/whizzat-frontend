@@ -39,8 +39,9 @@ export default function DashboardRecrutador({ perfil }: Props) {
           setHasEmpresa(false);
         } else {
           const data = await res.json();
-          if (data.length > 0) setHasEmpresa(true);
-          else setHasEmpresa(false);
+
+          //setUserId(data.usuario_id); // <-- usa state agora
+          setHasEmpresa(data.empresas.length > 0);
         }
       } catch (error) {
         console.error("Erro ao verificar vínculo:", error);

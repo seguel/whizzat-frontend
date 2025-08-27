@@ -18,6 +18,7 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
 
   const { isReady } = useAuthGuard("/cadastro/login");
   const [hasEmpresa, setHasEmpresa] = useState<boolean | null>(null);
+  const [userId, setUserId] = useState<string>("");
 
   // Busca se há empresa vinculada ao perfil
   useEffect(() => {
@@ -35,7 +36,9 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
         );
 
         const data = await res.json();
-        setHasEmpresa(data.length > 0);
+
+        setUserId(data.usuario_id); // <-- usa state agora
+        setHasEmpresa(data.empresas.length > 0);
       } catch (error) {
         console.error("Erro ao verificar vínculo:", error);
         setHasEmpresa(false);
@@ -44,6 +47,14 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
 
     fetchVinculo();
   }, [perfil]);
+
+  // só renderiza depois que userId estiver definido
+  if (!userId) {
+    return {
+      isLoading: true,
+      componente: <div>Carregando...</div>, // pode trocar por um loader/spinner
+    };
+  }
 
   // Cadastro ou edição de vaga
   if (isCadastro || isEdicao) {
@@ -59,6 +70,7 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
           hasEmpresa={hasEmpresa}
           empresaId={empresaId ?? null}
           vagaId={vagaId ?? null}
+          userId={userId}
         />
       ),
     };

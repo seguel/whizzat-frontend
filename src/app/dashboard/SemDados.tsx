@@ -1,10 +1,11 @@
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface SemDadosProps {
   tipo: "empresa" | "vaga" | "avaliador"; // pode adicionar mais depois
 }
 
 export default function SemDados({ tipo }: SemDadosProps) {
+  const router = useRouter();
   const renderBloco = () => {
     switch (tipo) {
       case "empresa":
@@ -21,11 +22,14 @@ export default function SemDados({ tipo }: SemDadosProps) {
             <p className="text-sm text-gray-600 mb-4 pb-4">
               Você poderá criar quantas páginas de empresas desejar.
             </p>
-            <Link href="/dashboard/empresa_dados?perfil=recrutador">
-              <button className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer">
-                Preencher dados da empresa
-              </button>
-            </Link>
+            <button
+              onClick={() =>
+                router.push(`/dashboard/empresa_dados?perfil=recrutador&op=N`)
+              }
+              className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+            >
+              Preencher dados da empresa
+            </button>
           </>
         );
 
@@ -38,11 +42,14 @@ export default function SemDados({ tipo }: SemDadosProps) {
             <p className="text-sm text-gray-600 mb-4 pb-4">
               Você poderá criar quantas vagas desejar.
             </p>
-            <Link href="/dashboard/vagas/nova">
-              <button className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer">
-                Cadastrar vaga
-              </button>
-            </Link>
+            <button
+              onClick={() =>
+                router.push(`/dashboard/vagas?perfil=recrutador&op=N`)
+              }
+              className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+            >
+              Cadastrar vaga
+            </button>
           </>
         );
 
@@ -55,11 +62,9 @@ export default function SemDados({ tipo }: SemDadosProps) {
             <p className="text-sm text-gray-600 mb-4 pb-4">
               Cadastre avaliadores para ajudar na análise de candidatos.
             </p>
-            <Link href="/dashboard/avaliadores/novo">
-              <button className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer">
-                Adicionar avaliador
-              </button>
-            </Link>
+            <button className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer">
+              Adicionar avaliador
+            </button>
           </>
         );
 

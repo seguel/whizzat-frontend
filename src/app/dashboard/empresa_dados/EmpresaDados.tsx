@@ -14,27 +14,7 @@ import { useRouter } from "next/navigation";
 interface EmpresaDadosProps {
   perfil: ProfileType;
   empresaId?: string | null;
-}
-
-// LocalStorage hook
-function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") return initialValue;
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(key, JSON.stringify(storedValue));
-    } catch {}
-  }, [storedValue, key]);
-
-  return [storedValue, setStoredValue] as const;
+  userId?: string;
 }
 
 // Tipos de dados do formulário
@@ -60,20 +40,49 @@ interface EmpresaData {
   imagem_fundo?: string;
 }
 
-export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
+// LocalStorage hook
+// Hook genérico
+function useLocalStorage<T>(key: string, initialValue: T) {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    if (typeof window === "undefined") return initialValue;
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(storedValue));
+    } catch {}
+  }, [storedValue, key]);
+
+  return [storedValue, setStoredValue] as const;
+}
+
+export default function EmpresaDados({
+  perfil,
+  empresaId,
+  userId,
+}: EmpresaDadosProps) {
   const router = useRouter();
 
   const [step, setStep] = useState(1);
-  const [form, setForm] = useLocalStorage<EmpresaForm>("empresaForm", {
-    nome: "",
-    site: "",
-    email: "",
-    telefone: "",
-    logoPreview: null,
-    localizacao: "",
-    apresentacao: "",
-    capaPreview: null,
-  });
+  const [form, setForm] = useLocalStorage<EmpresaForm>(
+    `empresaForm_${userId}`,
+    {
+      nome: "",
+      site: "",
+      email: "",
+      telefone: "",
+      logoPreview: null,
+      localizacao: "",
+      apresentacao: "",
+      capaPreview: null,
+    }
+  );
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [capaFile, setCapaFile] = useState<File | null>(null);
   const [showErrors, setShowErrors] = useState(false);
@@ -220,7 +229,7 @@ export default function EmpresaDados({ perfil, empresaId }: EmpresaDadosProps) {
         setEmpresaPublicada(data);
 
         // Limpa o localStorage se necessário
-        localStorage.removeItem("empresaForm");
+        localStorage.removeItem(`empresaForm_${userId}`);
 
         setIsSubmitting(false);
         nextStep();
