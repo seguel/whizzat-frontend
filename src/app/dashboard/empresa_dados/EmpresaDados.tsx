@@ -10,6 +10,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 interface EmpresaDadosProps {
   perfil: ProfileType;
@@ -129,17 +130,29 @@ export default function EmpresaDados({
   // Handlers comuns
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
-    if (name === "logo" && files?.[0]) {
+
+    if ((name === "logo" || name === "capa") && files?.[0]) {
       const file = files[0];
-      setLogoFile(file);
+      const maxSize = 1 * 1024 * 1024; // 1MB
+
+      if (file.size > maxSize) {
+        toast.error("O arquivo deve ter no máximo 1MB.", {
+          duration: 5000, // ← 5 segundos
+        });
+        return;
+      }
+
       const preview = URL.createObjectURL(file);
-      setForm((prev) => ({ ...prev, logoPreview: preview }));
-    } else if (name === "capa" && files?.[0]) {
-      const file = files[0];
-      setCapaFile(file);
-      const preview = URL.createObjectURL(file);
-      setForm((prev) => ({ ...prev, capaPreview: preview }));
+
+      if (name === "logo") {
+        setLogoFile(file);
+        setForm((prev) => ({ ...prev, logoPreview: preview }));
+      } else if (name === "capa") {
+        setCapaFile(file);
+        setForm((prev) => ({ ...prev, capaPreview: preview }));
+      }
     } else {
+      // Para campos de texto ou outros
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
@@ -230,12 +243,16 @@ export default function EmpresaDados({
 
         // Limpa o localStorage se necessário
         localStorage.removeItem(`empresaForm_${userId}`);
-
+        toast.success(`Empresa "${data.nome_empresa}" publicada com sucesso!`, {
+          duration: 5000, // ← 5 segundos
+        });
         setIsSubmitting(false);
         nextStep();
       } catch (err) {
         console.error("Erro ao enviar dados:", err);
-        alert("Erro ao enviar dados da empresa. Tente novamente.");
+        toast.error("Erro ao enviar dados da empresa. Tente novamente.", {
+          duration: 5000, // ← 5 segundos
+        });
         setIsSubmitting(false);
       }
     }
@@ -378,7 +395,7 @@ export default function EmpresaDados({
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Carregue o logotipo de sua empresa:
+                    Carregue o logotipo da sua empresa (tamanho máximo: 1MB).
                   </label>
                   <label
                     className={`
@@ -514,7 +531,8 @@ export default function EmpresaDados({
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Carregue uma imagem de capa para a página de sua empresa:
+                      Carregue a imagem de capa da página da sua empresa
+                      (tamanho máximo: 1MB)
                     </label>
                     <label
                       className={`
@@ -633,7 +651,7 @@ export default function EmpresaDados({
                       type="submit"
                       className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
                         isFormValid(form)
-                          ? " bg-purple-100 hover:bg-purple-200  cursor-pointer"
+                          ? " bg-purple-100 hover:bg-purple-200 cursor-pointer"
                           : "bg-gray-300 cursor-not-allowed"
                       }`}
                     >
