@@ -143,7 +143,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
         {!hasEmpresa ? (
           <SemDados tipo="empresa" />
         ) : (
-          <main className="p-4 w-[98%] mx-auto">
+          <main className="p-4 w-[98%] mx-auto flex-1">
             {hasVagas ? (
               <>
                 {/* Filtros */}
