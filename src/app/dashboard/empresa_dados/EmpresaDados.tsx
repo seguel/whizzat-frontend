@@ -577,15 +577,18 @@ export default function EmpresaDados({
             )}
 
             {step === 4 && (
-              <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-                <div className="w-full space-y-6 min-h-[100%] flex flex-col">
+              <form
+                onSubmit={handleSubmit}
+                className="flex-1 flex flex-col w-full h-full"
+              >
+                <div className="w-full h-full flex flex-col">
                   {/* Capa e logo */}
-                  <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0">
+                  <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0 overflow-hidden">
                     {form.capaPreview ? (
                       <img
                         src={form.capaPreview}
                         alt="Imagem de capa"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full min-w-full min-h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -608,9 +611,8 @@ export default function EmpresaDados({
                       )}
                     </div>
                   </div>
-
                   {/* Informações da empresa */}
-                  <div className="pt-8 px-4 md:px-8">
+                  <div className="flex-1 pt-8 px-4 md:px-8">
                     <h2 className="text-xl font-semibold text-gray-800 mb-2">
                       {form.nome || "Nome da empresa"}
                     </h2>
@@ -631,7 +633,7 @@ export default function EmpresaDados({
                       type="submit"
                       className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
                         isFormValid(form)
-                          ? " bg-purple-100 hover:bg-purple-200  cursor-pointer"
+                          ? " bg-purple-100 hover:bg-purple-200  cursor-pointer"
                           : "bg-gray-300 cursor-not-allowed"
                       }`}
                     >
