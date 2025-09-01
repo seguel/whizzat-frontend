@@ -853,6 +853,9 @@ export default function VagaDados({
                         <h1 className="block text-sm mb-1 py-3 font-bold">
                           Informe as Skills que você busca para este perfil
                           profissional
+                          <p className="block text-[11x] font-light">
+                            (mínimo 3 e no máximo 12)
+                          </p>
                         </h1>
 
                         <label className="text-sm font-medium mb-1 flex items-center gap-1">
@@ -868,9 +871,9 @@ export default function VagaDados({
                               isClearable
                               placeholder="Digite ou selecione uma skill"
                               value={selectedSkill}
-                              onChange={(newValue) => {
-                                setSelectedSkill(newValue);
-                              }}
+                              onChange={(newValue) =>
+                                setSelectedSkill(newValue)
+                              }
                               options={skills.map((skill) => ({
                                 value: String(skill.skill_id),
                                 label: skill.skill,
@@ -878,6 +881,7 @@ export default function VagaDados({
                               formatCreateLabel={(inputValue) =>
                                 `Criar nova skill: "${inputValue}"`
                               }
+                              isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
                             />
                           </div>
 
@@ -953,10 +957,15 @@ export default function VagaDados({
                                   </div>
 
                                   {/* Avaliador */}
-                                  <div className="flex items-center gap-4 text-sm min-w-[250px]">
-                                    <label className="font-medium whitespace-nowrap">
-                                      Avaliador:
-                                    </label>
+                                  <div className="flex items-center gap-4 text-sm min-w-[260px]">
+                                    <div className="flex items-center gap-1">
+                                      <label className="font-medium whitespace-nowrap">
+                                        Avaliador:
+                                      </label>
+                                      <TooltipIcon
+                                        message={`1. Próprio: Será selecionado\nsomente entre os avaliadores existentes\nna empresa recrutadora\n\n2. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações`}
+                                      />
+                                    </div>
                                     <label className="flex items-center gap-1">
                                       <input
                                         type="radio"
@@ -983,7 +992,7 @@ export default function VagaDados({
                                           )
                                         }
                                       />
-                                      Externo
+                                      Whizzat
                                     </label>
                                   </div>
                                 </div>
@@ -1012,7 +1021,13 @@ export default function VagaDados({
                         </button>
                         <button
                           type="submit"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                          disabled={form.lista_skills.length < 3} // só habilita se >= 3
+                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
+                          ${
+                            form.lista_skills.length < 3
+                              ? "bg-gray-300 cursor-not-allowed"
+                              : "bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          }`}
                         >
                           Avançar
                         </button>
@@ -1038,9 +1053,9 @@ export default function VagaDados({
                           {/* Bloco - Informações da vaga */}
                           <div className="w-[65%] space-y-4 mr-2">
                             {/* Linha 1 - Logo + Título da vaga e empresa */}
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                              {/* Logo e título + empresa */}
-                              <div className="flex flex-row sm:flex-1 gap-4 items-center">
+                            <div className="flex flex-col gap-4">
+                              {/* Logo e título + empresa ocupando toda largura */}
+                              <div className="flex flex-row w-full gap-4 items-center">
                                 {/* Logo */}
                                 <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
                                   {form.logo ? (
@@ -1050,7 +1065,7 @@ export default function VagaDados({
                                       width={64}
                                       height={64}
                                       className="w-full h-full object-cover"
-                                      unoptimized // opcional, se estiver usando imagens externas sem loader
+                                      unoptimized
                                     />
                                   ) : (
                                     <div className="text-xs text-gray-400 text-center px-2">
@@ -1060,7 +1075,7 @@ export default function VagaDados({
                                 </div>
 
                                 {/* Título e empresa */}
-                                <div>
+                                <div className="flex-1">
                                   <h2 className="text-xl font-semibold text-gray-800">
                                     {form.nome_vaga}
                                   </h2>
@@ -1074,14 +1089,11 @@ export default function VagaDados({
                                 </div>
                               </div>
 
-                              {/* Data de vigência */}
-                              <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-3 py-1 text-sm w-fit self-start sm:self-auto">
+                              {/* Data de vigência abaixo */}
+                              <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
                                 <CalendarDays className="w-4 h-4 text-purple-500" />
                                 <span>
-                                  Vigência até:{" "}
-                                  <strong className="md:block">
-                                    {dataFormatada}
-                                  </strong>
+                                  Vigência até: <strong>{dataFormatada}</strong>
                                 </span>
                               </div>
                             </div>
@@ -1232,9 +1244,9 @@ export default function VagaDados({
                         {/* Bloco - Informações da vaga */}
                         <div className="w-[65%] space-y-4 mr-2">
                           {/* Linha 1 - Logo + Título da vaga e empresa */}
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            {/* Logo e título + empresa */}
-                            <div className="flex flex-row sm:flex-1 gap-4 items-center">
+                          <div className="flex flex-col gap-4">
+                            {/* Logo e título + empresa ocupando toda largura */}
+                            <div className="flex flex-row w-full gap-4 items-center">
                               {/* Logo */}
                               <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
                                 {vagaPublicada?.empresa?.logo ? (
@@ -1244,7 +1256,7 @@ export default function VagaDados({
                                     width={64}
                                     height={64}
                                     className="w-full h-full object-cover"
-                                    unoptimized // opcional, se estiver usando imagens externas sem loader
+                                    unoptimized
                                   />
                                 ) : (
                                   <div className="text-xs text-gray-400 text-center px-2">
@@ -1264,14 +1276,11 @@ export default function VagaDados({
                               </div>
                             </div>
 
-                            {/* Data de vigência */}
-                            <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-3 py-1 text-sm w-fit self-start sm:self-auto">
+                            {/* Data de vigência abaixo */}
+                            <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
                               <CalendarDays className="w-4 h-4 text-purple-500" />
                               <span>
-                                Vigência até:{" "}
-                                <strong className="md:block">
-                                  {dataFormatada}
-                                </strong>
+                                Vigência até: <strong>{dataFormatada}</strong>
                               </span>
                             </div>
                           </div>
