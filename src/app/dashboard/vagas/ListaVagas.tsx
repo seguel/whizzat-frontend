@@ -97,7 +97,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
             `${process.env.NEXT_PUBLIC_API_URL}/empresas/vinculo/${perfilId}`,
             { method: "GET", credentials: "include" }
           ),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/`, {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/filtro`, {
             method: "GET",
             credentials: "include",
           }),

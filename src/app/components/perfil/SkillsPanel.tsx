@@ -88,7 +88,7 @@ export default function SkillsPanel({ skills }: SkillsPanelProps) {
           Distribuição de skills
         </h3>
         <ResponsiveContainer width="100%" height={240}>
-          <RadarChart cx="50%" cy="50%" outerRadius="65%" data={radarData}>
+          <RadarChart cx="50%" cy="50%" outerRadius="45%" data={radarData}>
             <PolarGrid />
             <PolarAngleAxis dataKey="skill" tick={{ fontSize: 10 }} />
             <PolarRadiusAxis angle={30} domain={[0, 10]} tick={false} />
