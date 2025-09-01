@@ -227,18 +227,26 @@ export default function EmpresaDados({
           }
         );
 
+        const data = await response.json(); // <- Aqui pega o retorno da empresa salva
+
         if (!response.ok) {
-          throw new Error("Erro ao salvar empresa.");
+          // o backend Nest devolve { statusCode, message, error }
+          const errorMessage =
+            typeof data.message === "string"
+              ? data.message
+              : Array.isArray(data.message)
+              ? data.message.join(", ")
+              : "Erro ao salvar empresa.";
+
+          throw new Error(errorMessage);
         }
 
-        const data = await response.json(); // <- Aqui pega o retorno da empresa salva
         /* const empresaComUrls = {
           ...data,
           logoUrl: getFileUrl(data.logo),
           capaUrl: getFileUrl(data.imagem_fundo),
         }; */
 
-        console.log(data);
         setEmpresaPublicada(data);
 
         // Limpa o localStorage se necessário
@@ -248,11 +256,19 @@ export default function EmpresaDados({
         });
         setIsSubmitting(false);
         nextStep();
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Erro ao enviar dados:", err);
-        toast.error("Erro ao enviar dados da empresa. Tente novamente.", {
-          duration: 5000, // ← 5 segundos
+
+        // type guard
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Erro ao enviar dados da empresa. Tente novamente.";
+
+        toast.error(message, {
+          duration: 5000,
         });
+
         setIsSubmitting(false);
       }
     }
@@ -395,7 +411,8 @@ export default function EmpresaDados({
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Carregue o logotipo da sua empresa (tamanho máximo: 1MB).
+                    Carregue o logotipo da sua empresa (recomendado 512×512 px,
+                    até 1MB).
                   </label>
                   <label
                     className={`
@@ -531,8 +548,8 @@ export default function EmpresaDados({
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Carregue a imagem de capa da página da sua empresa
-                      (tamanho máximo: 1MB)
+                      Carregue a imagem de capa da sua empresa (recomendado:
+                      1200×300 px, até 1MB)
                     </label>
                     <label
                       className={`
