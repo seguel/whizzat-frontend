@@ -109,8 +109,8 @@ export default function DashboardCandidato({ perfil }: Props) {
           />
           <main className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2 space-y-6">
-              <JobList title="Minhas vagas" jobs={[]} />
-              <JobList title="Vagas compatíveis" jobs={[]} />
+              <JobList title="Minhas vagas" jobs={[]} perfil={perfil} />
+              <JobList title="Vagas compatíveis" jobs={[]} perfil={perfil} />
             </div>
             <div className="md:col-span-1">
               <SkillsPanel />
