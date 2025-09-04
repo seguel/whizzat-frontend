@@ -22,7 +22,6 @@ export default async function Page({
   if (!validPerfis.includes(perfil as PerfilKey)) {
     notFound();
   }
-
   return (
     <MiddlewarePage
       perfil={perfil as ProfileType}

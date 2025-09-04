@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"; // App Router
 
 interface Props {
   perfil: ProfileType;
+  empresaId: number | null;
 }
 
 interface EmpresaData {
@@ -23,7 +24,7 @@ interface EmpresaData {
   imagem_fundo?: string;
 }
 
-export default function Empresa({ perfil }: Props) {
+export default function Empresa({ perfil, empresaId }: Props) {
   const router = useRouter();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -50,6 +51,10 @@ export default function Empresa({ perfil }: Props) {
           setEmpresas(data.empresas);
           if (data.empresas.length === 1) {
             setEmpresaSelecionada(data.empresas[0]);
+          } else {
+            if (empresaId && !isNaN(Number(empresaId))) {
+              handleSelecionarEmpresa(Number(empresaId));
+            }
           }
         }
       } catch (error) {

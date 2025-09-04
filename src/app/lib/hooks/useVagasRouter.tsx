@@ -3,7 +3,9 @@ import VagasDados from "../../dashboard/vagas/VagaDados";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { useAuthGuard } from "./useAuthGuard";
 import Vagas from "../../dashboard/vagas/ListaVagas";
+import VagaDetalhe from "../../dashboard/vagas/VagaDetalhe";
 import LoadingOverlay from "../../components/LoadingOverlay";
+import VagaDetalhes from "./../../dashboard/vagas/VagaDetalhe";
 
 interface Options {
   perfil: ProfileType;
@@ -81,8 +83,16 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
 
   const componente = isLoading ? (
     <LoadingOverlay />
+  ) : vagaId ? (
+    <VagaDetalhes
+      perfil={perfil}
+      vagaId={vagaId}
+      empresaId={empresaId ?? null}
+    />
   ) : (
-    <Vagas perfil={perfil} hasEmpresa={hasEmpresa} />
+    <>
+      <Vagas perfil={perfil} hasEmpresa={hasEmpresa} />
+    </>
   );
 
   return { isLoading, componente };

@@ -4,6 +4,7 @@ import Image from "next/image";
 
 interface JobCardProps {
   empresa_id: number;
+  perfil: string;
   vaga_id: number;
   logo: string;
   nome_empresa: string;
@@ -17,6 +18,8 @@ interface JobCardProps {
 
 export default function JobCard({
   vaga_id,
+  empresa_id,
+  perfil,
   logo,
   nome_vaga,
   nome_empresa,
@@ -25,7 +28,10 @@ export default function JobCard({
   pcd,
 }: JobCardProps) {
   return (
-    <Link href={`/dashboard/vaga_detalhe/${vaga_id}`} className="block w-full">
+    <Link
+      href={`/dashboard/vagas?perfil=${perfil}&vagaid=${vaga_id}&id=${empresa_id}`}
+      className="block w-full"
+    >
       <div className="flex flex-row justify-start items-start rounded-lg p-3 sm:p-4 bg-white shadow-sm border border-gray-100 cursor-pointer hover:shadow-md hover:border-purple-200 transition w-full">
         {/* Logo e Badge PCD */}
         <div className="flex flex-col items-center sm:items-start mr-3 sm:mr-4 flex-shrink-0">

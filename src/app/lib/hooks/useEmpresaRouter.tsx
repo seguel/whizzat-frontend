@@ -66,7 +66,7 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
   const isLoading = !isReady || hasEmpresa === null;
 
   const componente = hasEmpresa ? (
-    <Empresa perfil={perfil} />
+    <Empresa perfil={perfil} empresaId={id ?? null} />
   ) : (
     <EmpresaDados perfil={perfil} userId={userId} />
   );
