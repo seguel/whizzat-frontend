@@ -15,11 +15,17 @@ interface Job {
 
 interface JobListProps {
   title: string;
+  perfil: string;
   jobs: Job[];
   colorClass?: string; // cor da faixa
 }
 
-export default function JobList({ title, jobs, colorClass }: JobListProps) {
+export default function JobList({
+  title,
+  perfil,
+  jobs,
+  colorClass,
+}: JobListProps) {
   return (
     <section>
       {/* Cabeçalho */}
@@ -32,7 +38,7 @@ export default function JobList({ title, jobs, colorClass }: JobListProps) {
       {/* Lista */}
       <div className="flex flex-col gap-3 mt-2">
         {jobs.map((job, idx) => (
-          <JobCard key={idx} {...job} />
+          <JobCard key={idx} {...job} perfil={perfil} />
         ))}
       </div>
     </section>
