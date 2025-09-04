@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"; // App Router
 
 interface Props {
   perfil: ProfileType;
-  empresaId: number | null;
+  empresaId: string | null;
 }
 
 interface EmpresaData {
