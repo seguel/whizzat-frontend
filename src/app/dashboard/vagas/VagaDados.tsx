@@ -327,8 +327,12 @@ export default function VagaDados({
       setIsSubmitting(true);
 
       try {
+        const perfilId =
+          perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+
         const payload = {
           empresa_id: Number(form.empresa_id),
+          perfil_id: perfilId,
           nome_vaga: form.nome_vaga,
           descricao: form.descricao,
           local_vaga: form.local_vaga,
@@ -1307,12 +1311,12 @@ export default function VagaDados({
                           <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
                             <div className="flex items-center gap-2 w-full sm:w-1/2">
                               <Clock className="w-4 h-4 text-gray-500 shrink-0" />
-                              {vagaPublicada?.periodo?.periodo ||
+                              {vagaPublicada?.periodo_trabalho?.periodo ||
                                 "Período não informado"}
                             </div>
                             <div className="flex items-center gap-2 w-full sm:w-1/2">
                               <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
-                              {vagaPublicada?.modalidade?.modalidade ||
+                              {vagaPublicada?.modalidade_trabalho?.modalidade ||
                                 "Modalidade não informada"}
                             </div>
                           </div>
