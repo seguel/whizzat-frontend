@@ -245,6 +245,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
                       <JobList
                         title={`Candidatos sugeridos: ${sugeridos.length}`}
                         jobs={sugeridos}
+                        perfil={perfil}
                         colorClass="bg-purple-100 text-purple-700"
                       />
                     )}
@@ -253,6 +254,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
                       <JobList
                         title={`Candidatos escolhidos: ${escolhidos.length}`}
                         jobs={escolhidos}
+                        perfil={perfil}
                         colorClass="bg-purple-200 text-purple-800"
                       />
                     )}
@@ -260,6 +262,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
                       <JobList
                         title={`Candidatos em avaliação: ${avaliacao.length}`}
                         jobs={avaliacao}
+                        perfil={perfil}
                         colorClass="bg-purple-300 text-purple-900"
                       />
                     )}
