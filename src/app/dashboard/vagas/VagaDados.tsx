@@ -70,8 +70,8 @@ interface VagaData {
   local_vaga: string;
   modalidade_trabalho_id: string;
   periodo_trabalho_id: string;
-  modalidade: ModalidadeVaga;
-  periodo: PeriodoVaga;
+  modalidade_trabalho: ModalidadeVaga;
+  periodo_trabalho: PeriodoVaga;
   pcd: boolean;
   qtde_dias_aberta: number;
   qtde_posicao: number;
