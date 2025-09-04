@@ -70,7 +70,7 @@ export default function DashboardRecrutador({ perfil }: Props) {
           <>
             <main className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2 space-y-6">
-                <JobList title="Vagas da empresa" jobs={[]} />
+                <JobList title="Vagas da empresa" jobs={[]} perfil={perfil} />
               </div>
               <div className="md:col-span-1">
                 <TalentPoolPanel />
