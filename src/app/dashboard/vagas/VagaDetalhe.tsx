@@ -55,6 +55,7 @@ interface VagaData {
   skills: SkillAvaliacao[];
   data_cadastro: string;
   logo: string;
+  prazo: string;
 }
 
 export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
@@ -137,7 +138,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                   {/* Dados da vaga e skills lado a lado */}
                   {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border border-yellow-500"> */}
                   {/* Bloco - Informações da vaga */}
-                  <div className="w-[65%] space-y-4 mr-2">
+                  <div className="w-full lg:w-[65%] space-y-4 mr-2">
                     {/* Linha 1 - Logo + Título da vaga e empresa */}
                     <div className="flex flex-col gap-4">
                       {/* Logo e título + empresa ocupando toda largura */}
@@ -180,7 +181,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                       <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
                         <CalendarDays className="w-4 h-4 text-purple-500" />
                         <span>
-                          Vigência até: <strong>{vaga?.data_cadastro}</strong>
+                          Vigência até: <strong>{vaga?.prazo}</strong>
                         </span>
                       </div>
                     </div>
