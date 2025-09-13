@@ -7,7 +7,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation"; // App Router
-// import { getFileUrl } from "../../util/getFileUrl";
+import Link from "next/link";
 
 interface Props {
   perfil: ProfileType;
@@ -24,16 +24,45 @@ interface EmpresaData {
   imagem_fundo?: string;
 }
 
+interface VagaData {
+  vaga_id: number;
+  empresa_id: number;
+  nome_vaga: string;
+  descricao: string;
+  local_vaga: string; // 👈 ajustar para casar com o back
+  pcd: boolean;
+  qtde_dias_aberta: number;
+  qtde_posicao: number;
+  data_cadastro: string;
+  modalidade_trabalho: {
+    modalidade_trabalho_id: number;
+    modalidade: string;
+    ativo: boolean;
+  };
+  periodo_trabalho: {
+    periodo_trabalho_id: number;
+    periodo: string;
+    ativo: boolean;
+  };
+  nome_empresa: string;
+  logo: string;
+  prazo: string;
+}
+
 export default function Empresa({ perfil, empresaId }: Props) {
+  console.log("entrei");
   const router = useRouter();
 
+  const [hasVagas, setHasVaga] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [empresas, setEmpresas] = useState<EmpresaData[]>([]);
+  const [listVagas, setListVagas] = useState<VagaData[]>([]);
   const [empresaSelecionada, setEmpresaSelecionada] =
     useState<EmpresaData | null>(null);
 
   useEffect(() => {
+    setIsLoading(true);
     const perfilId =
       perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
@@ -48,14 +77,14 @@ export default function Empresa({ perfil, empresaId }: Props) {
         );
         const data = await res.json();
         if (Array.isArray(data.empresas)) {
-          setEmpresas(data.empresas);
-          if (data.empresas.length === 1) {
+          if (empresaId && !isNaN(Number(empresaId))) {
+            handleSelecionarEmpresa(Number(empresaId));
+          } else if (data.empresas.length === 1) {
             setEmpresaSelecionada(data.empresas[0]);
           } else {
-            if (empresaId && !isNaN(Number(empresaId))) {
-              handleSelecionarEmpresa(Number(empresaId));
-            }
+            setEmpresaSelecionada(null);
           }
+          setEmpresas(data.empresas);
         }
       } catch (error) {
         console.error("Erro ao buscar empresas:", error);
@@ -65,20 +94,40 @@ export default function Empresa({ perfil, empresaId }: Props) {
     };
 
     fetchEmpresas();
-  }, [perfil]);
+  }, [perfil, empresaId]);
 
   const handleSelecionarEmpresa = async (id: number) => {
     setIsLoading(true);
+    const perfilId =
+      perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/empresas/${id}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      const data = await res.json();
-      setEmpresaSelecionada(data);
+      const [empresasRes, vagasRes] = await Promise.all([
+        fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${id}/perfil/${perfilId}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        ),
+        fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/empresas/lista-vagas-empresa/${id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        ),
+      ]);
+
+      const [empresasData, vagasData] = await Promise.all([
+        empresasRes.json(),
+        vagasRes.json(),
+      ]);
+      // console.log(vagasData);
+      setEmpresaSelecionada(empresasData);
+      setListVagas(vagasData);
+      setHasVaga(vagasData.length > 0);
+
+      router.push(`/dashboard/empresa_dados?perfil=${perfil}&id=${id}`);
     } catch (error) {
       console.error("Erro ao buscar dados da empresa:", error);
     } finally {
@@ -103,25 +152,47 @@ export default function Empresa({ perfil, empresaId }: Props) {
           {empresaSelecionada ? (
             <div className="flex flex-col items-start p-4 bg-white rounded-lg shadow-sm w-full min-h-[500px] space-y-6">
               <div className="pt-1 px-1 flex justify-between w-full">
-                {/* Botão voltar (esquerda) */}
-                <button
-                  onClick={() => setEmpresaSelecionada(null)}
-                  className="px-4 py-2 text-sm rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
-                >
-                  ← Voltar para lista de empresas
-                </button>
+                {/* Esquerda: botão voltar */}
+                <div className="flex">
+                  <button
+                    onClick={() => {
+                      setEmpresaSelecionada(null); // limpa estado
+                      router.replace(
+                        `/dashboard/empresa_dados?perfil=${perfil}`
+                      ); // limpa query id
+                    }}
+                    className="px-4 py-2 text-sm rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                  >
+                    ← Voltar para lista de empresas
+                  </button>
+                </div>
 
-                {/* Botão cadastrar (direita) */}
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/dashboard/empresa_dados?perfil=${perfil}&op=N`
-                    )
-                  }
-                  className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
-                >
-                  + Cadastrar Empresa
-                </button>
+                {/* Direita: botões cadastrar e editar */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/empresa_dados?perfil=${perfil}&op=N`
+                      )
+                    }
+                    className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                  >
+                    + Cadastrar Empresa
+                  </button>
+
+                  {perfil === "recrutador" && (
+                    <button
+                      onClick={() =>
+                        router.push(
+                          `/dashboard/empresa_dados?perfil=${perfil}&op=E&id=${empresaSelecionada.empresa_id}`
+                        )
+                      }
+                      className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                    >
+                      Editar Empresa
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Capa e logo */}
@@ -173,7 +244,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
                 </div>
 
                 {/* Informações + Vagas */}
-                <div className="pt-10 px-4 md:px-8 w-full grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="pt-10 px-4 md:px-5 w-full grid grid-cols-1 md:grid-cols-4 gap-2">
                   {/* Coluna esquerda */}
                   <div className="md:col-span-3 space-y-2">
                     <h2 className="text-xl font-semibold text-gray-800">
@@ -187,78 +258,115 @@ export default function Empresa({ perfil, empresaId }: Props) {
 
                   {/* Coluna direita */}
                   <div className="flex flex-col items-start justify-start space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Vagas
-                    </h3>
-                    <button
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresaSelecionada.empresa_id}`
-                        )
-                      }
-                      className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
-                    >
-                      Cadastrar Vaga
-                    </button>
+                    <div className="flex flex-row w-full items-center justify-start gap-4">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        Vagas
+                      </h3>
+                      <button
+                        onClick={() =>
+                          router.push(
+                            `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresaSelecionada.empresa_id}`
+                          )
+                        }
+                        className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                      >
+                        + Cadastrar Vaga
+                      </button>
+                    </div>
+
+                    {hasVagas && (
+                      <div className="grid grid-cols-1  w-full ">
+                        {listVagas?.map((job, idx) => (
+                          <Link
+                            key={idx}
+                            href={`/dashboard/vagas?perfil=${perfil}&vagaid=${job.vaga_id}&id=${empresaSelecionada.empresa_id}`}
+                            className="block w-full mb-2"
+                          >
+                            <div className="flex flex-row justify-start items-start rounded-lg p-3 sm:p-4 bg-white shadow-sm border border-gray-100 cursor-pointer hover:shadow-md hover:border-purple-200 transition w-full">
+                              {/* Infos */}
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm break-words">
+                                  {job.nome_vaga}
+                                </h3>
+                                <p className="text-xs text-gray-500 break-words">
+                                  {job.local_vaga}
+                                </p>
+                                <p className="text-xs text-gray-500 break-words">
+                                  {job.qtde_posicao}{" "}
+                                  {job.qtde_posicao > 1 ? "vagas" : "vaga"}
+                                </p>
+
+                                <p className="flex items-center justify-center text-xs px-2 py-1 rounded-lg bg-purple-100 mt-2 sm:mt-4 max-w-full">
+                                  <strong>Aberta até: {job.prazo}</strong>
+                                </p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
           ) : (
-            // Caso tenha múltiplas empresas
-            <>
-              <div className="pt-1 px-1 flex justify-end w-full">
-                {/* Botão cadastrar (direita) */}
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/dashboard/empresa_dados?perfil=${perfil}&op=N`
-                    )
-                  }
-                  className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
-                >
-                  + Cadastrar Empresa
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {empresas.map((empresa) => (
-                  <div
-                    key={empresa.empresa_id}
-                    className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg cursor-pointer transition"
-                    onClick={() => handleSelecionarEmpresa(empresa.empresa_id)}
+            empresas && (
+              <>
+                <div className="pt-1 px-1 flex justify-end w-full">
+                  {/* Botão cadastrar (direita) */}
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/empresa_dados?perfil=${perfil}&op=N`
+                      )
+                    }
+                    className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                   >
-                    {/* Logo */}
-                    <div className="w-full flex justify-center mb-4">
-                      {empresa.logo ? (
-                        <Image
-                          src={empresa.logo}
-                          alt="Logo da empresa"
-                          width={64}
-                          height={64}
-                          className="w-16 h-16 object-contain"
-                          unoptimized // opcional, se estiver usando imagens externas sem loader
-                        />
-                      ) : (
-                        <div className="w-16 h-16 flex items-center justify-center bg-gray-100 text-gray-400 rounded-full text-xs text-center">
-                          Sem logo
-                        </div>
-                      )}
-                    </div>
+                    + Cadastrar Empresa
+                  </button>
+                </div>
 
-                    <h3 className="text-md font-semibold text-center text-gray-800">
-                      {empresa.nome_empresa}
-                    </h3>
-                    <p className="text-sm text-center text-gray-500 mt-1">
-                      {empresa.email || "sem email"}
-                    </p>
-                    <p className="text-sm text-center text-gray-500">
-                      {empresa.telefone || "sem telefone"}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {empresas.map((empresa) => (
+                    <div
+                      key={empresa.empresa_id}
+                      className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg cursor-pointer transition"
+                      onClick={() =>
+                        handleSelecionarEmpresa(empresa.empresa_id)
+                      }
+                    >
+                      {/* Logo */}
+                      <div className="w-full flex justify-center mb-4">
+                        {empresa.logo ? (
+                          <Image
+                            src={empresa.logo}
+                            alt="Logo da empresa"
+                            width={64}
+                            height={64}
+                            className="w-16 h-16 object-contain"
+                            unoptimized // opcional, se estiver usando imagens externas sem loader
+                          />
+                        ) : (
+                          <div className="w-16 h-16 flex items-center justify-center bg-gray-100 text-gray-400 rounded-full text-xs text-center">
+                            Sem logo
+                          </div>
+                        )}
+                      </div>
+
+                      <h3 className="text-md font-semibold text-center text-gray-800">
+                        {empresa.nome_empresa}
+                      </h3>
+                      <p className="text-sm text-center text-gray-500 mt-1">
+                        {empresa.email || "sem email"}
+                      </p>
+                      <p className="text-sm text-center text-gray-500">
+                        {empresa.telefone || "sem telefone"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )
           )}
         </main>
       </div>
