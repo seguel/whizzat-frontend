@@ -101,9 +101,12 @@ export default function EmpresaDados({
 
     const fetchEmpresa = async () => {
       setLoadingEmpresa(true);
+      const perfilId =
+        perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${empresaId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${empresaId}/perfil/${perfilId}`,
           {
             method: "GET",
             credentials: "include",
@@ -112,7 +115,21 @@ export default function EmpresaDados({
         if (!res.ok) throw new Error("Erro ao buscar dados da empresa");
 
         const data = await res.json();
-        setEmpresa(data);
+
+        // mapeia os campos da API para o form
+        const empresaFormData: EmpresaForm = {
+          nome: data.nome_empresa || "",
+          site: data.website || "",
+          email: data.email || "",
+          telefone: data.telefone || "",
+          localizacao: data.localizacao || "",
+          apresentacao: data.apresentacao || "",
+          logoPreview: data.logo || null,
+          capaPreview: data.imagem_fundo || null,
+        };
+
+        setForm(empresaFormData); // <- preenche estado + localStorage
+        setEmpresa(data); // se quiser manter o objeto bruto
       } catch (error) {
         console.error("Erro ao carregar empresa:", error);
       } finally {
@@ -126,6 +143,23 @@ export default function EmpresaDados({
   if (empresaId && loadingEmpresa) {
     return <LoadingOverlay />;
   }
+
+  const handleCancel = () => {
+    // Limpa o formulário salvo no localStorage
+    localStorage.removeItem(`empresaForm_${userId}`);
+
+    // Feedback visual
+    toast.error("Alterações descartadas.", {
+      duration: 3000, // 3 segundos
+    });
+
+    // Redireciona com segurança, evitando id indefinido
+    const url = empresaId
+      ? `/dashboard/empresa_dados?perfil=${perfil}&id=${empresaId}`
+      : `/dashboard/empresa_dados?perfil=${perfil}`;
+
+    router.push(url);
+  };
 
   // Handlers comuns
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -145,9 +179,15 @@ export default function EmpresaDados({
       const preview = URL.createObjectURL(file);
 
       if (name === "logo") {
+        if (form.logoPreview && !form.logoPreview.startsWith("http")) {
+          URL.revokeObjectURL(form.logoPreview);
+        }
         setLogoFile(file);
         setForm((prev) => ({ ...prev, logoPreview: preview }));
       } else if (name === "capa") {
+        if (form.capaPreview && !form.capaPreview.startsWith("http")) {
+          URL.revokeObjectURL(form.capaPreview);
+        }
         setCapaFile(file);
         setForm((prev) => ({ ...prev, capaPreview: preview }));
       }
@@ -206,60 +246,51 @@ export default function EmpresaDados({
         body.append("localizacao", form.localizacao);
         body.append("apresentacao", form.apresentacao);
 
+        // só manda o perfilId no create
+
         const perfilId =
           perfil === "recrutador" ? "2" : perfil === "avaliador" ? "3" : "1";
         body.append("perfilId", perfilId);
+        if (empresaId) {
+          body.append("empresa_id", String(empresaId));
+        }
 
-        if (logoFile) body.append("files", logoFile);
-        if (capaFile) body.append("files", capaFile);
+        if (logoFile) body.append("logo", logoFile);
+        if (capaFile) body.append("imagem_fundo", capaFile);
 
-        /* 
-        for (let [key, value] of body.entries()) {
-          console.log(key, value);
-        } */
+        const url = !empresaId
+          ? `${process.env.NEXT_PUBLIC_API_URL}/empresas/create-empresa`
+          : `${process.env.NEXT_PUBLIC_API_URL}/empresas/update-empresa`;
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/create-empresa`,
-          {
-            method: "POST",
-            body,
-            credentials: "include",
-          }
-        );
+        const response = await fetch(url, {
+          method: "POST",
+          body,
+          credentials: "include",
+        });
 
-        const data = await response.json(); // <- Aqui pega o retorno da empresa salva
+        const data = await response.json();
 
         if (!response.ok) {
-          // o backend Nest devolve { statusCode, message, error }
           const errorMessage =
             typeof data.message === "string"
               ? data.message
               : Array.isArray(data.message)
               ? data.message.join(", ")
               : "Erro ao salvar empresa.";
-
           throw new Error(errorMessage);
         }
 
-        /* const empresaComUrls = {
-          ...data,
-          logoUrl: getFileUrl(data.logo),
-          capaUrl: getFileUrl(data.imagem_fundo),
-        }; */
-
         setEmpresaPublicada(data);
 
-        // Limpa o localStorage se necessário
         localStorage.removeItem(`empresaForm_${userId}`);
         toast.success(`Empresa "${data.nome_empresa}" publicada com sucesso!`, {
-          duration: 5000, // ← 5 segundos
+          duration: 5000,
         });
         setIsSubmitting(false);
         nextStep();
       } catch (err: unknown) {
         console.error("Erro ao enviar dados:", err);
 
-        // type guard
         const message =
           err instanceof Error
             ? err.message
@@ -458,6 +489,13 @@ export default function EmpresaDados({
                 </div>
 
                 <div className="flex justify-end">
+                  <button
+                    type="button" // evita submit acidental
+                    onClick={handleCancel}
+                    className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
                   <button
                     type="submit"
                     className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
