@@ -16,6 +16,7 @@ import { ptBR } from "date-fns/locale";
 import { toast } from "react-hot-toast";
 // import { getFileUrl } from "../../util/getFileUrl";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Props {
   perfil: ProfileType;
@@ -59,6 +60,7 @@ interface VagasForm {
   lista_skills: SkillAvaliacao[];
   data_cadastro: string;
   logo: string;
+  ativo: boolean;
 }
 
 interface VagaData {
@@ -78,6 +80,7 @@ interface VagaData {
   skills: SkillAvaliacao[];
   data_cadastro: string;
   logo: string;
+  ativo: boolean;
 }
 
 function useLocalStorage<T>(key: string, initialValue: T) {
@@ -107,6 +110,8 @@ export default function VagaDados({
   vagaId,
   userId,
 }: Props) {
+  const router = useRouter();
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [form, setForm] = useLocalStorage<VagasForm>(`vagasForm_${userId}`, {
@@ -120,8 +125,9 @@ export default function VagaDados({
     qtde_dias_aberta: "",
     qtde_posicao: "",
     lista_skills: [],
-    data_cadastro: "",
+    data_cadastro: new Date().toISOString(),
     logo: "",
+    ativo: true,
   });
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -131,6 +137,7 @@ export default function VagaDados({
   const [loadingVagaEmpresa, setLoadingVagaEmpresa] = useState<boolean>(false);
   const [diasDisponiveis, setDiasDisponiveis] = useState(0);
   const [quantidadeVagas, setQuantidadeVagas] = useState(0);
+  const [hasAvaliadorProprio, setHasAvaliadorProprio] = useState(false);
 
   const [empresas, setEmpresas] = useState<
     { empresa_id: number; nome_empresa: string; logo: string }[]
@@ -144,12 +151,6 @@ export default function VagaDados({
   const [skills, setSkills] = useState<{ skill_id: number; skill: string }[]>(
     []
   );
-
-  // Data de vigência
-  const dataCadastro = new Date();
-  const dias = Number(form.qtde_dias_aberta ?? 0);
-  const dataVigencia = addDays(dataCadastro, dias);
-  const dataFormatada = format(dataVigencia, "dd 'de' MMMM", { locale: ptBR });
 
   /* const skillsData =
     form.lista_skills?.map((skill) => ({
@@ -165,14 +166,30 @@ export default function VagaDados({
     label: string;
   } | null>(null);
 
+  // Data de vigência
+  const dataBase = form.data_cadastro
+    ? new Date(form.data_cadastro)
+    : new Date();
+  const dias = Number(form.qtde_dias_aberta ?? 0);
+
+  // fallback caso a data seja inválida
+  const dataVigencia = isNaN(dataBase.getTime())
+    ? new Date()
+    : addDays(dataBase, dias);
+
+  const dataFormatada = format(dataVigencia, "dd 'de' MMMM", { locale: ptBR });
+
   useEffect(() => {
     if (!vagaId) return;
 
     const fetchVaga = async () => {
       setLoadingVagaEmpresa(true);
       try {
+        const perfilId =
+          perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/vaga/${vagaId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/empresas/vaga/${vagaId}/empresa/${empresaId}/perfil/${perfilId}`,
           {
             method: "GET",
             credentials: "include",
@@ -181,6 +198,27 @@ export default function VagaDados({
         if (!res.ok) throw new Error("Erro ao buscar dados da vaga");
 
         const data = await res.json();
+        //console.log(data);
+        const vagaFormData: VagasForm = {
+          empresa_id: data.empresa_id,
+          nome_vaga: data.nome_vaga || "",
+          descricao: data.descricao || "",
+          local_vaga: data.local_vaga || "",
+          modalidade_trabalho_id: data.modalidade_trabalho_id || "",
+          periodo_trabalho_id: data.periodo_trabalho_id || "",
+          pcd: data.pcd || false,
+          qtde_dias_aberta: data.qtde_dias_aberta || "",
+          qtde_posicao: data.qtde_posicao || "",
+          lista_skills: data.skills || [],
+          data_cadastro: data.data_cadastro
+            ? new Date(data.data_cadastro).toISOString()
+            : new Date().toISOString(),
+          logo: data.logo || "",
+          ativo: data.ativo ?? true,
+        };
+        setDiasDisponiveis(data.qtde_dias_aberta);
+        setQuantidadeVagas(data.qtde_posicao);
+        setForm(vagaFormData);
         setVaga(data);
       } catch (error) {
         console.error("Erro ao carregar vaga:", error);
@@ -264,12 +302,6 @@ export default function VagaDados({
     return <LoadingOverlay />;
   }
 
-  /* const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-
-    setForm((prev) => ({ ...prev, [name]: value }));
-  }; */
-
   const handleChange_dinamicos = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -289,6 +321,22 @@ export default function VagaDados({
 
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 4));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
+
+  const handleCancel = () => {
+    // Limpa o formulário salvo no localStorage
+    localStorage.removeItem(`vagasForm_${userId}`);
+
+    // Feedback visual
+    toast.error("Alterações descartadas.", {
+      duration: 3000, // 3 segundos
+    });
+
+    const url = vagaId
+      ? `/dashboard/vagas?perfil=${perfil}&vagaid=${vagaId}&id=${empresaId}`
+      : `/dashboard/vagas?perfil=${perfil}`;
+
+    router.push(url);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -343,25 +391,21 @@ export default function VagaDados({
           qtde_posicao: Number(form.qtde_posicao),
           skills: form.lista_skills.filter((s) => s.skill_id > 0), // ← SkillAvaliacao[]
           novas_skills: form.lista_skills.filter((s) => s.skill_id < 0), // ← opcional
+          ...(vagaId ? { vaga_id: Number(vagaId), ativo: form.ativo } : {}),
         };
 
-        /* 
-        for (let [key, value] of body.entries()) {
-          console.log(key, value);
-        }
-        return; */
+        const url = !vagaId
+          ? `${process.env.NEXT_PUBLIC_API_URL}/empresas/create-vaga`
+          : `${process.env.NEXT_PUBLIC_API_URL}/empresas/update-vaga`;
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/create-vaga`,
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          }
-        );
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+          credentials: "include",
+        });
 
         if (!response.ok) {
           throw new Error("Erro ao salvar vaga.");
@@ -511,6 +555,27 @@ export default function VagaDados({
                     onSubmit={handleSubmit}
                     className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full"
                   >
+                    {vagaId && (
+                      <div className="col-span-1 md:col-span-2 flex justify-start">
+                        <label className="flex items-center cursor-pointer">
+                          <div className="relative">
+                            <input
+                              type="checkbox"
+                              name="ativo"
+                              checked={form.ativo ?? vaga?.ativo ?? true}
+                              onChange={handleChange_dinamicos}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
+                            <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
+                          </div>
+                          <span className="ml-3 text-sm font-normal text-gray-700">
+                            Ativo
+                          </span>
+                        </label>
+                      </div>
+                    )}
+
                     {/* Coluna Esquerda */}
                     <div className="flex flex-col gap-4">
                       {/* Empresa */}
@@ -550,7 +615,7 @@ export default function VagaDados({
                           type="text"
                           className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
                           placeholder="nome da vaga"
-                          defaultValue={vaga?.nome_vaga ?? form.nome_vaga}
+                          defaultValue={form.nome_vaga ?? vaga?.nome_vaga}
                           onChange={handleChange_dinamicos}
                         />
                         {showErrors && !form.nome_vaga && (
@@ -568,7 +633,7 @@ export default function VagaDados({
                           type="text"
                           className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
                           placeholder="local da vaga"
-                          defaultValue={vaga?.local_vaga ?? form.local_vaga}
+                          defaultValue={form.local_vaga ?? vaga?.local_vaga}
                           onChange={handleChange_dinamicos}
                         />
                         {showErrors && !form.local_vaga && (
@@ -595,8 +660,10 @@ export default function VagaDados({
                                 value={mod.modalidade_trabalho_id}
                                 checked={
                                   String(mod.modalidade_trabalho_id) ===
-                                  (form.modalidade_trabalho_id ||
-                                    vaga?.modalidade_trabalho_id?.toString())
+                                  String(
+                                    form.modalidade_trabalho_id ??
+                                      vaga?.modalidade_trabalho_id
+                                  )
                                 }
                                 onChange={handleChange_dinamicos}
                                 className="appearance-none w-4 h-4 rounded-full border-2 border-purple-600 checked:bg-purple-600 checked:border-purple-600 cursor-pointer transition-all duration-200"
@@ -625,8 +692,10 @@ export default function VagaDados({
                                 onChange={handleChange_dinamicos}
                                 checked={
                                   String(per.periodo_trabalho_id) ===
-                                  (form.periodo_trabalho_id ||
-                                    vaga?.periodo_trabalho_id?.toString())
+                                  String(
+                                    form.periodo_trabalho_id ??
+                                      vaga?.periodo_trabalho_id
+                                  )
                                 }
                                 className="appearance-none w-4 h-4 rounded-full border-2 border-purple-600 checked:bg-purple-600 checked:border-purple-600 cursor-pointer transition-all duration-200"
                               />
@@ -666,7 +735,7 @@ export default function VagaDados({
                           name="descricao"
                           maxLength={5000}
                           rows={9}
-                          defaultValue={vaga?.descricao ?? form.descricao}
+                          defaultValue={form.descricao ?? vaga?.descricao}
                           className="border rounded-md px-3 py-2 resize-none border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
                           placeholder="Descrição da vaga"
                           onChange={handleChange_dinamicos}
@@ -709,9 +778,9 @@ export default function VagaDados({
                             min={1}
                             max={60}
                             className="border rounded-md w-16 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300
-             [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-             [&::-moz-appearance]:textfield"
-                            value={diasDisponiveis}
+                                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
+                                  [&::-moz-appearance]:textfield"
+                            value={form.qtde_dias_aberta ?? diasDisponiveis}
                             onChange={(e) => {
                               let valor = parseInt(e.target.value || "1", 10);
                               if (isNaN(valor)) valor = 1;
@@ -787,9 +856,9 @@ export default function VagaDados({
                             min={0}
                             max={100}
                             className="border rounded-md w-16 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300
-             [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-             [&::-moz-appearance]:textfield"
-                            value={quantidadeVagas}
+                                [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
+                                [&::-moz-appearance]:textfield"
+                            value={form.qtde_posicao ?? quantidadeVagas}
                             onChange={(e) => {
                               let valor = parseInt(e.target.value || "0", 10);
                               if (isNaN(valor)) valor = 0;
@@ -835,8 +904,14 @@ export default function VagaDados({
                       </label>
                     </div>
 
-                    {/* Botão Avançar */}
                     <div className="col-span-1 mt-4 md:col-span-2 flex justify-center md:justify-end">
+                      <button
+                        type="button" // evita submit acidental
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
                       <button
                         type="submit"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
@@ -967,13 +1042,23 @@ export default function VagaDados({
                                         Avaliador:
                                       </label>
                                       <TooltipIcon
-                                        message={`1. Próprio: Será selecionado\nsomente entre os avaliadores existentes\nna empresa recrutadora\n\n2. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações`}
+                                        message={
+                                          hasAvaliadorProprio
+                                            ? `1. Próprio: Será selecionado\nsomente entre os avaliadores existentes\nna empresa recrutadora.\n\n2. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações.`
+                                            : `1. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações e quando a empresa\n selecionada não possuir avaliador\n próprio.`
+                                        }
                                       />
                                     </div>
                                     <label className="flex items-center gap-1">
                                       <input
                                         type="radio"
-                                        checked={item.avaliador_proprio}
+                                        checked={
+                                          hasAvaliadorProprio === true &&
+                                          item.avaliador_proprio
+                                            ? true
+                                            : false
+                                        }
+                                        disabled={!hasAvaliadorProprio}
                                         onChange={() =>
                                           handleSkillChange(
                                             item.skill_id,
@@ -987,7 +1072,11 @@ export default function VagaDados({
                                     <label className="flex items-center gap-1">
                                       <input
                                         type="radio"
-                                        checked={!item.avaliador_proprio}
+                                        checked={
+                                          hasAvaliadorProprio === false
+                                            ? true
+                                            : !item.avaliador_proprio
+                                        }
                                         onChange={() =>
                                           handleSkillChange(
                                             item.skill_id,
@@ -1016,25 +1105,38 @@ export default function VagaDados({
 
                       {/* Botões no rodapé */}
                       <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                        <button
-                          onClick={prevStep}
-                          type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                        >
-                          Voltar
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={form.lista_skills.length < 3} // só habilita se >= 3
-                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
+                        <div className="flex">
+                          <button
+                            onClick={prevStep}
+                            type="button"
+                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                          >
+                            Voltar
+                          </button>
+                        </div>
+
+                        {/* Direita: botões cadastrar e editar */}
+                        <div className="flex gap-2">
+                          <button
+                            type="button" // evita submit acidental
+                            onClick={handleCancel}
+                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={form.lista_skills.length < 3} // só habilita se >= 3
+                            className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
                           ${
                             form.lista_skills.length < 3
                               ? "bg-gray-300 cursor-not-allowed"
                               : "bg-purple-100 hover:bg-purple-200 cursor-pointer"
                           }`}
-                        >
-                          Avançar
-                        </button>
+                          >
+                            Avançar
+                          </button>
+                        </div>
                       </div>
                     </form>
                   </div>
@@ -1111,10 +1213,10 @@ export default function VagaDados({
                               <div className="flex items-center gap-2 w-full sm:w-1/2">
                                 <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
                                 Aberta em:{" "}
-                                {dataCadastro
-                                  ? new Date(dataCadastro).toLocaleDateString(
-                                      "pt-BR"
-                                    )
+                                {form.data_cadastro ?? dataBase
+                                  ? new Date(
+                                      form.data_cadastro ?? dataBase
+                                    ).toLocaleDateString("pt-BR")
                                   : "Data não informada"}
                               </div>
                             </div>
@@ -1125,16 +1227,16 @@ export default function VagaDados({
                                 <Clock className="w-4 h-4 text-gray-500 shrink-0" />
                                 {periodos.find(
                                   (p) =>
-                                    p.periodo_trabalho_id.toString() ===
-                                    form.periodo_trabalho_id
+                                    String(p.periodo_trabalho_id) ===
+                                    String(form.periodo_trabalho_id)
                                 )?.periodo || "Período não informado"}
                               </div>
                               <div className="flex items-center gap-2 w-full sm:w-1/2">
                                 <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
                                 {modalidades.find(
                                   (m) =>
-                                    m.modalidade_trabalho_id.toString() ===
-                                    form.modalidade_trabalho_id
+                                    String(m.modalidade_trabalho_id) ===
+                                    String(form.modalidade_trabalho_id)
                                 )?.modalidade || "Modalidade não informada"}
                               </div>
                             </div>
@@ -1210,26 +1312,40 @@ export default function VagaDados({
 
                       {/* Botões */}
                       <div className="flex flex-col md:flex-row justify-between gap-2 mt-6">
-                        <button
-                          onClick={prevStep}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                        >
-                          Voltar
-                        </button>
-                        <button
-                          type="submit"
-                          className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
-                            isFormValid(form)
-                              ? "text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                              : "bg-gray-300 cursor-not-allowed"
-                          }`}
-                        >
-                          {isSubmitting ? (
-                            <ImSpinner2 className="animate-spin" />
-                          ) : (
-                            "Publicar"
-                          )}
-                        </button>
+                        <div className="flex">
+                          <button
+                            onClick={prevStep}
+                            type="button"
+                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                          >
+                            Voltar
+                          </button>
+                        </div>
+
+                        {/* Direita: botões cadastrar e editar */}
+                        <div className="flex gap-2">
+                          <button
+                            type="button" // evita submit acidental
+                            onClick={handleCancel}
+                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="submit"
+                            className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
+                              isFormValid(form)
+                                ? "text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                                : "bg-gray-300 cursor-not-allowed"
+                            }`}
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              "Publicar"
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </form>
                   </div>
@@ -1402,13 +1518,13 @@ export default function VagaDados({
 
 const isFormValid = (form: VagasForm) => {
   return (
-    form.empresa_id.trim() !== "" &&
+    form.empresa_id !== "" &&
     form.nome_vaga.trim() !== "" &&
     form.local_vaga.trim() !== "" &&
     form.descricao.trim() !== "" &&
-    form.modalidade_trabalho_id.trim() !== "" &&
+    form.modalidade_trabalho_id !== null &&
     form.periodo_trabalho_id !== null &&
-    form.qtde_dias_aberta.trim() !== "0" &&
-    form.qtde_posicao.trim() !== "0"
+    form.qtde_dias_aberta !== "0" &&
+    form.qtde_posicao !== "0"
   );
 };

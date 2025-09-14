@@ -50,7 +50,6 @@ interface VagaData {
 }
 
 export default function Empresa({ perfil, empresaId }: Props) {
-  console.log("entrei");
   const router = useRouter();
 
   const [hasVagas, setHasVaga] = useState<boolean>(false);
