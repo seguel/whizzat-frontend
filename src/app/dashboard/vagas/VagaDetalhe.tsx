@@ -10,6 +10,7 @@ import SkillsPanel from "../../components/perfil/SkillsPanel";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Props {
   perfil: ProfileType;
@@ -56,9 +57,11 @@ interface VagaData {
   data_cadastro: string;
   logo: string;
   prazo: string;
+  ativo: boolean;
 }
 
 export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
+  const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [vaga, setVaga] = useState<VagaData | null>(null);
@@ -121,6 +124,35 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
 
         <main className="p-4 grid grid-cols-1 gap-4 w-[98%] mx-auto">
           <div className="flex flex-col items-start p-4 bg-white rounded-lg shadow-sm w-full min-h-[500px]">
+            <div className="pt-1 px-1 flex justify-between w-full">
+              {/* Esquerda: botão voltar */}
+              <div className="flex mb-1">
+                <button
+                  onClick={() => {
+                    router.replace(`/dashboard/vagas?perfil=${perfil}`); // limpa query id
+                  }}
+                  className="px-4 py-2 text-sm rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                >
+                  ← Voltar para lista de vagas
+                </button>
+              </div>
+
+              {/* Direita: botões cadastrar e editar */}
+              <div className="flex gap-2">
+                {perfil === "recrutador" && (
+                  <button
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/vagas?perfil=${perfil}&op=E&vagaid=${vagaId}&id=${empresaId}`
+                      )
+                    }
+                    className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                  >
+                    Editar Vaga
+                  </button>
+                )}
+              </div>
+            </div>
             <div className="w-full h-full flex flex-col">
               {/* <div className="pt-1 px-1 flex justify-between w-full mb-4">
                 {/* Botão voltar (esquerda) 
@@ -176,14 +208,65 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                           </p>
                         </div>
                       </div>
+                    </div>
 
+                    <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
                       {/* Data de vigência abaixo */}
-                      <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
-                        <CalendarDays className="w-4 h-4 text-purple-500" />
-                        <span>
-                          Vigência até: <strong>{vaga?.prazo}</strong>
-                        </span>
+                      <div className="flex w-full sm:w-1/2">
+                        <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
+                          <CalendarDays className="w-4 h-4 text-purple-500" />
+                          <span>
+                            Vigência até: <strong>{vaga?.prazo}</strong>
+                          </span>
+                        </div>
                       </div>
+                      {perfil === "recrutador" && (
+                        <div className="flex items-center gap-2 w-full sm:w-1/2">
+                          <span className="font-medium">Situação:</span>
+                          {vaga?.ativo ? (
+                            <span className="flex items-center gap-1">
+                              <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-3 w-3 text-white"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                              <span className="text-sm  text-green-600">
+                                Ativa
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1">
+                              <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-3 w-3 text-white"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+
+                              <span className="text-sm  text-gray-600">
+                                Inativa
+                              </span>
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* Linha 1 - Local e Data de Cadastro */}

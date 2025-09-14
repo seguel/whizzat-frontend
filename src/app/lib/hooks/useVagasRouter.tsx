@@ -3,7 +3,6 @@ import VagasDados from "../../dashboard/vagas/VagaDados";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { useAuthGuard } from "./useAuthGuard";
 import Vagas from "../../dashboard/vagas/ListaVagas";
-import VagaDetalhe from "../../dashboard/vagas/VagaDetalhe";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import VagaDetalhes from "./../../dashboard/vagas/VagaDetalhe";
 

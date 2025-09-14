@@ -534,19 +534,32 @@ export default function EmpresaDados({
 
                   {/* Botões no rodapé */}
                   <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                    <button
-                      onClick={prevStep}
-                      type="button"
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                    >
-                      Voltar
-                    </button>
-                    <button
-                      type="submit"
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                    >
-                      Avançar
-                    </button>
+                    <div className="flex">
+                      <button
+                        onClick={prevStep}
+                        type="button"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+
+                    {/* Direita: botões cadastrar e editar */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button" // evita submit acidental
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                      >
+                        Avançar
+                      </button>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -632,18 +645,32 @@ export default function EmpresaDados({
                     )}
                   </div>
                   <div className="flex justify-between">
-                    <button
-                      onClick={prevStep}
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                    >
-                      Voltar
-                    </button>
-                    <button
-                      type="submit"
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                    >
-                      Avançar
-                    </button>
+                    <div className="flex">
+                      <button
+                        onClick={prevStep}
+                        type="button"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+
+                    {/* Direita: botões cadastrar e editar */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button" // evita submit acidental
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      >
+                        Avançar
+                      </button>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -696,26 +723,40 @@ export default function EmpresaDados({
 
                   {/* Botões */}
                   <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto px-4 md:px-8 pb-4">
-                    <button
-                      onClick={prevStep}
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                    >
-                      Voltar
-                    </button>
-                    <button
-                      type="submit"
-                      className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
-                        isFormValid(form)
-                          ? " bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                          : "bg-gray-300 cursor-not-allowed"
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <ImSpinner2 className="animate-spin" />
-                      ) : (
-                        "Publicar"
-                      )}
-                    </button>
+                    <div className="flex">
+                      <button
+                        onClick={prevStep}
+                        type="button"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+
+                    {/* Direita: botões cadastrar e editar */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button" // evita submit acidental
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
+                          isFormValid(form)
+                            ? " bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                            : "bg-gray-300 cursor-not-allowed"
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <ImSpinner2 className="animate-spin" />
+                        ) : (
+                          "Publicar"
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </form>
