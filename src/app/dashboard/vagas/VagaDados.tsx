@@ -178,7 +178,7 @@ export default function VagaDados({
     : addDays(dataBase, dias);
 
   const dataFormatada = format(dataVigencia, "dd 'de' MMMM", { locale: ptBR });
-
+  setHasAvaliadorProprio(false);
   useEffect(() => {
     if (!vagaId) return;
 
