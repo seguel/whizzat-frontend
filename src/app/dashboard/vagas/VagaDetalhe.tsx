@@ -66,8 +66,8 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
 
   const [vaga, setVaga] = useState<VagaData | null>(null);
   const [loadingVagaEmpresa, setLoadingVagaEmpresa] = useState<boolean>(false);
-  const [diasDisponiveis, setDiasDisponiveis] = useState(0);
-  const [quantidadeVagas, setQuantidadeVagas] = useState(0);
+  /* const [diasDisponiveis, setDiasDisponiveis] = useState(0);
+  const [quantidadeVagas, setQuantidadeVagas] = useState(0); */
 
   useEffect(() => {
     if (!vagaId) return;
