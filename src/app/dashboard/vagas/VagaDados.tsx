@@ -712,7 +712,7 @@ export default function VagaDados({
                           <input
                             type="checkbox"
                             name="pcd"
-                            checked={vaga?.pcd ?? form.pcd ?? false}
+                            checked={ form.pcd ?? vaga?.pcd ??  false}
                             onChange={handleChange_dinamicos}
                             className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer"
                           />
