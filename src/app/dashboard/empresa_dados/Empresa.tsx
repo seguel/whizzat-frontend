@@ -126,7 +126,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
       setListVagas(vagasData);
       setHasVaga(vagasData.length > 0);
 
-      router.push(`/dashboard/empresa_dados?perfil=${perfil}&id=${id}`);
+      //router.push(`/dashboard/empresa_dados?perfil=${perfil}&id=${id}`);
     } catch (error) {
       console.error("Erro ao buscar dados da empresa:", error);
     } finally {
