@@ -80,6 +80,8 @@ export default function Empresa({ perfil, empresaId }: Props) {
             handleSelecionarEmpresa(Number(empresaId));
           } else if (data.empresas.length === 1) {
             setEmpresaSelecionada(data.empresas[0]);
+            handleSelecionarEmpresa(Number(data.empresas[0].empresa_id));
+            
           } else {
             setEmpresaSelecionada(null);
           }
@@ -121,7 +123,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
         empresasRes.json(),
         vagasRes.json(),
       ]);
-      // console.log(vagasData);
+      console.log(vagasData);
       setEmpresaSelecionada(empresasData);
       setListVagas(vagasData);
       setHasVaga(vagasData.length > 0);
