@@ -167,7 +167,7 @@ export default function EmpresaDados({
 
   // Handlers comuns
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target;
+    const { name, files } = e.target;
 
     if ((name === "logo" || name === "capa") && files?.[0]) {
       const file = files[0];
