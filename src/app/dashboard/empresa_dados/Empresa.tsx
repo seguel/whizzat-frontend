@@ -47,6 +47,7 @@ interface VagaData {
   nome_empresa: string;
   logo: string;
   prazo: string;
+  ativo: boolean;
 }
 
 export default function Empresa({ perfil, empresaId }: Props) {
@@ -81,7 +82,6 @@ export default function Empresa({ perfil, empresaId }: Props) {
           } else if (data.empresas.length === 1) {
             setEmpresaSelecionada(data.empresas[0]);
             handleSelecionarEmpresa(Number(data.empresas[0].empresa_id));
-            
           } else {
             setEmpresaSelecionada(null);
           }
@@ -123,7 +123,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
         empresasRes.json(),
         vagasRes.json(),
       ]);
-      console.log(vagasData);
+      // console.log(vagasData);
       setEmpresaSelecionada(empresasData);
       setListVagas(vagasData);
       setHasVaga(vagasData.length > 0);
@@ -296,6 +296,50 @@ export default function Empresa({ perfil, empresaId }: Props) {
                                   {job.qtde_posicao}{" "}
                                   {job.qtde_posicao > 1 ? "vagas" : "vaga"}
                                 </p>
+                                
+                                  {job?.ativo ? (
+                                    <span className="flex items-center gap-1">
+                                      <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          className="h-3 w-3 text-white"
+                                          viewBox="0 0 20 20"
+                                          fill="currentColor"
+                                        >
+                                          <path
+                                            fillRule="evenodd"
+                                            d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                            clipRule="evenodd"
+                                          />
+                                        </svg>
+                                      </div>
+                                      <span className="text-sm  text-green-600">
+                                        Ativa
+                                      </span>
+                                    </span>
+                                  ) : (
+                                    <span className="flex items-center gap-1">
+                                      <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          className="h-3 w-3 text-white"
+                                          viewBox="0 0 20 20"
+                                          fill="currentColor"
+                                        >
+                                          <path
+                                            fillRule="evenodd"
+                                            d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
+                                            clipRule="evenodd"
+                                          />
+                                        </svg>
+                                      </div>
+
+                                      <span className="text-sm  text-gray-600">
+                                        Inativa
+                                      </span>
+                                    </span>
+                                  )}
+                                
 
                                 <p className="flex items-center justify-center text-xs px-2 py-1 rounded-lg bg-purple-100 mt-2 sm:mt-4 max-w-full">
                                   <strong>Aberta até: {job.prazo}</strong>
