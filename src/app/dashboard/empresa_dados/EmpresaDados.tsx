@@ -28,6 +28,7 @@ interface EmpresaForm {
   localizacao: string;
   apresentacao: string;
   capaPreview: string | null;
+  ativo: boolean;
 }
 
 interface EmpresaData {
@@ -39,6 +40,7 @@ interface EmpresaData {
   apresentacao?: string;
   logo?: string;
   imagem_fundo?: string;
+  ativo: boolean;
 }
 
 // LocalStorage hook
@@ -82,6 +84,7 @@ export default function EmpresaDados({
       localizacao: "",
       apresentacao: "",
       capaPreview: null,
+      ativo: true,
     }
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -126,6 +129,7 @@ export default function EmpresaDados({
           apresentacao: data.apresentacao || "",
           logoPreview: data.logo || null,
           capaPreview: data.imagem_fundo || null,
+          ativo: data.ativo ?? true,
         };
 
         setForm(empresaFormData); // <- preenche estado + localStorage
@@ -193,6 +197,12 @@ export default function EmpresaDados({
       }
     } else {
       // Para campos de texto ou outros
+      const { name, type } = e.target;
+      const value =
+        type === "checkbox"
+          ? (e.target as HTMLInputElement).checked
+          : e.target.value;
+
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
@@ -251,8 +261,10 @@ export default function EmpresaDados({
         const perfilId =
           perfil === "recrutador" ? "2" : perfil === "avaliador" ? "3" : "1";
         body.append("perfilId", perfilId);
+
         if (empresaId) {
           body.append("empresa_id", String(empresaId));
+          body.append("ativo", form.ativo ? "1" : "0");
         }
 
         if (logoFile) body.append("logo", logoFile);
@@ -287,7 +299,10 @@ export default function EmpresaDados({
           duration: 5000,
         });
         setIsSubmitting(false);
-        nextStep();
+        //nextStep();
+        router.push(
+          `/dashboard/empresa_dados?perfil=${perfil}&id=${data.empresa_id}`
+        );
       } catch (err: unknown) {
         console.error("Erro ao enviar dados:", err);
 
@@ -361,6 +376,26 @@ export default function EmpresaDados({
                 onSubmit={handleSubmit}
                 className="grid grid-cols-1 gap-4 w-full"
               >
+                {empresaId && (
+                  // <div className="col-span-1 md:col-span-2 flex justify-start">
+                  <label className="flex items-center cursor-pointer">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        name="ativo"
+                        checked={form.ativo ?? empresa?.ativo ?? true}
+                        onChange={handleChange}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
+                      <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
+                    </div>
+                    <span className="ml-3 text-sm font-normal text-gray-700">
+                      Ativo
+                    </span>
+                  </label>
+                  // </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Nome da empresa:
@@ -767,7 +802,6 @@ export default function EmpresaDados({
             {step === 5 && empresaPublicada && (
               <div className="flex flex-col items-start p-4 w-full min-h-[500px] space-y-6">
                 {/* Capa e logo */}
-
                 <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0">
                   {empresaPublicada.imagem_fundo ? (
                     <Image
