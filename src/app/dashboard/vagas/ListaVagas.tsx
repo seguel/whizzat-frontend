@@ -64,7 +64,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
       const skillParam = filtroSkill || "todos";
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/empresas/vagas-sugeridos/${perfilId}?empresaId=${empresaParam}&skill=${skillParam}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/empresas/vagas-abertas-sugeridos/${perfilId}?empresaId=${empresaParam}&skill=${skillParam}`,
         {
           method: "GET",
           credentials: "include",
@@ -94,7 +94,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
 
         const [empresasRes, skillsRes, sugeridosRes] = await Promise.all([
           fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/empresas/vinculo/${perfilId}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/empresas/vinculo-ativas/${perfilId}`,
             { method: "GET", credentials: "include" }
           ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/filtro`, {
@@ -102,7 +102,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
             credentials: "include",
           }),
           fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/empresas/vagas-sugeridos/${perfilId}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/empresas/vagas-abertas-sugeridos/${perfilId}`,
             { method: "GET", credentials: "include" }
           ),
         ]);

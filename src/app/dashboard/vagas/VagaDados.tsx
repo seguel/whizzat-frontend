@@ -180,7 +180,7 @@ export default function VagaDados({
   const dataFormatada = format(dataVigencia, "dd 'de' MMMM", { locale: ptBR });
 
   useEffect(() => {
-      setHasAvaliadorProprio(false);
+    setHasAvaliadorProprio(false);
     if (!vagaId) return;
 
     const fetchVaga = async () => {
@@ -422,7 +422,10 @@ export default function VagaDados({
         toast.success(`Vaga "${data.nome_vaga}" publicada com sucesso!`, {
           duration: 5000, // ← 5 segundos
         });
-        nextStep();
+        //nextStep();
+        router.push(
+          `/dashboard/vagas?perfil=${perfil}&vagaid=${data.vaga_id}&id=${data.empresa_id}`
+        );
       } catch (err) {
         console.error("Erro ao enviar dados:", err);
         toast.error("Erro ao enviar dados da vaga. Tente novamente.", {
@@ -712,7 +715,7 @@ export default function VagaDados({
                           <input
                             type="checkbox"
                             name="pcd"
-                            checked={ form.pcd ?? vaga?.pcd ??  false}
+                            checked={form.pcd ?? vaga?.pcd ?? false}
                             onChange={handleChange_dinamicos}
                             className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer"
                           />
