@@ -6,7 +6,7 @@ import Sidebar from "../components/perfil/Sidebar";
 import TopBar from "../components/perfil/TopBar";
 import JobList from "../components/perfil/JobList";
 import SkillsPanel from "../components/perfil/SkillsPanel";
-import DashboardWrapper from "../components/DashboardWrapper";
+import DashboardWrapper from "../components/PageWrapper";
 import { ProfileType } from "../components/perfil/ProfileContext";
 
 interface Props {

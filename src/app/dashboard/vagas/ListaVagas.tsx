@@ -14,6 +14,8 @@ import { ImSpinner2 } from "react-icons/im";
 interface Props {
   perfil: ProfileType;
   hasEmpresa: boolean | null;
+  hasPerfilRecrutador: boolean | null;
+  recrutadorId: number | null;
 }
 
 interface Job {
@@ -29,10 +31,15 @@ interface Job {
   pcd?: boolean;
 }
 
-export default function ListaVagas({ perfil, hasEmpresa }: Props) {
+export default function ListaVagas({
+  perfil,
+  hasEmpresa,
+  hasPerfilRecrutador,
+  recrutadorId,
+}: Props) {
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [isFiltering, setIsFiltering] = useState(false);
   const [hasVagas, setHasVaga] = useState<boolean>(false);
 
@@ -41,7 +48,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
   const [avaliacao, setAvaliacao] = useState<Job[]>([]);
 
   const [empresas, setEmpresas] = useState<
-    { empresa_id: number; nome_empresa: string }[]
+    { id: number; nome_empresa: string }[]
   >([]);
   const [skills, setSkills] = useState<{ skill_id: number; skill: string }[]>(
     []
@@ -56,15 +63,14 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
     try {
       setIsFiltering(true);
 
-      const perfilId =
-        perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+      // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
       // Se não selecionar, envia "todos"
       const empresaParam = filtroEmpresa || "todos";
       const skillParam = filtroSkill || "todos";
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/empresas/vagas-abertas-sugeridos/${perfilId}?empresaId=${empresaParam}&skill=${skillParam}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/vagas/vagas-abertas/${recrutadorId}?empresaId=${empresaParam}&skill=${skillParam}`,
         {
           method: "GET",
           credentials: "include",
@@ -85,16 +91,19 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
   };
 
   useEffect(() => {
+    if (!hasPerfilRecrutador || !hasEmpresa) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
 
     const fetchSelectData = async () => {
       try {
-        const perfilId =
-          perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+        // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
         const [empresasRes, skillsRes, sugeridosRes] = await Promise.all([
           fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/empresas/vinculo-ativas/${perfilId}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/empresas/filtro-ativas/${recrutadorId}`,
             { method: "GET", credentials: "include" }
           ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/filtro`, {
@@ -102,7 +111,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
             credentials: "include",
           }),
           fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/empresas/vagas-abertas-sugeridos/${perfilId}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/vagas/vagas-abertas/${recrutadorId}`,
             { method: "GET", credentials: "include" }
           ),
         ]);
@@ -112,6 +121,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
           skillsRes.json(),
           sugeridosRes.json(),
         ]);
+        console.log(sugeridosData);
         setEmpresas(empresasData.empresas);
         setSkills(skillsData);
         setSugeridos(sugeridosData);
@@ -140,8 +150,10 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
       <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        {!hasEmpresa ? (
-          <SemDados tipo="empresa" />
+        {!hasPerfilRecrutador ? (
+          <SemDados tipo="perfil" perfil={perfil} />
+        ) : !hasEmpresa ? (
+          <SemDados tipo="empresa" perfil={perfil} />
         ) : (
           <main className="p-4 w-[98%] mx-auto flex-1">
             {hasVagas ? (
@@ -162,7 +174,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
                                 label:
                                   empresas.find(
                                     (e) =>
-                                      String(e.empresa_id) === filtroEmpresa
+                                      String(e.id) === filtroEmpresa
                                   )?.nome_empresa || "",
                               }
                             : { value: "", label: "Todas as empresas" }
@@ -173,7 +185,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
                         options={[
                           { value: "", label: "Todas as empresas" },
                           ...empresas.map((empresa) => ({
-                            value: String(empresa.empresa_id),
+                            value: String(empresa.id),
                             label: empresa.nome_empresa,
                           })),
                         ]}
@@ -294,7 +306,7 @@ export default function ListaVagas({ perfil, hasEmpresa }: Props) {
                 )}
               </>
             ) : (
-              <SemDados tipo="vaga" />
+              <SemDados tipo="vaga" perfil={perfil} />
             )}
           </main>
         )}

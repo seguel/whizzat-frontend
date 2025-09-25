@@ -1,75 +1,129 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import EmpresaDados from "../../dashboard/empresa_dados/EmpresaDados";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { useAuthGuard } from "./useAuthGuard";
 //import LoadingOverlay from "../../components/LoadingOverlay";
 import Empresa from "../../dashboard/empresa_dados/Empresa";
+import { useRecrutadorEmpresa } from "./useRecrutadorEmpresa";
 
 interface Options {
   perfil: ProfileType;
   op?: "N" | "E";
   id?: string;
+  rec?: string;
 }
 
-export function useEmpresaRouter({ perfil, op, id }: Options) {
+export function useEmpresaRouter({ perfil, op, id, rec }: Options) {
   const isCadastro = op === "N";
   const isEdicao = op === "E" && id;
 
   const { isReady } = useAuthGuard("/cadastro/login");
+  /*  const [hasPerfilRecrutador, setHasPerfilRecrutador] = useState<
+    boolean | null
+  >(null);
   const [hasEmpresa, setHasEmpresa] = useState<boolean | null>(false);
-  const [userId, setUserId] = useState<string>(""); // <-- aqui
+  const [userId, setUserId] = useState<string>(""); // <-- aqui */
 
-  useEffect(() => {
+  const { userId, recrutadorId, hasPerfilRecrutador, hasEmpresa, loading } =
+    useRecrutadorEmpresa(perfil);
+
+  /* useEffect(() => {
     const perfilId =
       perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
-    const fetchVinculo = async () => {
+    const verificarHasPerfilRecrutador = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/vinculo/${perfilId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/recrutador/check-hasperfil/${perfilId}`,
+          {
+            method: "GET",
+            credentials: "include", // importante para enviar o cookie JWT
+          }
+        );
+
+        const data = await res.json();
+        setUserId(data.usuario_id);
+        if (data.id != null) {
+          setHasPerfilRecrutador(true);
+          fetchVinculoEmpresa(data.id); // se quiser armazenar o id
+          // <-- usa state agora
+        } else {
+          setHasPerfilRecrutador(false);
+        }
+      } catch (error) {
+        console.error("Erro ao verificar perfil:", error);
+        setHasPerfilRecrutador(false);
+      }
+    };
+
+    const fetchVinculoEmpresa = async (recrutadorId: number) => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/recrutador/vinculo-empresa/${recrutadorId}`,
           {
             method: "GET",
             credentials: "include",
           }
         );
 
-        const data = await res.json();
+        if (!res.ok) {
+          setHasEmpresa(false);
+        } else {
+          const data = await res.json();
+          console.log(data);
 
-        setUserId(data.usuario_id); // <-- usa state agora
-        setHasEmpresa(data.empresas.length > 0);
+          setHasEmpresa(true);
+        }
       } catch (error) {
         console.error("Erro ao verificar vínculo:", error);
         setHasEmpresa(false);
       }
     };
-
-    fetchVinculo();
-  }, [perfil]);
+    verificarHasPerfilRecrutador();
+  }, [perfil]); */
 
   // só renderiza depois que userId estiver definido
-  if (!userId) {
+  if (!userId || loading) {
     return {
       isLoading: true,
       componente: <div>Carregando...</div>, // pode trocar por um loader/spinner
     };
   }
 
-  if (isCadastro || isEdicao || !hasEmpresa) {
+  if ((isCadastro || isEdicao || !hasEmpresa) && hasPerfilRecrutador) {
     return {
       isLoading: false,
       componente: (
-        <EmpresaDados perfil={perfil} empresaId={id ?? null} userId={userId} />
+        <EmpresaDados
+          perfil={perfil}
+          empresaId={id ?? null}
+          userId={userId}
+          recrutadorId={String(recrutadorId) ?? null}
+        />
       ),
     };
   }
 
-  const isLoading = !isReady || hasEmpresa === null;
+  const isLoading =
+    !isReady ||
+    loading ||
+    (hasEmpresa === null && hasPerfilRecrutador === null);
 
-  const componente = hasEmpresa ? (
-    <Empresa perfil={perfil} empresaId={id ?? null} />
-  ) : (
-    <EmpresaDados perfil={perfil} userId={userId} />
-  );
+  const componente =
+    hasEmpresa || !hasPerfilRecrutador ? (
+      <Empresa
+        perfil={perfil}
+        empresaId={id ?? null}
+        recrutadorId={String(recrutadorId) ?? null}
+        hasPerfilRecrutador={hasPerfilRecrutador}
+      />
+    ) : (
+      <EmpresaDados
+        perfil={perfil}
+        userId={userId}
+        recrutadorId={String(recrutadorId) ?? null}
+      />
+    );
 
   return { isLoading, componente };
 }

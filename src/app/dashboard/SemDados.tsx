@@ -1,10 +1,11 @@
 import { useRouter } from "next/navigation";
 
 interface SemDadosProps {
-  tipo: "empresa" | "vaga" | "avaliador"; // pode adicionar mais depois
+  tipo: "empresa" | "vaga" | "perfil"; // pode adicionar mais depois
+  perfil: "candidato" | "avaliador" | "recrutador";
 }
 
-export default function SemDados({ tipo }: SemDadosProps) {
+export default function SemDados({ tipo, perfil }: SemDadosProps) {
   const router = useRouter();
   const renderBloco = () => {
     switch (tipo) {
@@ -85,7 +86,7 @@ export default function SemDados({ tipo }: SemDadosProps) {
           </>
         );
 
-      case "avaliador":
+      case "perfil":
         return (
           <>
             <div className="flex flex-col items-center justify-center h-full text-center w-full">
@@ -104,20 +105,18 @@ export default function SemDados({ tipo }: SemDadosProps) {
                 />
               </svg>
               <h2 className="text-lg sm:text-xl font-medium text-gray-700">
-                Nenhum avaliador cadastrado até o momento.
+                Olá! Seu perfil de {perfil} ainda não está completo ou ativo.
               </h2>
               <p className="text-sm text-gray-500 mt-2">
-                Cadastre avaliadores para ajudar na análise de candidatos.
-              </p>
-              <p className="text-sm text-gray-500 mb-4 pb-4">
-                Você poderá cadastrar quantas avaliadores quiser. Clique no
-                botão abaixo para começar.
+                Ative ou complete os dados para poder utilizar os recursos do seu perfil.
               </p>
               <button
-                onClick={() => router.push(`/dashboard/perfil=avaliador`)}
+                onClick={() =>
+                  router.push(`/dashboard/perfil?perfil=${perfil}`)
+                }
                 className="mt-5 px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
               >
-                Adicionar avaliador
+                Adicionar {perfil}
               </button>
             </div>
           </>

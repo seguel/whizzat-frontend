@@ -15,7 +15,8 @@ import { toast } from "react-hot-toast";
 interface EmpresaDadosProps {
   perfil: ProfileType;
   empresaId?: string | null;
-  userId?: string;
+  userId?: number;
+  recrutadorId?: string | null;
 }
 
 // Tipos de dados do formulário
@@ -69,6 +70,7 @@ export default function EmpresaDados({
   perfil,
   empresaId,
   userId,
+  recrutadorId,
 }: EmpresaDadosProps) {
   const router = useRouter();
 
@@ -104,12 +106,11 @@ export default function EmpresaDados({
 
     const fetchEmpresa = async () => {
       setLoadingEmpresa(true);
-      const perfilId =
-        perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+      /* const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1; */
 
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${empresaId}/perfil/${perfilId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${empresaId}/recrutador/${recrutadorId}`,
           {
             method: "GET",
             credentials: "include",
@@ -249,6 +250,7 @@ export default function EmpresaDados({
 
       try {
         const body = new FormData();
+        body.append("recrutadorId", String(recrutadorId));
         body.append("nome", form.nome);
         body.append("site", form.site);
         body.append("email", form.email);
@@ -269,6 +271,10 @@ export default function EmpresaDados({
 
         if (logoFile) body.append("logo", logoFile);
         if (capaFile) body.append("imagem_fundo", capaFile);
+        /* console.log("logoFile state:", logoFile);
+        for (const [key, value] of body.entries()) {
+          console.log("FormData:", key, value);
+        } */
 
         const url = !empresaId
           ? `${process.env.NEXT_PUBLIC_API_URL}/empresas/create-empresa`
@@ -300,9 +306,7 @@ export default function EmpresaDados({
         });
         setIsSubmitting(false);
         //nextStep();
-        router.push(
-          `/dashboard/empresa_dados?perfil=${perfil}&id=${data.empresa_id}`
-        );
+        router.push(`/dashboard/empresa_dados?perfil=${perfil}&id=${data.id}`);
       } catch (err: unknown) {
         console.error("Erro ao enviar dados:", err);
 
