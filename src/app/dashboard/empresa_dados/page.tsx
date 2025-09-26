@@ -24,7 +24,7 @@ export default async function Page({
   const perfil = params.perfil ?? "candidato";
   const op = params.op as "N" | "E" | undefined;
   const id = params.id ?? undefined;
-  const rec = params.rec ?? undefined; //recrutador
+  // const rec = params.rec ?? undefined; //recrutador
 
   // Redireciona se perfil não definido
   if (!perfil) {
@@ -36,5 +36,5 @@ export default async function Page({
     notFound();
   }
 
-  return <MiddlewarePage perfil={perfil as ProfileType} op={op} id={id} rec={rec} />;
+  return <MiddlewarePage perfil={perfil as ProfileType} op={op} id={id} />;
 }

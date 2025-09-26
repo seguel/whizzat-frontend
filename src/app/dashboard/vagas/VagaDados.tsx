@@ -942,6 +942,7 @@ export default function VagaDados({
                           Skills:
                           <TooltipIcon
                             message={`Como adicionar skill que não está na lista:\n1. Digite a skill desejada;\n2. Selecione 'Criar nova skill';\n3. Clique no botão Adicionar.`}
+                            perfil={perfil}
                           />
                         </label>
 
@@ -1048,6 +1049,7 @@ export default function VagaDados({
                                             ? `1. Próprio: Será selecionado\nsomente entre os avaliadores existentes\nna empresa recrutadora.\n\n2. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações.`
                                             : `1. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações e quando a empresa\n selecionada não possuir avaliador\n próprio.`
                                         }
+                                        perfil={perfil}
                                       />
                                     </div>
                                     <label className="flex items-center gap-1">
@@ -1305,7 +1307,7 @@ export default function VagaDados({
 
                         {/* Coluna Direita - Gráficos */}
                         <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                          <SkillsPanel skills={skillsData} />
+                          <SkillsPanel skills={skillsData}  perfil={perfil}/>
                         </div>
                       </div>
 
@@ -1501,7 +1503,7 @@ export default function VagaDados({
 
                       {/* Coluna Direita - Gráficos */}
                       <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                        <SkillsPanel skills={vagaPublicada?.skills} />
+                        <SkillsPanel skills={vagaPublicada?.skills}  perfil={perfil}/>
                       </div>
                     </div>
                   </div>

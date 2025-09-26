@@ -264,7 +264,8 @@ export default function Empresa({
                 <div className="pt-10 px-4 md:px-5 w-full grid grid-cols-1 md:grid-cols-4 gap-2">
                   {/* Coluna esquerda */}
 
-                  <div className="md:col-span-3 space-y-2">
+                  <div className="md:col-span-3 space-y-3">
+                    {/* Status + Nome */}
                     {empresaSelecionada.ativo ? (
                       <span className="flex items-center gap-1">
                         <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
@@ -281,7 +282,7 @@ export default function Empresa({
                             />
                           </svg>
                         </div>
-                        <span className="text-sm  text-green-600">Ativa</span>
+                        <span className="text-sm text-green-600">Ativa</span>
                       </span>
                     ) : (
                       <span className="flex items-center gap-1">
@@ -299,29 +300,112 @@ export default function Empresa({
                             />
                           </svg>
                         </div>
-
-                        <span className="text-sm  text-gray-600">Inativa</span>
+                        <span className="text-sm text-gray-600">Inativa</span>
                       </span>
                     )}
+
                     <h2 className="text-xl font-semibold text-gray-800">
                       {empresaSelecionada.nome_empresa}
                     </h2>
-                    <p className="text-sm text-gray-800">
-                      {empresaSelecionada.localizacao}
-                    </p>
-                    <p className="text-sm text-gray-800">
-                      {empresaSelecionada.telefone}
-                    </p>
-                    <p className="text-sm text-gray-800">
-                      {empresaSelecionada.website}
-                    </p>
-                    <p className="text-sm text-gray-800">
-                      {empresaSelecionada.email}
-                    </p>
-                    <p className="text-sm text-gray-700 whitespace-pre-line">
+
+                    {/* Bloco 2 colunas */}
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800">
+                      {/* Localização */}
+                      <div className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 11c1.656 0 3-1.344 3-3s-1.344-3-3-3-3 1.344-3 3 1.344 3 3 3z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 22s8-4.5 8-12a8 8 0 10-16 0c0 7.5 8 12 8 12z"
+                          />
+                        </svg>
+                        {empresaSelecionada.localizacao}
+                      </div>
+
+                      {/* Telefone */}
+                      <div className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.2 3.6a1 1 0 01-.272 1.06l-1.516 1.516a11.042 11.042 0 005.292 5.292l1.516-1.516a1 1 0 011.06-.272l3.6 1.2a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C8.477 21 3 15.523 3 9V5z"
+                          />
+                        </svg>
+                        {empresaSelecionada.telefone}
+                      </div>
+
+                      {/* Website */}
+                      <div className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          {/* Globo de internet */}
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 3a9 9 0 100 18 9 9 0 000-18z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.25 12h19.5M12 2.25c2.25 2.25 3.75 5.25 3.75 9.75s-1.5 7.5-3.75 9.75M12 2.25C9.75 4.5 8.25 7.5 8.25 12s1.5 7.5 3.75 9.75"
+                          />
+                        </svg>
+                        {empresaSelecionada.website}
+                      </div>
+
+                      {/* Email */}
+                      <div className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 25 25"
+                          stroke="currentColor"
+                        >
+                          {/* Envelope */}
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 8h18a2 2 0 002-2V8a2 2 0 00-2-2H3a2 2 0 00-2 2v6a2 2 0 002 2z"
+                          />
+                        </svg>
+                        {empresaSelecionada.email}
+                      </div>
+                    </div>
+
+                    {/* Apresentação */}
+                    <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-3">
                       {empresaSelecionada.apresentacao ||
                         "Nenhuma apresentação fornecida."}
-                    </p>
+                    </div>
                   </div>
 
                   {/* Coluna direita */}

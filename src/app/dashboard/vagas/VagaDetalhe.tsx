@@ -364,7 +364,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
 
                 {/* Coluna Direita - Gráficos */}
                 <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                  <SkillsPanel skills={vaga?.skills} />
+                  <SkillsPanel skills={vaga?.skills}  perfil={perfil}/>
                 </div>
               </div>
             </div>

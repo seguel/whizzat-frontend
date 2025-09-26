@@ -94,9 +94,9 @@ export default function EmpresaDados({
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [empresaPublicada, setEmpresaPublicada] = useState<EmpresaData | null>(
+  /* const [empresaPublicada, setEmpresaPublicada] = useState<EmpresaData | null>(
     null
-  );
+  ); */
 
   const [empresa, setEmpresa] = useState<EmpresaData | null>(null);
   const [loadingEmpresa, setLoadingEmpresa] = useState<boolean>(false);
@@ -298,7 +298,7 @@ export default function EmpresaDados({
           throw new Error(errorMessage);
         }
 
-        setEmpresaPublicada(data);
+        // setEmpresaPublicada(data);
 
         localStorage.removeItem(`empresaForm_${userId}`);
         toast.success(`Empresa "${data.nome_empresa}" publicada com sucesso!`, {
@@ -752,12 +752,148 @@ export default function EmpresaDados({
                   </div>
                   {/* Informações da empresa */}
                   <div className="flex-1 pt-8 px-4 md:px-8">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                      {form.nome || "Nome da empresa"}
-                    </h2>
-                    <p className="text-sm text-gray-700 whitespace-pre-line">
-                      {form.apresentacao || "Nenhuma apresentação fornecida."}
-                    </p>
+                    <div className="md:col-span-3 space-y-3">
+                      {/* Status + Nome */}
+                      {form.ativo ? (
+                        <span className="flex items-center gap-1">
+                          <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3 w-3 text-white"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <span className="text-sm text-green-600">Ativa</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1">
+                          <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3 w-3 text-white"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <span className="text-sm text-gray-600">Inativa</span>
+                        </span>
+                      )}
+
+                      <h2 className="text-xl font-semibold text-gray-800">
+                        {form.nome}
+                      </h2>
+
+                      {/* Bloco 2 colunas */}
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800">
+                        {/* Localização */}
+                        <div className="flex items-center gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 text-gray-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 11c1.656 0 3-1.344 3-3s-1.344-3-3-3-3 1.344-3 3 1.344 3 3 3z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 22s8-4.5 8-12a8 8 0 10-16 0c0 7.5 8 12 8 12z"
+                            />
+                          </svg>
+                          {form.localizacao}
+                        </div>
+
+                        {/* Telefone */}
+                        <div className="flex items-center gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 text-gray-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.2 3.6a1 1 0 01-.272 1.06l-1.516 1.516a11.042 11.042 0 005.292 5.292l1.516-1.516a1 1 0 011.06-.272l3.6 1.2a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C8.477 21 3 15.523 3 9V5z"
+                            />
+                          </svg>
+                          {form.telefone}
+                        </div>
+
+                        {/* Website */}
+                        <div className="flex items-center gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 text-gray-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            {/* Globo de internet */}
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 3a9 9 0 100 18 9 9 0 000-18z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M2.25 12h19.5M12 2.25c2.25 2.25 3.75 5.25 3.75 9.75s-1.5 7.5-3.75 9.75M12 2.25C9.75 4.5 8.25 7.5 8.25 12s1.5 7.5 3.75 9.75"
+                            />
+                          </svg>
+                          {form.site}
+                        </div>
+
+                        {/* Email */}
+                        <div className="flex items-center gap-2">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-gray-500"
+                            fill="none"
+                            viewBox="0 0 25 25"
+                            stroke="currentColor"
+                          >
+                            {/* Envelope */}
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 8h18a2 2 0 002-2V8a2 2 0 00-2-2H3a2 2 0 00-2 2v6a2 2 0 002 2z"
+                            />
+                          </svg>
+                          {form.email}
+                        </div>
+                      </div>
+
+                      {/* Apresentação */}
+                      <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-3">
+                        {form.apresentacao || "Nenhuma apresentação fornecida."}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Botões */}
@@ -800,12 +936,12 @@ export default function EmpresaDados({
                 </div>
               </form>
             )}
-
+            {/* 
             {step === 5 && empresaPublicada === null && <LoadingOverlay />}
 
             {step === 5 && empresaPublicada && (
               <div className="flex flex-col items-start p-4 w-full min-h-[500px] space-y-6">
-                {/* Capa e logo */}
+                /* Capa e logo /
                 <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0">
                   {empresaPublicada.imagem_fundo ? (
                     <Image
@@ -822,7 +958,7 @@ export default function EmpresaDados({
                     </div>
                   )}
 
-                  {/* Logo sobreposto */}
+                  {/* Logo sobreposto /}
                   <div className="absolute left-6 top-full -translate-y-2/3 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-full shadow-md flex items-center justify-center overflow-hidden border-4 border-white z-10">
                     {empresaPublicada.logo ? (
                       <Image
@@ -841,9 +977,9 @@ export default function EmpresaDados({
                   </div>
                 </div>
 
-                {/* Informações + Vagas */}
+                {/* Informações + Vagas /}
                 <div className="pt-10 px-4 md:px-8 w-full grid grid-cols-1 md:grid-cols-4 gap-6">
-                  {/* Coluna esquerda */}
+                  {/* Coluna esquerda /}
                   <div className="md:col-span-3 space-y-2">
                     <h2 className="text-xl font-semibold text-gray-800">
                       {empresaPublicada.nome_empresa}
@@ -854,7 +990,7 @@ export default function EmpresaDados({
                     </p>
                   </div>
 
-                  {/* Coluna direita */}
+                  {/* Coluna direita /}
                   <div className="flex flex-col items-start justify-start space-y-3">
                     <h3 className="text-lg font-semibold text-gray-800">
                       Vagas
@@ -872,7 +1008,7 @@ export default function EmpresaDados({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </main>
       </div>

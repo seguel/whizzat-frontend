@@ -40,7 +40,7 @@ export default function DashboardCandidato({ perfil }: Props) {
               <JobList title="Vagas compatíveis" jobs={[]} perfil={perfil} />
             </div>
             <div className="md:col-span-1">
-              <SkillsPanel />
+              <SkillsPanel skills={[]} perfil={perfil} />
             </div>
           </main>
         </div>

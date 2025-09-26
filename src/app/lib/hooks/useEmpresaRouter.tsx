@@ -10,10 +10,10 @@ interface Options {
   perfil: ProfileType;
   op?: "N" | "E";
   id?: string;
-  rec?: string;
+  // rec?: string;
 }
 
-export function useEmpresaRouter({ perfil, op, id, rec }: Options) {
+export function useEmpresaRouter({ perfil, op, id }: Options) {
   const isCadastro = op === "N";
   const isEdicao = op === "E" && id;
 

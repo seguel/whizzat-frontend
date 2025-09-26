@@ -11,11 +11,11 @@ interface Props {
   perfil: ProfileType;
   op?: "N" | "E";
   id?: string;
-  rec?: string;
+  // rec?: string;
 }
 
-export default function Middleware({ perfil, op, id, rec }: Props) {
-  const { isLoading, componente } = useEmpresaRouter({ perfil, op, id, rec });
+export default function Middleware({ perfil, op, id }: Props) {
+  const { isLoading, componente } = useEmpresaRouter({ perfil, op, id });
 
   if (isLoading) return <LoadingOverlay />;
 
