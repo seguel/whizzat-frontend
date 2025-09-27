@@ -15,14 +15,49 @@ type Skill = {
 
 type SkillsPanelProps = {
   skills?: Skill[];
+  perfil: "candidato" | "avaliador" | "recrutador";
 };
 
-export default function SkillsPanel({ skills }: SkillsPanelProps) {
+export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
   // Conversão dos dados para o gráfico
   const radarData = (skills ?? []).map((skill) => ({
     skill: skill.nome,
     value: skill.peso / 10,
   }));
+
+  // Map para classes de cor de acordo com o perfil
+  const perfilColors: Record<
+    "candidato" | "avaliador" | "recrutador",
+    { bg: string; hover: string; text: string; fill: string; grafico: string }
+  > = {
+    candidato: {
+      bg: "bg-green-500",
+      hover: "hover:bg-green-200",
+      text: "text-green-500",
+      fill: "fill-green-600",
+      grafico: "#16A34A",
+    },
+    recrutador: {
+      bg: "bg-purple-500",
+      hover: "hover:bg-purple-200",
+      text: "text-purple-500",
+      fill: "fill-purple-600",
+      grafico: "#9810fa",
+    },
+    avaliador: {
+      bg: "bg-blue-500",
+      hover: "hover:bg-blue-200",
+      text: "text-blue-500",
+      fill: "fill-blue-600",
+      grafico: "#155dfc",
+    },
+  };
+
+  const nmrScore = `text-lg font-bold
+   ${perfilColors[perfil].fill}
+    `;
+
+  const corGrafico = `${perfilColors[perfil].grafico}`;
 
   // Cálculo da média para o score (em % de 100)
   const media =
@@ -39,7 +74,7 @@ export default function SkillsPanel({ skills }: SkillsPanelProps) {
   const dashOffset = dashArray - (media / 100) * dashArray;
 
   return (
-    <aside className="bg-white rounded-xl p-3 shadow-sm w-full md:max-w-[280px]">
+    <aside className="bg-white rounded-xl p-3 shadow-sm w-full md:max-w-[280px] ">
       {/* Score circular */}
       <div className="flex flex-col items-center">
         <svg className="w-28 h-28" viewBox="0 0 120 120">
@@ -71,12 +106,7 @@ export default function SkillsPanel({ skills }: SkillsPanelProps) {
           >
             Score Médio
           </text>
-          <text
-            x="60"
-            y="78"
-            textAnchor="middle"
-            className="text-lg fill-purple-600 font-bold"
-          >
+          <text x="60" y="78" textAnchor="middle" className={nmrScore}>
             {media}
           </text>
         </svg>
@@ -96,7 +126,7 @@ export default function SkillsPanel({ skills }: SkillsPanelProps) {
               name="skills"
               dataKey="value"
               stroke="#9333EA"
-              fill="#D8B4FE"
+              fill={corGrafico}
               fillOpacity={0.6}
             />
           </RadarChart>

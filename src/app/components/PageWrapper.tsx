@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition } from "react";
 import LoadingOverlay from "./LoadingOverlay";
 
-export default function DashboardWrapper({
+export default function PageWrapper({
   children,
   externalLoading,
 }: {

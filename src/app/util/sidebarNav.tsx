@@ -33,7 +33,11 @@ export function getNavItems(profile: ProfileType): NavItem[] {
         },
         { icon: <Star size={20} />, label: "Minhas vagas", route: "/vagas" },
         { icon: <Search size={20} />, label: "Buscar vagas", route: "/buscar" },
-        { icon: <User size={20} />, label: "Perfil", route: "/perfil" },
+        {
+          icon: <User size={20} />,
+          label: "Meu Perfil",
+          route: `/dashboard/perfil?perfil=${profile}`,
+        },
         {
           icon: <CheckSquare size={20} />,
           label: "Avaliações",
@@ -66,7 +70,11 @@ export function getNavItems(profile: ProfileType): NavItem[] {
           label: "Empresas",
           route: `/dashboard/empresa_dados?perfil=${profile}`,
         },
-        { icon: <User size={20} />, label: "Perfil", route: "/perfil" },
+        {
+          icon: <User size={20} />,
+          label: "Meu Perfil",
+          route: `/dashboard/perfil?perfil=${profile}`,
+        },
         { icon: <Calendar size={20} />, label: "Agenda", route: "/agenda" },
         {
           icon: <Bell size={20} />,
@@ -86,8 +94,13 @@ export function getNavItems(profile: ProfileType): NavItem[] {
         },
         {
           icon: <CheckSquare size={20} />,
-          label: "Minhas avaliações",
+          label: "Avaliações",
           route: "/avaliacoes",
+        },
+        {
+          icon: <User size={20} />,
+          label: "Meu Perfil",
+          route: `/dashboard/perfil?perfil=${profile}`,
         },
         { icon: <Calendar size={20} />, label: "Agenda", route: "/agenda" },
         {

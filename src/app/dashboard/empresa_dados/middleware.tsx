@@ -11,6 +11,7 @@ interface Props {
   perfil: ProfileType;
   op?: "N" | "E";
   id?: string;
+  // rec?: string;
 }
 
 export default function Middleware({ perfil, op, id }: Props) {
