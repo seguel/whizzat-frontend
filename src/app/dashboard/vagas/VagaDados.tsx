@@ -23,7 +23,8 @@ interface Props {
   hasEmpresa: boolean | null;
   empresaId: string | null;
   vagaId: string | null;
-  userId?: string;
+  userId?: number;
+  recrutadorId: number | null;
 }
 interface SkillAvaliacao {
   skill_id: number;
@@ -109,6 +110,7 @@ export default function VagaDados({
   empresaId,
   vagaId,
   userId,
+  recrutadorId,
 }: Props) {
   const router = useRouter();
 
@@ -140,7 +142,7 @@ export default function VagaDados({
   const [hasAvaliadorProprio, setHasAvaliadorProprio] = useState(false);
 
   const [empresas, setEmpresas] = useState<
-    { empresa_id: number; nome_empresa: string; logo: string }[]
+    { id: number; nome_empresa: string; logo: string }[]
   >([]);
   const [modalidades, setModalidades] = useState<
     { modalidade_trabalho_id: number; modalidade: string }[]
@@ -186,11 +188,10 @@ export default function VagaDados({
     const fetchVaga = async () => {
       setLoadingVagaEmpresa(true);
       try {
-        const perfilId =
-          perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+        // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/vaga/${vagaId}/empresa/${empresaId}/perfil/${perfilId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/vagas/${vagaId}/empresa/${empresaId}`,
           {
             method: "GET",
             credentials: "include",
@@ -233,15 +234,14 @@ export default function VagaDados({
 
   useEffect(() => {
     setLoadingVagaEmpresa(true);
-    const perfilId =
-      perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+    // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
     const fetchSelectData = async () => {
       try {
         const [empresasRes, modalidadesRes, periodosRes, skillsRes] =
           await Promise.all([
             fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/empresas/vinculo/${perfilId}`,
+              `${process.env.NEXT_PUBLIC_API_URL}/empresas/recrutador/${recrutadorId}`,
               {
                 method: "GET",
                 credentials: "include",
@@ -287,7 +287,7 @@ export default function VagaDados({
     if (!empresaId || empresas.length === 0) return;
 
     const empresaSelecionada = empresas.find(
-      (e) => e.empresa_id.toString() === empresaId.toString()
+      (e) => e.id.toString() === empresaId.toString()
     );
 
     if (empresaSelecionada) {
@@ -396,8 +396,8 @@ export default function VagaDados({
         };
 
         const url = !vagaId
-          ? `${process.env.NEXT_PUBLIC_API_URL}/empresas/create-vaga`
-          : `${process.env.NEXT_PUBLIC_API_URL}/empresas/update-vaga`;
+          ? `${process.env.NEXT_PUBLIC_API_URL}/vagas/create-vaga`
+          : `${process.env.NEXT_PUBLIC_API_URL}/vagas/update-vaga`;
 
         const response = await fetch(url, {
           method: "POST",
@@ -489,7 +489,7 @@ export default function VagaDados({
   const handleEmpresaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
     const empresaSelecionada = empresas.find(
-      (e) => e.empresa_id.toString() === selectedId
+      (e) => e.id.toString() === selectedId
     );
 
     setForm((prev) => ({
@@ -510,7 +510,7 @@ export default function VagaDados({
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
         {!hasEmpresa ? (
-          <SemDados tipo="empresa" />
+          <SemDados tipo="empresa" perfil={perfil} />
         ) : (
           <>
             {step != 4 && (
@@ -601,10 +601,7 @@ export default function VagaDados({
                         >
                           <option value="">Selecione a empresa</option>
                           {empresas.map((empresa) => (
-                            <option
-                              key={empresa.empresa_id}
-                              value={empresa.empresa_id}
-                            >
+                            <option key={empresa.id} value={empresa.id}>
                               {empresa.nome_empresa}
                             </option>
                           ))}
@@ -945,6 +942,7 @@ export default function VagaDados({
                           Skills:
                           <TooltipIcon
                             message={`Como adicionar skill que não está na lista:\n1. Digite a skill desejada;\n2. Selecione 'Criar nova skill';\n3. Clique no botão Adicionar.`}
+                            perfil={perfil}
                           />
                         </label>
 
@@ -1051,6 +1049,7 @@ export default function VagaDados({
                                             ? `1. Próprio: Será selecionado\nsomente entre os avaliadores existentes\nna empresa recrutadora.\n\n2. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações.`
                                             : `1. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações e quando a empresa\n selecionada não possuir avaliador\n próprio.`
                                         }
+                                        perfil={perfil}
                                       />
                                     </div>
                                     <label className="flex items-center gap-1">
@@ -1191,9 +1190,7 @@ export default function VagaDados({
                                   </h2>
                                   <p className="text-sm text-gray-500">
                                     {empresas.find(
-                                      (e) =>
-                                        e.empresa_id.toString() ===
-                                        form.empresa_id
+                                      (e) => e.id.toString() === form.empresa_id
                                     )?.nome_empresa ?? "Indefinida"}
                                   </p>
                                 </div>
@@ -1310,7 +1307,7 @@ export default function VagaDados({
 
                         {/* Coluna Direita - Gráficos */}
                         <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                          <SkillsPanel skills={skillsData} />
+                          <SkillsPanel skills={skillsData}  perfil={perfil}/>
                         </div>
                       </div>
 
@@ -1506,7 +1503,7 @@ export default function VagaDados({
 
                       {/* Coluna Direita - Gráficos */}
                       <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                        <SkillsPanel skills={vagaPublicada?.skills} />
+                        <SkillsPanel skills={vagaPublicada?.skills}  perfil={perfil}/>
                       </div>
                     </div>
                   </div>

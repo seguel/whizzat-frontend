@@ -8,20 +8,26 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation"; // App Router
 import Link from "next/link";
+import SemDados from "../SemDados";
 
 interface Props {
   perfil: ProfileType;
   empresaId: string | null;
+  recrutadorId: string | null;
+  hasPerfilRecrutador: boolean;
 }
 
 interface EmpresaData {
-  empresa_id: number;
+  id: number;
   nome_empresa: string;
+  website?: string;
   email?: string;
   telefone?: string;
+  localizacao?: string;
   apresentacao?: string;
   logo?: string;
   imagem_fundo?: string;
+  ativo: boolean;
 }
 
 interface VagaData {
@@ -50,7 +56,12 @@ interface VagaData {
   ativo: boolean;
 }
 
-export default function Empresa({ perfil, empresaId }: Props) {
+export default function Empresa({
+  perfil,
+  empresaId,
+  recrutadorId,
+  hasPerfilRecrutador,
+}: Props) {
   const router = useRouter();
 
   const [hasVagas, setHasVaga] = useState<boolean>(false);
@@ -62,26 +73,31 @@ export default function Empresa({ perfil, empresaId }: Props) {
     useState<EmpresaData | null>(null);
 
   useEffect(() => {
+    if (!hasPerfilRecrutador) {
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
-    const perfilId =
-      perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+    // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
     const fetchEmpresas = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/vinculo/${perfilId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/empresas/recrutador/${recrutadorId}`,
           {
             method: "GET",
             credentials: "include",
           }
         );
         const data = await res.json();
+
         if (Array.isArray(data.empresas)) {
           if (empresaId && !isNaN(Number(empresaId))) {
             handleSelecionarEmpresa(Number(empresaId));
           } else if (data.empresas.length === 1) {
             setEmpresaSelecionada(data.empresas[0]);
-            handleSelecionarEmpresa(Number(data.empresas[0].empresa_id));
+            handleSelecionarEmpresa(Number(data.empresas[0].id));
           } else {
             setEmpresaSelecionada(null);
           }
@@ -99,12 +115,11 @@ export default function Empresa({ perfil, empresaId }: Props) {
 
   const handleSelecionarEmpresa = async (id: number) => {
     setIsLoading(true);
-    const perfilId =
-      perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+    // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
     try {
       const [empresasRes, vagasRes] = await Promise.all([
         fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${id}/perfil/${perfilId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${id}/recrutador/${recrutadorId}`,
           {
             method: "GET",
             credentials: "include",
@@ -149,8 +164,9 @@ export default function Empresa({ perfil, empresaId }: Props) {
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
         <main className="p-4 grid grid-cols-1 gap-4 w-[98%] mx-auto">
-          {/* Caso tenha empresa selecionada */}
-          {empresaSelecionada ? (
+          {!hasPerfilRecrutador ? (
+            <SemDados tipo="perfil" perfil={perfil} />
+          ) : empresaSelecionada ? (
             <div className="flex flex-col items-start p-4 bg-white rounded-lg shadow-sm w-full min-h-[500px] space-y-6">
               <div className="pt-1 px-1 flex justify-between w-full">
                 {/* Esquerda: botão voltar */}
@@ -185,7 +201,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
                     <button
                       onClick={() =>
                         router.push(
-                          `/dashboard/empresa_dados?perfil=${perfil}&op=E&id=${empresaSelecionada.empresa_id}`
+                          `/dashboard/empresa_dados?perfil=${perfil}&op=E&id=${empresaSelecionada.id}`
                         )
                       }
                       className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
@@ -247,14 +263,149 @@ export default function Empresa({ perfil, empresaId }: Props) {
                 {/* Informações + Vagas */}
                 <div className="pt-10 px-4 md:px-5 w-full grid grid-cols-1 md:grid-cols-4 gap-2">
                   {/* Coluna esquerda */}
-                  <div className="md:col-span-3 space-y-2">
+
+                  <div className="md:col-span-3 space-y-3">
+                    {/* Status + Nome */}
+                    {empresaSelecionada.ativo ? (
+                      <span className="flex items-center gap-1">
+                        <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-3 w-3 text-white"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-sm text-green-600">Ativa</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-3 w-3 text-white"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-sm text-gray-600">Inativa</span>
+                      </span>
+                    )}
+
                     <h2 className="text-xl font-semibold text-gray-800">
                       {empresaSelecionada.nome_empresa}
                     </h2>
-                    <p className="text-sm text-gray-700 whitespace-pre-line">
+
+                    {/* Bloco 2 colunas */}
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800">
+                      {/* Localização */}
+                      <div className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 11c1.656 0 3-1.344 3-3s-1.344-3-3-3-3 1.344-3 3 1.344 3 3 3z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 22s8-4.5 8-12a8 8 0 10-16 0c0 7.5 8 12 8 12z"
+                          />
+                        </svg>
+                        {empresaSelecionada.localizacao}
+                      </div>
+
+                      {/* Telefone */}
+                      <div className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.2 3.6a1 1 0 01-.272 1.06l-1.516 1.516a11.042 11.042 0 005.292 5.292l1.516-1.516a1 1 0 011.06-.272l3.6 1.2a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C8.477 21 3 15.523 3 9V5z"
+                          />
+                        </svg>
+                        {empresaSelecionada.telefone}
+                      </div>
+
+                      {/* Website */}
+                      <div className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          {/* Globo de internet */}
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 3a9 9 0 100 18 9 9 0 000-18z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M2.25 12h19.5M12 2.25c2.25 2.25 3.75 5.25 3.75 9.75s-1.5 7.5-3.75 9.75M12 2.25C9.75 4.5 8.25 7.5 8.25 12s1.5 7.5 3.75 9.75"
+                          />
+                        </svg>
+                        {empresaSelecionada.website}
+                      </div>
+
+                      {/* Email */}
+                      <div className="flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 25 25"
+                          stroke="currentColor"
+                        >
+                          {/* Envelope */}
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 8h18a2 2 0 002-2V8a2 2 0 00-2-2H3a2 2 0 00-2 2v6a2 2 0 002 2z"
+                          />
+                        </svg>
+                        {empresaSelecionada.email}
+                      </div>
+                    </div>
+
+                    {/* Apresentação */}
+                    <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-3">
                       {empresaSelecionada.apresentacao ||
                         "Nenhuma apresentação fornecida."}
-                    </p>
+                    </div>
                   </div>
 
                   {/* Coluna direita */}
@@ -266,7 +417,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
                       <button
                         onClick={() =>
                           router.push(
-                            `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresaSelecionada.empresa_id}`
+                            `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresaSelecionada.id}`
                           )
                         }
                         className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
@@ -280,7 +431,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
                         {listVagas?.map((job, idx) => (
                           <Link
                             key={idx}
-                            href={`/dashboard/vagas?perfil=${perfil}&vagaid=${job.vaga_id}&id=${empresaSelecionada.empresa_id}`}
+                            href={`/dashboard/vagas?perfil=${perfil}&vagaid=${job.vaga_id}&id=${empresaSelecionada.id}`}
                             className="block w-full mb-2"
                           >
                             <div className="flex flex-row justify-start items-start rounded-lg p-3 sm:p-4 bg-white shadow-sm border border-gray-100 cursor-pointer hover:shadow-md hover:border-purple-200 transition w-full">
@@ -296,50 +447,49 @@ export default function Empresa({ perfil, empresaId }: Props) {
                                   {job.qtde_posicao}{" "}
                                   {job.qtde_posicao > 1 ? "vagas" : "vaga"}
                                 </p>
-                                
-                                  {job?.ativo ? (
-                                    <span className="flex items-center gap-1">
-                                      <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-3 w-3 text-white"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                      </div>
-                                      <span className="text-sm  text-green-600">
-                                        Ativa
-                                      </span>
-                                    </span>
-                                  ) : (
-                                    <span className="flex items-center gap-1">
-                                      <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-3 w-3 text-white"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                      </div>
 
-                                      <span className="text-sm  text-gray-600">
-                                        Inativa
-                                      </span>
+                                {job?.ativo ? (
+                                  <span className="flex items-center gap-1">
+                                    <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-3 w-3 text-white"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="text-sm  text-green-600">
+                                      Ativa
                                     </span>
-                                  )}
-                                
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1">
+                                    <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-3 w-3 text-white"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </div>
+
+                                    <span className="text-sm  text-gray-600">
+                                      Inativa
+                                    </span>
+                                  </span>
+                                )}
 
                                 <p className="flex items-center justify-center text-xs px-2 py-1 rounded-lg bg-purple-100 mt-2 sm:mt-4 max-w-full">
                                   <strong>Aberta até: {job.prazo}</strong>
@@ -374,11 +524,11 @@ export default function Empresa({ perfil, empresaId }: Props) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {empresas.map((empresa) => (
                     <div
-                      key={empresa.empresa_id}
-                      className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg cursor-pointer transition"
-                      onClick={() =>
-                        handleSelecionarEmpresa(empresa.empresa_id)
-                      }
+                      key={empresa.id}
+                      className={`bg-white rounded-lg shadow-md p-4 hover:shadow-lg cursor-pointer transition border-2 ${
+                        empresa.ativo ? "border-green-500" : "border-gray-400"
+                      }`}
+                      onClick={() => handleSelecionarEmpresa(empresa.id)}
                     >
                       {/* Logo */}
                       <div className="w-full flex justify-center mb-4">
@@ -389,7 +539,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
                             width={64}
                             height={64}
                             className="w-16 h-16 object-contain"
-                            unoptimized // opcional, se estiver usando imagens externas sem loader
+                            unoptimized
                           />
                         ) : (
                           <div className="w-16 h-16 flex items-center justify-center bg-gray-100 text-gray-400 rounded-full text-xs text-center">
@@ -398,6 +548,7 @@ export default function Empresa({ perfil, empresaId }: Props) {
                         )}
                       </div>
 
+                      {/* Nome + dados */}
                       <h3 className="text-md font-semibold text-center text-gray-800">
                         {empresa.nome_empresa}
                       </h3>
@@ -407,6 +558,48 @@ export default function Empresa({ perfil, empresaId }: Props) {
                       <p className="text-sm text-center text-gray-500">
                         {empresa.telefone || "sem telefone"}
                       </p>
+
+                      {/* Status apenas com texto colorido */}
+                      {empresa.ativo ? (
+                        <span className="flex items-center  justify-center gap-1">
+                          <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3 w-3 text-white"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <span className="text-sm  text-green-600">Ativa</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center gap-1">
+                          <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3 w-3 text-white"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+
+                          <span className="text-sm  text-gray-600">
+                            Inativa
+                          </span>
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
