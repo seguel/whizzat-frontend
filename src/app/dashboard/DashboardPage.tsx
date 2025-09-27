@@ -6,7 +6,7 @@ import {
 import DashboardCandidato from "./DashboardCandidato";
 import DashboardRecrutador from "./DashboardRecrutador";
 import DashboardAvaliador from "./DashboardAvaliador";
-import DashboardWrapper from "../components/DashboardWrapper";
+import DashboardWrapper from "../components/PageWrapper";
 import { useAuthGuard } from "../lib/hooks/useAuthGuard";
 import LoadingOverlay from "../components/LoadingOverlay";
 

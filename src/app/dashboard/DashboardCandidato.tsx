@@ -6,7 +6,7 @@ import Sidebar from "../components/perfil/Sidebar";
 import TopBar from "../components/perfil/TopBar";
 import JobList from "../components/perfil/JobList";
 import SkillsPanel from "../components/perfil/SkillsPanel";
-import DashboardWrapper from "../components/DashboardWrapper";
+import DashboardWrapper from "../components/PageWrapper";
 import { ProfileType } from "../components/perfil/ProfileContext";
 
 interface Props {
@@ -40,7 +40,7 @@ export default function DashboardCandidato({ perfil }: Props) {
               <JobList title="Vagas compatíveis" jobs={[]} perfil={perfil} />
             </div>
             <div className="md:col-span-1">
-              <SkillsPanel />
+              <SkillsPanel skills={[]} perfil={perfil} />
             </div>
           </main>
         </div>
