@@ -38,7 +38,6 @@ export function useRecrutadorEmpresa(perfil: Perfil) {
         } else {
           setHasPerfilRecrutador(false);
           setHasEmpresa(false);
-          setLoading(false);
         }
       } catch (error) {
         console.error("Erro ao verificar perfil:", error);
@@ -62,10 +61,9 @@ export function useRecrutadorEmpresa(perfil: Perfil) {
         if (!res.ok) {
           setHasEmpresa(false);
         } else {
-          await res.json(); // caso precise dos dados da empresa
+          await res.json(); // se precisar armazenar os dados da empresa depois
           setHasEmpresa(true);
         }
-        setLoading(false);
       } catch (error) {
         console.error("Erro ao verificar vínculo:", error);
         setHasEmpresa(false);
@@ -80,6 +78,6 @@ export function useRecrutadorEmpresa(perfil: Perfil) {
     recrutadorId,
     hasPerfilRecrutador,
     hasEmpresa,
-    loading,
+    loading, // <- quem usa o hook decide se mostra "Carregando..."
   };
 }

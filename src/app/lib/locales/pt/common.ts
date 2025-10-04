@@ -76,6 +76,18 @@ const pt = {
     btn_reenviar: "Reenviar link de ativação",
     info: "Para reenviar o link, acesse a página de login.",
   },
+  confirma_email_avaliador: {
+    token_invalido: "Token inválido ou ausente.",
+    erro_geral: "Erro ao ativar a conta. Token inválido ou expirado.",
+    reenvio_link_sucesso: "Link reenviado com sucesso. Verifique seu e-mail.",
+    reenvio_link_erro: "Erro ao reenviar o link. Tente novamente.",
+    titulo: "Confirmação de Cadastro",
+    confirmando: "Confirmando seu cadastro...",
+    redirecionando: "Redirecionando para o login...",
+    reenviar: "Reenviando...",
+    btn_reenviar: "Reenviar link de ativação",
+    info: "Para reenviar o link, acesse a página de login.",
+  },
   perfil: {
     titulo_primeiro: "Olá, seja bem vindo(a) ao Whizzat!",
     titulo_segundo: "Para iniciar, escolha uma opção de perfil",

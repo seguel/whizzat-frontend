@@ -65,18 +65,22 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [vaga, setVaga] = useState<VagaData | null>(null);
-  const [loadingVagaEmpresa, setLoadingVagaEmpresa] = useState<boolean>(false);
+  const [loadingVagaEmpresa, setLoadingVagaEmpresa] = useState<boolean>(true);
   /* const [diasDisponiveis, setDiasDisponiveis] = useState(0);
   const [quantidadeVagas, setQuantidadeVagas] = useState(0); */
 
   useEffect(() => {
-    if (!vagaId) return;
+    if (!vagaId) {
+      setLoadingVagaEmpresa(false);
+      return;
+    }
 
     const fetchVaga = async () => {
       // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
       if (!empresaId || !vagaId) {
         console.warn("empresaId ou vagaId não informado");
+        setLoadingVagaEmpresa(false);
         return;
       }
 
@@ -107,7 +111,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
     fetchVaga();
   }, [vagaId]);
 
-  if ((vagaId || empresaId) && loadingVagaEmpresa) {
+  if (!vagaId || !empresaId || loadingVagaEmpresa) {
     return <LoadingOverlay />;
   }
 
@@ -200,7 +204,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                           <p className="text-sm text-gray-500">
                             <Link
                               className="hover:underline"
-                              href={`/dashboard/empresa_dados?perfil=${perfil}&id=${empresaId}`}
+                              href={`/dashboard/empresa/detalhe/${empresaId}?perfil=${perfil}`}
                             >
                               {vaga?.empresa?.nome_empresa}
                             </Link>
