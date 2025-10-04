@@ -20,6 +20,8 @@ interface Props {
 export default function PerfilPage({ perfil, id }: Props) {
   const { isReady } = useAuthGuard("/cadastro/login");
   const [userId, setUserId] = useState<string>("");
+  const [nomeUser, setNomeUser] = useState<string>("");
+
   const [recrutadorId, setRecrutadorId] = useState<string>("");
   const [avaliadorId, setAvaliadorId] = useState<string>("");
 
@@ -40,6 +42,7 @@ export default function PerfilPage({ perfil, id }: Props) {
         const data = await res.json();
         setUserId(data.usuario_id);
         setRecrutadorId(data.id);
+        setNomeUser(data.nome_user);
       } catch (error) {
         console.error("Erro ao verificar perfil:", error);
       }
@@ -56,18 +59,17 @@ export default function PerfilPage({ perfil, id }: Props) {
         );
 
         const data = await res.json();
+        
         setUserId(data.usuario_id);
         setAvaliadorId(data.id);
+        setNomeUser(data.nome_user);
       } catch (error) {
         console.error("Erro ao verificar perfil:", error);
       }
     };
 
-    if(perfilId == 2)
-      verificarHasPerfilRecrutador();
-    else if(perfilId == 3)
-      verificarHasPerfilAvaliador();
-    
+    if (perfilId == 2) verificarHasPerfilRecrutador();
+    else if (perfilId == 3) verificarHasPerfilAvaliador();
   }, [perfil]);
 
   if (!isReady || !userId) return <LoadingOverlay />;
@@ -76,18 +78,22 @@ export default function PerfilPage({ perfil, id }: Props) {
     <ProfileProvider initialProfile={perfil}>
       <PerfilWrapper>
         {/* {perfil === "candidato" && <PerfilCandidato perfil={perfil} />} */}
-        {perfil === "recrutador" && 
+        {perfil === "recrutador" && (
           <PerfilRecrutador
             perfil={perfil}
             userId={userId}
             recrutadorId={id ?? recrutadorId ?? null}
+            nome_user={nomeUser}
           />
-        }
-        {perfil === "avaliador" && 
-        <PerfilAvaliador 
+        )}
+        {perfil === "avaliador" && (
+          <PerfilAvaliador
             perfil={perfil}
             userId={userId}
-            avaliadorId={id ?? avaliadorId ?? null} />}
+            avaliadorId={id ?? avaliadorId ?? null}
+            nome_user={nomeUser}
+          />
+        )}
       </PerfilWrapper>
     </ProfileProvider>
   );

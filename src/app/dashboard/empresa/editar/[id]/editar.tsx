@@ -2,41 +2,45 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Sidebar from "../../components/perfil/Sidebar";
-import TopBar from "../../components/perfil/TopBar";
-import { ProfileType } from "../../components/perfil/ProfileContext";
-/* import { useAuthGuard } from "../../lib/hooks/useAuthGuard";*/
-import LoadingOverlay from "../../components/LoadingOverlay";
+import Sidebar from "../../../../components/perfil/Sidebar";
+import TopBar from "../../../../components/perfil/TopBar";
+import { ProfileType } from "../../../../components/perfil/ProfileContext";
+import LoadingOverlay from "../../../../components/LoadingOverlay";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
-import { useRouter } from "next/navigation";
-import { toast } from "react-hot-toast";
 
-interface RecrutadorProps {
+interface EmpresaDadosProps {
   perfil: ProfileType;
-  recrutadorId?: string | null;
-  userId?: string;
-  nome_user: string;
+  empresaId: string | null;
+  userId: number;
+  recrutadorId: string | null;
+  hasPerfilRecrutador: boolean;
 }
 
 // Tipos de dados do formulário
-interface RecrutadorForm {
+interface EmpresaForm {
+  nome: string;
+  site: string;
+  email: string;
   telefone: string;
   logoPreview: string | null;
   localizacao: string;
   apresentacao: string;
-  meioNotificacao: string;
+  capaPreview: string | null;
   ativo: boolean;
-  nome_user: string;
 }
 
-interface RecrutadorData {
-  recrutador_id: number;
+interface EmpresaData {
+  empresa_id: number;
+  nome_empresa: string;
+  email?: string;
+  website?: string;
   telefone?: string;
   apresentacao?: string;
-  localizacao: string;
-  meio_notificacao: string;
   logo?: string;
+  imagem_fundo?: string;
   ativo: boolean;
 }
 
@@ -62,93 +66,89 @@ function useLocalStorage<T>(key: string, initialValue: T) {
   return [storedValue, setStoredValue] as const;
 }
 
-export default function PerfilRecrutador({
+export default function EmpresaEditar({
   perfil,
-  recrutadorId,
+  empresaId,
   userId,
-  nome_user,
-}: RecrutadorProps) {
+  recrutadorId,
+  hasPerfilRecrutador,
+}: EmpresaDadosProps) {
   const router = useRouter();
-
   const [step, setStep] = useState(1);
-  const [form, setForm] = useLocalStorage<RecrutadorForm>(
-    `recrutadorForm_${userId}`,
+  const [form, setForm] = useLocalStorage<EmpresaForm>(
+    `empresaForm_${userId}`,
     {
+      nome: "",
+      site: "",
+      email: "",
       telefone: "",
       logoPreview: null,
       localizacao: "",
       apresentacao: "",
-      meioNotificacao: "",
+      capaPreview: null,
       ativo: true,
-      nome_user: "",
     }
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [capaFile, setCapaFile] = useState<File | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  //const [recrutadorPublicado, setRecrutadorPublicado] = useState<RecrutadorData | null>(null);
 
-  const [recrutador, setRecrutador] = useState<RecrutadorData | null>(null);
-  const [loadingRecrutador, setLoadingRecrutador] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (nome_user && !form.nome_user) {
-      setForm((prev) => ({ ...prev, nome_user }));
-    }
-  }, [nome_user]);
+  const [empresa, setEmpresa] = useState<EmpresaData | null>(null);
+  const [loadingEmpresa, setLoadingEmpresa] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!recrutadorId) return;
+    if (!empresaId || !hasPerfilRecrutador) return;
 
-    const fetchRecrutador = async () => {
-      setLoadingRecrutador(true);
-      const perfilId =
-        perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+    const fetchEmpresa = async () => {
+      setLoadingEmpresa(true);
+      /* const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1; */
 
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/recrutador/${recrutadorId}/perfil/${perfilId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${empresaId}/recrutador/${recrutadorId}`,
           {
             method: "GET",
             credentials: "include",
           }
         );
-        if (!res.ok) throw new Error("Erro ao buscar dados da recrutador");
+        if (!res.ok) throw new Error("Erro ao buscar dados da empresa");
 
         const data = await res.json();
 
         // mapeia os campos da API para o form
-        const recrutadorFormData: RecrutadorForm = {
-          telefone: data.recrutador?.telefone || "",
-          localizacao: data.recrutador?.localizacao || "",
-          apresentacao: data.recrutador?.apresentacao || "",
-          meioNotificacao: data.recrutador?.meio_notificacao || "",
-          logoPreview: data.recrutador?.logo || null,
-          ativo: data.recrutador?.ativo ?? true,
-          nome_user: data.nomeUser,
+        const empresaFormData: EmpresaForm = {
+          nome: data.nome_empresa || "",
+          site: data.website || "",
+          email: data.email || "",
+          telefone: data.telefone || "",
+          localizacao: data.localizacao || "",
+          apresentacao: data.apresentacao || "",
+          logoPreview: data.logo || null,
+          capaPreview: data.imagem_fundo || null,
+          ativo: data.ativo ?? true,
         };
 
-        setForm(recrutadorFormData); // <- preenche estado + localStorage
-        setRecrutador(data); // se quiser manter o objeto bruto
-        router.push(`/dashboard/perfil?perfil=${perfil}&id=${recrutadorId}`);
+        setForm(empresaFormData); // <- preenche estado + localStorage
+        setEmpresa(data); // se quiser manter o objeto bruto
       } catch (error) {
-        console.error("Erro ao carregar recrutador:", error);
+        console.error("Erro ao carregar empresa:", error);
       } finally {
-        setLoadingRecrutador(false);
+        setLoadingEmpresa(false);
       }
     };
 
-    fetchRecrutador();
-  }, [recrutadorId]);
+    fetchEmpresa();
+  }, [empresaId]);
 
-  if (recrutadorId && loadingRecrutador) {
+  if (empresaId && loadingEmpresa) {
     return <LoadingOverlay />;
   }
 
   const handleCancel = () => {
     // Limpa o formulário salvo no localStorage
-    localStorage.removeItem(`recrutadorForm_${userId}`);
+    localStorage.removeItem(`empresaForm_${userId}`);
 
     // Feedback visual
     toast.error("Alterações descartadas.", {
@@ -156,7 +156,7 @@ export default function PerfilRecrutador({
     });
 
     // Redireciona com segurança, evitando id indefinido
-    const url = `/dashboard?perfil=${perfil}`;
+    const url = `/dashboard/empresa/detalhe/${empresaId}?perfil=${perfil}`;
 
     router.push(url);
   };
@@ -165,7 +165,7 @@ export default function PerfilRecrutador({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = e.target;
 
-    if (name === "logo" && files?.[0]) {
+    if ((name === "logo" || name === "capa") && files?.[0]) {
       const file = files[0];
       const maxSize = 1 * 1024 * 1024; // 1MB
 
@@ -184,6 +184,12 @@ export default function PerfilRecrutador({
         }
         setLogoFile(file);
         setForm((prev) => ({ ...prev, logoPreview: preview }));
+      } else if (name === "capa") {
+        if (form.capaPreview && !form.capaPreview.startsWith("http")) {
+          URL.revokeObjectURL(form.capaPreview);
+        }
+        setCapaFile(file);
+        setForm((prev) => ({ ...prev, capaPreview: preview }));
       }
     } else {
       // Para campos de texto ou outros
@@ -197,7 +203,7 @@ export default function PerfilRecrutador({
     }
   };
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 3));
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 5));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -205,51 +211,69 @@ export default function PerfilRecrutador({
     setShowErrors(true);
 
     if (step === 1) {
-      if (!form.telefone || !form.localizacao || !form.meioNotificacao) return;
-
+      if (
+        !form.nome ||
+        !form.site ||
+        !form.email ||
+        !form.telefone /* ||
+        !logoFile */
+      )
+        return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
     if (step === 2) {
+      if (!form.localizacao) return;
+      setShowErrors(false);
+      nextStep();
+      return;
+    }
+
+    if (step === 3) {
+      if (!form.apresentacao) return;
+      setShowErrors(false);
+      nextStep();
+      return;
+    }
+
+    if (step === 4) {
       if (!isFormValid(form)) return;
 
       setIsSubmitting(true);
 
       try {
+        const body = new FormData();
+        body.append("recrutadorId", String(recrutadorId));
+        body.append("nome", form.nome);
+        body.append("site", form.site);
+        body.append("email", form.email);
+        body.append("telefone", form.telefone);
+        body.append("localizacao", form.localizacao);
+        body.append("apresentacao", form.apresentacao);
+
+        // só manda o perfilId no create
+
         const perfilId =
           perfil === "recrutador" ? "2" : perfil === "avaliador" ? "3" : "1";
+        body.append("perfilId", perfilId);
 
-        const formData = new FormData();
-        formData.append("telefone", form.telefone);
-        formData.append("localizacao", form.localizacao);
-        formData.append("apresentacao", form.apresentacao);
-        formData.append("meio_notificacao", form.meioNotificacao);
+        body.append("empresa_id", String(empresaId));
+        body.append("ativo", form.ativo ? "1" : "0");
 
-        if (logoFile) {
-          formData.append("logo", logoFile); // precisa ser File/Blob
-        }
-
-        if (recrutadorId) {
-          formData.append("recrutadorId", String(recrutadorId));
-          formData.append("ativo", form.ativo ? "1" : "0");
-        } else {
-          formData.append("perfilId", perfilId);
-        }
-
+        if (logoFile) body.append("logo", logoFile);
+        if (capaFile) body.append("imagem_fundo", capaFile);
         /* console.log("logoFile state:", logoFile);
-        for (const [key, value] of formData.entries()) {
+        for (const [key, value] of body.entries()) {
           console.log("FormData:", key, value);
         } */
 
-        const url = !recrutadorId
-          ? `${process.env.NEXT_PUBLIC_API_URL}/recrutador/create-recrutador`
-          : `${process.env.NEXT_PUBLIC_API_URL}/recrutador/update-recrutador`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas/update-empresa`;
 
         const response = await fetch(url, {
           method: "POST",
-          body: formData,
+          body,
           credentials: "include",
         });
 
@@ -261,25 +285,23 @@ export default function PerfilRecrutador({
               ? data.message
               : Array.isArray(data.message)
               ? data.message.join(", ")
-              : "Erro ao salvar recrutador.";
+              : "Erro ao salvar empresa.";
           throw new Error(errorMessage);
         }
 
-        //setRecrutadorPublicado(data);
-
-        localStorage.removeItem(`recrutadorForm_${userId}`);
-        toast.success(`Recrutador publicada com sucesso!`, {
+        localStorage.removeItem(`empresaForm_${userId}`);
+        toast.success(`Empresa "${data.nome_empresa}" publicada com sucesso!`, {
           duration: 5000,
         });
         setIsSubmitting(false);
-        router.push(`/dashboard?perfil=${perfil}`);
+        router.push(`/dashboard/empresa/detalhe/${data.id}?perfil=${perfil}`);
       } catch (err: unknown) {
         console.error("Erro ao enviar dados:", err);
 
         const message =
           err instanceof Error
             ? err.message
-            : "Erro ao enviar dados da recrutador. Tente novamente.";
+            : "Erro ao enviar dados da empresa. Tente novamente.";
 
         toast.error(message, {
           duration: 5000,
@@ -303,7 +325,13 @@ export default function PerfilRecrutador({
         {step != 5 && (
           <div className="pt-3 pl-6 flex items-center justify-center">
             <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
-              {["1 Dados", "2 Visualizar", "3 Publicar"].map((etapa, index) => (
+              {[
+                "1 Dados",
+                "2 Localização",
+                "3 Apresentação",
+                "4 Visualizar",
+                "5 Publicar",
+              ].map((etapa, index) => (
                 <div
                   key={index}
                   className="flex items-center gap-1 flex-1 min-w-0"
@@ -322,7 +350,7 @@ export default function PerfilRecrutador({
                   >
                     {etapa.split(" ")[1]}
                   </span>
-                  {index < 2 && (
+                  {index < 4 && (
                     <span className="mx-1 text-gray-300 hidden sm:inline">
                       ───────
                     </span>
@@ -340,14 +368,14 @@ export default function PerfilRecrutador({
                 onSubmit={handleSubmit}
                 className="grid grid-cols-1 gap-4 w-full"
               >
-                {recrutadorId && (
+                {empresaId && (
                   // <div className="col-span-1 md:col-span-2 flex justify-start">
                   <label className="flex items-center cursor-pointer">
                     <div className="relative">
                       <input
                         type="checkbox"
                         name="ativo"
-                        checked={form.ativo ?? recrutador?.ativo ?? true}
+                        checked={form.ativo ?? empresa?.ativo ?? true}
                         onChange={handleChange}
                         className="sr-only peer"
                       />
@@ -360,20 +388,61 @@ export default function PerfilRecrutador({
                   </label>
                   // </div>
                 )}
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Nome da empresa:
+                  </label>
+                  <input
+                    type="text"
+                    name="nome"
+                    placeholder="Empresa"
+                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
+                    defaultValue={empresa?.nome_empresa ?? form.nome}
+                    onChange={handleChange}
+                  />
+                  {showErrors && !form.nome && (
+                    <p className="text-sm text-red-600 mt-1">
+                      Campo obrigatório.
+                    </p>
+                  )}
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Nome:
+                    Website da empresa:
                   </label>
-                  <div className="flex items-center border border-blue-400 rounded px-3 py-2 bg-gray-100 cursor-not-allowed opacity-80">
-                    <input
-                      name="nome_user"
-                      placeholder="Nome"
-                      className="w-full outline-none"
-                      defaultValue={form.nome_user}
-                      disabled={true}
-                    />
-                  </div>
+                  <input
+                    type="url"
+                    name="site"
+                    placeholder="Website"
+                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
+                    defaultValue={empresa?.website ?? form.site}
+                    onChange={handleChange}
+                  />
+                  {showErrors && !form.site && (
+                    <p className="text-sm text-red-600 mt-1">
+                      Campo obrigatório.
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Email de contato:
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email"
+                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
+                    defaultValue={empresa?.email ?? form.email}
+                    onChange={handleChange}
+                  />
+                  {showErrors && !form.email && (
+                    <p className="text-sm text-red-600 mt-1">
+                      Campo obrigatório.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -381,12 +450,13 @@ export default function PerfilRecrutador({
                     Telefone de contato:
                   </label>
                   <div className="flex items-center border border-purple-400 rounded px-3 py-2">
+                    <span className="mr-2">🇧🇷</span>
                     <input
                       type="tel"
                       name="telefone"
                       placeholder="Telefone"
                       className="w-full outline-none"
-                      defaultValue={form.telefone}
+                      defaultValue={empresa?.telefone ?? form.telefone}
                       onChange={handleChange}
                     />
                   </div>
@@ -398,98 +468,19 @@ export default function PerfilRecrutador({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Localização:
-                  </label>
-                  <input
-                    type="text"
-                    name="localizacao"
-                    placeholder="Informe o seu local"
-                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
-                    value={form.localizacao}
-                    onChange={handleChange}
-                  />
-                  {showErrors && !form.localizacao && (
-                    <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
-                    </p>
-                  )}
-                </div>
-
-                <fieldset className="text-sm text-gray-700 mt-2">
-                  <legend className="mb-1 font-medium">
-                    Meio de Notificação:
-                  </legend>
-                  <div className="flex">
-                    <label className="flex items-center gap-2 cursor-pointer mr-10">
-                      <input
-                        type="radio"
-                        name="meioNotificacao"
-                        value="WhatsApp"
-                        checked={"WhatsApp" === String(form.meioNotificacao)}
-                        onChange={handleChange}
-                        className="appearance-none w-4 h-4 rounded-full border-2 border-purple-600 checked:bg-purple-600 checked:border-purple-600 cursor-pointer transition-all duration-200"
-                      />
-                      <span>WhatsApp</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="meioNotificacao"
-                        value="SMS"
-                        checked={"SMS" === String(form.meioNotificacao)}
-                        onChange={handleChange}
-                        className="appearance-none w-4 h-4 rounded-full border-2 border-purple-600 checked:bg-purple-600 checked:border-purple-600 cursor-pointer transition-all duration-200"
-                      />
-                      <span>SMS</span>
-                    </label>
-                  </div>
-                  {showErrors && !form.localizacao && (
-                    <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
-                    </p>
-                  )}
-                </fieldset>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Descreva, em algumas linhas, um pouco mais sobre você. Este
-                    texto será sua carta de apresentação para as empresas na
-                    plataforma.{" "}
-                    <strong>
-                      (Caso você seja de uma única empresa, pode deixar em
-                      branco este campo)
-                    </strong>
-                  </label>
-                  <textarea
-                    name="apresentacao"
-                    placeholder="Apresente-se "
-                    className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
-                    rows={6}
-                    value={form.apresentacao || ""}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        apresentacao: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div>
                   <label className="block text-sm font-medium mb-2">
-                    Carregue uma foto, imagem, logo do recrutador (recomendado
-                    512×512 px, até 1MB).
+                    Carregue o logotipo da sua empresa (recomendado 512×512 px,
+                    até 1MB).
                   </label>
                   <label
                     className={`
-                      flex flex-col items-center justify-center
-                      border border-dashed border-purple-400 rounded
-                      cursor-pointer hover:bg-purple-50
-                      min-h-[50px]
-                      p-3
-                      sm:p-6
-                    `}
+                        flex flex-col items-center justify-center
+                        border border-dashed border-purple-400 rounded
+                        cursor-pointer hover:bg-purple-50
+                        min-h-[50px]
+                        p-3
+                        sm:p-6
+                      `}
                   >
                     {form.logoPreview ? (
                       <Image
@@ -543,29 +534,213 @@ export default function PerfilRecrutador({
             )}
 
             {step === 2 && (
+              <div className="w-full h-full flex flex-col">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+                  <div className="flex-1">
+                    <h1 className="block text-sm mb-1 py-3 font-bold">
+                      Informe sua localização para encontrar os melhores
+                      candidatos
+                    </h1>
+                    <label className="block text-sm font-medium mb-1">
+                      Localização:
+                    </label>
+                    <input
+                      type="text"
+                      name="localizacao"
+                      placeholder="Informe o local de sua empresa"
+                      className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
+                      value={form.localizacao}
+                      onChange={handleChange}
+                    />
+                    {showErrors && !form.localizacao && (
+                      <p className="text-sm text-red-600 mt-1">
+                        Campo obrigatório.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Botões no rodapé */}
+                  <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
+                    <div className="flex">
+                      <button
+                        onClick={prevStep}
+                        type="button"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+
+                    {/* Direita: botões cadastrar e editar */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button" // evita submit acidental
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                      >
+                        Avançar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="w-full h-full flex flex-col">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+                  <div className="flex-1">
+                    <h1 className="block text-sm  mb-1 py-3 font-bold">
+                      Apresentação da empresa
+                    </h1>
+                    <label className="block text-sm font-medium mb-1">
+                      Descreva, em algumas linhas, quem é sua empresa e o que
+                      ela busca profissionalmente. Este texto será sua carta de
+                      apresentação para candidatos e especialistas na
+                      plataforma.
+                    </label>
+                    <textarea
+                      name="apresentacao"
+                      placeholder="Apresente sua empresa"
+                      className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
+                      rows={6}
+                      value={form.apresentacao || ""}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          apresentacao: e.target.value,
+                        }))
+                      }
+                    />
+                    {showErrors && !form.apresentacao && (
+                      <p className="text-sm text-red-600 mt-1">
+                        Campo obrigatório.
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Carregue a imagem de capa da sua empresa (recomendado:
+                      1200×300 px, até 1MB)
+                    </label>
+                    <label
+                      className={`
+                        flex flex-col items-center justify-center
+                        border border-dashed border-purple-400 rounded
+                        cursor-pointer hover:bg-purple-50
+                        min-h-[50px]
+                        p-3
+                        sm:p-6
+                      `}
+                    >
+                      {form.capaPreview ? (
+                        <Image
+                          src={form.capaPreview}
+                          alt="Prévia da logo"
+                          width={200}
+                          height={50}
+                          className="object-contain mb-2"
+                          unoptimized
+                          priority={false}
+                        />
+                      ) : (
+                        <FaCloudUploadAlt className="text-2xl mb-1" />
+                      )}
+                      {!form.capaPreview && (
+                        <span className="text-sm font-medium text-center sm:text-base">
+                          Clique aqui e carregue sua imagem
+                        </span>
+                      )}
+                      <input
+                        type="file"
+                        name="capa"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleChange}
+                      />
+                    </label>
+                    {showErrors && !capaFile && (
+                      <p className="text-sm text-red-600 mt-1">
+                        capa obrigatória.
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex justify-between">
+                    <div className="flex">
+                      <button
+                        onClick={prevStep}
+                        type="button"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+
+                    {/* Direita: botões cadastrar e editar */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button" // evita submit acidental
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      >
+                        Avançar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {step === 4 && (
               <form
                 onSubmit={handleSubmit}
                 className="flex-1 flex flex-col w-full h-full"
               >
                 <div className="w-full h-full flex flex-col">
-                  <div className="flex items-start gap-4">
-                    {/* Avatar / Logo */}
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0">
+                  {/* Capa e logo */}
+                  <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0 overflow-hidden">
+                    {form.capaPreview ? (
+                      <img
+                        src={form.capaPreview}
+                        alt="Imagem de capa"
+                        className="w-full h-full min-w-full min-h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        Sem imagem de capa
+                      </div>
+                    )}
+
+                    {/* Logo sobreposto e responsivo */}
+                    <div className="absolute left-6 top-full -translate-y-2/3 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-full shadow-md flex items-center justify-center overflow-hidden border-4 border-white z-10">
                       {form.logoPreview ? (
                         <img
                           src={form.logoPreview}
-                          alt="Logo da recrutador"
-                          className="w-full h-full object-cover"
+                          alt="Logo da empresa"
+                          className="w-full h-full object-contain"
                         />
                       ) : (
-                        <div className="text-xs text-gray-400 flex items-center justify-center h-full">
+                        <div className="text-xs text-gray-400 text-center px-2">
                           Sem logo
                         </div>
                       )}
                     </div>
-
-                    {/* Dados */}
-                    <div className="flex-1 space-y-3 ">
+                  </div>
+                  {/* Informações da empresa */}
+                  <div className="flex-1 pt-8 px-4 md:px-8">
+                    <div className="md:col-span-3 space-y-3">
                       {/* Status + Nome */}
                       {form.ativo ? (
                         <span className="flex items-center gap-1">
@@ -605,12 +780,12 @@ export default function PerfilRecrutador({
                         </span>
                       )}
 
-                      <div className="flex items-center gap-2 font-bold">
-                        {form.nome_user}
-                      </div>
+                      <h2 className="text-xl font-semibold text-gray-800">
+                        {form.nome}
+                      </h2>
 
                       {/* Bloco 2 colunas */}
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800 w-[50%]">
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800">
                         {/* Localização */}
                         <div className="flex items-center gap-2">
                           <svg
@@ -656,7 +831,7 @@ export default function PerfilRecrutador({
                         </div>
 
                         {/* Website */}
-                        {/* <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4 text-gray-500"
@@ -664,7 +839,7 @@ export default function PerfilRecrutador({
                             viewBox="0 0 24 24"
                             stroke="currentColor"
                           >
-                            {/* Globo de internet /}
+                            {/* Globo de internet */}
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -679,34 +854,34 @@ export default function PerfilRecrutador({
                             />
                           </svg>
                           {form.site}
-                        </div> */}
+                        </div>
 
-                        {/* Meio de comunicação */}
+                        {/* Email */}
                         <div className="flex items-center gap-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 text-gray-500"
+                            className="h-5 w-5 text-gray-500"
                             fill="none"
-                            viewBox="0 0 24 24"
+                            viewBox="0 0 25 25"
                             stroke="currentColor"
                           >
-                            {/* Balão de chat */}
+                            {/* Envelope */}
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M8 10h8m-8 4h5m-9 5.5V5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H7l-4 4z"
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-18 8h18a2 2 0 002-2V8a2 2 0 00-2-2H3a2 2 0 00-2 2v6a2 2 0 002 2z"
                             />
                           </svg>
-                          {form.meioNotificacao}
+                          {form.email}
                         </div>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Apresentação */}
-                  <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-5">
-                    {form.apresentacao || "Nenhuma apresentação fornecida."}
+                      {/* Apresentação */}
+                      <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-3">
+                        {form.apresentacao || "Nenhuma apresentação fornecida."}
+                      </div>
+                    </div>
                   </div>
 
                   {/* Botões */}
@@ -756,13 +931,15 @@ export default function PerfilRecrutador({
   );
 }
 
-const isFormValid = (form: RecrutadorForm) => {
+const isFormValid = (form: EmpresaForm) => {
   return (
+    form.nome.trim() !== "" &&
+    form.site.trim() !== "" &&
+    form.email.trim() !== "" &&
     form.telefone.trim() !== "" &&
     form.localizacao.trim() !== "" &&
-    form.meioNotificacao.trim() !== ""
-    /*form.apresentacao.trim() !== ""  &&
-    form.logoPreview !== null &&
-    form.capaPreview !== null */
+    form.apresentacao.trim() !== "" /* &&
+      form.logoPreview !== null &&
+      form.capaPreview !== null */
   );
 };

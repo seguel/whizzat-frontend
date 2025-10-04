@@ -1,9 +1,11 @@
 // import { useEffect, useState } from "react";
-import EmpresaDados from "../../dashboard/empresa_dados/EmpresaDados";
+import EmpresaCriar from "../../dashboard/empresa/criar/criar";
+import EmpresaListar from "../../dashboard/empresa/lista";
+import EmpresaEditar from "../../dashboard/empresa/editar/[id]/editar";
+import EmpresaDetalhe from "../../dashboard/empresa/detalhe/[id]/detalhe";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { useAuthGuard } from "./useAuthGuard";
 //import LoadingOverlay from "../../components/LoadingOverlay";
-import Empresa from "../../dashboard/empresa_dados/Empresa";
 import { useRecrutadorEmpresa } from "./useRecrutadorEmpresa";
 
 interface Options {
@@ -38,7 +40,8 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
           {
             method: "GET",
             credentials: "include", // importante para enviar o cookie JWT
-          }
+          }import EmpresaEditar from './../../dashboard/empresa/editar/[id]/page';
+
         );
 
         const data = await res.json();
@@ -90,15 +93,27 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
     };
   }
 
-  if ((isCadastro || isEdicao || !hasEmpresa) && hasPerfilRecrutador) {
+  if ((isCadastro || !hasEmpresa) && hasPerfilRecrutador) {
     return {
       isLoading: false,
       componente: (
-        <EmpresaDados
+        <EmpresaCriar
+          perfil={perfil}
+          userId={userId}
+          recrutadorId={String(recrutadorId) ?? null}
+        />
+      ),
+    };
+  } else if (isEdicao && hasPerfilRecrutador) {
+    return {
+      isLoading: false,
+      componente: (
+        <EmpresaEditar
           perfil={perfil}
           empresaId={id ?? null}
           userId={userId}
           recrutadorId={String(recrutadorId) ?? null}
+          hasPerfilRecrutador={hasPerfilRecrutador}
         />
       ),
     };
@@ -109,21 +124,28 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
     loading ||
     (hasEmpresa === null && hasPerfilRecrutador === null);
 
-  const componente =
-    hasEmpresa || !hasPerfilRecrutador ? (
-      <Empresa
+  const componente = hasEmpresa ? (
+    id ? (
+      <EmpresaDetalhe
         perfil={perfil}
         empresaId={id ?? null}
         recrutadorId={String(recrutadorId) ?? null}
         hasPerfilRecrutador={hasPerfilRecrutador}
       />
     ) : (
-      <EmpresaDados
+      <EmpresaListar
         perfil={perfil}
-        userId={userId}
-        recrutadorId={String(recrutadorId) ?? null}
+        recrutadorId={recrutadorId ? String(recrutadorId) : null}
+        hasPerfilRecrutador={hasPerfilRecrutador}
       />
-    );
+    )
+  ) : (
+    <EmpresaCriar
+      perfil={perfil}
+      userId={userId}
+      recrutadorId={recrutadorId ? String(recrutadorId) : null}
+    />
+  );
 
   return { isLoading, componente };
 }

@@ -1190,7 +1190,7 @@ export default function VagaDados({
                                   </h2>
                                   <p className="text-sm text-gray-500">
                                     {empresas.find(
-                                      (e) => e.id.toString() === form.empresa_id
+                                      (e) => e.id.toString() === form.empresa_id.toString()
                                     )?.nome_empresa ?? "Indefinida"}
                                   </p>
                                 </div>

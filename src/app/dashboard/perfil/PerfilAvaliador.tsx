@@ -20,6 +20,7 @@ interface AvaliadorProps {
   perfil: ProfileType;
   avaliadorId?: string | null;
   userId?: string;
+  nome_user: string;
 }
 
 interface SkillAvaliacao {
@@ -42,6 +43,8 @@ interface AvaliadorForm {
   lista_skills: SkillAvaliacao[];
   ativo: boolean;
   trabalha_empresa: string;
+  nome_user: string;
+  cadastro_liberado: boolean;
 }
 
 interface AvaliadorData {
@@ -83,7 +86,9 @@ export default function PerfilAvaliador({
   perfil,
   avaliadorId,
   userId,
+  nome_user,
 }: AvaliadorProps) {
+  console.log(nome_user);
   const router = useRouter();
 
   const [step, setStep] = useState(1);
@@ -100,6 +105,8 @@ export default function PerfilAvaliador({
       lista_skills: [],
       ativo: true,
       trabalha_empresa: "",
+      nome_user: "",
+      cadastro_liberado: false,
     }
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -124,6 +131,12 @@ export default function PerfilAvaliador({
   } | null>(null);
 
   useEffect(() => {
+    if (nome_user && !form.nome_user) {
+      setForm((prev) => ({ ...prev, nome_user }));
+    }
+  }, [nome_user]);
+
+  useEffect(() => {
     if (!avaliadorId) return;
 
     const fetchAvaliador = async () => {
@@ -142,6 +155,7 @@ export default function PerfilAvaliador({
         if (!res.ok) throw new Error("Erro ao buscar dados da avaliador");
 
         const data = await res.json();
+        console.log(data);
 
         // mapeia os campos da API para o form
         const avaliadorFormData: AvaliadorForm = {
@@ -155,10 +169,14 @@ export default function PerfilAvaliador({
           lista_skills: data.skills || [],
           ativo: data.ativo ?? true,
           trabalha_empresa: data.empresa_id ? "SIM" : "NAO",
+          nome_user: data.nomeUser,
+          cadastro_liberado: data.cadastro_liberado ?? false,
         };
 
         setForm(avaliadorFormData); // <- preenche estado + localStorage
-        setAvaliador(data); // se quiser manter o objeto bruto
+        setAvaliador(data.avaliador); // se quiser manter o objeto bruto
+        // setNomeUSer(data.nomeUser);
+
         router.push(`/dashboard/perfil?perfil=${perfil}&id=${avaliadorId}`);
       } catch (error) {
         console.error("Erro ao carregar avaliador:", error);
@@ -263,7 +281,7 @@ export default function PerfilAvaliador({
         [name]: value,
         // se selecionou "NAO", limpa empresa_id
         ...(name === "trabalha_empresa" && value === "NAO"
-          ? { empresa_id: "" }
+          ? { empresa_id: "", avaliar_todos: "1" }
           : {}),
       }));
     }
@@ -540,25 +558,59 @@ export default function PerfilAvaliador({
                 className="grid grid-cols-1 gap-4 w-full"
               >
                 {avaliadorId && (
-                  // <div className="col-span-1 md:col-span-2 flex justify-start">
-                  <label className="flex items-center cursor-pointer">
-                    <div className="relative">
-                      <input
-                        type="checkbox"
-                        name="ativo"
-                        checked={form.ativo ?? avaliador?.ativo ?? true}
-                        onChange={handleChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
-                      <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
+                  <div className="flex items-center justify-between w-full">
+                    {/* Esquerda: Toggle + "Ativo" */}
+                    <label className="flex items-center cursor-pointer">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          name="ativo"
+                          checked={form.ativo ?? avaliador?.ativo ?? true}
+                          onChange={handleChange}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
+                        <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
+                      </div>
+                      <span className="ml-3 text-sm font-normal text-gray-700">
+                        Ativo
+                      </span>
+                    </label>
+
+                    {/* Direita: Situação Cadastro */}
+                    <div className="text-sm text-right">
+                      <span className="block font-medium text-gray-700">
+                        Situação do Cadastro:
+                      </span>
+                      <span
+                        className={`block ${
+                          form.cadastro_liberado
+                            ? "text-green-600 font-semibold"
+                            : "text-yellow-600 font-medium"
+                        }`}
+                      >
+                        {form.cadastro_liberado
+                          ? "Confirmado"
+                          : "Aguardando confirmação"}
+                      </span>
                     </div>
-                    <span className="ml-3 text-sm font-normal text-gray-700">
-                      Ativo
-                    </span>
-                  </label>
-                  // </div>
+                  </div>
                 )}
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Nome:
+                  </label>
+                  <div className="flex items-center border border-blue-400 rounded px-3 py-2 bg-gray-100 cursor-not-allowed opacity-80">
+                    <input
+                      name="nome_user"
+                      placeholder="Nome"
+                      className="w-full outline-none"
+                      defaultValue={form.nome_user}
+                      disabled={true}
+                    />
+                  </div>
+                </div>
 
                 <fieldset className="text-sm text-gray-700 mt-2">
                   <legend className="mb-1 font-medium">
@@ -638,7 +690,11 @@ export default function PerfilAvaliador({
                         type="radio"
                         name="avaliar_todos"
                         value="1"
-                        checked={"1" === String(form.avaliar_todos)}
+                        checked={
+                          form.trabalha_empresa !== "SIM"
+                            ? true
+                            : "1" === String(form.avaliar_todos)
+                        }
                         onChange={handleChange}
                         className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
                       />
@@ -649,9 +705,19 @@ export default function PerfilAvaliador({
                         type="radio"
                         name="avaliar_todos"
                         value="0"
-                        checked={"0" === String(form.avaliar_todos)}
+                        checked={
+                          form.trabalha_empresa !== "SIM"
+                            ? false
+                            : "0" === String(form.avaliar_todos)
+                        }
+                        disabled={form.trabalha_empresa !== "SIM"}
                         onChange={handleChange}
-                        className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
+                        className={`appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200
+                          ${
+                            form.trabalha_empresa !== "SIM"
+                              ? "bg-gray-100 cursor-not-allowed opacity-80"
+                              : ""
+                          }`}
                       />
                       <span>Somente da minha empresa</span>
                     </label>
@@ -944,22 +1010,46 @@ export default function PerfilAvaliador({
                                 {/* Estrela de favorito */}
                                 <button
                                   type="button"
-                                  onClick={() =>
+                                  onClick={() => {
+                                    const totalFavoritos =
+                                      form.lista_skills.filter(
+                                        (s) => s.favorito
+                                      ).length;
+
+                                    // Se já tem 5 favoritos e este não é favorito → não deixa clicar
+                                    if (totalFavoritos >= 5 && !item.favorito) {
+                                      return;
+                                    }
+
                                     handleSkillChange(
                                       item.skill_id,
                                       "favorito",
                                       !item.favorito
-                                    )
+                                    );
+                                  }}
+                                  className={`flex items-center ${
+                                    form.lista_skills.filter((s) => s.favorito)
+                                      .length >= 5 && !item.favorito
+                                      ? "cursor-not-allowed opacity-50"
+                                      : "cursor-pointer"
+                                  }`}
+                                  disabled={
+                                    form.lista_skills.filter((s) => s.favorito)
+                                      .length >= 5 && !item.favorito
                                   }
-                                  className="flex items-center"
                                 >
-                                  <Star
-                                    className={`w-4 h-4 cursor-pointer transition-colors ${
-                                      item.favorito
-                                        ? "fill-yellow-400 text-yellow-400"
-                                        : "text-gray-400"
-                                    }`}
-                                  />
+                                  <TooltipIcon
+                                    message={`- Pode ser selecionado até 5 favoritos.\n- Os Skills favoritos serão assumidos\n como preferenciais para avaliações de candidatos.`}
+                                    perfil={perfil}
+                                  >
+                                    <Star
+                                      className={`w-4 h-4 transition-colors ${
+                                        item.favorito
+                                          ? "fill-yellow-400 text-yellow-400"
+                                          : "text-gray-400"
+                                      }`}
+                                    />
+                                  </TooltipIcon>
                                 </button>
 
                                 {/* Tempo da skill */}
@@ -1107,7 +1197,9 @@ export default function PerfilAvaliador({
                                 </span>
                               </span>
                             )}
-
+                            <div className="flex items-center gap-2 font-bold">
+                              {form.nome_user}
+                            </div>
                             {/* Bloco 2 colunas */}
                             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800 w-full">
                               {/* empresa */}
@@ -1116,7 +1208,9 @@ export default function PerfilAvaliador({
 
                                 <p className="text-sm text-gray-500 font-bold">
                                   {empresas.find(
-                                    (e) => e.id.toString() === form.empresa_id
+                                    (e) =>
+                                      e.id.toString() ===
+                                      form.empresa_id.toString()
                                   )?.nome_empresa ?? "Sem empresa"}
                                 </p>
                               </div>

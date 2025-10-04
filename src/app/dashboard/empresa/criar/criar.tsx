@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Sidebar from "../../components/perfil/Sidebar";
-import TopBar from "../../components/perfil/TopBar";
-import { ProfileType } from "../../components/perfil/ProfileContext";
+import Sidebar from "../../../components/perfil/Sidebar";
+import TopBar from "../../../components/perfil/TopBar";
+import { ProfileType } from "../../../components/perfil/ProfileContext";
 /* import { useAuthGuard } from "../../lib/hooks/useAuthGuard";*/
-import LoadingOverlay from "../../components/LoadingOverlay";
+import LoadingOverlay from "../../../components/LoadingOverlay";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,6 @@ import { toast } from "react-hot-toast";
 
 interface EmpresaDadosProps {
   perfil: ProfileType;
-  empresaId?: string | null;
   userId?: number;
   recrutadorId?: string | null;
 }
@@ -29,18 +28,6 @@ interface EmpresaForm {
   localizacao: string;
   apresentacao: string;
   capaPreview: string | null;
-  ativo: boolean;
-}
-
-interface EmpresaData {
-  empresa_id: number;
-  nome_empresa: string;
-  email?: string;
-  website?: string;
-  telefone?: string;
-  apresentacao?: string;
-  logo?: string;
-  imagem_fundo?: string;
   ativo: boolean;
 }
 
@@ -66,9 +53,8 @@ function useLocalStorage<T>(key: string, initialValue: T) {
   return [storedValue, setStoredValue] as const;
 }
 
-export default function EmpresaDados({
+export default function EmpresaCriar({
   perfil,
-  empresaId,
   userId,
   recrutadorId,
 }: EmpresaDadosProps) {
@@ -94,60 +80,6 @@ export default function EmpresaDados({
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  /* const [empresaPublicada, setEmpresaPublicada] = useState<EmpresaData | null>(
-    null
-  ); */
-
-  const [empresa, setEmpresa] = useState<EmpresaData | null>(null);
-  const [loadingEmpresa, setLoadingEmpresa] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!empresaId) return;
-
-    const fetchEmpresa = async () => {
-      setLoadingEmpresa(true);
-      /* const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1; */
-
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/${empresaId}/recrutador/${recrutadorId}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        if (!res.ok) throw new Error("Erro ao buscar dados da empresa");
-
-        const data = await res.json();
-
-        // mapeia os campos da API para o form
-        const empresaFormData: EmpresaForm = {
-          nome: data.nome_empresa || "",
-          site: data.website || "",
-          email: data.email || "",
-          telefone: data.telefone || "",
-          localizacao: data.localizacao || "",
-          apresentacao: data.apresentacao || "",
-          logoPreview: data.logo || null,
-          capaPreview: data.imagem_fundo || null,
-          ativo: data.ativo ?? true,
-        };
-
-        setForm(empresaFormData); // <- preenche estado + localStorage
-        setEmpresa(data); // se quiser manter o objeto bruto
-      } catch (error) {
-        console.error("Erro ao carregar empresa:", error);
-      } finally {
-        setLoadingEmpresa(false);
-      }
-    };
-
-    fetchEmpresa();
-  }, [empresaId]);
-
-  if (empresaId && loadingEmpresa) {
-    return <LoadingOverlay />;
-  }
 
   const handleCancel = () => {
     // Limpa o formulário salvo no localStorage
@@ -159,9 +91,7 @@ export default function EmpresaDados({
     });
 
     // Redireciona com segurança, evitando id indefinido
-    const url = empresaId
-      ? `/dashboard/empresa_dados?perfil=${perfil}&id=${empresaId}`
-      : `/dashboard/empresa_dados?perfil=${perfil}`;
+    const url = `/dashboard/empresa?perfil=${perfil}`;
 
     router.push(url);
   };
@@ -221,7 +151,7 @@ export default function EmpresaDados({
         !form.site ||
         !form.email ||
         !form.telefone /* ||
-        !logoFile */
+            !logoFile */
       )
         return;
       setShowErrors(false);
@@ -264,21 +194,14 @@ export default function EmpresaDados({
           perfil === "recrutador" ? "2" : perfil === "avaliador" ? "3" : "1";
         body.append("perfilId", perfilId);
 
-        if (empresaId) {
-          body.append("empresa_id", String(empresaId));
-          body.append("ativo", form.ativo ? "1" : "0");
-        }
-
         if (logoFile) body.append("logo", logoFile);
         if (capaFile) body.append("imagem_fundo", capaFile);
         /* console.log("logoFile state:", logoFile);
-        for (const [key, value] of body.entries()) {
-          console.log("FormData:", key, value);
-        } */
+            for (const [key, value] of body.entries()) {
+              console.log("FormData:", key, value);
+            } */
 
-        const url = !empresaId
-          ? `${process.env.NEXT_PUBLIC_API_URL}/empresas/create-empresa`
-          : `${process.env.NEXT_PUBLIC_API_URL}/empresas/update-empresa`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL}/empresas/create-empresa`;
 
         const response = await fetch(url, {
           method: "POST",
@@ -298,15 +221,12 @@ export default function EmpresaDados({
           throw new Error(errorMessage);
         }
 
-        // setEmpresaPublicada(data);
-
         localStorage.removeItem(`empresaForm_${userId}`);
         toast.success(`Empresa "${data.nome_empresa}" publicada com sucesso!`, {
           duration: 5000,
         });
         setIsSubmitting(false);
-        //nextStep();
-        router.push(`/dashboard/empresa_dados?perfil=${perfil}&id=${data.id}`);
+        router.push(`/dashboard/empresa/detalhe/${data.id}?perfil=${perfil}`);
       } catch (err: unknown) {
         console.error("Erro ao enviar dados:", err);
 
@@ -323,6 +243,10 @@ export default function EmpresaDados({
       }
     }
   };
+
+  if (!userId) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -380,26 +304,6 @@ export default function EmpresaDados({
                 onSubmit={handleSubmit}
                 className="grid grid-cols-1 gap-4 w-full"
               >
-                {empresaId && (
-                  // <div className="col-span-1 md:col-span-2 flex justify-start">
-                  <label className="flex items-center cursor-pointer">
-                    <div className="relative">
-                      <input
-                        type="checkbox"
-                        name="ativo"
-                        checked={form.ativo ?? empresa?.ativo ?? true}
-                        onChange={handleChange}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
-                      <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
-                    </div>
-                    <span className="ml-3 text-sm font-normal text-gray-700">
-                      Ativo
-                    </span>
-                  </label>
-                  // </div>
-                )}
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Nome da empresa:
@@ -409,7 +313,7 @@ export default function EmpresaDados({
                     name="nome"
                     placeholder="Empresa"
                     className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
-                    defaultValue={empresa?.nome_empresa ?? form.nome}
+                    defaultValue={form.nome}
                     onChange={handleChange}
                   />
                   {showErrors && !form.nome && (
@@ -428,7 +332,7 @@ export default function EmpresaDados({
                     name="site"
                     placeholder="Website"
                     className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
-                    defaultValue={empresa?.website ?? form.site}
+                    defaultValue={form.site}
                     onChange={handleChange}
                   />
                   {showErrors && !form.site && (
@@ -447,7 +351,7 @@ export default function EmpresaDados({
                     name="email"
                     placeholder="Email"
                     className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
-                    defaultValue={empresa?.email ?? form.email}
+                    defaultValue={form.email}
                     onChange={handleChange}
                   />
                   {showErrors && !form.email && (
@@ -468,7 +372,7 @@ export default function EmpresaDados({
                       name="telefone"
                       placeholder="Telefone"
                       className="w-full outline-none"
-                      defaultValue={empresa?.telefone ?? form.telefone}
+                      defaultValue={form.telefone}
                       onChange={handleChange}
                     />
                   </div>
@@ -486,13 +390,13 @@ export default function EmpresaDados({
                   </label>
                   <label
                     className={`
-                      flex flex-col items-center justify-center
-                      border border-dashed border-purple-400 rounded
-                      cursor-pointer hover:bg-purple-50
-                      min-h-[50px]
-                      p-3
-                      sm:p-6
-                    `}
+                        flex flex-col items-center justify-center
+                        border border-dashed border-purple-400 rounded
+                        cursor-pointer hover:bg-purple-50
+                        min-h-[50px]
+                        p-3
+                        sm:p-6
+                      `}
                   >
                     {form.logoPreview ? (
                       <Image
@@ -643,13 +547,13 @@ export default function EmpresaDados({
                     </label>
                     <label
                       className={`
-                      flex flex-col items-center justify-center
-                      border border-dashed border-purple-400 rounded
-                      cursor-pointer hover:bg-purple-50
-                      min-h-[50px]
-                      p-3
-                      sm:p-6
-                    `}
+                        flex flex-col items-center justify-center
+                        border border-dashed border-purple-400 rounded
+                        cursor-pointer hover:bg-purple-50
+                        min-h-[50px]
+                        p-3
+                        sm:p-6
+                      `}
                     >
                       {form.capaPreview ? (
                         <Image
@@ -936,79 +840,6 @@ export default function EmpresaDados({
                 </div>
               </form>
             )}
-            {/* 
-            {step === 5 && empresaPublicada === null && <LoadingOverlay />}
-
-            {step === 5 && empresaPublicada && (
-              <div className="flex flex-col items-start p-4 w-full min-h-[500px] space-y-6">
-                /* Capa e logo /
-                <div className="relative w-full h-20 sm:h-24 md:h-36 rounded-lg bg-gray-100 z-0">
-                  {empresaPublicada.imagem_fundo ? (
-                    <Image
-                      src={empresaPublicada.imagem_fundo}
-                      alt="Imagem de capa"
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-cover"
-                      unoptimized // opcional, se estiver usando imagens externas sem loader
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      Sem imagem de capa
-                    </div>
-                  )}
-
-                  {/* Logo sobreposto /}
-                  <div className="absolute left-6 top-full -translate-y-2/3 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-white rounded-full shadow-md flex items-center justify-center overflow-hidden border-4 border-white z-10">
-                    {empresaPublicada.logo ? (
-                      <Image
-                        src={empresaPublicada.logo}
-                        alt="Logo da empresa"
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                        unoptimized // opcional, se estiver usando imagens externas sem loader
-                      />
-                    ) : (
-                      <div className="text-xs text-gray-400 text-center px-2">
-                        Sem logo
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Informações + Vagas /}
-                <div className="pt-10 px-4 md:px-8 w-full grid grid-cols-1 md:grid-cols-4 gap-6">
-                  {/* Coluna esquerda /}
-                  <div className="md:col-span-3 space-y-2">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      {empresaPublicada.nome_empresa}
-                    </h2>
-                    <p className="text-sm text-gray-700 whitespace-pre-line">
-                      {empresaPublicada.apresentacao ||
-                        "Nenhuma apresentação fornecida."}
-                    </p>
-                  </div>
-
-                  {/* Coluna direita /}
-                  <div className="flex flex-col items-start justify-start space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      Vagas
-                    </h3>
-                    <button
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresaPublicada.empresa_id}`
-                        )
-                      }
-                      className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
-                    >
-                      Cadastrar Vaga
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )} */}
           </div>
         </main>
       </div>
@@ -1024,7 +855,7 @@ const isFormValid = (form: EmpresaForm) => {
     form.telefone.trim() !== "" &&
     form.localizacao.trim() !== "" &&
     form.apresentacao.trim() !== "" /* &&
-    form.logoPreview !== null &&
-    form.capaPreview !== null */
+      form.logoPreview !== null &&
+      form.capaPreview !== null */
   );
 };
