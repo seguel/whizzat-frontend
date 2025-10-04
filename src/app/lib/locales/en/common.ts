@@ -75,6 +75,18 @@ const en = {
     btn_reenviar: "Resend activation link",
     info: "To resend the link, go to the login page.",
   },
+  confirma_email_avaliador: {
+    token_invalido: "Invalid or missing token.",
+    erro_geral: "Error activating the account. Invalid or expired token.",
+    reenvio_link_sucesso: "Link successfully resent. Check your email.",
+    reenvio_link_erro: "Error resending the link. Please try again.",
+    titulo: "Registration Confirmation",
+    confirmando: "Confirming your registration...",
+    redirecionando: "Redirecting to login...",
+    reenviar: "Resending...",
+    btn_reenviar: "Resend activation link",
+    info: "To resend the link, go to the login page.",
+  },
   perfil: {
     titulo_primeiro: "Hello, welcome to whizzat!",
     titulo_segundo: "To get started, choose a profile option",

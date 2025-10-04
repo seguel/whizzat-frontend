@@ -68,7 +68,7 @@ export function getNavItems(profile: ProfileType): NavItem[] {
         {
           icon: <Store size={20} />,
           label: "Empresas",
-          route: `/dashboard/empresa_dados?perfil=${profile}`,
+          route: `/dashboard/empresa?perfil=${profile}`,
         },
         {
           icon: <User size={20} />,
