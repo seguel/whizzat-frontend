@@ -67,7 +67,7 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
             </p>
             <button
               onClick={() =>
-                router.push(`/dashboard/empresa_dados?perfil=recrutador&op=N`)
+                router.push(`/dashboard/empresa?perfil=recrutador&op=N`)
               }
               className={btnClass}
             >
