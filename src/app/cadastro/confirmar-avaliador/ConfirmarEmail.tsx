@@ -20,8 +20,6 @@ const ConfirmarEmail = () => {
     "loading"
   );
   const [message, setMessage] = useState("");
-  const [resendLoading, setResendLoading] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState("");
 
   useEffect(() => {
     if (!searchParams) return;
@@ -77,38 +75,6 @@ const ConfirmarEmail = () => {
     activateAccount();
   }, [router, searchParams, i18n]);
 
-  const handleResend = async () => {
-    setResendLoading(true);
-    setResendSuccess("");
-
-    /* try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/avaliador/resend-activation`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept-Language": i18n.language,
-          },
-          body: JSON.stringify({ avaliador }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setResendSuccess(t("confirma_email_avaliador.reenvio_link_sucesso"));
-      } else {
-        throw new Error(data.message || "Erro ao reenviar.");
-      }
-    } catch {
-      setResendSuccess(t("confirma_email_avaliador.reenvio_link_erro"));
-    } finally {
-      setResendLoading(false);
-    } */
-    setResendLoading(false);
-  };
-
   if (!isReady) {
     return null; // ou um loader, se preferir
   }
@@ -150,7 +116,6 @@ const ConfirmarEmail = () => {
           <div className="flex flex-col items-center space-y-4">
             <ExclamationCircleIcon className="w-10 h-10 text-red-500" />
             <p className="text-red-600">{message}</p>
-            
           </div>
         )}
       </div>
