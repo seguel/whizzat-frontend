@@ -20,8 +20,6 @@ const RejeitarEmail = () => {
     "loading"
   );
   const [message, setMessage] = useState("");
-  const [resendLoading, setResendLoading] = useState(false);
-  const [resendSuccess, setResendSuccess] = useState("");
 
   useEffect(() => {
     if (!searchParams) return;
