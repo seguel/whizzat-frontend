@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
 
-const ConfirmarEmail = () => {
+const RejeitarEmail = () => {
   const { t, i18n } = useTranslation("common");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,7 +48,7 @@ const ConfirmarEmail = () => {
     const activateAccount = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/avaliador/activate`,
+          `${process.env.NEXT_PUBLIC_API_URL}/avaliador/reject`,
           {
             method: "POST",
             headers: {
@@ -77,38 +77,6 @@ const ConfirmarEmail = () => {
     activateAccount();
   }, [router, searchParams, i18n]);
 
-  const handleResend = async () => {
-    setResendLoading(true);
-    setResendSuccess("");
-
-    /* try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/avaliador/resend-activation`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept-Language": i18n.language,
-          },
-          body: JSON.stringify({ avaliador }),
-        }
-      );
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setResendSuccess(t("confirma_email_avaliador.reenvio_link_sucesso"));
-      } else {
-        throw new Error(data.message || "Erro ao reenviar.");
-      }
-    } catch {
-      setResendSuccess(t("confirma_email_avaliador.reenvio_link_erro"));
-    } finally {
-      setResendLoading(false);
-    } */
-    setResendLoading(false);
-  };
-
   if (!isReady) {
     return null; // ou um loader, se preferir
   }
@@ -124,7 +92,7 @@ const ConfirmarEmail = () => {
           className="mx-auto"
         />
         <h1 className="text-2xl font-bold text-gray-800">
-          {t("confirma_email_avaliador.titulo")}
+          {t("confirma_email_avaliador.titulo_reject")}
         </h1>
 
         {status === "loading" && (
@@ -140,9 +108,6 @@ const ConfirmarEmail = () => {
           <div className="flex flex-col items-center space-y-2">
             <CheckCircleIcon className="w-10 h-10 text-green-500" />
             <p className="text-green-600 font-medium">{message}</p>
-            {/* <p className="text-sm text-gray-500">
-              {t("confirma_email_avaliador.redirecionando")}
-            </p> */}
           </div>
         )}
 
@@ -150,7 +115,6 @@ const ConfirmarEmail = () => {
           <div className="flex flex-col items-center space-y-4">
             <ExclamationCircleIcon className="w-10 h-10 text-red-500" />
             <p className="text-red-600">{message}</p>
-            
           </div>
         )}
       </div>
@@ -158,4 +122,4 @@ const ConfirmarEmail = () => {
   );
 };
 
-export default ConfirmarEmail;
+export default RejeitarEmail;
