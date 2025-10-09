@@ -138,7 +138,7 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
               onClick={() => router.push(`/dashboard/perfil?perfil=${perfil}`)}
               className={`mt-5 ${btnClass}`}
             >
-              Adicionar {perfil}
+              Verificar {perfil}
             </button>
           </div>
         );

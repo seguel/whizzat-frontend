@@ -81,6 +81,7 @@ const en = {
     reenvio_link_sucesso: "Link successfully resent. Check your email.",
     reenvio_link_erro: "Error resending the link. Please try again.",
     titulo: "Registration Confirmation",
+    titulo_reject: "Registration Cancellation",
     confirmando: "Confirming your registration...",
     redirecionando: "Redirecting to login...",
     reenviar: "Resending...",

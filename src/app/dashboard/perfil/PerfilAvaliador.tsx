@@ -44,7 +44,8 @@ interface AvaliadorForm {
   ativo: boolean;
   trabalha_empresa: string;
   nome_user: string;
-  cadastro_liberado: boolean;
+  status_cadastro: number;
+  data_envio_link: string | null;
 }
 
 interface AvaliadorData {
@@ -58,6 +59,7 @@ interface AvaliadorData {
   avaliar_todos: string;
   skills: SkillAvaliacao[];
   ativo: boolean;
+  data_envio_link: string;
 }
 
 // LocalStorage hook
@@ -88,7 +90,6 @@ export default function PerfilAvaliador({
   userId,
   nome_user,
 }: AvaliadorProps) {
-  console.log(nome_user);
   const router = useRouter();
 
   const [step, setStep] = useState(1);
@@ -106,12 +107,14 @@ export default function PerfilAvaliador({
       ativo: true,
       trabalha_empresa: "",
       nome_user: "",
-      cadastro_liberado: false,
+      status_cadastro: -1,
+      data_envio_link: null,
     }
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [avaliador, setAvaliador] = useState<AvaliadorData | null>(null);
@@ -155,7 +158,6 @@ export default function PerfilAvaliador({
         if (!res.ok) throw new Error("Erro ao buscar dados da avaliador");
 
         const data = await res.json();
-        console.log(data);
 
         // mapeia os campos da API para o form
         const avaliadorFormData: AvaliadorForm = {
@@ -170,7 +172,8 @@ export default function PerfilAvaliador({
           ativo: data.ativo ?? true,
           trabalha_empresa: data.empresa_id ? "SIM" : "NAO",
           nome_user: data.nomeUser,
-          cadastro_liberado: data.cadastro_liberado ?? false,
+          status_cadastro: data.status_cadastro ?? -1,
+          data_envio_link: data.data_envio_link || null,
         };
 
         setForm(avaliadorFormData); // <- preenche estado + localStorage
@@ -503,6 +506,33 @@ export default function PerfilAvaliador({
     }));
   };
 
+  const handleReenviarSolicitacao = async () => {
+    setIsResending(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/avaliador/reenviar-solicitacao/${avaliadorId}`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Erro ao reenviar solicitação");
+      }
+      toast.success(`Solicitação reenviada com sucesso!`, {
+        duration: 5000,
+      });
+      window.location.reload();
+    } catch (error) {
+      toast.error(`Erro ao reenviar solicitação!`, {
+        duration: 5000,
+      });
+      console.error("Erro ao reenviar solicitação:", error);
+      setIsResending(false);
+    }
+  };
+
   if (loadingAvaliador) return <LoadingOverlay />;
 
   return (
@@ -582,17 +612,59 @@ export default function PerfilAvaliador({
                       <span className="block font-medium text-gray-700">
                         Situação do Cadastro:
                       </span>
-                      <span
-                        className={`block ${
-                          form.cadastro_liberado
-                            ? "text-green-600 font-semibold"
-                            : "text-yellow-600 font-medium"
-                        }`}
-                      >
-                        {form.cadastro_liberado
-                          ? "Confirmado"
-                          : "Aguardando confirmação"}
-                      </span>
+
+                      {(() => {
+                        if (
+                          form.status_cadastro === -1 &&
+                          form.data_envio_link
+                        ) {
+                          const cadastroDate = new Date(form.data_envio_link);
+                          const diffDias = Math.floor(
+                            (Date.now() - cadastroDate.getTime()) /
+                              (1000 * 60 * 60 * 24)
+                          );
+
+                          if (diffDias > 3) {
+                            // Exibe botão no lugar do texto
+                            return (
+                              <button
+                                type="button"
+                                onClick={handleReenviarSolicitacao}
+                                className="mt-1 rounded-md bg-blue-600 px-3 py-1 text-white text-xs font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+                              >
+                                {isResending ? (
+                                  <span className="flex items-center gap-1">
+                                    <ImSpinner2 className="animate-spin" />
+                                    Enviando ...
+                                  </span>
+                                ) : (
+                                  "Reenviar Solicitação"
+                                )}
+                                
+                              </button>
+                            );
+                          }
+                        }
+
+                        // Caso contrário, exibe o texto normalmente
+                        return (
+                          <span
+                            className={`block ${
+                              form.status_cadastro === 1
+                                ? "text-green-600 font-semibold"
+                                : form.status_cadastro === -1
+                                ? "text-yellow-600 font-medium"
+                                : "text-red-600 font-medium"
+                            }`}
+                          >
+                            {form.status_cadastro === 1
+                              ? "Confirmado"
+                              : form.status_cadastro === -1
+                              ? "Aguardando confirmação"
+                              : "Cadastro Rejeitado"}
+                          </span>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
