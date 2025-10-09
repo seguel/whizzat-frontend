@@ -82,6 +82,7 @@ const pt = {
     reenvio_link_sucesso: "Link reenviado com sucesso. Verifique seu e-mail.",
     reenvio_link_erro: "Erro ao reenviar o link. Tente novamente.",
     titulo: "Confirmação de Cadastro",
+    titulo_reject: "Cancelamento de Cadastro",
     confirmando: "Confirmando seu cadastro...",
     redirecionando: "Redirecionando para o login...",
     reenviar: "Reenviando...",
