@@ -51,7 +51,7 @@ export default function TopBar({
   }
 
   return (
-    <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-[#F5F6F6] shadow-sm">
+    <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-[#F5F6F6] shadow-sm cursor-pointer">
       <div className="flex items-center gap-2">
         <button
           onClick={() => setIsDrawerOpen?.(true)}
@@ -80,7 +80,7 @@ export default function TopBar({
           <select
             value={currentProfile}
             onChange={handleChange}
-            className={`bg-transparent text-sm px-2 py-1 rounded-md focus:outline-none focus:ring-2 ${colors.ring}`}
+            className={`bg-transparent text-sm px-2 py-1 cursor-pointer rounded-md focus:outline-none focus:ring-2 ${colors.ring}`}
           >
             <option value="candidato">Candidato(a)</option>
             <option value="recrutador">Recrutador(a)</option>
