@@ -8,7 +8,14 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 /* import { useAuthGuard } from "../../lib/hooks/useAuthGuard";*/
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { X, Building2, ClipboardCheck, Star } from "lucide-react";
+import {
+  X,
+  Building2,
+  ClipboardCheck,
+  Star,
+  FileText,
+  Upload,
+} from "lucide-react";
 import { ImSpinner2 } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
@@ -21,6 +28,22 @@ interface AvaliadorProps {
   avaliadorId?: string | null;
   userId?: string;
   nome_user: string;
+}
+
+interface FormacaoAvaliacao {
+  id: number;
+  graduacao_id: number;
+  formacao: string;
+  certificado_file?: string; // nome ou caminho (pode ficar vazio no início)
+  certificado_preview?: string; // URL temporária (opcional)
+}
+
+interface CertificadoAvaliacao {
+  // id: string | number;
+  certificacao_id: number;
+  nome?: string;
+  certificado_file?: string; // nome ou caminho (pode ficar vazio no início)
+  certificado_preview?: string; // URL temporária (opcional)
 }
 
 interface SkillAvaliacao {
@@ -41,6 +64,8 @@ interface AvaliadorForm {
   meioNotificacao: string;
   avaliar_todos: string;
   lista_skills: SkillAvaliacao[];
+  lista_formacao: FormacaoAvaliacao[];
+  lista_certificado: CertificadoAvaliacao[];
   ativo: boolean;
   trabalha_empresa: string;
   nome_user: string;
@@ -58,6 +83,8 @@ interface AvaliadorData {
   logo?: string;
   avaliar_todos: string;
   skills: SkillAvaliacao[];
+  formacoes: FormacaoAvaliacao[];
+  certificacoes: CertificadoAvaliacao[];
   ativo: boolean;
   data_envio_link: string;
 }
@@ -104,6 +131,8 @@ export default function PerfilAvaliador({
       meioNotificacao: "",
       avaliar_todos: "",
       lista_skills: [],
+      lista_formacao: [],
+      lista_certificado: [],
       ativo: true,
       trabalha_empresa: "",
       nome_user: "",
@@ -117,14 +146,65 @@ export default function PerfilAvaliador({
   const [isResending, setIsResending] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  /***** formacao ******/
+  const [formacaoInput, setFormacaoInput] = useState<string>("");
+  const [novoCertificadoFile, setNovoCertificadoFile] = useState<File | null>(
+    null
+  );
+  const [novoCertificadoPreview, setNovoCertificadoPreview] = useState<
+    string | null
+  >(null);
+  // Estado para arquivos dos itens já adicionados
+  const [, /* certificadoFiles */ setCertificadoFiles] = useState<
+    Record<string, File>
+  >({});
+  const [certificadoPreviews, setCertificadoPreviews] = useState<
+    Record<string, string>
+  >({});
+  /***** fim formacao ******/
+
+  /***** certificacoes ******/
+  const [novoCertificacaoFile, setNovoCertificacaoFile] = useState<File | null>(
+    null
+  );
+  const [novoCertificacaoPreview, setNovoCertificacaoPreview] = useState<
+    string | null
+  >(null);
+  // Estado para arquivos dos itens já adicionados
+  const [, /* certificacaoFiles */ setCertificacaoFiles] = useState<
+    Record<string, File>
+  >({});
+  const [certificacaoPreview, setCertificacaoPreview] = useState<
+    Record<string, string>
+  >({});
+
+  const [certificacao, setCertificacao] = useState<
+    { id: number | string; certificado: string }[]
+  >([]);
+
+  const [selectedCertificacao, setSelectedCertificacao] = useState<{
+    value: string;
+    label: string;
+  } | null>(null);
+  /***** fim certificacoes ******/
+
   const [avaliador, setAvaliador] = useState<AvaliadorData | null>(null);
   const [loadingAvaliador, setLoadingAvaliador] = useState<boolean>(true);
   const [empresas, setEmpresas] = useState<
     { id: number; nome_empresa: string }[]
   >([]);
+  const [graduacoes, setGraduacoes] = useState<
+    { id: number; graduacao: string }[]
+  >([]);
+
   const [skills, setSkills] = useState<{ skill_id: number; skill: string }[]>(
     []
   );
+
+  const [selectedGraduacao, setSelectedGraduacao] = useState<{
+    value: string;
+    label: string;
+  } | null>(null);
 
   const skillsData = form.lista_skills || [];
 
@@ -169,6 +249,8 @@ export default function PerfilAvaliador({
           logoPreview: data.logo || null,
           avaliar_todos: data.avaliar_todos ? "1" : "0",
           lista_skills: data.skills || [],
+          lista_formacao: data.formacoes || [],
+          lista_certificado: data.certificacoes || [],
           ativo: data.ativo ?? true,
           trabalha_empresa: data.empresa_id ? "SIM" : "NAO",
           nome_user: data.nomeUser,
@@ -197,27 +279,41 @@ export default function PerfilAvaliador({
 
     const fetchSelectData = async () => {
       try {
-        const [empresasRes, skillsRes] = await Promise.all([
-          fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/avaliador/empresas-cadastro/`,
-            {
+        const [empresasRes, skillsRes, graduacoesRes, certificacaoRes] =
+          await Promise.all([
+            fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/avaliador/empresas-cadastro/`,
+              {
+                method: "GET",
+                credentials: "include",
+              }
+            ),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/`, {
               method: "GET",
               credentials: "include",
-            }
-          ),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/`, {
-            method: "GET",
-            credentials: "include",
-          }),
-        ]);
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/graduacao/`, {
+              method: "GET",
+              credentials: "include",
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/certificacoes/`, {
+              method: "GET",
+              credentials: "include",
+            }),
+          ]);
 
-        const [empresasData, skillsData] = await Promise.all([
-          empresasRes.json(),
-          skillsRes.json(),
-        ]);
+        const [empresasData, skillsData, graduacoesData, certificacaoData] =
+          await Promise.all([
+            empresasRes.json(),
+            skillsRes.json(),
+            graduacoesRes.json(),
+            certificacaoRes.json(),
+          ]);
 
         setEmpresas(empresasData.empresas);
         setSkills(skillsData);
+        setGraduacoes(graduacoesData);
+        setCertificacao(certificacaoData);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
       } finally {
@@ -302,7 +398,21 @@ export default function PerfilAvaliador({
     }));
   };
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 3));
+  const handleGraduacaoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const selectedText = e.target.options[e.target.selectedIndex].text; // 👈 pega o texto visível
+
+    if (selectedId) {
+      setSelectedGraduacao({
+        value: selectedId,
+        label: selectedText,
+      });
+    } else {
+      setSelectedGraduacao(null);
+    }
+  };
+
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 6));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -329,13 +439,27 @@ export default function PerfilAvaliador({
     }
 
     if (step === 2) {
-      if (form.lista_skills.length <= 0) return;
+      if (form.lista_formacao.length <= 0) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
     if (step === 3) {
+      if (form.lista_certificado.length <= 0) return;
+      setShowErrors(false);
+      nextStep();
+      return;
+    }
+
+    if (step === 4) {
+      if (form.lista_skills.length <= 0) return;
+      setShowErrors(false);
+      nextStep();
+      return;
+    }
+
+    if (step === 5) {
       if (!isFormValid(form)) return;
 
       setIsSubmitting(true);
@@ -381,6 +505,18 @@ export default function PerfilAvaliador({
           "novas_skills",
           JSON.stringify(
             serializeSkills(form.lista_skills.filter((s) => s.skill_id < 0))
+          )
+        );
+
+        formData.append(
+          "formacoes",
+          JSON.stringify(
+            form.lista_formacao.map((f) => ({
+              id: typeof f.id === "string" && f.id ? null : f.id,
+              graduacao_id: f.graduacao_id,
+              formacao: f.formacao,
+              certificado_file: f.certificado_file,
+            }))
           )
         );
 
@@ -506,6 +642,173 @@ export default function PerfilAvaliador({
     }));
   };
 
+  /*** formacao ***/
+
+  const handleNovoCertificadoChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      alert("O arquivo deve ter no máximo 2MB.");
+      return;
+    }
+
+    setNovoCertificadoFile(file);
+    setNovoCertificadoPreview(URL.createObjectURL(file));
+  };
+
+  const handleAddFormacao = () => {
+    if (!selectedGraduacao || !formacaoInput.trim() || !novoCertificadoFile)
+      return;
+
+    const novaId = Date.now() * -1;
+    const novaFormacao: FormacaoAvaliacao = {
+      id: novaId,
+      graduacao_id: Number(selectedGraduacao.value),
+      formacao: formacaoInput.trim(),
+      certificado_file: String(novaId),
+      certificado_preview: novoCertificadoPreview || undefined,
+    };
+
+    setForm((prev) => ({
+      ...prev,
+      lista_formacao: [...prev.lista_formacao, novaFormacao],
+    }));
+
+    // Salva arquivo para envio posterior
+    setCertificadoFiles((prev) => ({ ...prev, [novaId]: novoCertificadoFile }));
+    setCertificadoPreviews((prev) => ({
+      ...prev,
+      [novaId]: novoCertificadoPreview || "",
+    }));
+
+    // Limpar campos temporários
+    setSelectedGraduacao(null);
+    setFormacaoInput("");
+    setNovoCertificadoFile(null);
+    setNovoCertificadoPreview(null);
+  };
+
+  const handleCertificadoItemChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: string | number
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const preview = URL.createObjectURL(file);
+
+    setCertificadoFiles((prev) => ({ ...prev, [id]: file }));
+    setCertificadoPreviews((prev) => ({ ...prev, [id]: preview }));
+
+    setForm((prev) => ({
+      ...prev,
+      lista_formacao: prev.lista_formacao.map((f) =>
+        f.id === id ? { ...f, certificado_preview: preview } : f
+      ),
+    }));
+  };
+
+  const handleRemoveFormacao = (id: string | number) => {
+    setForm((prev) => ({
+      ...prev,
+      lista_formacao: prev.lista_formacao.filter((f) => f.id !== id),
+    }));
+  };
+
+  /*** certificacoes ***/
+  const handleNovoCertificacaoChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      alert("O arquivo deve ter no máximo 2MB.");
+      return;
+    }
+
+    setNovoCertificacaoFile(file);
+    setNovoCertificacaoPreview(URL.createObjectURL(file));
+  };
+
+  const handleAddCertificacao = () => {
+    if (!selectedCertificacao?.value || !novoCertificacaoFile) {
+      setShowErrors(true);
+      return;
+    }
+    const isNovaCert = isNaN(Number(selectedCertificacao.value));
+    const id = isNovaCert
+      ? Date.now() * -1
+      : Number(selectedCertificacao.value);
+
+    if (form.lista_certificado.some((s) => s.certificacao_id === id)) return;
+
+    const novaCert = {
+      certificacao_id: id,
+      nome: selectedCertificacao.label, // ← Salva o nome para posterior criação no backend
+      certificado_file: String(id),
+      certificado_preview: novoCertificacaoPreview || undefined,
+    };
+
+    setCertificacaoFiles((prev) => ({ ...prev, [id]: novoCertificacaoFile }));
+    setCertificacaoPreview((prev) => ({
+      ...prev,
+      [id]: novoCertificacaoPreview || "",
+    }));
+
+    setForm((prev) => ({
+      ...prev,
+      lista_certificado: [...prev.lista_certificado, novaCert],
+    }));
+
+    if (isNovaCert) {
+      setCertificacao((prev) => [
+        ...prev,
+        { id: id, certificado: selectedCertificacao.label },
+      ]);
+    }
+
+    setSelectedCertificacao(null);
+    setNovoCertificacaoFile(null);
+    setNovoCertificacaoPreview(null);
+  };
+
+  const handleCertificacaoItemChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: string | number
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const preview = URL.createObjectURL(file);
+
+    setCertificacaoFiles((prev) => ({ ...prev, [id]: file }));
+    setCertificacaoPreview((prev) => ({ ...prev, [id]: preview }));
+
+    setForm((prev) => ({
+      ...prev,
+      lista_certificado: prev.lista_certificado.map((f) =>
+        f.certificacao_id === id ? { ...f, certificado_preview: preview } : f
+      ),
+    }));
+  };
+
+  const handleRemoveCertificacao = (id: number) => {
+    setForm((prev) => ({
+      ...prev,
+      lista_certificado: prev.lista_certificado.filter(
+        (s) => s.certificacao_id !== id
+      ),
+    }));
+  };
+
+  /*** fim certificaoes ***/
+
   const handleReenviarSolicitacao = async () => {
     setIsResending(true);
     try {
@@ -545,37 +848,42 @@ export default function PerfilAvaliador({
       <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        {step != 4 && (
+        {step != 6 && (
           <div className="pt-3 pl-6 flex items-center justify-center">
             <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
-              {["1 Dados", "2 Skills", "3 Visualizar", "4 Publicar"].map(
-                (etapa, index) => (
+              {[
+                "1 Dados",
+                "2 Formação Academica",
+                "3 Certificação",
+                "4 Skills",
+                "5 Visualizar",
+                "6 Publicar",
+              ].map((etapa, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-1 flex-1 min-w-0"
+                >
                   <div
-                    key={index}
-                    className="flex items-center gap-1 flex-1 min-w-0"
+                    className={`w-6 h-6 rounded-full text-center text-white text-xs flex items-center justify-center ${
+                      step === index + 1 ? "bg-blue-600" : "bg-gray-300"
+                    }`}
                   >
-                    <div
-                      className={`w-6 h-6 rounded-full text-center text-white text-xs flex items-center justify-center ${
-                        step === index + 1 ? "bg-blue-600" : "bg-gray-300"
-                      }`}
-                    >
-                      {index + 1}
-                    </div>
-                    <span
-                      className={`truncate ${
-                        step === index + 1 ? "text-black" : "text-gray-400"
-                      }`}
-                    >
-                      {etapa.split(" ")[1]}
-                    </span>
-                    {index < 2 && (
-                      <span className="mx-1 text-gray-300 hidden sm:inline">
-                        ───────
-                      </span>
-                    )}
+                    {index + 1}
                   </div>
-                )
-              )}
+                  <span
+                    className={`truncate ${
+                      step === index + 1 ? "text-black" : "text-gray-400"
+                    }`}
+                  >
+                    {etapa.split(" ")[1]}
+                  </span>
+                  {index < 5 && (
+                    <span className="mx-1 text-gray-300 hidden sm:inline">
+                      ─────
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -640,7 +948,6 @@ export default function PerfilAvaliador({
                                 ) : (
                                   "Reenviar Solicitação"
                                 )}
-                                
                               </button>
                             );
                           }
@@ -865,7 +1172,7 @@ export default function PerfilAvaliador({
                       <span>SMS</span>
                     </label>
                   </div>
-                  {showErrors && !form.localizacao && (
+                  {showErrors && !form.meioNotificacao && (
                     <p className="text-sm text-red-600 mt-1">
                       Campo obrigatório.
                     </p>
@@ -964,6 +1271,428 @@ export default function PerfilAvaliador({
             )}
 
             {step === 2 && (
+              <div className="w-full h-full flex flex-col">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+                  <div>
+                    <h1 className="block text-sm mb-1 py-3 font-bold">
+                      Informe as suas formações acadêmicas
+                    </h1>
+
+                    {/* Linha de adição de formação */}
+                    <div className="flex flex-col sm:flex-row sm:items-end sm:gap-3 gap-2">
+                      {/* Graduação */}
+                      <div className="flex flex-col w-full sm:w-1/4">
+                        <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                          Graduação:
+                        </label>
+                        <select
+                          className="border border-blue-400 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-300"
+                          name="graduacao_id"
+                          value={selectedGraduacao?.value || ""}
+                          onChange={handleGraduacaoChange}
+                        >
+                          <option value="">Selecione a graduação</option>
+                          {graduacoes.map((grad) => (
+                            <option key={grad.id} value={grad.id}>
+                              {grad.graduacao}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Formação */}
+                      <div className="flex flex-col w-full sm:w-2/4">
+                        <label className="text-xs sm:text-sm font-medium mb-1 flex items-center gap-1">
+                          Formação:
+                        </label>
+                        <input
+                          type="text"
+                          name="formacao"
+                          placeholder="Digite sua formação"
+                          className="w-full border border-blue-400 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-blue-300"
+                          value={formacaoInput}
+                          onChange={(e) => setFormacaoInput(e.target.value)}
+                        />
+                      </div>
+
+                      {/* Upload certificado estilizado */}
+                      <div className="flex flex-col w-full sm:w-1/4">
+                        <label className="text-xs sm:text-sm font-medium mb-1">
+                          Certificado (JPG, PNG ou PDF)
+                        </label>
+                        {/* Input real (oculto) */}
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          className="hidden"
+                          id="novo-certificado"
+                          onChange={handleNovoCertificadoChange} // ✅ AQUI ESTAVA FALTANDO
+                        />
+
+                        {/* Label estilizado (clique para selecionar arquivo) */}
+                        <label
+                          htmlFor="novo-certificado"
+                          className="flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-blue-400 rounded-md cursor-pointer hover:bg-blue-50 transition text-sm sm:text-base truncate"
+                        >
+                          <Upload
+                            size={18}
+                            className="text-blue-600 shrink-0"
+                          />
+                          <span className="truncate">
+                            {novoCertificadoFile
+                              ? novoCertificadoFile.name // mostra o nome real do arquivo
+                              : "Selecione o arquivo"}
+                          </span>
+                        </label>
+                      </div>
+
+                      {/* Botão adicionar */}
+                      <div className="flex sm:mt-6">
+                        <button
+                          type="button"
+                          onClick={handleAddFormacao}
+                          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
+                        >
+                          + Adicionar
+                        </button>
+                      </div>
+                    </div>
+
+                    {showErrors &&
+                      (!selectedGraduacao?.value ||
+                        !formacaoInput ||
+                        !novoCertificadoFile) && (
+                        <p className="text-sm text-red-600 mt-1">
+                          Campo obrigatório.
+                        </p>
+                      )}
+                  </div>
+
+                  {/* Lista de formações */}
+                  <div className="flex flex-1 flex-col gap-3 mt-5">
+                    {form.lista_formacao?.map((item) => {
+                      const graduacaoObj = graduacoes.find(
+                        (g) => g.id === item.graduacao_id
+                      );
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                          <div className="flex flex-col gap-2 w-full">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap">
+                              {/* Tipo da graduação */}
+                              <div className="flex items-center gap-2 text-sm min-w-[200px] font-bold">
+                                <span>
+                                  {graduacaoObj?.graduacao ??
+                                    "Graduação não encontrada"}
+                                </span>
+                              </div>
+
+                              {/* Nome da formação */}
+                              <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                {item.formacao}
+                              </div>
+
+                              {/* Ações */}
+                              <div className="flex items-center gap-3 text-sm min-w-[120px]">
+                                {/* Visualizar certificado */}
+                                {certificadoPreviews[item.id] && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      window.open(
+                                        certificadoPreviews[item.id],
+                                        "_blank"
+                                      )
+                                    }
+                                    className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
+                                    title="Visualizar certificado"
+                                  >
+                                    <FileText size={20} />
+                                  </button>
+                                )}
+
+                                {/* Upload certificado */}
+                                <label
+                                  htmlFor={`certificado-${item.id}`}
+                                  className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
+                                  title="Substituir certificado"
+                                >
+                                  <Upload size={20} />
+                                </label>
+                                <input
+                                  type="file"
+                                  accept="image/*,application/pdf"
+                                  id={`certificado-${item.id}`}
+                                  className="hidden"
+                                  onChange={(e) =>
+                                    handleCertificadoItemChange(e, item.id)
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Remover formação */}
+                          <button
+                            onClick={() => handleRemoveFormacao(item.id)}
+                            className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 self-end sm:self-auto cursor-pointer"
+                            title="Remover Formação"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Botões de navegação */}
+                  <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
+                    <div className="flex">
+                      <button
+                        onClick={prevStep}
+                        type="button"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={form.lista_formacao.length < 1}
+                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
+                          ${
+                            form.lista_formacao.length < 1
+                              ? "bg-gray-300 cursor-not-allowed"
+                              : "bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                          }`}
+                      >
+                        Avançar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="w-full h-full flex flex-col">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+                  <div>
+                    <h1 className="block text-sm mb-1 py-3 font-bold">
+                      Informe as suas certificações
+                      <p className="block text-[11x] font-light">(mínimo 1)</p>
+                    </h1>
+
+                    <div className="w-full">
+                      <div className="grid grid-cols-1 md:grid-cols-[3fr_1.5fr_auto] gap-4 items-end">
+                        {/* Campo de certificação - largo */}
+                        <div className="flex flex-col w-full">
+                          <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                            Certificações:
+                            <TooltipIcon
+                              message={`Como adicionar certificação que não está na lista:\n1. Digite a certificação desejada;\n2. Selecione 'Criar nova certificação';\n3. Clique no botão Adicionar.`}
+                              perfil={perfil}
+                            />
+                          </label>
+                          <CreatableSelect
+                            isClearable
+                            placeholder="Digite ou selecione"
+                            value={selectedCertificacao}
+                            onChange={(newValue) =>
+                              setSelectedCertificacao(newValue)
+                            }
+                            options={certificacao.map((cert) => ({
+                              value: String(cert.id),
+                              label: cert.certificado,
+                            }))}
+                            formatCreateLabel={(inputValue) =>
+                              `Criar nova certificação: "${inputValue}"`
+                            }
+                          />
+                        </div>
+
+                        {/* Upload - médio */}
+                        <div className="flex flex-col w-full">
+                          <label className="text-xs sm:text-sm font-medium mb-1">
+                            Certificado (JPG, PNG ou PDF)
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            className="hidden"
+                            id="novo-certificacao"
+                            onChange={handleNovoCertificacaoChange}
+                          />
+                          <label
+                            htmlFor="novo-certificacao"
+                            className="flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-blue-400 rounded-md cursor-pointer hover:bg-blue-50 transition text-sm truncate"
+                          >
+                            <Upload
+                              size={18}
+                              className="text-blue-600 shrink-0"
+                            />
+                            <span className="truncate">
+                              {novoCertificacaoFile
+                                ? novoCertificacaoFile.name
+                                : "Selecionar"}
+                            </span>
+                          </label>
+                        </div>
+
+                        {/* Botão - largura automática */}
+                        <div className="flex flex-col w-full">
+                          <label className="text-xs sm:text-sm font-medium mb-1 opacity-0">
+                            &nbsp;
+                          </label>
+                          <button
+                            type="button"
+                            onClick={handleAddCertificacao}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition whitespace-nowrap w-full md:w-auto cursor-pointer"
+                          >
+                            + Adicionar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {showErrors &&
+                      (form.lista_certificado.length <= 0 ||
+                        !novoCertificacaoFile) && (
+                        <p className="text-sm text-red-600 mt-1">
+                          Campo obrigatório.
+                        </p>
+                      )}
+                  </div>
+
+                  <div className="flex flex-1 flex-col gap-3 mt-5">
+                    {form.lista_certificado.map((item) => {
+                      const cert = certificacao.find(
+                        (s) => s.id === item.certificacao_id
+                      );
+                      return (
+                        <div
+                          key={item.certificacao_id}
+                          className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                          <div className="flex flex-col gap-2 w-full">
+                            {/* Linha com Skill, Peso e Avaliador */}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
+                              {/* Nome da skill */}
+                              <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                {cert?.certificado ?? item.nome}
+                              </div>
+
+                              {/* Ações */}
+                              <div className="flex items-center gap-3 text-sm min-w-[120px]">
+                                {/* Visualizar certificado */}
+                                {certificacaoPreview[item.certificacao_id] && (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      window.open(
+                                        certificacaoPreview[
+                                          item.certificacao_id
+                                        ],
+                                        "_blank"
+                                      )
+                                    }
+                                    className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
+                                    title="Visualizar certificado"
+                                  >
+                                    <FileText size={20} />
+                                  </button>
+                                )}
+
+                                {/* Upload certificado */}
+                                <label
+                                  htmlFor={`certificado-${item.certificacao_id}`}
+                                  className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
+                                  title="Substituir certificado"
+                                >
+                                  <Upload size={20} />
+                                </label>
+                                <input
+                                  type="file"
+                                  accept="image/*,application/pdf"
+                                  id={`certificado-${item.certificacao_id}`}
+                                  className="hidden"
+                                  onChange={(e) =>
+                                    handleCertificacaoItemChange(
+                                      e,
+                                      item.certificacao_id
+                                    )
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() =>
+                              handleRemoveCertificacao(item.certificacao_id)
+                            }
+                            className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 cursor-pointer"
+                            title="Remover certificação"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Botões no rodapé */}
+                  <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
+                    <div className="flex">
+                      <button
+                        onClick={prevStep}
+                        type="button"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                      >
+                        Voltar
+                      </button>
+                    </div>
+
+                    {/* Direita: botões cadastrar e editar */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button" // evita submit acidental
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={form.lista_certificado.length < 1} // só habilita se >= 3
+                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
+                      ${
+                        form.lista_certificado.length < 1
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                      }`}
+                      >
+                        Avançar
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {step === 4 && (
               <div className="w-full h-full flex flex-col">
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1">
                   <div>
@@ -1193,7 +1922,7 @@ export default function PerfilAvaliador({
               </div>
             )}
 
-            {step === 3 && (
+            {step === 5 && (
               <form
                 onSubmit={handleSubmit}
                 className="flex-1 flex flex-col w-full h-full"
