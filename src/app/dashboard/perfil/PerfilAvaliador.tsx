@@ -487,6 +487,9 @@ export default function PerfilAvaliador({
     if (step === 5) {
       if (!isFormValid(form)) return;
 
+      if (certificadoFiles || certificacaoFiles) {
+      }
+
       setIsSubmitting(true);
 
       try {
@@ -579,7 +582,7 @@ export default function PerfilAvaliador({
             // 🔥 removido: certificado_preview
           })); */
 
-        const certificacoesNovas = form.lista_certificado
+        /* const certificacoesNovas = form.lista_certificado
           .filter((c) => c.certificacao_id < 0)
           .map((c) => ({
             certificacao_id: c.certificacao_id,
@@ -589,7 +592,7 @@ export default function PerfilAvaliador({
                 ? c.certificado_file.name
                 : c.certificado_file || null,
             // 🔥 removido: certificado_preview
-          }));
+          })); */
 
         // Anexa os arquivos reais
         form.lista_certificado.forEach((c, index) => {
