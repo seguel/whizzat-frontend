@@ -34,15 +34,15 @@ interface FormacaoAvaliacao {
   id: number;
   graduacao_id: number;
   formacao: string;
-  certificado_file?: string; // nome ou caminho (pode ficar vazio no início)
+  certificado_file?: string | File; // nome ou caminho (pode ficar vazio no início)
   certificado_preview?: string; // URL temporária (opcional)
 }
 
 interface CertificadoAvaliacao {
   // id: string | number;
   certificacao_id: number;
-  nome?: string;
-  certificado_file?: string; // nome ou caminho (pode ficar vazio no início)
+  certificado?: string;
+  certificado_file?: string | File; // nome ou caminho (pode ficar vazio no início)
   certificado_preview?: string; // URL temporária (opcional)
 }
 
@@ -83,7 +83,7 @@ interface AvaliadorData {
   logo?: string;
   avaliar_todos: string;
   skills: SkillAvaliacao[];
-  formacoes: FormacaoAvaliacao[];
+  formacao: FormacaoAvaliacao[];
   certificacoes: CertificadoAvaliacao[];
   ativo: boolean;
   data_envio_link: string;
@@ -155,7 +155,7 @@ export default function PerfilAvaliador({
     string | null
   >(null);
   // Estado para arquivos dos itens já adicionados
-  const [, /* certificadoFiles */ setCertificadoFiles] = useState<
+  const [certificadoFiles, setCertificadoFiles] = useState<
     Record<string, File>
   >({});
   const [certificadoPreviews, setCertificadoPreviews] = useState<
@@ -171,7 +171,7 @@ export default function PerfilAvaliador({
     string | null
   >(null);
   // Estado para arquivos dos itens já adicionados
-  const [, /* certificacaoFiles */ setCertificacaoFiles] = useState<
+  const [certificacaoFiles, setCertificacaoFiles] = useState<
     Record<string, File>
   >({});
   const [certificacaoPreview, setCertificacaoPreview] = useState<
@@ -238,6 +238,7 @@ export default function PerfilAvaliador({
         if (!res.ok) throw new Error("Erro ao buscar dados da avaliador");
 
         const data = await res.json();
+        // console.log(data);
 
         // mapeia os campos da API para o form
         const avaliadorFormData: AvaliadorForm = {
@@ -249,7 +250,7 @@ export default function PerfilAvaliador({
           logoPreview: data.logo || null,
           avaliar_todos: data.avaliar_todos ? "1" : "0",
           lista_skills: data.skills || [],
-          lista_formacao: data.formacoes || [],
+          lista_formacao: data.formacao || [],
           lista_certificado: data.certificacoes || [],
           ativo: data.ativo ?? true,
           trabalha_empresa: data.empresa_id ? "SIM" : "NAO",
@@ -272,6 +273,30 @@ export default function PerfilAvaliador({
 
     fetchAvaliador();
   }, [avaliadorId]);
+
+  useEffect(() => {
+    const previews: Record<string, string> = {};
+    form.lista_formacao.forEach((f) => {
+      if (f.certificado_preview) {
+        previews[f.id] = f.certificado_preview;
+      } else if (typeof f.certificado_file === "string" && f.certificado_file) {
+        previews[f.id] = f.certificado_file; // vindo do BD
+      }
+    });
+    setCertificadoPreviews(previews);
+  }, [form.lista_formacao]);
+
+  useEffect(() => {
+    const previews: Record<string, string> = {};
+    form.lista_certificado.forEach((f) => {
+      if (f.certificado_preview) {
+        previews[f.certificacao_id] = f.certificado_preview;
+      } else if (typeof f.certificado_file === "string" && f.certificado_file) {
+        previews[f.certificacao_id] = f.certificado_file; // vindo do BD
+      }
+    });
+    setCertificacaoPreview(previews);
+  }, [form.lista_certificado]);
 
   useEffect(() => {
     setLoadingAvaliador(true);
@@ -439,14 +464,14 @@ export default function PerfilAvaliador({
     }
 
     if (step === 2) {
-      if (form.lista_formacao.length <= 0) return;
+      // if (form.lista_formacao.length <= 0) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
     if (step === 3) {
-      if (form.lista_certificado.length <= 0) return;
+      // if (form.lista_certificado.length <= 0) return;
       setShowErrors(false);
       nextStep();
       return;
@@ -469,6 +494,8 @@ export default function PerfilAvaliador({
           perfil === "recrutador" ? "2" : perfil === "avaliador" ? "3" : "1";
 
         const formData = new FormData();
+
+        // Campos simples
         formData.append(
           "empresaId",
           form.empresa_id ? String(form.empresa_id) : ""
@@ -483,16 +510,16 @@ export default function PerfilAvaliador({
           form.avaliar_todos === "1" ? "true" : "false"
         );
 
-        if (logoFile) {
-          formData.append("logo", logoFile); // precisa ser File/Blob
-        }
+        if (logoFile) formData.append("logo", logoFile);
 
         if (avaliadorId) {
           formData.append("avaliadorId", String(avaliadorId));
           formData.append("ativo", form.ativo ? "1" : "0");
         }
 
-        // Skills existentes
+        // ================================
+        // SKILLS
+        // ================================
         formData.append(
           "skills",
           JSON.stringify(
@@ -500,7 +527,6 @@ export default function PerfilAvaliador({
           )
         );
 
-        // Skills novas
         formData.append(
           "novas_skills",
           JSON.stringify(
@@ -508,23 +534,86 @@ export default function PerfilAvaliador({
           )
         );
 
+        // ================================
+        // FORMAÇÕES
+        // ================================
+        const formacoesData = form.lista_formacao.map((f, index) => {
+          return {
+            id: f.id,
+            graduacao_id: f.graduacao_id,
+            formacao: f.formacao,
+            certificado_field: `formacao_certificado_${index}`, // ✅ adiciona o fieldname
+            certificado_file:
+              f.certificado_file instanceof File
+                ? f.certificado_file.name
+                : f.certificado_file || null,
+          };
+        });
+        // 🔥 ANEXAR OS ARQUIVOS REAIS AO FormData
+        form.lista_formacao.forEach((f, index) => {
+          if (f.certificado_file instanceof File) {
+            formData.append(
+              `formacao_certificado_${index}`,
+              f.certificado_file
+            );
+          }
+        });
+
+        formData.append("formacoes", JSON.stringify(formacoesData));
+
+        // ================================
+        // CERTIFICAÇÕES
+        // ================================
+        // ================================
+        // CERTIFICAÇÕES
+        // ================================
+        /* const certificacoesExistentes = form.lista_certificado
+          .filter((c) => c.certificacao_id > 0)
+          .map((c) => ({
+            certificacao_id: c.certificacao_id,
+            certificado: c.certificado,
+            certificado_file:
+              c.certificado_file instanceof File
+                ? c.certificado_file.name
+                : c.certificado_file || null,
+            // 🔥 removido: certificado_preview
+          })); */
+
+        const certificacoesNovas = form.lista_certificado
+          .filter((c) => c.certificacao_id < 0)
+          .map((c) => ({
+            certificacao_id: c.certificacao_id,
+            certificado: c.certificado,
+            certificado_file:
+              c.certificado_file instanceof File
+                ? c.certificado_file.name
+                : c.certificado_file || null,
+            // 🔥 removido: certificado_preview
+          }));
+
+        // Anexa os arquivos reais
+        form.lista_certificado.forEach((c, index) => {
+          if (c.certificado_file instanceof File) {
+            formData.append(`certificado_${index}`, c.certificado_file);
+          }
+        });
+        const certificacoesData = form.lista_certificado.map((c, index) => ({
+          ...c,
+          certificado_field: `certificado_${index}`, // ✅ adiciona o fieldname
+        }));
+        // console.log(certificacoesData.filter((c) => c.certificacao_id > 0));
         formData.append(
-          "formacoes",
-          JSON.stringify(
-            form.lista_formacao.map((f) => ({
-              id: typeof f.id === "string" && f.id ? null : f.id,
-              graduacao_id: f.graduacao_id,
-              formacao: f.formacao,
-              certificado_file: f.certificado_file,
-            }))
-          )
+          "certificacoes",
+          JSON.stringify(certificacoesData.filter((c) => c.certificacao_id > 0))
+        );
+        formData.append(
+          "novas_certificacoes",
+          JSON.stringify(certificacoesData.filter((c) => c.certificacao_id < 0))
         );
 
-        /* console.log("logoFile state:", logoFile);
-        for (const [key, value] of formData.entries()) {
-          console.log("FormData:", key, value);
-        } */
-
+        // ================================
+        // ENVIO AO BACKEND
+        // ================================
         const url = !avaliadorId
           ? `${process.env.NEXT_PUBLIC_API_URL}/avaliador/create-avaliador`
           : `${process.env.NEXT_PUBLIC_API_URL}/avaliador/update-avaliador`;
@@ -547,12 +636,8 @@ export default function PerfilAvaliador({
           throw new Error(errorMessage);
         }
 
-        //setAvaliadorPublicado(data);
-
         localStorage.removeItem(`avaliadorForm_${userId}`);
-        toast.success(`Avaliador publicada com sucesso!`, {
-          duration: 5000,
-        });
+        toast.success(`Avaliador publicado com sucesso!`, { duration: 5000 });
         setIsSubmitting(false);
         router.push(`/dashboard?perfil=${perfil}`);
       } catch (err: unknown) {
@@ -669,7 +754,7 @@ export default function PerfilAvaliador({
       id: novaId,
       graduacao_id: Number(selectedGraduacao.value),
       formacao: formacaoInput.trim(),
-      certificado_file: String(novaId),
+      certificado_file: novoCertificadoFile,
       certificado_preview: novoCertificadoPreview || undefined,
     };
 
@@ -694,22 +779,39 @@ export default function PerfilAvaliador({
 
   const handleCertificadoItemChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    id: string | number
+    id: number
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const preview = URL.createObjectURL(file);
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert("O arquivo deve ter no máximo 2MB.");
+      return;
+    }
 
+    // Cria uma nova URL (e invalida a anterior)
+    const previewUrl = URL.createObjectURL(file);
+
+    // Atualiza o form corretamente
+    setForm((prev) => {
+      const novaLista = prev.lista_formacao.map((f) =>
+        f.id === id
+          ? {
+              ...f,
+              certificado_file: file, // substitui o arquivo
+              certificado_preview: previewUrl, // substitui o preview
+            }
+          : f
+      );
+      return { ...prev, lista_formacao: novaLista };
+    });
+
+    // Atualiza refs auxiliares
     setCertificadoFiles((prev) => ({ ...prev, [id]: file }));
-    setCertificadoPreviews((prev) => ({ ...prev, [id]: preview }));
+    setCertificadoPreviews((prev) => ({ ...prev, [id]: previewUrl }));
 
-    setForm((prev) => ({
-      ...prev,
-      lista_formacao: prev.lista_formacao.map((f) =>
-        f.id === id ? { ...f, certificado_preview: preview } : f
-      ),
-    }));
+    toast.success(`Certificado Atualizado!`, { duration: 2000 });
   };
 
   const handleRemoveFormacao = (id: string | number) => {
@@ -750,8 +852,8 @@ export default function PerfilAvaliador({
 
     const novaCert = {
       certificacao_id: id,
-      nome: selectedCertificacao.label, // ← Salva o nome para posterior criação no backend
-      certificado_file: String(id),
+      certificado: selectedCertificacao.label, // ← Salva o nome para posterior criação no backend
+      certificado_file: novoCertificacaoFile,
       certificado_preview: novoCertificacaoPreview || undefined,
     };
 
@@ -780,22 +882,39 @@ export default function PerfilAvaliador({
 
   const handleCertificacaoItemChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    id: string | number
+    id: number
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const preview = URL.createObjectURL(file);
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert("O arquivo deve ter no máximo 2MB.");
+      return;
+    }
 
+    // Cria uma nova URL (e invalida a anterior)
+    const previewUrl = URL.createObjectURL(file);
+
+    // Atualiza o form corretamente
+    setForm((prev) => {
+      const novaLista = prev.lista_certificado.map((f) =>
+        f.certificacao_id === id
+          ? {
+              ...f,
+              certificado_file: file, // substitui o arquivo
+              certificado_preview: previewUrl, // substitui o preview
+            }
+          : f
+      );
+      return { ...prev, lista_certificado: novaLista };
+    });
+
+    // Atualiza refs auxiliares
     setCertificacaoFiles((prev) => ({ ...prev, [id]: file }));
-    setCertificacaoPreview((prev) => ({ ...prev, [id]: preview }));
+    setCertificacaoPreview((prev) => ({ ...prev, [id]: previewUrl }));
 
-    setForm((prev) => ({
-      ...prev,
-      lista_certificado: prev.lista_certificado.map((f) =>
-        f.certificacao_id === id ? { ...f, certificado_preview: preview } : f
-      ),
-    }));
+    toast.success(`Certificado Atualizado!`, { duration: 2000 });
   };
 
   const handleRemoveCertificacao = (id: number) => {
@@ -1470,13 +1589,7 @@ export default function PerfilAvaliador({
                       </button>
                       <button
                         type="submit"
-                        disabled={form.lista_formacao.length < 1}
-                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
-                          ${
-                            form.lista_formacao.length < 1
-                              ? "bg-gray-300 cursor-not-allowed"
-                              : "bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                          }`}
+                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
                       >
                         Avançar
                       </button>
@@ -1591,7 +1704,7 @@ export default function PerfilAvaliador({
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
                               {/* Nome da skill */}
                               <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
-                                {cert?.certificado ?? item.nome}
+                                {cert?.certificado ?? item.certificado}
                               </div>
 
                               {/* Ações */}
@@ -1676,13 +1789,7 @@ export default function PerfilAvaliador({
                       </button>
                       <button
                         type="submit"
-                        disabled={form.lista_certificado.length < 1} // só habilita se >= 3
-                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
-                      ${
-                        form.lista_certificado.length < 1
-                          ? "bg-gray-300 cursor-not-allowed"
-                          : "bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                      }`}
+                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
                       >
                         Avançar
                       </button>
@@ -2098,6 +2205,48 @@ export default function PerfilAvaliador({
                         <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-5">
                           {form.apresentacao ||
                             "Nenhuma apresentação fornecida."}
+                        </div>
+                        <div className="flex flex-row w-[95%] mt-5">
+                          <div className="w-1/2 rounded-xl p-1 shadow-sm">
+                            <p className="ml-1">Formações:</p>
+                            {Array.isArray(form.lista_formacao) &&
+                            form.lista_formacao.length > 0 ? (
+                              form.lista_formacao.map((item) => {
+                                return (
+                                  <div
+                                    key={item.id}
+                                    className="mt-2 border border-blue-300 text-gray-500 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                                  >
+                                    {item.formacao}
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <p className="text-sm text-gray-500 font-bold mt-3 text-center">
+                                Nenhuma formação cadastrada
+                              </p>
+                            )}
+                          </div>
+                          <div className="ml-2 w-1/2 rounded-xl p-1 shadow-sm">
+                            <p className="ml-1">Certificações:</p>
+                            {Array.isArray(form.lista_certificado) &&
+                            form.lista_certificado.length > 0 ? (
+                              form.lista_certificado.map((item) => {
+                                return (
+                                  <div
+                                    key={item.certificacao_id}
+                                    className="mt-2 border border-blue-300 text-gray-500 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                                  >
+                                    {item.certificado}
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <p className="text-sm text-gray-500 font-bold mt-3 text-center">
+                                Nenhuma certificação cadastrada
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
