@@ -75,22 +75,22 @@ export default function JobCard({
         <div className="flex flex-wrap justify-center sm:justify-start gap-1 sm:gap-2 mt-3 pt-2  w-full">
           {pcd && (
             <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-              ♿ PCD
+              <span className="text-[12px]">♿</span> PCD
             </span>
           )}
           {lgbtq && (
             <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-              🏳️‍🌈 LGBTQ+
+              <span className="text-[12px]">🏳️‍🌈</span> LGBTQ+
             </span>
           )}
           {mulheres && (
             <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-              👩‍💼 Mulheres
+              <span className="text-[12px]">👩‍💼</span> Mulheres
             </span>
           )}
           {cinquenta_mais && (
             <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-              👴 50+
+              <span className="text-[12px]">👴</span> 50+
             </span>
           )}
         </div>
