@@ -9,6 +9,7 @@ import {
   Bell,
   Store,
   LogOut,
+  ClipboardCheck,
 } from "lucide-react";
 
 export type ProfileType = "candidato" | "recrutador" | "avaliador";
@@ -69,6 +70,11 @@ export function getNavItems(profile: ProfileType): NavItem[] {
           icon: <Store size={20} />,
           label: "Empresas",
           route: `/dashboard/empresa?perfil=${profile}`,
+        },
+        {
+          icon: <ClipboardCheck size={20} />,
+          label: "Especialistas",
+          route: `/dashboard/especialista?perfil=${profile}`,
         },
         {
           icon: <User size={20} />,
