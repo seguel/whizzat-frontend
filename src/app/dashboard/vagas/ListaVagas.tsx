@@ -29,6 +29,9 @@ interface Job {
   qtde_dias_aberta: number;
   prazo: string;
   pcd?: boolean;
+  lgbtq?: boolean;
+  mulheres?: boolean;
+  cinquenta_mais?: boolean;
 }
 
 export default function ListaVagas({
@@ -173,8 +176,7 @@ export default function ListaVagas({
                                 value: filtroEmpresa,
                                 label:
                                   empresas.find(
-                                    (e) =>
-                                      String(e.id) === filtroEmpresa
+                                    (e) => String(e.id) === filtroEmpresa
                                   )?.nome_empresa || "",
                               }
                             : { value: "", label: "Todas as empresas" }
