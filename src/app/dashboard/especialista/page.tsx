@@ -22,7 +22,7 @@ export default async function Page({
   const params: SearchParamsType = searchParams ? await searchParams : {};
 
   const perfil = params.perfil ?? "candidato";
-  const op = params.op as "N" | "E" | undefined;
+  // const op = params.op as "N" | "E" | undefined;
   const id = params.id ?? undefined;
   // const rec = params.rec ?? undefined; //recrutador
 
