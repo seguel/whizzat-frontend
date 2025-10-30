@@ -11,6 +11,9 @@ interface Job {
   qtde_dias_aberta: number;
   prazo: string;
   pcd?: boolean;
+  lgbtq?: boolean;
+  mulheres?: boolean;
+  cinquenta_mais?: boolean;
 }
 
 interface JobListProps {
