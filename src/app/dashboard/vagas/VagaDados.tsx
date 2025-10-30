@@ -56,6 +56,9 @@ interface VagasForm {
   modalidade_trabalho_id: string;
   periodo_trabalho_id: string;
   pcd: boolean;
+  lgbtq: boolean;
+  mulheres: boolean;
+  cinquenta_mais: boolean;
   qtde_dias_aberta: string;
   qtde_posicao: string;
   lista_skills: SkillAvaliacao[];
@@ -76,6 +79,9 @@ interface VagaData {
   modalidade_trabalho: ModalidadeVaga;
   periodo_trabalho: PeriodoVaga;
   pcd: boolean;
+  lgbtq: boolean;
+  mulheres: boolean;
+  cinquenta_mais: boolean;
   qtde_dias_aberta: number;
   qtde_posicao: number;
   skills: SkillAvaliacao[];
@@ -124,6 +130,9 @@ export default function VagaDados({
     modalidade_trabalho_id: "",
     periodo_trabalho_id: "",
     pcd: false,
+    lgbtq: false,
+    mulheres: false,
+    cinquenta_mais: false,
     qtde_dias_aberta: "",
     qtde_posicao: "",
     lista_skills: [],
@@ -209,6 +218,9 @@ export default function VagaDados({
           modalidade_trabalho_id: data.modalidade_trabalho_id || "",
           periodo_trabalho_id: data.periodo_trabalho_id || "",
           pcd: data.pcd || false,
+          lgbtq: data.lgbtq || false,
+          mulheres: data.mulheres || false,
+          cinquenta_mais: data.cinquenta_mais || false,
           qtde_dias_aberta: data.qtde_dias_aberta || "",
           qtde_posicao: data.qtde_posicao || "",
           lista_skills: data.skills || [],
@@ -388,6 +400,9 @@ export default function VagaDados({
           modalidade_trabalho_id: Number(form.modalidade_trabalho_id),
           periodo_trabalho_id: Number(form.periodo_trabalho_id),
           pcd: form.pcd,
+          lgbtq: form.lgbtq,
+          mulheres: form.mulheres,
+          cinquenta_mais: form.cinquenta_mais,
           qtde_dias_aberta: Number(form.qtde_dias_aberta),
           qtde_posicao: Number(form.qtde_posicao),
           skills: form.lista_skills.filter((s) => s.skill_id > 0), // ← SkillAvaliacao[]
@@ -707,24 +722,103 @@ export default function VagaDados({
                       </fieldset>
 
                       {/* Inclusiva */}
-                      <label className="flex items-center space-x-2 cursor-pointer mt-2">
-                        <div className="relative w-4 h-4">
-                          <input
-                            type="checkbox"
-                            name="pcd"
-                            checked={form.pcd ?? vaga?.pcd ?? false}
-                            onChange={handleChange_dinamicos}
-                            className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer"
-                          />
+                      <div className="mt-4 w-full">
+                        {/* Título */}
+                        <p className="text-sm sm:text-base font-normal mb-3 text-[#14342A]">
+                          Vaga Afirmativa / Inclusiva
+                        </p>
 
-                          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-xs pointer-events-none opacity-0 peer-checked:opacity-100">
-                            ✔
-                          </span>
+                        {/* Grid responsivo */}
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-x-6">
+                          {/* Coluna esquerda */}
+                          <div className="flex flex-col space-y-2">
+                            {/* Checkbox PCD */}
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <div className="relative w-4 h-4 sm:w-5 sm:h-5">
+                                <input
+                                  type="checkbox"
+                                  name="pcd"
+                                  checked={form.pcd ?? vaga?.pcd ?? false}
+                                  onChange={handleChange_dinamicos}
+                                  className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
+                                />
+                                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+                                  ✔
+                                </span>
+                              </div>
+                              <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
+                                PCD
+                              </span>
+                            </label>
+
+                            {/* Checkbox Mulheres */}
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <div className="relative w-4 h-4 sm:w-5 sm:h-5">
+                                <input
+                                  type="checkbox"
+                                  name="mulheres"
+                                  checked={
+                                    form.mulheres ?? vaga?.mulheres ?? false
+                                  }
+                                  onChange={handleChange_dinamicos}
+                                  className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
+                                />
+                                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+                                  ✔
+                                </span>
+                              </div>
+                              <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
+                                Mulheres
+                              </span>
+                            </label>
+                          </div>
+
+                          {/* Coluna direita */}
+                          <div className="flex flex-col space-y-2">
+                            {/* Checkbox LGBTQ+ */}
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <div className="relative w-4 h-4 sm:w-5 sm:h-5">
+                                <input
+                                  type="checkbox"
+                                  name="lgbtq"
+                                  checked={form.lgbtq ?? vaga?.lgbtq ?? false}
+                                  onChange={handleChange_dinamicos}
+                                  className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
+                                />
+                                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+                                  ✔
+                                </span>
+                              </div>
+                              <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
+                                LGBTQ+
+                              </span>
+                            </label>
+
+                            {/* Checkbox 50+ */}
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <div className="relative w-4 h-4 sm:w-5 sm:h-5">
+                                <input
+                                  type="checkbox"
+                                  name="cinquenta_mais"
+                                  checked={
+                                    form.cinquenta_mais ??
+                                    vaga?.cinquenta_mais ??
+                                    false
+                                  }
+                                  onChange={handleChange_dinamicos}
+                                  className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
+                                />
+                                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+                                  ✔
+                                </span>
+                              </div>
+                              <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
+                                50+
+                              </span>
+                            </label>
+                          </div>
                         </div>
-                        <span className="text-sm font-normal">
-                          Inclusiva PCD
-                        </span>
-                      </label>
+                      </div>
                     </div>
 
                     {/* Coluna Direita */}
@@ -1190,7 +1284,9 @@ export default function VagaDados({
                                   </h2>
                                   <p className="text-sm text-gray-500">
                                     {empresas.find(
-                                      (e) => e.id.toString() === form.empresa_id.toString()
+                                      (e) =>
+                                        e.id.toString() ===
+                                        form.empresa_id.toString()
                                     )?.nome_empresa ?? "Indefinida"}
                                   </p>
                                 </div>
@@ -1251,6 +1347,29 @@ export default function VagaDados({
                                   </span>
                                 )}
                               </div>
+                              <div className="w-full sm:w-1/2">
+                                {form?.lgbtq && (
+                                  <span role="img" aria-label="acessível">
+                                    🏳️‍🌈 Vaga para LGBTQ+
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
+                              <div className="w-full sm:w-1/2">
+                                {form.mulheres && (
+                                  <span role="img" aria-label="acessível">
+                                    👩‍💼 Vaga para Mulheres
+                                  </span>
+                                )}
+                              </div>
+                              <div className="w-full sm:w-1/2">
+                                {form?.cinquenta_mais && (
+                                  <span role="img" aria-label="acessível">
+                                    👴 Vaga para 50+
+                                  </span>
+                                )}
+                              </div>
                             </div>
 
                             {/* Linha 4 - Descrição */}
@@ -1307,7 +1426,7 @@ export default function VagaDados({
 
                         {/* Coluna Direita - Gráficos */}
                         <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                          <SkillsPanel skills={skillsData}  perfil={perfil}/>
+                          <SkillsPanel skills={skillsData} perfil={perfil} />
                         </div>
                       </div>
 
@@ -1447,6 +1566,29 @@ export default function VagaDados({
                                 </span>
                               )}
                             </div>
+                            <div className="w-full sm:w-1/2">
+                              {vagaPublicada?.lgbtq && (
+                                <span role="img" aria-label="acessível">
+                                  🏳️‍🌈 Vaga para LGBTQ+
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
+                            <div className="w-full sm:w-1/2">
+                              {vagaPublicada?.mulheres && (
+                                <span role="img" aria-label="acessível">
+                                  👩‍💼 Vaga para Mulheres
+                                </span>
+                              )}
+                            </div>
+                            <div className="w-full sm:w-1/2">
+                              {vagaPublicada?.cinquenta_mais && (
+                                <span role="img" aria-label="acessível">
+                                  👴 Vaga para 50+
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           {/* Linha 4 - Descrição */}
@@ -1503,7 +1645,10 @@ export default function VagaDados({
 
                       {/* Coluna Direita - Gráficos */}
                       <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                        <SkillsPanel skills={vagaPublicada?.skills}  perfil={perfil}/>
+                        <SkillsPanel
+                          skills={vagaPublicada?.skills}
+                          perfil={perfil}
+                        />
                       </div>
                     </div>
                   </div>

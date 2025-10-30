@@ -51,6 +51,9 @@ interface VagaData {
   modalidade_trabalho: ModalidadeVaga;
   periodo_trabalho: PeriodoVaga;
   pcd: boolean;
+  lgbtq: boolean;
+  mulheres: boolean;
+  cinquenta_mais: boolean;
   qtde_dias_aberta: number;
   qtde_posicao: number;
   skills: SkillAvaliacao[];
@@ -312,6 +315,29 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                           </span>
                         )}
                       </div>
+                      <div className="w-full sm:w-1/2">
+                        {vaga?.lgbtq && (
+                          <span role="img" aria-label="acessível">
+                            🏳️‍🌈 Vaga para LGBTQ+
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
+                      <div className="w-full sm:w-1/2">
+                        {vaga?.mulheres && (
+                          <span role="img" aria-label="acessível">
+                            👩‍💼 Vaga para Mulheres
+                          </span>
+                        )}
+                      </div>
+                      <div className="w-full sm:w-1/2">
+                        {vaga?.cinquenta_mais && (
+                          <span role="img" aria-label="acessível">
+                            👴 Vaga para 50+
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Linha 4 - Descrição */}
@@ -368,7 +394,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
 
                 {/* Coluna Direita - Gráficos */}
                 <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                  <SkillsPanel skills={vaga?.skills}  perfil={perfil}/>
+                  <SkillsPanel skills={vaga?.skills} perfil={perfil} />
                 </div>
               </div>
             </div>
