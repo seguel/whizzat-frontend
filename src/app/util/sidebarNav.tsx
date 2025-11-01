@@ -73,7 +73,7 @@ export function getNavItems(profile: ProfileType): NavItem[] {
         },
         {
           icon: <ClipboardCheck size={20} />,
-          label: "Especialistas",
+          label: "Avaliadores",
           route: `/dashboard/especialista?perfil=${profile}`,
         },
         {
