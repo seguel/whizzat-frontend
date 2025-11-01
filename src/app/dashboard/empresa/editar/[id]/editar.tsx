@@ -169,9 +169,18 @@ export default function EmpresaEditar({
       const file = files[0];
       const maxSize = 1 * 1024 * 1024; // 1MB
 
+      // 🔒 Verifica se o tipo MIME é de imagem
+      if (!file.type.startsWith("image/")) {
+        toast.error("Envie apenas arquivos de imagem (JPG, PNG, SVG, etc.)", {
+          duration: 5000,
+        });
+        return;
+      }
+
+      // 🔒 Verifica tamanho
       if (file.size > maxSize) {
         toast.error("O arquivo deve ter no máximo 1MB.", {
-          duration: 5000, // ← 5 segundos
+          duration: 5000,
         });
         return;
       }
@@ -192,7 +201,7 @@ export default function EmpresaEditar({
         setForm((prev) => ({ ...prev, capaPreview: preview }));
       }
     } else {
-      // Para campos de texto ou outros
+      // Campos de texto e outros
       const { name, type } = e.target;
       const value =
         type === "checkbox"

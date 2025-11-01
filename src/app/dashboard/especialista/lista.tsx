@@ -201,7 +201,7 @@ export default function EmpresaListar({
                             </div>
 
                             {/* Infos */}
-                            <div className="flex flex-col min-w-0">
+                            <div className="flex flex-col min-w-0 w-full">
                               <h3 className="font-semibold text-sm break-words">
                                 {espec.nomeUser}
                               </h3>
