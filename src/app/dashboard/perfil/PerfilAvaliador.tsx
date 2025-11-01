@@ -564,36 +564,6 @@ export default function PerfilAvaliador({
 
         formData.append("formacoes", JSON.stringify(formacoesData));
 
-        // ================================
-        // CERTIFICAÇÕES
-        // ================================
-        // ================================
-        // CERTIFICAÇÕES
-        // ================================
-        /* const certificacoesExistentes = form.lista_certificado
-          .filter((c) => c.certificacao_id > 0)
-          .map((c) => ({
-            certificacao_id: c.certificacao_id,
-            certificado: c.certificado,
-            certificado_file:
-              c.certificado_file instanceof File
-                ? c.certificado_file.name
-                : c.certificado_file || null,
-            // 🔥 removido: certificado_preview
-          })); */
-
-        /* const certificacoesNovas = form.lista_certificado
-          .filter((c) => c.certificacao_id < 0)
-          .map((c) => ({
-            certificacao_id: c.certificacao_id,
-            certificado: c.certificado,
-            certificado_file:
-              c.certificado_file instanceof File
-                ? c.certificado_file.name
-                : c.certificado_file || null,
-            // 🔥 removido: certificado_preview
-          })); */
-
         // Anexa os arquivos reais
         form.lista_certificado.forEach((c, index) => {
           if (c.certificado_file instanceof File) {
