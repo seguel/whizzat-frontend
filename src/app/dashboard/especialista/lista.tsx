@@ -6,66 +6,135 @@ import TopBar from "../../components/perfil/TopBar";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // App Router
+// import { useRouter } from "next/navigation"; // App Router
 import SemDados from "../SemDados";
+// import { useTranslation } from "react-i18next";
+import { toast } from "react-hot-toast";
+import { ImSpinner2 } from "react-icons/im";
 
 interface Props {
   perfil: ProfileType;
-  recrutadorId: string | null;
+  recrutadorId: number | null;
+  hasPerfilRecrutador: boolean;
 }
 
-interface EmpresaData {
+interface EspecialistaData {
   id: number;
   nome_empresa: string;
-  website?: string;
-  email?: string;
-  telefone?: string;
+  empresa_id: number;
+  nomeUser: string;
   localizacao?: string;
-  apresentacao?: string;
   logo?: string;
-  imagem_fundo?: string;
   ativo: boolean;
+  status_cadastro: number;
 }
 
-export default function EmpresaListar({ perfil, recrutadorId }: Props) {
-  const router = useRouter();
+export default function EmpresaListar({
+  perfil,
+  recrutadorId,
+  hasPerfilRecrutador,
+}: Props) {
+  // const { t, i18n } = useTranslation("common");
+  // const router = useRouter();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [empresas, setEmpresas] = useState<EmpresaData[]>([]);
+  const [especialistas, setEspecialistas] = useState<EspecialistaData[]>([]);
+  const [isSubmitConfirma, setIsSubmitConfirma] = useState(false);
+  const [isSubmitRejeita, setIsSubmitRejeita] = useState(false);
+
+  const colunas = [
+    { titulo: "Avaliadores Aguardando Confirmação", filtro: -1 },
+    { titulo: "Avaliadores Reprovados", filtro: 0 },
+    { titulo: "Avaliadores Aprovados", filtro: 1 },
+  ] as const;
+  // const lng = "pt"; //searchParams.get("lng");
 
   useEffect(() => {
-    /* if (!hasPerfilRecrutador) {
+    if (!hasPerfilRecrutador) {
       setIsLoading(false);
       return;
-    } */
+    }
 
     setIsLoading(true);
-    // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
-    const fetchEmpresas = async () => {
+    const fetchEspecialistas = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/empresas/recrutador/${recrutadorId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/avaliador/recrutador/${recrutadorId}`,
           {
             method: "GET",
             credentials: "include",
           }
         );
         const data = await res.json();
-
-        if (Array.isArray(data.empresas)) {
-          setEmpresas(data.empresas);
-        }
+        console.log(data);
+        setEspecialistas(data);
       } catch (error) {
-        console.error("Erro ao buscar empresas:", error);
+        console.error("Erro ao buscar especialistas:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchEmpresas();
-  }, [perfil]);
+    fetchEspecialistas();
+  }, [recrutadorId]);
+
+  const handleClickConfirmar = async (id: number, empresa_id: number) => {
+    try {
+      setIsSubmitConfirma(true);
+
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/avaliador/activate-form`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, empresa_id }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      toast.success(`Avaliador atualizado com sucesso!`, { duration: 3000 });
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (error) {
+      toast.error(`Problemas ao tentar executar a operação!`, {
+        duration: 3000,
+      });
+      setIsSubmitConfirma(false);
+    }
+  };
+
+  const handleClickRejeitar = async (id: number, empresa_id: number) => {
+    try {
+      setIsSubmitRejeita(true);
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/avaliador/reject-form`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, empresa_id }),
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      toast.success(`Avaliador atualizado com sucesso!`, { duration: 3000 });
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (error) {
+      toast.error(`Problemas ao tentar executar a operação!`, {
+        duration: 3000,
+      });
+      setIsSubmitRejeita(false);
+    }
+  };
 
   if (isLoading) return <LoadingOverlay />;
 
@@ -80,113 +149,158 @@ export default function EmpresaListar({ perfil, recrutadorId }: Props) {
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
         <main className="p-4 grid grid-cols-1 gap-4 w-[98%] mx-auto">
-          {!recrutadorId ? (
+          {!hasPerfilRecrutador ? (
             <SemDados tipo="perfil" perfil={perfil} />
           ) : (
-            empresas && (
-              <>
-                <div className="pt-1 px-1 flex justify-end w-full">
-                  {/* Botão cadastrar (direita) */}
-                  <button
-                    onClick={() =>
-                      router.push(
-                        `/dashboard/empresa/criar?perfil=${perfil}&op=N`
-                      )
-                    }
-                    className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
-                  >
-                    + Cadastrar Empresa
-                  </button>
-                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {colunas.map((coluna) => {
+                const especialistasFiltradas = especialistas.filter(
+                  (e) => e.status_cadastro === coluna.filtro
+                );
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {empresas.map((empresa) => (
-                    <div
-                      key={empresa.id}
-                      className={`bg-white rounded-lg shadow-md p-4 hover:shadow-lg cursor-pointer transition border-2 ${
-                        empresa.ativo ? "border-green-500" : "border-gray-400"
-                      }`}
-                      onClick={() =>
-                        router.push(
-                          `/dashboard/empresa/detalhe/${empresa.id}?perfil=${perfil}`
-                        )
-                      }
-                    >
-                      {/* Logo */}
-                      <div className="w-full flex justify-center mb-4">
-                        {empresa.logo ? (
-                          <Image
-                            src={empresa.logo}
-                            alt="Logo da empresa"
-                            width={64}
-                            height={64}
-                            className="w-16 h-16 object-contain"
-                            unoptimized
-                          />
-                        ) : (
-                          <div className="w-16 h-16 flex items-center justify-center bg-gray-100 text-gray-400 rounded-full text-xs text-center">
-                            Sem logo
+                return (
+                  <div key={coluna.filtro}>
+                    <h3 className="text-sm font-semibold text-purple-700 bg-purple-100 px-4 py-2 rounded-full inline-block mb-4">
+                      {coluna.titulo}
+                    </h3>
+
+                    <div className="flex flex-col gap-4">
+                      {especialistasFiltradas.length > 0 ? (
+                        especialistasFiltradas.map((espec) => (
+                          <div
+                            key={espec.id}
+                            className={`flex items-start gap-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md 
+                                ${
+                                  espec.ativo && espec.status_cadastro === 1
+                                    ? "border-green-400"
+                                    : !espec.ativo ||
+                                      espec.status_cadastro === 0
+                                    ? "border-gray-400"
+                                    : espec.status_cadastro === -1
+                                    ? "border-orange-400"
+                                    : ""
+                                }
+                              `}
+                          >
+                            {/* Logo */}
+                            <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                              {espec.logo ? (
+                                <Image
+                                  src={espec.logo}
+                                  alt={espec.nome_empresa}
+                                  width={56}
+                                  height={56}
+                                  className="w-full h-full object-cover"
+                                  unoptimized
+                                />
+                              ) : (
+                                <span className="text-[10px] text-gray-400 text-center px-2">
+                                  Sem logo
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Infos */}
+                            <div className="flex flex-col min-w-0">
+                              <h3 className="font-semibold text-sm break-words">
+                                {espec.nomeUser}
+                              </h3>
+                              <p className="text-xs text-gray-500 truncate">
+                                {espec.localizacao}
+                              </p>
+                              <p className="text-xs truncate">
+                                {espec.nome_empresa}
+                              </p>
+                              <div className="flex justify-between mt-3 gap-2">
+                                {espec.ativo && espec.status_cadastro === -1 ? (
+                                  <>
+                                    <button
+                                      type="button"
+                                      className="flex-1 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1 cursor-pointer"
+                                      onClick={() =>
+                                        handleClickConfirmar(
+                                          espec.id,
+                                          espec.empresa_id
+                                        )
+                                      }
+                                    >
+                                      {isSubmitConfirma ? (
+                                        <ImSpinner2 className="animate-spin text-lg" />
+                                      ) : (
+                                        "Aprovar"
+                                      )}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="flex-1 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 cursor-pointer"
+                                      onClick={() =>
+                                        handleClickRejeitar(
+                                          espec.id,
+                                          espec.empresa_id
+                                        )
+                                      }
+                                    >
+                                      {isSubmitRejeita ? (
+                                        <ImSpinner2 className="animate-spin text-lg" />
+                                      ) : (
+                                        "Reprovar"
+                                      )}
+                                    </button>
+                                  </>
+                                ) : espec.ativo &&
+                                  espec.status_cadastro === 0 ? (
+                                  <div className="flex justify-center w-full gap-2">
+                                    <button
+                                      type="button"
+                                      className="flex-1 max-w-[50%] flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1 cursor-pointer"
+                                      onClick={() =>
+                                        handleClickConfirmar(
+                                          espec.id,
+                                          espec.empresa_id
+                                        )
+                                      }
+                                    >
+                                      {isSubmitConfirma ? (
+                                        <ImSpinner2 className="animate-spin text-lg" />
+                                      ) : (
+                                        "Aprovar"
+                                      )}
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-center w-full gap-2">
+                                    <button
+                                      type="button"
+                                      className="flex-1 max-w-[50%] flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 cursor-pointer"
+                                      onClick={() =>
+                                        handleClickRejeitar(
+                                          espec.id,
+                                          espec.empresa_id
+                                        )
+                                      }
+                                    >
+                                      {isSubmitRejeita ? (
+                                        <ImSpinner2 className="animate-spin text-lg" />
+                                      ) : (
+                                        "Reprovar"
+                                      )}
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        )}
-                      </div>
-
-                      {/* Nome + dados */}
-                      <h3 className="text-md font-semibold text-center text-gray-800">
-                        {empresa.nome_empresa}
-                      </h3>
-                      <p className="text-sm text-center text-gray-500 mt-1">
-                        {empresa.email || "sem email"}
-                      </p>
-                      <p className="text-sm text-center text-gray-500">
-                        {empresa.telefone || "sem telefone"}
-                      </p>
-
-                      {/* Status apenas com texto colorido */}
-                      {empresa.ativo ? (
-                        <span className="flex items-center  justify-center gap-1">
-                          <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-3 w-3 text-white"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                          <span className="text-sm  text-green-600">Ativa</span>
-                        </span>
+                        ))
                       ) : (
-                        <span className="flex items-center justify-center gap-1">
-                          <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-3 w-3 text-white"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
-
-                          <span className="text-sm  text-gray-600">
-                            Inativa
-                          </span>
-                        </span>
+                        <p className="text-xs text-gray-400 italic">
+                          Nenhum especialista nesta categoria.
+                        </p>
                       )}
                     </div>
-                  ))}
-                </div>
-              </>
-            )
+                  </div>
+                );
+              })}
+            </div>
           )}
         </main>
       </div>
