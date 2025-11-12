@@ -8,7 +8,7 @@ import { ProfileType } from "../../../../components/perfil/ProfileContext";
 /* import { useAuthGuard } from "../../lib/hooks/useAuthGuard";*/
 import LoadingOverlay from "../../../../components/LoadingOverlay";
 // import { FaCloudUploadAlt } from "react-icons/fa";
-// import { ImSpinner2 } from "react-icons/im";
+import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -65,6 +65,7 @@ export default function EmpresaDetalhe({
   hasPerfilRecrutador,
 }: EmpresaDadosProps) {
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -103,12 +104,15 @@ export default function EmpresaDetalhe({
           empresasRes.json(),
           vagasRes.json(),
         ]);
-        // console.log(empresasData);
+        console.log(vagasData);
         setEmpresas(empresasData);
         setListVagas(vagasData);
         setHasVaga(vagasData.length > 0);
       } catch (error) {
-        console.error("Erro ao buscar dados da empresa:", error);
+        console.error(
+          t("tela_empresa_dados.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setIsLoading(false);
       }
@@ -140,7 +144,7 @@ export default function EmpresaDetalhe({
                   }}
                   className="px-4 py-2 text-sm rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                 >
-                  ← Voltar para lista de empresas
+                  {t("tela_empresa_dados.item_botao_lista_empresa")}
                 </button>
               </div>
 
@@ -154,7 +158,7 @@ export default function EmpresaDetalhe({
                   }
                   className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                 >
-                  + Cadastrar Empresa
+                  {t("tela_empresa_dados.item_botao_cadastrar")}
                 </button>
 
                 {perfil === "recrutador" && (
@@ -166,7 +170,7 @@ export default function EmpresaDetalhe({
                     }
                     className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                   >
-                    Editar Empresa
+                    {t("tela_empresa_dados.item_botao_editar")}
                   </button>
                 )}
               </div>
@@ -192,7 +196,7 @@ export default function EmpresaDetalhe({
                       className="w-full h-full object-cover"
                     /> */
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    Sem imagem de capa
+                    {t("tela_empresa_dados.item_msg_sem_capa")}
                   </div>
                 )}
 
@@ -214,7 +218,7 @@ export default function EmpresaDetalhe({
                         className="w-full h-full object-contain"
                       /> */
                     <div className="text-xs text-gray-400 text-center px-2">
-                      Sem logo
+                      {t("tela_empresa_dados.item_msg_sem_foto")}
                     </div>
                   )}
                 </div>
@@ -242,7 +246,9 @@ export default function EmpresaDetalhe({
                           />
                         </svg>
                       </div>
-                      <span className="text-sm text-green-600">Ativa</span>
+                      <span className="text-sm text-green-600">
+                        {t("tela_empresa_dados.item_ativo")}
+                      </span>
                     </span>
                   ) : (
                     <span className="flex items-center gap-1">
@@ -260,7 +266,9 @@ export default function EmpresaDetalhe({
                           />
                         </svg>
                       </div>
-                      <span className="text-sm text-gray-600">Inativa</span>
+                      <span className="text-sm text-gray-600">
+                        {t("tela_empresa_dados.item_inativo")}
+                      </span>
                     </span>
                   )}
 
@@ -364,7 +372,7 @@ export default function EmpresaDetalhe({
                   {/* Apresentação */}
                   <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-3">
                     {empresas?.apresentacao ||
-                      "Nenhuma apresentação fornecida."}
+                      t("tela_empresa_dados.item_msg_nenhuma_apresentacao")}
                   </div>
                 </div>
 
@@ -372,7 +380,7 @@ export default function EmpresaDetalhe({
                 <div className="flex flex-col items-start justify-start space-y-3">
                   <div className="flex flex-row w-full items-center justify-start gap-4">
                     <h3 className="text-lg font-semibold text-gray-800">
-                      Vagas
+                      {t("tela_empresa_dados.item_item_vagas")}
                     </h3>
                     <button
                       onClick={() =>
@@ -382,7 +390,7 @@ export default function EmpresaDetalhe({
                       }
                       className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                     >
-                      + Cadastrar Vaga
+                      {t("tela_empresa_dados.item_botao_vaga")}
                     </button>
                   </div>
 
@@ -425,7 +433,7 @@ export default function EmpresaDetalhe({
                                     </svg>
                                   </div>
                                   <span className="text-sm  text-green-600">
-                                    Ativa
+                                    {t("tela_empresa_dados.item_ativo")}
                                   </span>
                                 </span>
                               ) : (
@@ -446,13 +454,16 @@ export default function EmpresaDetalhe({
                                   </div>
 
                                   <span className="text-sm  text-gray-600">
-                                    Inativa
+                                    {t("tela_empresa_dados.item_inativo")}
                                   </span>
                                 </span>
                               )}
 
                               <p className="flex items-center justify-center text-xs px-2 py-1 rounded-lg bg-purple-100 mt-2 sm:mt-4 max-w-full">
-                                <strong>Aberta até: {job.prazo}</strong>
+                                <strong>
+                                  {t("tela_empresa_dados.item_item_periodo")}{" "}
+                                  {job.prazo}
+                                </strong>
                               </p>
                             </div>
                           </div>

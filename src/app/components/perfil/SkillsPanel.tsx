@@ -7,6 +7,8 @@ import {
   PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 
 type Skill = {
   nome?: string;
@@ -19,6 +21,23 @@ type SkillsPanelProps = {
 };
 
 export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
+  const { t, i18n } = useTranslation("common");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      const onInit = () => setReady(true);
+      i18n.on("initialized", onInit);
+      return () => {
+        i18n.off("initialized", onInit);
+      };
+    }
+  }, [i18n]);
+
+  if (!ready) return null;
+
   // Conversão dos dados para o gráfico
   const radarData = (skills ?? []).map((skill) => ({
     skill: skill.nome,
@@ -104,7 +123,7 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
             textAnchor="middle"
             className="text-[13px] fill-gray-500 font-semibold"
           >
-            Score Médio
+            {t("tela_vaga_dados.item_label_panel_score")}
           </text>
           <text x="60" y="78" textAnchor="middle" className={nmrScore}>
             {media}
@@ -115,7 +134,7 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
       {/* Radar Chart */}
       <div className="mt-4">
         <h3 className="text-sm font-semibold text-center mb-2">
-          Distribuição de skills
+          {t("tela_vaga_dados.item_label_panel_skill")}
         </h3>
         <ResponsiveContainer width="100%" height={240}>
           <RadarChart cx="50%" cy="50%" outerRadius="45%" data={radarData}>

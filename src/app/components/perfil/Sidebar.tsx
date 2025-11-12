@@ -5,7 +5,7 @@ import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ProfileType } from "./ProfileContext";
-import { getNavItems, NavItem } from "../../util/sidebarNav";
+import { useNavItems, NavItem } from "../../util/sidebarNav";
 import Image from "next/image";
 
 interface SidebarProps {
@@ -21,7 +21,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const navItems = getNavItems(profile);
+  const navItems = useNavItems(profile);
 
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
