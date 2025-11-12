@@ -22,6 +22,7 @@ import { toast } from "react-hot-toast";
 import CreatableSelect from "react-select/creatable";
 import TooltipIcon from "../../components/TooltipIcon";
 import SkillsPanel from "../../components/perfil/SkillsPanel";
+import { useTranslation } from "react-i18next";
 
 interface AvaliadorProps {
   perfil: ProfileType;
@@ -118,6 +119,7 @@ export default function PerfilAvaliador({
   nome_user,
 }: AvaliadorProps) {
   const router = useRouter();
+  const { t, i18n } = useTranslation("common");
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useLocalStorage<AvaliadorForm>(
@@ -235,7 +237,10 @@ export default function PerfilAvaliador({
             credentials: "include",
           }
         );
-        if (!res.ok) throw new Error("Erro ao buscar dados da avaliador");
+        if (!res.ok)
+          throw new Error(
+            t("tela_perfil_avaliador.item_alerta_erro_buscar_dados")
+          );
 
         const data = await res.json();
         // console.log(data);
@@ -265,7 +270,10 @@ export default function PerfilAvaliador({
 
         router.push(`/dashboard/perfil?perfil=${perfil}&id=${avaliadorId}`);
       } catch (error) {
-        console.error("Erro ao carregar avaliador:", error);
+        console.error(
+          t("tela_perfil_avaliador.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setLoadingAvaliador(false);
       }
@@ -340,7 +348,10 @@ export default function PerfilAvaliador({
         setGraduacoes(graduacoesData);
         setCertificacao(certificacaoData);
       } catch (error) {
-        console.error("Erro ao buscar dados:", error);
+        console.error(
+          t("tela_perfil_avaliador.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setLoadingAvaliador(false);
       }
@@ -358,7 +369,7 @@ export default function PerfilAvaliador({
     localStorage.removeItem(`avaliadorForm_${userId}`);
 
     // Feedback visual
-    toast.error("Alterações descartadas.", {
+    toast.error(t("tela_perfil_avaliador.item_alerta_descartada"), {
       duration: 3000, // 3 segundos
     });
 
@@ -378,7 +389,7 @@ export default function PerfilAvaliador({
 
       // 🔒 Verifica se o tipo MIME é de imagem
       if (!file.type.startsWith("image/")) {
-        toast.error("Envie apenas arquivos de imagem (JPG, PNG, SVG, etc.)", {
+        toast.error(t("tela_perfil_avaliador.item_alerta_erro_tipo_arq"), {
           duration: 5000,
         });
         return;
@@ -386,7 +397,7 @@ export default function PerfilAvaliador({
 
       // 🔒 Verifica tamanho
       if (file.size > maxSize) {
-        toast.error("O arquivo deve ter no máximo 1MB.", {
+        toast.error(t("tela_perfil_avaliador.item_alerta_erro_tamanho_arq"), {
           duration: 5000,
         });
         return;
@@ -604,6 +615,9 @@ export default function PerfilAvaliador({
           method: "POST",
           body: formData,
           credentials: "include",
+          headers: {
+            "Accept-Language": i18n.language,
+          },
         });
 
         const data = await response.json();
@@ -614,21 +628,23 @@ export default function PerfilAvaliador({
               ? data.message
               : Array.isArray(data.message)
               ? data.message.join(", ")
-              : "Erro ao salvar avaliador.";
+              : t("tela_perfil_avaliador.item_alerta_erro_salvar");
           throw new Error(errorMessage);
         }
 
         localStorage.removeItem(`avaliadorForm_${userId}`);
-        toast.success(`Avaliador publicado com sucesso!`, { duration: 5000 });
+        toast.success(t("tela_perfil_avaliador.item_alerta_sucesso"), {
+          duration: 5000,
+        });
         setIsSubmitting(false);
         router.push(`/dashboard?perfil=${perfil}`);
       } catch (err: unknown) {
-        console.error("Erro ao enviar dados:", err);
+        console.error(t("tela_perfil_avaliador.item_alerta_erro_salvar"), err);
 
         const message =
           err instanceof Error
             ? err.message
-            : "Erro ao enviar dados da avaliador. Tente novamente.";
+            : t("tela_perfil_avaliador.item_alerta_erro_salvar");
 
         toast.error(message, {
           duration: 5000,
@@ -719,7 +735,7 @@ export default function PerfilAvaliador({
 
     const maxSize = 2 * 1024 * 1024; // 2MB
     if (file.size > maxSize) {
-      alert("O arquivo deve ter no máximo 2MB.");
+      alert(t("tela_perfil_avaliador.item_alerta_erro_tamanho_arq2"));
       return;
     }
 
@@ -768,7 +784,7 @@ export default function PerfilAvaliador({
 
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert("O arquivo deve ter no máximo 2MB.");
+      alert(t("tela_perfil_avaliador.item_alerta_erro_tamanho_arq2"));
       return;
     }
 
@@ -793,7 +809,10 @@ export default function PerfilAvaliador({
     setCertificadoFiles((prev) => ({ ...prev, [id]: file }));
     setCertificadoPreviews((prev) => ({ ...prev, [id]: previewUrl }));
 
-    toast.success(`Certificado Atualizado!`, { duration: 2000 });
+    toast.success(
+      t("tela_perfil_avaliador.item_botao_certificado_atualizado"),
+      { duration: 2000 }
+    );
   };
 
   const handleRemoveFormacao = (id: string | number) => {
@@ -812,7 +831,7 @@ export default function PerfilAvaliador({
 
     const maxSize = 2 * 1024 * 1024; // 2MB
     if (file.size > maxSize) {
-      alert("O arquivo deve ter no máximo 2MB.");
+      alert(t("tela_perfil_avaliador.item_alerta_erro_tamanho_arq2"));
       return;
     }
 
@@ -871,7 +890,7 @@ export default function PerfilAvaliador({
 
     const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
-      alert("O arquivo deve ter no máximo 2MB.");
+      alert(t("tela_perfil_avaliador.item_alerta_erro_tamanho_arq2"));
       return;
     }
 
@@ -896,7 +915,10 @@ export default function PerfilAvaliador({
     setCertificacaoFiles((prev) => ({ ...prev, [id]: file }));
     setCertificacaoPreview((prev) => ({ ...prev, [id]: previewUrl }));
 
-    toast.success(`Certificado Atualizado!`, { duration: 2000 });
+    toast.success(
+      t("tela_perfil_avaliador.item_botao_certificado_atualizado"),
+      { duration: 2000 }
+    );
   };
 
   const handleRemoveCertificacao = (id: number) => {
@@ -918,21 +940,32 @@ export default function PerfilAvaliador({
         {
           method: "POST",
           credentials: "include",
+          headers: {
+            "Accept-Language": i18n.language,
+          },
         }
       );
 
       if (!res.ok) {
-        throw new Error("Erro ao reenviar solicitação");
+        throw new Error(
+          t("tela_perfil_avaliador.item_alerta_erro_reenviar_solicitacao")
+        );
       }
-      toast.success(`Solicitação reenviada com sucesso!`, {
+      toast.success(t("tela_perfil_avaliador.item_alerta_reenviar_sucesso"), {
         duration: 5000,
       });
       window.location.reload();
     } catch (error) {
-      toast.error(`Erro ao reenviar solicitação!`, {
-        duration: 5000,
-      });
-      console.error("Erro ao reenviar solicitação:", error);
+      toast.error(
+        t("tela_perfil_avaliador.item_alerta_erro_reenviar_solicitacao"),
+        {
+          duration: 5000,
+        }
+      );
+      console.error(
+        t("tela_perfil_avaliador.item_alerta_erro_reenviar_solicitacao"),
+        error
+      );
       setIsResending(false);
     }
   };
@@ -953,12 +986,12 @@ export default function PerfilAvaliador({
           <div className="pt-3 pl-6 flex items-center justify-center">
             <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
               {[
-                "1 Dados",
-                "2 Formação Academica",
-                "3 Certificação",
-                "4 Skills",
-                "5 Visualizar",
-                "6 Publicar",
+                `1 ${t("tela_topo_passos.passo_dados")}`,
+                `2 ${t("tela_topo_passos.passo_formacao")}`,
+                `3 ${t("tela_topo_passos.passo_certificacao")}`,
+                `4 ${t("tela_topo_passos.passo_skills")}`,
+                `5 ${t("tela_topo_passos.passo_visualizar")}`,
+                `6 ${t("tela_topo_passos.passo_publicar")}`,
               ].map((etapa, index) => (
                 <div
                   key={index}
@@ -1012,14 +1045,16 @@ export default function PerfilAvaliador({
                         <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
                       </div>
                       <span className="ml-3 text-sm font-normal text-gray-700">
-                        Ativo
+                        {t("tela_perfil_avaliador.item_ativo")}
                       </span>
                     </label>
 
                     {/* Direita: Situação Cadastro */}
                     <div className="text-sm text-right">
                       <span className="block font-medium text-gray-700">
-                        Situação do Cadastro:
+                        {t(
+                          "tela_perfil_avaliador.item_label_situacao_cadastro"
+                        )}
                       </span>
 
                       {(() => {
@@ -1044,10 +1079,14 @@ export default function PerfilAvaliador({
                                 {isResending ? (
                                   <span className="flex items-center gap-1">
                                     <ImSpinner2 className="animate-spin" />
-                                    Enviando ...
+                                    {t(
+                                      "tela_perfil_avaliador.item_label_enviando"
+                                    )}
                                   </span>
                                 ) : (
-                                  "Reenviar Solicitação"
+                                  t(
+                                    "tela_perfil_avaliador.item_botao_situacao_cadastro"
+                                  )
                                 )}
                               </button>
                             );
@@ -1066,10 +1105,16 @@ export default function PerfilAvaliador({
                             }`}
                           >
                             {form.status_cadastro === 1
-                              ? "Confirmado"
+                              ? t(
+                                  "tela_perfil_avaliador.item_msg_situacao_cadastro_confirmado"
+                                )
                               : form.status_cadastro === -1
-                              ? "Aguardando confirmação"
-                              : "Cadastro Rejeitado"}
+                              ? t(
+                                  "tela_perfil_avaliador.item_msg_situacao_cadastro_aguardando"
+                                )
+                              : t(
+                                  "tela_perfil_avaliador.item_msg_situacao_cadastro_rejeitado"
+                                )}
                           </span>
                         );
                       })()}
@@ -1079,12 +1124,14 @@ export default function PerfilAvaliador({
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Nome:
+                    {t("tela_perfil_avaliador.item_label_nome")}
                   </label>
                   <div className="flex items-center border border-blue-400 rounded px-3 py-2 bg-gray-100 cursor-not-allowed opacity-80">
                     <input
                       name="nome_user"
-                      placeholder="Nome"
+                      placeholder={t(
+                        "tela_perfil_avaliador.item_placeholder_nome"
+                      )}
                       className="w-full outline-none"
                       defaultValue={form.nome_user}
                       disabled={true}
@@ -1094,7 +1141,7 @@ export default function PerfilAvaliador({
 
                 <fieldset className="text-sm text-gray-700 mt-2">
                   <legend className="mb-1 font-medium">
-                    Você trabalha para uma empresa que está na Whizzat?
+                    {t("tela_perfil_avaliador.item_label_empresa_whizzat")}
                   </legend>
                   <div className="flex">
                     <label className="flex items-center gap-2 cursor-pointer mr-10">
@@ -1106,7 +1153,11 @@ export default function PerfilAvaliador({
                         onChange={handleChange}
                         className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
                       />
-                      <span>Sim</span>
+                      <span>
+                        {t(
+                          "tela_perfil_avaliador.item_msg_empresa_whizzat_sim"
+                        )}
+                      </span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -1117,14 +1168,18 @@ export default function PerfilAvaliador({
                         onChange={handleChange}
                         className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
                       />
-                      <span>Não</span>
+                      <span>
+                        {t(
+                          "tela_perfil_avaliador.item_msg_empresa_whizzat_nao"
+                        )}
+                      </span>
                     </label>
                   </div>
                 </fieldset>
 
                 {/* Empresa */}
                 <label className="flex flex-col text-sm text-gray-700 ">
-                  Empresa:
+                  {t("tela_perfil_avaliador.item_label_empresa")}
                   <select
                     className={`
                       border border-blue-600 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-300
@@ -1143,7 +1198,9 @@ export default function PerfilAvaliador({
                     onChange={handleEmpresaChange}
                     disabled={form.trabalha_empresa !== "SIM"}
                   >
-                    <option value="">Selecione a empresa</option>
+                    <option value="">
+                      {t("tela_perfil_avaliador.item_msg_empresa")}
+                    </option>
                     {empresas.map((empresa) => (
                       <option key={empresa.id} value={empresa.id}>
                         {empresa.nome_empresa}
@@ -1156,13 +1213,13 @@ export default function PerfilAvaliador({
                   !form.empresa_id &&
                   form.trabalha_empresa === "SIM" && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_perfil_avaliador.item_msg_campo_obt")}
                     </p>
                   )}
 
                 <fieldset className="text-sm text-gray-700 mt-2">
                   <legend className="mb-1 font-medium">
-                    Você deseja avaliar candidatos e vagas:
+                    {t("tela_perfil_avaliador.item_label_avaliar_vagas")}
                   </legend>
                   <div className="flex">
                     <label className="flex items-center gap-2 cursor-pointer mr-10">
@@ -1178,7 +1235,11 @@ export default function PerfilAvaliador({
                         onChange={handleChange}
                         className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
                       />
-                      <span>De qualquer empresa</span>
+                      <span>
+                        {t(
+                          "tela_perfil_avaliador.item_msg_avaliar_vagas_todas"
+                        )}
+                      </span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -1199,21 +1260,27 @@ export default function PerfilAvaliador({
                               : ""
                           }`}
                       />
-                      <span>Somente da minha empresa</span>
+                      <span>
+                        {t(
+                          "tela_perfil_avaliador.item_msg_avaliar_vagas_minha"
+                        )}
+                      </span>
                     </label>
                   </div>
                 </fieldset>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Telefone de contato:
+                    {t("tela_perfil_avaliador.item_label_telefone")}
                   </label>
                   <div className="flex items-center border border-blue-400 rounded px-3 py-2">
                     <span className="mr-2">🇧🇷</span>
                     <input
                       type="tel"
                       name="telefone"
-                      placeholder="Telefone"
+                      placeholder={t(
+                        "tela_perfil_avaliador.item_placeholder_telefone"
+                      )}
                       className="w-full outline-none"
                       defaultValue={avaliador?.telefone ?? form.telefone}
                       onChange={handleChange}
@@ -1221,33 +1288,35 @@ export default function PerfilAvaliador({
                   </div>
                   {showErrors && !form.telefone && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_perfil_avaliador.item_msg_campo_obt")}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Localização:
+                    {t("tela_perfil_avaliador.item_label_localizacao")}
                   </label>
                   <input
                     type="text"
                     name="localizacao"
-                    placeholder="Informe o seu local"
+                    placeholder={t(
+                      "tela_perfil_avaliador.item_placeholder_localizacao"
+                    )}
                     className="w-full border border-blue-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     value={form.localizacao}
                     onChange={handleChange}
                   />
                   {showErrors && !form.localizacao && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_perfil_avaliador.item_msg_campo_obt")}
                     </p>
                   )}
                 </div>
 
                 <fieldset className="text-sm text-gray-700 mt-2">
                   <legend className="mb-1 font-medium">
-                    Meio de Notificação:
+                    {t("tela_perfil_avaliador.item_label_notificacao")}
                   </legend>
                   <div className="flex">
                     <label className="flex items-center gap-2 cursor-pointer mr-10">
@@ -1275,24 +1344,23 @@ export default function PerfilAvaliador({
                   </div>
                   {showErrors && !form.meioNotificacao && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_perfil_avaliador.item_msg_campo_obt")}
                     </p>
                   )}
                 </fieldset>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Descreva, em algumas linhas, um pouco mais sobre você. Este
-                    texto será sua carta de apresentação para as empresas na
-                    plataforma.{" "}
+                    {t("tela_perfil_avaliador.item_label_descreva")}{" "}
                     <strong>
-                      (Caso você seja de uma única empresa, pode deixar em
-                      branco este campo)
+                      {t("tela_perfil_avaliador.item_label_descreva_negrito")}
                     </strong>
                   </label>
                   <textarea
                     name="apresentacao"
-                    placeholder="Apresente-se "
+                    placeholder={t(
+                      "tela_perfil_avaliador.item_placeholder_apresentacao"
+                    )}
                     className="w-full border border-blue-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     rows={6}
                     value={form.apresentacao || ""}
@@ -1307,8 +1375,7 @@ export default function PerfilAvaliador({
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Carregue uma foto, imagem, logo do avaliador (recomendado
-                    512×512 px, até 1MB).
+                    {t("tela_perfil_avaliador.item_label_foto")}
                   </label>
                   <label
                     className={`
@@ -1335,7 +1402,7 @@ export default function PerfilAvaliador({
                     )}
                     {!form.logoPreview && (
                       <span className="text-sm font-medium text-center sm:text-base">
-                        Clique aqui e carregue sua imagem
+                        {t("tela_perfil_avaliador.item_msg_foto")}
                       </span>
                     )}
                     <input
@@ -1348,7 +1415,7 @@ export default function PerfilAvaliador({
                   </label>
                   {showErrors && !logoFile && (
                     <p className="text-sm text-red-600 mt-1">
-                      Logo obrigatória.
+                      {t("tela_perfil_avaliador.item_msg_logo_obt")}
                     </p>
                   )}
                 </div>
@@ -1359,13 +1426,13 @@ export default function PerfilAvaliador({
                     onClick={handleCancel}
                     className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
                   >
-                    Cancelar
+                    {t("tela_perfil_avaliador.item_botao_cancelar")}
                   </button>
                   <button
                     type="submit"
                     className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
                   >
-                    Avançar
+                    {t("tela_perfil_avaliador.item_botao_avancar")}
                   </button>
                 </div>
               </form>
@@ -1376,7 +1443,7 @@ export default function PerfilAvaliador({
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1">
                   <div>
                     <h1 className="block text-sm mb-1 py-3 font-bold">
-                      Informe as suas formações acadêmicas
+                      {t("tela_perfil_avaliador.item_label_informe_formacao")}
                     </h1>
 
                     {/* Linha de adição de formação */}
@@ -1384,7 +1451,7 @@ export default function PerfilAvaliador({
                       {/* Graduação */}
                       <div className="flex flex-col w-full sm:w-1/4">
                         <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                          Graduação:
+                          {t("tela_perfil_avaliador.item_label_graduacao")}
                         </label>
                         <select
                           className="border border-blue-400 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-300"
@@ -1392,7 +1459,9 @@ export default function PerfilAvaliador({
                           value={selectedGraduacao?.value || ""}
                           onChange={handleGraduacaoChange}
                         >
-                          <option value="">Selecione a graduação</option>
+                          <option value="">
+                            {t("tela_perfil_avaliador.item_msg_graduacao")}
+                          </option>
                           {graduacoes.map((grad) => (
                             <option key={grad.id} value={grad.id}>
                               {grad.graduacao}
@@ -1404,12 +1473,14 @@ export default function PerfilAvaliador({
                       {/* Formação */}
                       <div className="flex flex-col w-full sm:w-2/4">
                         <label className="text-xs sm:text-sm font-medium mb-1 flex items-center gap-1">
-                          Formação:
+                          {t("tela_perfil_avaliador.item_label_formacao")}
                         </label>
                         <input
                           type="text"
                           name="formacao"
-                          placeholder="Digite sua formação"
+                          placeholder={t(
+                            "tela_perfil_avaliador.item_msg_formacao"
+                          )}
                           className="w-full border border-blue-400 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-blue-300"
                           value={formacaoInput}
                           onChange={(e) => setFormacaoInput(e.target.value)}
@@ -1419,7 +1490,7 @@ export default function PerfilAvaliador({
                       {/* Upload certificado estilizado */}
                       <div className="flex flex-col w-full sm:w-1/4">
                         <label className="text-xs sm:text-sm font-medium mb-1">
-                          Certificado (JPG, PNG ou PDF)
+                          {t("tela_perfil_avaliador.item_label_certificado")}
                         </label>
                         {/* Input real (oculto) */}
                         <input
@@ -1442,7 +1513,7 @@ export default function PerfilAvaliador({
                           <span className="truncate">
                             {novoCertificadoFile
                               ? novoCertificadoFile.name // mostra o nome real do arquivo
-                              : "Selecione o arquivo"}
+                              : t("tela_perfil_avaliador.item_msg_certificado")}
                           </span>
                         </label>
                       </div>
@@ -1452,9 +1523,9 @@ export default function PerfilAvaliador({
                         <button
                           type="button"
                           onClick={handleAddFormacao}
-                          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
+                          className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
                         >
-                          + Adicionar
+                          {t("tela_perfil_avaliador.item_botao_adicionar")}
                         </button>
                       </div>
                     </div>
@@ -1464,7 +1535,7 @@ export default function PerfilAvaliador({
                         !formacaoInput ||
                         !novoCertificadoFile) && (
                         <p className="text-sm text-red-600 mt-1">
-                          Campo obrigatório.
+                          {t("tela_perfil_avaliador.item_msg_campo_obt")}
                         </p>
                       )}
                   </div>
@@ -1487,7 +1558,9 @@ export default function PerfilAvaliador({
                               <div className="flex items-center gap-2 text-sm min-w-[200px] font-bold">
                                 <span>
                                   {graduacaoObj?.graduacao ??
-                                    "Graduação não encontrada"}
+                                    t(
+                                      "tela_perfil_avaliador.item_msg_nenhuma_graduacao"
+                                    )}
                                 </span>
                               </div>
 
@@ -1509,7 +1582,9 @@ export default function PerfilAvaliador({
                                       )
                                     }
                                     className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
-                                    title="Visualizar certificado"
+                                    title={t(
+                                      "tela_perfil_avaliador.item_botao_visualizar"
+                                    )}
                                   >
                                     <FileText size={20} />
                                   </button>
@@ -1519,7 +1594,9 @@ export default function PerfilAvaliador({
                                 <label
                                   htmlFor={`certificado-${item.id}`}
                                   className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
-                                  title="Substituir certificado"
+                                  title={t(
+                                    "tela_perfil_avaliador.item_botao_substituir"
+                                  )}
                                 >
                                   <Upload size={20} />
                                 </label>
@@ -1540,7 +1617,9 @@ export default function PerfilAvaliador({
                           <button
                             onClick={() => handleRemoveFormacao(item.id)}
                             className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 self-end sm:self-auto cursor-pointer"
-                            title="Remover Formação"
+                            title={t(
+                              "tela_perfil_avaliador.item_botao_remover_formacao"
+                            )}
                           >
                             <X size={18} />
                           </button>
@@ -1557,7 +1636,7 @@ export default function PerfilAvaliador({
                         type="button"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
                       >
-                        Voltar
+                        {t("tela_perfil_avaliador.item_botao_voltar")}
                       </button>
                     </div>
 
@@ -1567,13 +1646,13 @@ export default function PerfilAvaliador({
                         onClick={handleCancel}
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
                       >
-                        Cancelar
+                        {t("tela_perfil_avaliador.item_botao_cancelar")}
                       </button>
                       <button
                         type="submit"
                         className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
                       >
-                        Avançar
+                        {t("tela_perfil_avaliador.item_botao_avancar")}
                       </button>
                     </div>
                   </div>
@@ -1586,8 +1665,10 @@ export default function PerfilAvaliador({
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1">
                   <div>
                     <h1 className="block text-sm mb-1 py-3 font-bold">
-                      Informe as suas certificações
-                      <p className="block text-[11x] font-light">(mínimo 1)</p>
+                      {t(
+                        "tela_perfil_avaliador.item_label_informe_certificacao"
+                      )}
+                      {/* <p className="block text-[11x] font-light">(mínimo 1)</p> */}
                     </h1>
 
                     <div className="w-full">
@@ -1595,15 +1676,25 @@ export default function PerfilAvaliador({
                         {/* Campo de certificação - largo */}
                         <div className="flex flex-col w-full">
                           <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                            Certificações:
+                            {t("tela_perfil_avaliador.item_label_certificacao")}
                             <TooltipIcon
-                              message={`Como adicionar certificação que não está na lista:\n1. Digite a certificação desejada;\n2. Selecione 'Criar nova certificação';\n3. Clique no botão Adicionar.`}
+                              message={`${t(
+                                "tela_perfil_avaliador.item_tooltip_certificacao_titulo"
+                              )}\n${t(
+                                "tela_perfil_avaliador.item_tooltip_certificacao_passo1"
+                              )}\n${t(
+                                "tela_perfil_avaliador.item_tooltip_certificacao_passo2"
+                              )}\n${t(
+                                "tela_perfil_avaliador.item_tooltip_certificacao_passo3"
+                              )}`}
                               perfil={perfil}
                             />
                           </label>
                           <CreatableSelect
                             isClearable
-                            placeholder="Digite ou selecione"
+                            placeholder={t(
+                              "tela_perfil_avaliador.item_msg_certificacao"
+                            )}
                             value={selectedCertificacao}
                             onChange={(newValue) =>
                               setSelectedCertificacao(newValue)
@@ -1613,7 +1704,9 @@ export default function PerfilAvaliador({
                               label: cert.certificado,
                             }))}
                             formatCreateLabel={(inputValue) =>
-                              `Criar nova certificação: "${inputValue}"`
+                              `${t(
+                                "tela_perfil_avaliador.item_msg_criar_certificacao"
+                              )} ${inputValue}`
                             }
                           />
                         </div>
@@ -1621,7 +1714,7 @@ export default function PerfilAvaliador({
                         {/* Upload - médio */}
                         <div className="flex flex-col w-full">
                           <label className="text-xs sm:text-sm font-medium mb-1">
-                            Certificado (JPG, PNG ou PDF)
+                            {t("tela_perfil_avaliador.item_label_certificado")}
                           </label>
                           <input
                             type="file"
@@ -1641,7 +1734,9 @@ export default function PerfilAvaliador({
                             <span className="truncate">
                               {novoCertificacaoFile
                                 ? novoCertificacaoFile.name
-                                : "Selecionar"}
+                                : t(
+                                    "tela_perfil_avaliador.item_msg_certificado"
+                                  )}
                             </span>
                           </label>
                         </div>
@@ -1654,9 +1749,9 @@ export default function PerfilAvaliador({
                           <button
                             type="button"
                             onClick={handleAddCertificacao}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition whitespace-nowrap w-full md:w-auto cursor-pointer"
+                            className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
                           >
-                            + Adicionar
+                            {t("tela_perfil_avaliador.item_botao_adicionar")}
                           </button>
                         </div>
                       </div>
@@ -1666,7 +1761,7 @@ export default function PerfilAvaliador({
                       (form.lista_certificado.length <= 0 ||
                         !novoCertificacaoFile) && (
                         <p className="text-sm text-red-600 mt-1">
-                          Campo obrigatório.
+                          {t("tela_perfil_avaliador.item_msg_campo_obt")}
                         </p>
                       )}
                   </div>
@@ -1704,7 +1799,9 @@ export default function PerfilAvaliador({
                                       )
                                     }
                                     className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
-                                    title="Visualizar certificado"
+                                    title={t(
+                                      "tela_perfil_avaliador.item_botao_visualizar"
+                                    )}
                                   >
                                     <FileText size={20} />
                                   </button>
@@ -1714,7 +1811,9 @@ export default function PerfilAvaliador({
                                 <label
                                   htmlFor={`certificado-${item.certificacao_id}`}
                                   className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
-                                  title="Substituir certificado"
+                                  title={t(
+                                    "tela_perfil_avaliador.item_botao_substituir"
+                                  )}
                                 >
                                   <Upload size={20} />
                                 </label>
@@ -1739,7 +1838,9 @@ export default function PerfilAvaliador({
                               handleRemoveCertificacao(item.certificacao_id)
                             }
                             className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 cursor-pointer"
-                            title="Remover certificação"
+                            title={t(
+                              "tela_perfil_avaliador.item_botao_remover_certificacao"
+                            )}
                           >
                             <X size={18} />
                           </button>
@@ -1756,7 +1857,7 @@ export default function PerfilAvaliador({
                         type="button"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
                       >
-                        Voltar
+                        {t("tela_perfil_avaliador.item_botao_voltar")}
                       </button>
                     </div>
 
@@ -1767,13 +1868,13 @@ export default function PerfilAvaliador({
                         onClick={handleCancel}
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
                       >
-                        Cancelar
+                        {t("tela_perfil_avaliador.item_botao_cancelar")}
                       </button>
                       <button
                         type="submit"
                         className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
                       >
-                        Avançar
+                        {t("tela_perfil_avaliador.item_botao_avancar")}
                       </button>
                     </div>
                   </div>
@@ -1786,16 +1887,24 @@ export default function PerfilAvaliador({
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1">
                   <div>
                     <h1 className="block text-sm mb-1 py-3 font-bold">
-                      Informe as Skills que você deseja atuar como avaliador
+                      {t("tela_perfil_avaliador.item_label_informe_skills")}
                       <p className="block text-[11x] font-light">
-                        (mínimo 3 e no máximo 12)
+                        {t("tela_perfil_avaliador.item_label_informe_qtde")}
                       </p>
                     </h1>
 
                     <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                      Skills:
+                      {t("tela_perfil_avaliador.item_label_skill")}
                       <TooltipIcon
-                        message={`Como adicionar skill que não está na lista:\n1. Digite a skill desejada;\n2. Selecione 'Criar nova skill';\n3. Clique no botão Adicionar.`}
+                        message={`${t(
+                          "tela_perfil_avaliador.item_tooltip_skill_titulo"
+                        )}\n${t(
+                          "tela_perfil_avaliador.item_tooltip_skill_passo1"
+                        )}\n${t(
+                          "tela_perfil_avaliador.item_tooltip_skill_passo2"
+                        )}\n${t(
+                          "tela_perfil_avaliador.item_tooltip_skill_passo3"
+                        )}`}
                         perfil={perfil}
                       />
                     </label>
@@ -1804,7 +1913,9 @@ export default function PerfilAvaliador({
                       <div className="flex-1">
                         <CreatableSelect
                           isClearable
-                          placeholder="Digite ou selecione uma skill"
+                          placeholder={t(
+                            "tela_perfil_avaliador.item_msg_skill"
+                          )}
                           value={selectedSkill}
                           onChange={(newValue) => setSelectedSkill(newValue)}
                           options={skills.map((skill) => ({
@@ -1812,7 +1923,9 @@ export default function PerfilAvaliador({
                             label: skill.skill,
                           }))}
                           formatCreateLabel={(inputValue) =>
-                            `Criar nova skill: "${inputValue}"`
+                            `${t(
+                              "tela_perfil_avaliador.item_msg_criar_skill"
+                            )} ${inputValue}`
                           }
                           isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
                         />
@@ -1823,13 +1936,13 @@ export default function PerfilAvaliador({
                         onClick={handleAddSkill}
                         className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
                       >
-                        + Adicionar
+                        {t("tela_perfil_avaliador.item_botao_adicionar")}
                       </button>
                     </div>
 
                     {showErrors && form.lista_skills.length <= 0 && (
                       <p className="text-sm text-red-600 mt-1">
-                        Campo obrigatório.
+                        {t("tela_perfil_avaliador.item_msg_campo_obt")}
                       </p>
                     )}
                   </div>
@@ -1855,7 +1968,7 @@ export default function PerfilAvaliador({
                               {/* Peso com slider */}
                               <div className="flex items-center gap-2 text-sm min-w-[200px]">
                                 <label className="font-medium whitespace-nowrap">
-                                  Peso:
+                                  {t("tela_perfil_avaliador.item_label_peso")}
                                 </label>
                                 <input
                                   type="range"
@@ -1893,7 +2006,9 @@ export default function PerfilAvaliador({
                               <div className="flex items-center gap-4 text-sm min-w-[260px]">
                                 <div className="flex items-center gap-1">
                                   <label className="font-medium whitespace-nowrap">
-                                    Favorito:
+                                    {t(
+                                      "tela_perfil_avaliador.item_label_favorito"
+                                    )}
                                   </label>
                                 </div>
 
@@ -1929,7 +2044,13 @@ export default function PerfilAvaliador({
                                   }
                                 >
                                   <TooltipIcon
-                                    message={`- Pode ser selecionado até 5 favoritos.\n- Os Skills favoritos serão assumidos\n como preferenciais para avaliações de candidatos.`}
+                                    message={`${t(
+                                      "tela_perfil_avaliador.item_tooltip_favorite_passo1"
+                                    )}\n${t(
+                                      "tela_perfil_avaliador.item_tooltip_favorite_passo2"
+                                    )}\n${t(
+                                      "tela_perfil_avaliador.item_tooltip_favorite_passo2_1"
+                                    )}`}
                                     perfil={perfil}
                                   >
                                     <Star
@@ -1945,7 +2066,9 @@ export default function PerfilAvaliador({
                                 {/* Tempo da skill */}
                                 <input
                                   type="text"
-                                  placeholder="Tempo skill"
+                                  placeholder={t(
+                                    "tela_perfil_avaliador.item_placeholder_favorito"
+                                  )}
                                   className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
                                   value={item.tempo_favorito}
                                   onChange={(e) =>
@@ -1963,7 +2086,9 @@ export default function PerfilAvaliador({
                           <button
                             onClick={() => handleRemoveSkill(item.skill_id)}
                             className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
-                            title="Remover skill"
+                            title={t(
+                              "tela_perfil_avaliador.item_botao_remover_skill"
+                            )}
                           >
                             <X size={18} />
                           </button>
@@ -1980,7 +2105,7 @@ export default function PerfilAvaliador({
                         type="button"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
                       >
-                        Voltar
+                        {t("tela_perfil_avaliador.item_botao_voltar")}
                       </button>
                     </div>
 
@@ -1991,7 +2116,7 @@ export default function PerfilAvaliador({
                         onClick={handleCancel}
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
                       >
-                        Cancelar
+                        {t("tela_perfil_avaliador.item_botao_cancelar")}
                       </button>
                       <button
                         type="submit"
@@ -2003,7 +2128,7 @@ export default function PerfilAvaliador({
                           : "bg-blue-100 hover:bg-blue-200 cursor-pointer"
                       }`}
                       >
-                        Avançar
+                        {t("tela_perfil_avaliador.item_botao_avancar")}
                       </button>
                     </div>
                   </div>
@@ -2038,7 +2163,7 @@ export default function PerfilAvaliador({
                               />
                             ) : (
                               <div className="text-xs text-gray-400 flex items-center justify-center h-full">
-                                Sem logo
+                                {t("tela_perfil_avaliador.item_msg_sem_foto")}
                               </div>
                             )}
                           </div>
@@ -2063,7 +2188,7 @@ export default function PerfilAvaliador({
                                   </svg>
                                 </div>
                                 <span className="text-sm text-green-600">
-                                  Ativo
+                                  {t("tela_perfil_avaliador.item_ativo")}
                                 </span>
                               </span>
                             ) : (
@@ -2083,7 +2208,7 @@ export default function PerfilAvaliador({
                                   </svg>
                                 </div>
                                 <span className="text-sm text-gray-600">
-                                  Inativo
+                                  {t("tela_perfil_avaliador.item_inativo")}
                                 </span>
                               </span>
                             )}
@@ -2101,7 +2226,10 @@ export default function PerfilAvaliador({
                                     (e) =>
                                       e.id.toString() ===
                                       form.empresa_id.toString()
-                                  )?.nome_empresa ?? "Sem empresa"}
+                                  )?.nome_empresa ??
+                                    t(
+                                      "tela_perfil_avaliador.item_msg_sem_empresa"
+                                    )}
                                 </p>
                               </div>
 
@@ -2111,8 +2239,12 @@ export default function PerfilAvaliador({
 
                                 <p className="text-sm text-gray-500 ">
                                   {form.avaliar_todos == "1"
-                                    ? "Avaliar todos"
-                                    : "Avaliar somente da minha empresa"}
+                                    ? t(
+                                        "tela_perfil_avaliador.item_msg_avaliar_todas"
+                                      )
+                                    : t(
+                                        "tela_perfil_avaliador.item_msg_avaliar_minha"
+                                      )}
                                 </p>
                               </div>
 
@@ -2186,11 +2318,17 @@ export default function PerfilAvaliador({
                         {/* Apresentação */}
                         <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-5">
                           {form.apresentacao ||
-                            "Nenhuma apresentação fornecida."}
+                            t(
+                              "tela_perfil_avaliador.item_msg_nenhuma_apresentacao"
+                            )}
                         </div>
                         <div className="flex flex-row w-[95%] mt-5">
                           <div className="w-1/2 rounded-xl p-1 shadow-sm">
-                            <p className="ml-1">Formações:</p>
+                            <p className="ml-1">
+                              {t(
+                                "tela_perfil_avaliador.item_label_lista_formacao"
+                              )}
+                            </p>
                             {Array.isArray(form.lista_formacao) &&
                             form.lista_formacao.length > 0 ? (
                               form.lista_formacao.map((item) => {
@@ -2205,12 +2343,18 @@ export default function PerfilAvaliador({
                               })
                             ) : (
                               <p className="text-sm text-gray-500 font-bold mt-3 text-center">
-                                Nenhuma formação cadastrada
+                                {t(
+                                  "tela_perfil_avaliador.item_msg_nenhuma_formacao"
+                                )}
                               </p>
                             )}
                           </div>
                           <div className="ml-2 w-1/2 rounded-xl p-1 shadow-sm">
-                            <p className="ml-1">Certificações:</p>
+                            <p className="ml-1">
+                              {t(
+                                "tela_perfil_avaliador.item_label_lista_certificacao"
+                              )}
+                            </p>
                             {Array.isArray(form.lista_certificado) &&
                             form.lista_certificado.length > 0 ? (
                               form.lista_certificado.map((item) => {
@@ -2225,7 +2369,9 @@ export default function PerfilAvaliador({
                               })
                             ) : (
                               <p className="text-sm text-gray-500 font-bold mt-3 text-center">
-                                Nenhuma certificação cadastrada
+                                {t(
+                                  "tela_perfil_avaliador.item_msg_nenhuma_certificacao"
+                                )}
                               </p>
                             )}
                           </div>
@@ -2248,7 +2394,7 @@ export default function PerfilAvaliador({
                       type="button"
                       className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
                     >
-                      Voltar
+                      {t("tela_perfil_avaliador.item_botao_voltar")}
                     </button>
                   </div>
 
@@ -2259,7 +2405,7 @@ export default function PerfilAvaliador({
                       onClick={handleCancel}
                       className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
                     >
-                      Cancelar
+                      {t("tela_perfil_avaliador.item_botao_cancelar")}
                     </button>
                     <button
                       type="submit"
@@ -2272,7 +2418,7 @@ export default function PerfilAvaliador({
                       {isSubmitting ? (
                         <ImSpinner2 className="animate-spin" />
                       ) : (
-                        "Publicar"
+                        t("tela_perfil_avaliador.item_botao_publicar")
                       )}
                     </button>
                   </div>

@@ -11,6 +11,7 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface EmpresaDadosProps {
   perfil: ProfileType;
@@ -59,6 +60,7 @@ export default function EmpresaCriar({
   recrutadorId,
 }: EmpresaDadosProps) {
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useLocalStorage<EmpresaForm>(
@@ -86,7 +88,7 @@ export default function EmpresaCriar({
     localStorage.removeItem(`empresaForm_${userId}`);
 
     // Feedback visual
-    toast.error("Alterações descartadas.", {
+    toast.error(t("tela_empresa_dados.item_alerta_descartada"), {
       duration: 3000, // 3 segundos
     });
 
@@ -106,7 +108,7 @@ export default function EmpresaCriar({
 
       // 🔒 Verifica se o tipo MIME é de imagem
       if (!file.type.startsWith("image/")) {
-        toast.error("Envie apenas arquivos de imagem (JPG, PNG, SVG, etc.)", {
+        toast.error(t("tela_empresa_dados.item_alerta_erro_tipo_arq"), {
           duration: 5000,
         });
         return;
@@ -114,7 +116,7 @@ export default function EmpresaCriar({
 
       // 🔒 Verifica tamanho
       if (file.size > maxSize) {
-        toast.error("O arquivo deve ter no máximo 1MB.", {
+        toast.error(t("tela_empresa_dados.item_alerta_erro_tamanho_arq"), {
           duration: 5000,
         });
         return;
@@ -226,23 +228,28 @@ export default function EmpresaCriar({
               ? data.message
               : Array.isArray(data.message)
               ? data.message.join(", ")
-              : "Erro ao salvar empresa.";
+              : t("tela_empresa_dados.item_alerta_erro_salvar");
           throw new Error(errorMessage);
         }
 
         localStorage.removeItem(`empresaForm_${userId}`);
-        toast.success(`Empresa "${data.nome_empresa}" publicada com sucesso!`, {
-          duration: 5000,
-        });
+        toast.success(
+          `${t("tela_empresa_dados.item_alerta_sucesso_1")} ${
+            data.nome_empresa
+          } ${t("tela_empresa_dados.item_alerta_sucesso_2")}`,
+          {
+            duration: 5000,
+          }
+        );
         setIsSubmitting(false);
         router.push(`/dashboard/empresa/detalhe/${data.id}?perfil=${perfil}`);
       } catch (err: unknown) {
-        console.error("Erro ao enviar dados:", err);
+        console.error(t("tela_empresa_dados.item_alerta_erro_salvar"), err);
 
         const message =
           err instanceof Error
             ? err.message
-            : "Erro ao enviar dados da empresa. Tente novamente.";
+            : t("tela_empresa_dados.item_alerta_erro_salvar");
 
         toast.error(message, {
           duration: 5000,
@@ -271,11 +278,11 @@ export default function EmpresaCriar({
           <div className="pt-3 pl-6 flex items-center justify-center">
             <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
               {[
-                "1 Dados",
-                "2 Localização",
-                "3 Apresentação",
-                "4 Visualizar",
-                "5 Publicar",
+                `1 ${t("tela_topo_passos.passo_dados")}`,
+                `2 ${t("tela_topo_passos.passo_localizacao")}`,
+                `3 ${t("tela_topo_passos.passo_apresentacao")}`,
+                `4 ${t("tela_topo_passos.passo_visualizar")}`,
+                `5 ${t("tela_topo_passos.passo_publicar")}`,
               ].map((etapa, index) => (
                 <div
                   key={index}
@@ -315,71 +322,73 @@ export default function EmpresaCriar({
               >
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Nome da empresa:
+                    {t("tela_empresa_dados.item_label_nome")}
                   </label>
                   <input
                     type="text"
                     name="nome"
-                    placeholder="Empresa"
+                    placeholder={t("tela_empresa_dados.item_placeholder_nome")}
                     className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                     defaultValue={form.nome}
                     onChange={handleChange}
                   />
                   {showErrors && !form.nome && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_empresa_dados.item_msg_campo_obt")}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Website da empresa:
+                    {t("tela_empresa_dados.item_label_site")}
                   </label>
                   <input
                     type="url"
                     name="site"
-                    placeholder="Website"
+                    placeholder={t("tela_empresa_dados.item_placeholder_site")}
                     className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                     defaultValue={form.site}
                     onChange={handleChange}
                   />
                   {showErrors && !form.site && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_empresa_dados.item_msg_campo_obt")}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Email de contato:
+                    {t("tela_empresa_dados.item_label_email")}
                   </label>
                   <input
                     type="email"
                     name="email"
-                    placeholder="Email"
+                    placeholder={t("tela_empresa_dados.item_placeholder_email")}
                     className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                     defaultValue={form.email}
                     onChange={handleChange}
                   />
                   {showErrors && !form.email && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_empresa_dados.item_msg_campo_obt")}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Telefone de contato:
+                    {t("tela_empresa_dados.item_label_telefone")}
                   </label>
                   <div className="flex items-center border border-purple-400 rounded px-3 py-2">
                     <span className="mr-2">🇧🇷</span>
                     <input
                       type="tel"
                       name="telefone"
-                      placeholder="Telefone"
+                      placeholder={t(
+                        "tela_empresa_dados.item_placeholder_telefone"
+                      )}
                       className="w-full outline-none"
                       defaultValue={form.telefone}
                       onChange={handleChange}
@@ -387,15 +396,14 @@ export default function EmpresaCriar({
                   </div>
                   {showErrors && !form.telefone && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_empresa_dados.item_msg_campo_obt")}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Carregue o logotipo da sua empresa (recomendado 512×512 px,
-                    até 1MB).
+                    {t("tela_empresa_dados.item_label_foto")}
                   </label>
                   <label
                     className={`
@@ -422,7 +430,7 @@ export default function EmpresaCriar({
                     )}
                     {!form.logoPreview && (
                       <span className="text-sm font-medium text-center sm:text-base">
-                        Clique aqui e carregue sua imagem
+                        {t("tela_empresa_dados.item_msg_foto")}
                       </span>
                     )}
                     <input
@@ -435,7 +443,7 @@ export default function EmpresaCriar({
                   </label>
                   {showErrors && !logoFile && (
                     <p className="text-sm text-red-600 mt-1">
-                      Logo obrigatória.
+                      {t("tela_empresa_dados.item_msg_logo_obt")}
                     </p>
                   )}
                 </div>
@@ -446,13 +454,13 @@ export default function EmpresaCriar({
                     onClick={handleCancel}
                     className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                   >
-                    Cancelar
+                    {t("tela_empresa_dados.item_botao_cancelar")}
                   </button>
                   <button
                     type="submit"
                     className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                   >
-                    Avançar
+                    {t("tela_empresa_dados.item_botao_avancar")}
                   </button>
                 </div>
               </form>
@@ -463,23 +471,24 @@ export default function EmpresaCriar({
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1">
                   <div className="flex-1">
                     <h1 className="block text-sm mb-1 py-3 font-bold">
-                      Informe sua localização para encontrar os melhores
-                      candidatos
+                      {t("tela_empresa_dados.item_label_titulo_localizacao")}
                     </h1>
                     <label className="block text-sm font-medium mb-1">
-                      Localização:
+                      {t("tela_empresa_dados.item_label_localizacao")}
                     </label>
                     <input
                       type="text"
                       name="localizacao"
-                      placeholder="Informe o local de sua empresa"
+                      placeholder={t(
+                        "tela_empresa_dados.item_placeholder_localizacao"
+                      )}
                       className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                       value={form.localizacao}
                       onChange={handleChange}
                     />
                     {showErrors && !form.localizacao && (
                       <p className="text-sm text-red-600 mt-1">
-                        Campo obrigatório.
+                        {t("tela_empresa_dados.item_msg_campo_obt")}
                       </p>
                     )}
                   </div>
@@ -492,7 +501,7 @@ export default function EmpresaCriar({
                         type="button"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                       >
-                        Voltar
+                        {t("tela_empresa_dados.item_botao_voltar")}
                       </button>
                     </div>
 
@@ -503,13 +512,13 @@ export default function EmpresaCriar({
                         onClick={handleCancel}
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                       >
-                        Cancelar
+                        {t("tela_empresa_dados.item_botao_cancelar")}
                       </button>
                       <button
                         type="submit"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                       >
-                        Avançar
+                        {t("tela_empresa_dados.item_botao_avancar")}
                       </button>
                     </div>
                   </div>
@@ -522,17 +531,16 @@ export default function EmpresaCriar({
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1">
                   <div className="flex-1">
                     <h1 className="block text-sm  mb-1 py-3 font-bold">
-                      Apresentação da empresa
+                      {t("tela_empresa_dados.item_label_titulo_descreva")}
                     </h1>
                     <label className="block text-sm font-medium mb-1">
-                      Descreva, em algumas linhas, quem é sua empresa e o que
-                      ela busca profissionalmente. Este texto será sua carta de
-                      apresentação para candidatos e especialistas na
-                      plataforma.
+                      {t("tela_empresa_dados.item_label_descreva")}
                     </label>
                     <textarea
                       name="apresentacao"
-                      placeholder="Apresente sua empresa"
+                      placeholder={t(
+                        "tela_empresa_dados.item_placeholder_apresentacao"
+                      )}
                       className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                       rows={6}
                       value={form.apresentacao || ""}
@@ -545,14 +553,13 @@ export default function EmpresaCriar({
                     />
                     {showErrors && !form.apresentacao && (
                       <p className="text-sm text-red-600 mt-1">
-                        Campo obrigatório.
+                        {t("tela_empresa_dados.item_msg_campo_obt")}
                       </p>
                     )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Carregue a imagem de capa da sua empresa (recomendado:
-                      1200×300 px, até 1MB)
+                      {t("tela_empresa_dados.item_label_capa")}
                     </label>
                     <label
                       className={`
@@ -579,7 +586,7 @@ export default function EmpresaCriar({
                       )}
                       {!form.capaPreview && (
                         <span className="text-sm font-medium text-center sm:text-base">
-                          Clique aqui e carregue sua imagem
+                          {t("tela_empresa_dados.item_msg_foto")}
                         </span>
                       )}
                       <input
@@ -592,7 +599,7 @@ export default function EmpresaCriar({
                     </label>
                     {showErrors && !capaFile && (
                       <p className="text-sm text-red-600 mt-1">
-                        capa obrigatória.
+                        {t("tela_empresa_dados.item_msg_capa_obt")}
                       </p>
                     )}
                   </div>
@@ -603,7 +610,7 @@ export default function EmpresaCriar({
                         type="button"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                       >
-                        Voltar
+                        {t("tela_empresa_dados.item_botao_voltar")}
                       </button>
                     </div>
 
@@ -614,13 +621,13 @@ export default function EmpresaCriar({
                         onClick={handleCancel}
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                       >
-                        Cancelar
+                        {t("tela_empresa_dados.item_botao_cancelar")}
                       </button>
                       <button
                         type="submit"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                       >
-                        Avançar
+                        {t("tela_empresa_dados.item_botao_avancar")}
                       </button>
                     </div>
                   </div>
@@ -644,7 +651,7 @@ export default function EmpresaCriar({
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        Sem imagem de capa
+                        {t("tela_empresa_dados.item_msg_sem_capa")}
                       </div>
                     )}
 
@@ -658,7 +665,7 @@ export default function EmpresaCriar({
                         />
                       ) : (
                         <div className="text-xs text-gray-400 text-center px-2">
-                          Sem logo
+                          {t("tela_empresa_dados.item_msg_sem_foto")}
                         </div>
                       )}
                     </div>
@@ -683,7 +690,9 @@ export default function EmpresaCriar({
                               />
                             </svg>
                           </div>
-                          <span className="text-sm text-green-600">Ativa</span>
+                          <span className="text-sm text-green-600">
+                            {t("tela_empresa_dados.item_ativo")}
+                          </span>
                         </span>
                       ) : (
                         <span className="flex items-center gap-1">
@@ -701,7 +710,9 @@ export default function EmpresaCriar({
                               />
                             </svg>
                           </div>
-                          <span className="text-sm text-gray-600">Inativa</span>
+                          <span className="text-sm text-gray-600">
+                            {t("tela_empresa_dados.item_inativo")}
+                          </span>
                         </span>
                       )}
 
@@ -804,7 +815,8 @@ export default function EmpresaCriar({
 
                       {/* Apresentação */}
                       <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-3">
-                        {form.apresentacao || "Nenhuma apresentação fornecida."}
+                        {form.apresentacao ||
+                          t("tela_empresa_dados.item_msg_nenhuma_apresentacao")}
                       </div>
                     </div>
                   </div>
@@ -817,7 +829,7 @@ export default function EmpresaCriar({
                         type="button"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                       >
-                        Voltar
+                        {t("tela_empresa_dados.item_botao_voltar")}
                       </button>
                     </div>
 
@@ -828,7 +840,7 @@ export default function EmpresaCriar({
                         onClick={handleCancel}
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                       >
-                        Cancelar
+                        {t("tela_empresa_dados.item_botao_cancelar")}
                       </button>
                       <button
                         type="submit"
@@ -841,7 +853,7 @@ export default function EmpresaCriar({
                         {isSubmitting ? (
                           <ImSpinner2 className="animate-spin" />
                         ) : (
-                          "Publicar"
+                          t("tela_empresa_dados.item_botao_publicar")
                         )}
                       </button>
                     </div>

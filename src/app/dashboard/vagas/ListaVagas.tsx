@@ -10,6 +10,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { useRouter } from "next/navigation";
 import Select from "react-select";
 import { ImSpinner2 } from "react-icons/im";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -41,6 +42,8 @@ export default function ListaVagas({
   recrutadorId,
 }: Props) {
   const router = useRouter();
+  const { t } = useTranslation("common");
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isFiltering, setIsFiltering] = useState(false);
@@ -87,7 +90,7 @@ export default function ListaVagas({
       setAvaliacao(data);
       setHasVagasFiltro(data.length > 0);
     } catch (error) {
-      console.error("Erro ao filtrar vagas:", error);
+      console.error(t("tela_lista_vagas.item_alerta_erro_buscar_dados"), error);
     } finally {
       setIsFiltering(false);
     }
@@ -132,7 +135,10 @@ export default function ListaVagas({
         setAvaliacao(sugeridosData);
         setHasVaga(sugeridosData.length > 0);
       } catch (error) {
-        console.error("Erro ao buscar dados:", error);
+        console.error(
+          t("tela_lista_vagas.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setLoading(false);
       }
@@ -169,7 +175,7 @@ export default function ListaVagas({
                     <div className="w-full sm:w-[250px]">
                       <Select
                         isClearable
-                        placeholder="Todas as empresas"
+                        placeholder={t("tela_lista_vagas.item_msg_empresas")}
                         value={
                           filtroEmpresa
                             ? {
@@ -179,13 +185,19 @@ export default function ListaVagas({
                                     (e) => String(e.id) === filtroEmpresa
                                   )?.nome_empresa || "",
                               }
-                            : { value: "", label: "Todas as empresas" }
+                            : {
+                                value: "",
+                                label: t("tela_lista_vagas.item_msg_empresas"),
+                              }
                         }
                         onChange={(option) =>
                           setFiltroEmpresa(option ? String(option.value) : "")
                         }
                         options={[
-                          { value: "", label: "Todas as empresas" },
+                          {
+                            value: "",
+                            label: t("tela_lista_vagas.item_msg_empresas"),
+                          },
                           ...empresas.map((empresa) => ({
                             value: String(empresa.id),
                             label: empresa.nome_empresa,
@@ -200,7 +212,7 @@ export default function ListaVagas({
                       <div className="w-full sm:w-[250px]">
                         <Select
                           isClearable
-                          placeholder="Todas as Skills"
+                          placeholder={t("tela_lista_vagas.item_msg_skills")}
                           value={
                             filtroSkill
                               ? {
@@ -209,13 +221,19 @@ export default function ListaVagas({
                                     skills.find((s) => s.skill === filtroSkill)
                                       ?.skill || "",
                                 }
-                              : { value: "", label: "Todas as Skills" }
+                              : {
+                                  value: "",
+                                  label: t("tela_lista_vagas.item_msg_skills"),
+                                }
                           }
                           onChange={(option) =>
                             setFiltroSkill(option ? String(option.value) : "")
                           }
                           options={[
-                            { value: "", label: "Todas as Skills" },
+                            {
+                              value: "",
+                              label: t("tela_lista_vagas.item_msg_skills"),
+                            },
                             ...skills.map((sk) => ({
                               value: sk.skill,
                               label: sk.skill,
@@ -234,7 +252,7 @@ export default function ListaVagas({
                         {isFiltering ? (
                           <ImSpinner2 className="animate-spin" />
                         ) : (
-                          "Filtrar"
+                          t("tela_lista_vagas.item_botao_filtrar")
                         )}
                       </button>
                     </div>
@@ -248,7 +266,7 @@ export default function ListaVagas({
                       }
                       className="w-full sm:w-auto px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                     >
-                      + Cadastrar Vagas
+                      {t("tela_lista_vagas.item_botao_cadastrar")}
                     </button>
                   </div>
                 </div>
@@ -257,7 +275,9 @@ export default function ListaVagas({
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {sugeridos.length > 0 && (
                       <JobList
-                        title={`Candidatos sugeridos: ${sugeridos.length}`}
+                        title={`${t(
+                          "tela_lista_vagas.item_titulo_sugeridos"
+                        )} ${sugeridos.length}`}
                         jobs={sugeridos}
                         perfil={perfil}
                         colorClass="bg-purple-100 text-purple-700"
@@ -266,7 +286,9 @@ export default function ListaVagas({
 
                     {escolhidos.length > 0 && (
                       <JobList
-                        title={`Candidatos escolhidos: ${escolhidos.length}`}
+                        title={`${t(
+                          "tela_lista_vagas.item_titulo_escolhidos"
+                        )} ${escolhidos.length}`}
                         jobs={escolhidos}
                         perfil={perfil}
                         colorClass="bg-purple-200 text-purple-800"
@@ -274,7 +296,9 @@ export default function ListaVagas({
                     )}
                     {avaliacao.length > 0 && (
                       <JobList
-                        title={`Candidatos em avaliação: ${avaliacao.length}`}
+                        title={`${t(
+                          "tela_lista_vagas.item_titulo_avaliacao"
+                        )} ${avaliacao.length}`}
                         jobs={avaliacao}
                         perfil={perfil}
                         colorClass="bg-purple-300 text-purple-900"
@@ -298,11 +322,10 @@ export default function ListaVagas({
                       />
                     </svg>
                     <h2 className="text-lg sm:text-xl font-medium text-gray-700">
-                      Nenhuma vaga disponível com os critérios selecionados.
+                      {t("tela_lista_vagas.item_msg_sem_vagas")}
                     </h2>
                     <p className="text-sm text-gray-500 mt-2">
-                      Tente ajustar os filtros ou limpar a seleção para ver mais
-                      resultados.
+                      {t("tela_lista_vagas.item_msg_sem_vagas_filtro")}
                     </p>
                   </div>
                 )}
