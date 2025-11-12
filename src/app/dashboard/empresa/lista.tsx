@@ -8,6 +8,7 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import Image from "next/image";
 import { useRouter } from "next/navigation"; // App Router
 import SemDados from "../SemDados";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -34,6 +35,7 @@ export default function EmpresaListar({
   hasPerfilRecrutador,
 }: Props) {
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -59,11 +61,14 @@ export default function EmpresaListar({
         );
         const data = await res.json();
 
-        if (Array.isArray(data.empresas)) {          
+        if (Array.isArray(data.empresas)) {
           setEmpresas(data.empresas);
         }
       } catch (error) {
-        console.error("Erro ao buscar empresas:", error);
+        console.error(
+          t("tela_lista_empresas.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setIsLoading(false);
       }
@@ -100,7 +105,7 @@ export default function EmpresaListar({
                     }
                     className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                   >
-                    + Cadastrar Empresa
+                    {t("tela_lista_empresas.item_botao_cadastrar")}
                   </button>
                 </div>
 
@@ -112,10 +117,10 @@ export default function EmpresaListar({
                         empresa.ativo ? "border-green-500" : "border-gray-400"
                       }`}
                       onClick={() =>
-                          router.push(
-                            `/dashboard/empresa/detalhe/${empresa.id}?perfil=${perfil}`
-                          )
-                        }
+                        router.push(
+                          `/dashboard/empresa/detalhe/${empresa.id}?perfil=${perfil}`
+                        )
+                      }
                     >
                       {/* Logo */}
                       <div className="w-full flex justify-center mb-4">
@@ -130,7 +135,7 @@ export default function EmpresaListar({
                           />
                         ) : (
                           <div className="w-16 h-16 flex items-center justify-center bg-gray-100 text-gray-400 rounded-full text-xs text-center">
-                            Sem logo
+                            {t("tela_lista_empresas.item_msg_sem_foto")}
                           </div>
                         )}
                       </div>
@@ -140,10 +145,12 @@ export default function EmpresaListar({
                         {empresa.nome_empresa}
                       </h3>
                       <p className="text-sm text-center text-gray-500 mt-1">
-                        {empresa.email || "sem email"}
+                        {empresa.email ||
+                          t("tela_lista_empresas.item_msg_sem_email")}
                       </p>
                       <p className="text-sm text-center text-gray-500">
-                        {empresa.telefone || "sem telefone"}
+                        {empresa.telefone ||
+                          t("tela_lista_empresas.item_msg_sem_telefone")}
                       </p>
 
                       {/* Status apenas com texto colorido */}
@@ -163,7 +170,9 @@ export default function EmpresaListar({
                               />
                             </svg>
                           </div>
-                          <span className="text-sm  text-green-600">Ativa</span>
+                          <span className="text-sm  text-green-600">
+                            {t("tela_lista_empresas.item_ativo")}
+                          </span>
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-1">
@@ -183,7 +192,7 @@ export default function EmpresaListar({
                           </div>
 
                           <span className="text-sm  text-gray-600">
-                            Inativa
+                            {t("tela_lista_empresas.item_inativo")}
                           </span>
                         </span>
                       )}

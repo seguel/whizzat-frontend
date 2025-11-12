@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface JobCardProps {
   empresa_id: number;
@@ -32,6 +34,22 @@ export default function JobCard({
   mulheres,
   cinquenta_mais,
 }: JobCardProps) {
+  const { t, i18n } = useTranslation("common");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      const onInit = () => setReady(true);
+      i18n.on("initialized", onInit);
+      return () => {
+        i18n.off("initialized", onInit);
+      };
+    }
+  }, [i18n]);
+
+  if (!ready) return null; // ou um loading spinner opcional
   return (
     <Link
       href={`/dashboard/vagas?perfil=${perfil}&vagaid=${vaga_id}&id=${empresa_id}`}
@@ -54,7 +72,7 @@ export default function JobCard({
                 />
               ) : (
                 <div className="text-xs text-gray-400 text-center px-2">
-                  Sem logo
+                  {t("tela_lista_vagas.item_msg_sem_foto")}
                 </div>
               )}
             </div>
@@ -66,7 +84,9 @@ export default function JobCard({
             <p className="text-xs text-gray-500 break-words">{nome_empresa}</p>
             <p className="text-xs text-gray-500 break-words">{localizacao}</p>
             <p className="flex items-center justify-center text-xs px-2 py-1 rounded-lg bg-purple-100 mt-2 sm:mt-4 max-w-full">
-              <strong>Aberta até: {prazo}</strong>
+              <strong>
+                {t("tela_lista_vagas.item_item_periodo")} {prazo}
+              </strong>
             </p>
           </div>
         </div>
@@ -85,7 +105,8 @@ export default function JobCard({
           )}
           {mulheres && (
             <span className="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
-              <span className="text-[12px]">👩‍💼</span> Mulheres
+              <span className="text-[12px]">👩‍💼</span>{" "}
+              {t("tela_lista_vagas.item_msg_item_mulher")}
             </span>
           )}
           {cinquenta_mais && (

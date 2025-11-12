@@ -17,6 +17,7 @@ import { toast } from "react-hot-toast";
 // import { getFileUrl } from "../../util/getFileUrl";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -119,6 +120,7 @@ export default function VagaDados({
   recrutadorId,
 }: Props) {
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [step, setStep] = useState(1);
@@ -206,7 +208,8 @@ export default function VagaDados({
             credentials: "include",
           }
         );
-        if (!res.ok) throw new Error("Erro ao buscar dados da vaga");
+        if (!res.ok)
+          throw new Error(t("tela_vaga_dados.item_alerta_erro_buscar_dados"));
 
         const data = await res.json();
         //console.log(data);
@@ -235,7 +238,10 @@ export default function VagaDados({
         setForm(vagaFormData);
         setVaga(data);
       } catch (error) {
-        console.error("Erro ao carregar vaga:", error);
+        console.error(
+          t("tela_vaga_dados.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setLoadingVagaEmpresa(false);
       }
@@ -286,7 +292,10 @@ export default function VagaDados({
         setPeriodos(periodosData);
         setSkills(skillsData);
       } catch (error) {
-        console.error("Erro ao buscar dados:", error);
+        console.error(
+          t("tela_vaga_dados.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setLoadingVagaEmpresa(false);
       }
@@ -340,7 +349,7 @@ export default function VagaDados({
     localStorage.removeItem(`vagasForm_${userId}`);
 
     // Feedback visual
-    toast.error("Alterações descartadas.", {
+    toast.error(t("tela_vaga_dados.item_alerta_descartada"), {
       duration: 3000, // 3 segundos
     });
 
@@ -424,7 +433,7 @@ export default function VagaDados({
         });
 
         if (!response.ok) {
-          throw new Error("Erro ao salvar vaga.");
+          throw new Error(t("tela_vaga_dados.item_alerta_erro_salvar"));
         }
 
         const data = await response.json(); // <- Aqui pega o retorno da empresa salva
@@ -434,16 +443,21 @@ export default function VagaDados({
         localStorage.removeItem(`vagasForm_${userId}`);
 
         setIsSubmitting(false);
-        toast.success(`Vaga "${data.nome_vaga}" publicada com sucesso!`, {
-          duration: 5000, // ← 5 segundos
-        });
+        toast.success(
+          `${t("tela_vaga_dados.item_alerta_sucesso_1")} ${data.nome_vaga} ${t(
+            "tela_vaga_dados.item_alerta_sucesso_2"
+          )}`,
+          {
+            duration: 5000, // ← 5 segundos
+          }
+        );
         //nextStep();
         router.push(
           `/dashboard/vagas?perfil=${perfil}&vagaid=${data.vaga_id}&id=${data.empresa_id}`
         );
       } catch (err) {
         console.error("Erro ao enviar dados:", err);
-        toast.error("Erro ao enviar dados da vaga. Tente novamente.", {
+        toast.error(t("tela_vaga_dados.item_alerta_erro_salvar"), {
           duration: 5000, // ← 5 segundos
         });
         setIsSubmitting(false);
@@ -532,11 +546,10 @@ export default function VagaDados({
               <div className="pt-3 pl-6 flex items-center justify-center">
                 <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
                   {[
-                    "1 Dados",
-                    "2 Skills",
-                    /* "3 Especialista", */
-                    "3 Visualizar",
-                    "4 Publicar",
+                    `1 ${t("tela_topo_passos.passo_dados")}`,
+                    `2 ${t("tela_topo_passos.passo_skills")}`,
+                    `3 ${t("tela_topo_passos.passo_visualizar")}`,
+                    `4 ${t("tela_topo_passos.passo_publicar")}`,
                   ].map((etapa, index) => (
                     <div
                       key={index}
@@ -589,7 +602,7 @@ export default function VagaDados({
                             <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
                           </div>
                           <span className="ml-3 text-sm font-normal text-gray-700">
-                            Ativo
+                            {t("tela_vaga_dados.item_ativo")}
                           </span>
                         </label>
                       </div>
@@ -599,7 +612,7 @@ export default function VagaDados({
                     <div className="flex flex-col gap-4">
                       {/* Empresa */}
                       <label className="flex flex-col text-sm text-gray-700">
-                        Empresa:
+                        {t("tela_vaga_dados.item_label_nome")}
                         <select
                           className={`
                           border border-purple-600 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-300
@@ -614,7 +627,9 @@ export default function VagaDados({
                           onChange={handleEmpresaChange}
                           disabled={!!empresaId}
                         >
-                          <option value="">Selecione a empresa</option>
+                          <option value="">
+                            {t("tela_vaga_dados.item_placeholder_nome")}
+                          </option>
                           {empresas.map((empresa) => (
                             <option key={empresa.id} value={empresa.id}>
                               {empresa.nome_empresa}
@@ -625,36 +640,40 @@ export default function VagaDados({
 
                       {/* Nome da vaga */}
                       <label className="flex flex-col text-sm text-gray-700">
-                        Nome da vaga:
+                        {t("tela_vaga_dados.item_label_site")}
                         <input
                           name="nome_vaga"
                           type="text"
                           className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
-                          placeholder="nome da vaga"
+                          placeholder={t(
+                            "tela_vaga_dados.item_placeholder_site"
+                          )}
                           defaultValue={form.nome_vaga ?? vaga?.nome_vaga}
                           onChange={handleChange_dinamicos}
                         />
                         {showErrors && !form.nome_vaga && (
                           <p className="text-sm text-red-600 mt-1">
-                            Campo obrigatório.
+                            {t("tela_vaga_dados.item_msg_campo_obt")}
                           </p>
                         )}
                       </label>
 
                       {/* Local da vaga */}
                       <label className="flex flex-col text-sm text-gray-700">
-                        Local da vaga:
+                        {t("tela_vaga_dados.item_label_local")}
                         <input
                           name="local_vaga"
                           type="text"
                           className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
-                          placeholder="local da vaga"
+                          placeholder={t(
+                            "tela_vaga_dados.item_placeholder_local"
+                          )}
                           defaultValue={form.local_vaga ?? vaga?.local_vaga}
                           onChange={handleChange_dinamicos}
                         />
                         {showErrors && !form.local_vaga && (
                           <p className="text-sm text-red-600 mt-1">
-                            Campo obrigatório.
+                            {t("tela_vaga_dados.item_msg_campo_obt")}
                           </p>
                         )}
                       </label>
@@ -662,7 +681,7 @@ export default function VagaDados({
                       {/* Modalidade */}
                       <fieldset className="text-sm text-gray-700 mt-2">
                         <legend className="mb-1 font-medium">
-                          Modalidade de trabalho:
+                          {t("tela_vaga_dados.item_label_modalidade")}
                         </legend>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {modalidades.map((mod) => (
@@ -693,7 +712,7 @@ export default function VagaDados({
                       {/* Período */}
                       <fieldset className="text-sm text-gray-700 mt-2">
                         <legend className="mb-1 font-medium">
-                          Período de trabalho:
+                          {t("tela_vaga_dados.item_label_periodo")}
                         </legend>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {periodos.map((per) => (
@@ -725,7 +744,7 @@ export default function VagaDados({
                       <div className="mt-4 w-full">
                         {/* Título */}
                         <p className="text-sm sm:text-base font-normal mb-3 text-[#14342A]">
-                          Vaga Afirmativa / Inclusiva
+                          {t("tela_vaga_dados.item_label_vaga_afirmativa")}
                         </p>
 
                         {/* Grid responsivo */}
@@ -768,7 +787,7 @@ export default function VagaDados({
                                 </span>
                               </div>
                               <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                Mulheres
+                                {t("tela_vaga_dados.item_msg_item_mulher")}
                               </span>
                             </label>
                           </div>
@@ -825,26 +844,28 @@ export default function VagaDados({
                     <div className="flex flex-col gap-4">
                       {/* Descrição */}
                       <label className="flex flex-col text-sm text-gray-700">
-                        Descrição:
+                        {t("tela_vaga_dados.item_label_descricao")}
                         <textarea
                           name="descricao"
                           maxLength={5000}
                           rows={9}
                           defaultValue={form.descricao ?? vaga?.descricao}
                           className="border rounded-md px-3 py-2 resize-none border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
-                          placeholder="Descrição da vaga"
+                          placeholder={t(
+                            "tela_vaga_dados.item_placeholder_descricao"
+                          )}
                           onChange={handleChange_dinamicos}
                         />
                         {showErrors && !form.descricao && (
                           <p className="text-sm text-red-600 mt-1">
-                            Campo obrigatório.
+                            {t("tela_vaga_dados.item_msg_campo_obt")}
                           </p>
                         )}
                       </label>
 
                       {/* Dias disponíveis */}
                       <label className="flex flex-col text-sm text-gray-700">
-                        Quantos dias a vaga ficará disponível?
+                        {t("tela_vaga_dados.item_label_dias_vaga")}
                         <div className="flex items-center gap-2 mt-1">
                           {/* Botão de diminuir */}
                           <button
@@ -915,14 +936,14 @@ export default function VagaDados({
                         {showErrors &&
                           (!diasDisponiveis || diasDisponiveis === 0) && (
                             <p className="text-sm text-red-600 mt-1">
-                              Campo obrigatório.
+                              {t("tela_vaga_dados.item_msg_campo_obt")}
                             </p>
                           )}
                       </label>
 
                       {/* Quantidade de vagas */}
                       <label className="flex flex-col text-sm text-gray-700">
-                        Quantidade de vagas para este cargo:
+                        {t("tela_vaga_dados.item_label_qtde_vaga")}
                         <div className="flex items-center gap-2 mt-1">
                           {/* Botão de diminuir */}
                           <button
@@ -993,7 +1014,7 @@ export default function VagaDados({
                         {showErrors &&
                           (!quantidadeVagas || quantidadeVagas === 0) && (
                             <p className="text-sm text-red-600 mt-1">
-                              Campo obrigatório.
+                              {t("tela_vaga_dados.item_msg_campo_obt")}
                             </p>
                           )}
                       </label>
@@ -1005,13 +1026,13 @@ export default function VagaDados({
                         onClick={handleCancel}
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                       >
-                        Cancelar
+                        {t("tela_vaga_dados.item_botao_cancelar")}
                       </button>
                       <button
                         type="submit"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                       >
-                        Avançar
+                        {t("tela_vaga_dados.item_botao_avancar")}
                       </button>
                     </div>
                   </form>
@@ -1025,17 +1046,24 @@ export default function VagaDados({
                     >
                       <div>
                         <h1 className="block text-sm mb-1 py-3 font-bold">
-                          Informe as Skills que você busca para este perfil
-                          profissional
+                          {t("tela_vaga_dados.item_label_informe_skills")}
                           <p className="block text-[11x] font-light">
-                            (mínimo 3 e no máximo 12)
+                            {t("tela_vaga_dados.item_label_informe_qtde")}
                           </p>
                         </h1>
 
                         <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                          Skills:
+                          {t("tela_vaga_dados.item_label_skill")}
                           <TooltipIcon
-                            message={`Como adicionar skill que não está na lista:\n1. Digite a skill desejada;\n2. Selecione 'Criar nova skill';\n3. Clique no botão Adicionar.`}
+                            message={`${t(
+                              "tela_vaga_dados.item_tooltip_skill_titulo"
+                            )}\n${t(
+                              "tela_vaga_dados.item_tooltip_skill_passo1"
+                            )}\n${t(
+                              "tela_vaga_dados.item_tooltip_skill_passo2"
+                            )}\n${t(
+                              "tela_vaga_dados.item_tooltip_skill_passo3"
+                            )}`}
                             perfil={perfil}
                           />
                         </label>
@@ -1044,7 +1072,7 @@ export default function VagaDados({
                           <div className="flex-1">
                             <CreatableSelect
                               isClearable
-                              placeholder="Digite ou selecione uma skill"
+                              placeholder={t("tela_vaga_dados.item_msg_skill")}
                               value={selectedSkill}
                               onChange={(newValue) =>
                                 setSelectedSkill(newValue)
@@ -1054,7 +1082,9 @@ export default function VagaDados({
                                 label: skill.skill,
                               }))}
                               formatCreateLabel={(inputValue) =>
-                                `Criar nova skill: "${inputValue}"`
+                                `${t(
+                                  "tela_vaga_dados.item_msg_criar_skill"
+                                )} "${inputValue}"`
                               }
                               isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
                             />
@@ -1065,13 +1095,13 @@ export default function VagaDados({
                             onClick={handleAddSkill}
                             className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-700 transition whitespace-nowrap cursor-pointer"
                           >
-                            + Adicionar
+                            {t("tela_vaga_dados.item_botao_adicionar")}
                           </button>
                         </div>
 
                         {showErrors && form.lista_skills.length <= 0 && (
                           <p className="text-sm text-red-600 mt-1">
-                            Campo obrigatório.
+                            {t("tela_vaga_dados.item_msg_campo_obt")}
                           </p>
                         )}
                       </div>
@@ -1097,7 +1127,7 @@ export default function VagaDados({
                                   {/* Peso com slider */}
                                   <div className="flex items-center gap-2 text-sm min-w-[200px]">
                                     <label className="font-medium whitespace-nowrap">
-                                      Peso:
+                                      {t("tela_vaga_dados.item_label_peso")}
                                     </label>
                                     <input
                                       type="range"
@@ -1135,13 +1165,41 @@ export default function VagaDados({
                                   <div className="flex items-center gap-4 text-sm min-w-[260px]">
                                     <div className="flex items-center gap-1">
                                       <label className="font-medium whitespace-nowrap">
-                                        Avaliador:
+                                        {t(
+                                          "tela_vaga_dados.item_label_avaliador"
+                                        )}
                                       </label>
                                       <TooltipIcon
                                         message={
                                           hasAvaliadorProprio
-                                            ? `1. Próprio: Será selecionado\nsomente entre os avaliadores existentes\nna empresa recrutadora.\n\n2. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações.`
-                                            : `1. Whizzat: Será selecionado\nautomaticamente pela plataforma,\nconsiderando melhores skills\ne avaliações e quando a empresa\n selecionada não possuir avaliador\n próprio.`
+                                            ? `${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo1"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo2"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo3"
+                                              )}\n\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo4"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo5"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo6"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo7"
+                                              )}`
+                                            : `${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo8"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo9"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo10"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo11"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo12"
+                                              )}\n${t(
+                                                "tela_vaga_dados.item_tooltip_avaliador_passo13"
+                                              )}`
                                         }
                                         perfil={perfil}
                                       />
@@ -1164,7 +1222,7 @@ export default function VagaDados({
                                           )
                                         }
                                       />
-                                      Próprio
+                                      {t("tela_vaga_dados.item_label_proprio")}
                                     </label>
                                     <label className="flex items-center gap-1">
                                       <input
@@ -1182,7 +1240,7 @@ export default function VagaDados({
                                           )
                                         }
                                       />
-                                      Whizzat
+                                      {t("tela_vaga_dados.item_label_whizzat")}
                                     </label>
                                   </div>
                                 </div>
@@ -1191,7 +1249,9 @@ export default function VagaDados({
                               <button
                                 onClick={() => handleRemoveSkill(item.skill_id)}
                                 className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
-                                title="Remover skill"
+                                title={t(
+                                  "tela_vaga_dados.item_botao_remover_skill"
+                                )}
                               >
                                 <X size={18} />
                               </button>
@@ -1208,7 +1268,7 @@ export default function VagaDados({
                             type="button"
                             className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                           >
-                            Voltar
+                            {t("tela_vaga_dados.item_botao_voltar")}
                           </button>
                         </div>
 
@@ -1219,7 +1279,7 @@ export default function VagaDados({
                             onClick={handleCancel}
                             className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                           >
-                            Cancelar
+                            {t("tela_vaga_dados.item_botao_cancelar")}
                           </button>
                           <button
                             type="submit"
@@ -1231,7 +1291,7 @@ export default function VagaDados({
                               : "bg-purple-100 hover:bg-purple-200 cursor-pointer"
                           }`}
                           >
-                            Avançar
+                            {t("tela_vaga_dados.item_botao_avancar")}
                           </button>
                         </div>
                       </div>
@@ -1272,7 +1332,7 @@ export default function VagaDados({
                                     />
                                   ) : (
                                     <div className="text-xs text-gray-400 text-center px-2">
-                                      Sem logo
+                                      {t("tela_vaga_dados.item_msg_sem_foto")}
                                     </div>
                                   )}
                                 </div>
@@ -1287,7 +1347,8 @@ export default function VagaDados({
                                       (e) =>
                                         e.id.toString() ===
                                         form.empresa_id.toString()
-                                    )?.nome_empresa ?? "Indefinida"}
+                                    )?.nome_empresa ??
+                                      t("tela_vaga_dados.item_msg_indefinida")}
                                   </p>
                                 </div>
                               </div>
@@ -1296,7 +1357,8 @@ export default function VagaDados({
                               <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
                                 <CalendarDays className="w-4 h-4 text-purple-500" />
                                 <span>
-                                  Vigência até: <strong>{dataFormatada}</strong>
+                                  {t("tela_vaga_dados.item_msg_vigencia")}{" "}
+                                  <strong>{dataFormatada}</strong>
                                 </span>
                               </div>
                             </div>
@@ -1305,16 +1367,17 @@ export default function VagaDados({
                             <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
                               <div className="flex items-center gap-2 w-full sm:w-1/2">
                                 <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
-                                {form.local_vaga || "Local não informado"}
+                                {form.local_vaga ||
+                                  t("tela_vaga_dados.item_msg_sem_local")}
                               </div>
                               <div className="flex items-center gap-2 w-full sm:w-1/2">
                                 <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
-                                Aberta em:{" "}
+                                {t("tela_vaga_dados.item_msg_aberta")}{" "}
                                 {form.data_cadastro ?? dataBase
                                   ? new Date(
                                       form.data_cadastro ?? dataBase
                                     ).toLocaleDateString("pt-BR")
-                                  : "Data não informada"}
+                                  : t("tela_vaga_dados.item_msg_sem_data")}
                               </div>
                             </div>
 
@@ -1326,7 +1389,8 @@ export default function VagaDados({
                                   (p) =>
                                     String(p.periodo_trabalho_id) ===
                                     String(form.periodo_trabalho_id)
-                                )?.periodo || "Período não informado"}
+                                )?.periodo ||
+                                  t("tela_vaga_dados.item_msg_sem_periodo")}
                               </div>
                               <div className="flex items-center gap-2 w-full sm:w-1/2">
                                 <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
@@ -1334,7 +1398,8 @@ export default function VagaDados({
                                   (m) =>
                                     String(m.modalidade_trabalho_id) ===
                                     String(form.modalidade_trabalho_id)
-                                )?.modalidade || "Modalidade não informada"}
+                                )?.modalidade ||
+                                  t("tela_vaga_dados.item_msg_sem_modalidade")}
                               </div>
                             </div>
 
@@ -1343,14 +1408,14 @@ export default function VagaDados({
                               <div className="w-full sm:w-1/2">
                                 {form.pcd && (
                                   <span role="img" aria-label="acessível">
-                                    ♿ Vaga para PCD
+                                    ♿ {t("tela_vaga_dados.item_vaga_pcd")}
                                   </span>
                                 )}
                               </div>
                               <div className="w-full sm:w-1/2">
                                 {form?.lgbtq && (
                                   <span role="img" aria-label="acessível">
-                                    🏳️‍🌈 Vaga para LGBTQ+
+                                    🏳️‍🌈 {t("tela_vaga_dados.item_vaga_lgbtq")}
                                   </span>
                                 )}
                               </div>
@@ -1359,14 +1424,14 @@ export default function VagaDados({
                               <div className="w-full sm:w-1/2">
                                 {form.mulheres && (
                                   <span role="img" aria-label="acessível">
-                                    👩‍💼 Vaga para Mulheres
+                                    👩‍💼 {t("tela_vaga_dados.item_vaga_mulheres")}
                                   </span>
                                 )}
                               </div>
                               <div className="w-full sm:w-1/2">
                                 {form?.cinquenta_mais && (
                                   <span role="img" aria-label="acessível">
-                                    👴 Vaga para 50+
+                                    👴 {t("tela_vaga_dados.item_vaga_50_mais")}
                                   </span>
                                 )}
                               </div>
@@ -1375,7 +1440,7 @@ export default function VagaDados({
                             {/* Linha 4 - Descrição */}
                             <div>
                               <h3 className="text-md font-semibold text-gray-700 mb-1">
-                                Descrição
+                                {t("tela_vaga_dados.item_label_descricao")}
                               </h3>
                               <p className="text-sm text-gray-600 whitespace-pre-line">
                                 {form.descricao}
@@ -1388,7 +1453,7 @@ export default function VagaDados({
                           {/* Bloco - Lista de Skills */}
                           <div className="w-full sm:w-[30%] flex flex-col mt-2">
                             <h3 className="text-md font-semibold text-gray-700 mb-2">
-                              Skills e pesos
+                              {t("tela_vaga_dados.item_label_skill_pesos")}
                             </h3>
 
                             <ul className="grid grid-cols-1 xs:grid-cols-2 gap-2">
@@ -1403,7 +1468,8 @@ export default function VagaDados({
                                       {skill.nome}
                                     </span>
                                     <span className="text-xs text-[#808080]">
-                                      Peso: {skill.peso / 10}/10
+                                      {t("tela_vaga_dados.item_label_peso")}{" "}
+                                      {skill.peso / 10}/10
                                     </span>
                                   </div>
 
@@ -1438,7 +1504,7 @@ export default function VagaDados({
                             type="button"
                             className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                           >
-                            Voltar
+                            {t("tela_vaga_dados.item_botao_voltar")}
                           </button>
                         </div>
 
@@ -1449,7 +1515,7 @@ export default function VagaDados({
                             onClick={handleCancel}
                             className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                           >
-                            Cancelar
+                            {t("tela_vaga_dados.item_botao_cancelar")}
                           </button>
                           <button
                             type="submit"
@@ -1462,7 +1528,7 @@ export default function VagaDados({
                             {isSubmitting ? (
                               <ImSpinner2 className="animate-spin" />
                             ) : (
-                              "Publicar"
+                              t("tela_vaga_dados.item_botao_publicar")
                             )}
                           </button>
                         </div>
@@ -1500,7 +1566,7 @@ export default function VagaDados({
                                   />
                                 ) : (
                                   <div className="text-xs text-gray-400 text-center px-2">
-                                    Sem logo
+                                    {t("tela_vaga_dados.item_msg_sem_foto")}
                                   </div>
                                 )}
                               </div>
@@ -1520,7 +1586,8 @@ export default function VagaDados({
                             <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
                               <CalendarDays className="w-4 h-4 text-purple-500" />
                               <span>
-                                Vigência até: <strong>{dataFormatada}</strong>
+                                {t("tela_vaga_dados.item_msg_vigencia")}{" "}
+                                <strong>{dataFormatada}</strong>
                               </span>
                             </div>
                           </div>
@@ -1530,16 +1597,16 @@ export default function VagaDados({
                             <div className="flex items-center gap-2 w-full sm:w-1/2">
                               <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
                               {vagaPublicada?.local_vaga ||
-                                "Local não informado"}
+                                t("tela_vaga_dados.item_msg_sem_local")}
                             </div>
                             <div className="flex items-center gap-2 w-full sm:w-1/2">
                               <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
-                              Aberta em:{" "}
+                              {t("tela_vaga_dados.item_msg_aberta")}{" "}
                               {vagaPublicada?.data_cadastro
                                 ? new Date(
                                     vagaPublicada?.data_cadastro
                                   ).toLocaleDateString("pt-BR")
-                                : "Data não informada"}
+                                : t("tela_vaga_dados.item_msg_sem_data")}
                             </div>
                           </div>
 
@@ -1548,12 +1615,12 @@ export default function VagaDados({
                             <div className="flex items-center gap-2 w-full sm:w-1/2">
                               <Clock className="w-4 h-4 text-gray-500 shrink-0" />
                               {vagaPublicada?.periodo_trabalho?.periodo ||
-                                "Período não informado"}
+                                t("tela_vaga_dados.item_msg_sem_periodo")}
                             </div>
                             <div className="flex items-center gap-2 w-full sm:w-1/2">
                               <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
                               {vagaPublicada?.modalidade_trabalho?.modalidade ||
-                                "Modalidade não informada"}
+                                t("tela_vaga_dados.item_msg_sem_modalidade")}
                             </div>
                           </div>
 
@@ -1562,14 +1629,14 @@ export default function VagaDados({
                             <div className="w-full sm:w-1/2">
                               {vagaPublicada?.pcd && (
                                 <span role="img" aria-label="acessível">
-                                  ♿ Vaga para PCD
+                                  ♿ {t("tela_vaga_dados.item_vaga_pcd")}
                                 </span>
                               )}
                             </div>
                             <div className="w-full sm:w-1/2">
                               {vagaPublicada?.lgbtq && (
                                 <span role="img" aria-label="acessível">
-                                  🏳️‍🌈 Vaga para LGBTQ+
+                                  🏳️‍🌈 {t("tela_vaga_dados.item_vaga_lgbtq")}
                                 </span>
                               )}
                             </div>
@@ -1578,14 +1645,14 @@ export default function VagaDados({
                             <div className="w-full sm:w-1/2">
                               {vagaPublicada?.mulheres && (
                                 <span role="img" aria-label="acessível">
-                                  👩‍💼 Vaga para Mulheres
+                                  👩‍💼 {t("tela_vaga_dados.item_vaga_mulheres")}
                                 </span>
                               )}
                             </div>
                             <div className="w-full sm:w-1/2">
                               {vagaPublicada?.cinquenta_mais && (
                                 <span role="img" aria-label="acessível">
-                                  👴 Vaga para 50+
+                                  👴 {t("tela_vaga_dados.item_vaga_50_mais")}
                                 </span>
                               )}
                             </div>
@@ -1594,7 +1661,7 @@ export default function VagaDados({
                           {/* Linha 4 - Descrição */}
                           <div>
                             <h3 className="text-md font-semibold text-gray-700 mb-1">
-                              Descrição
+                              {t("tela_vaga_dados.item_label_descricao")}
                             </h3>
                             <p className="text-sm text-gray-600 whitespace-pre-line">
                               {vagaPublicada?.descricao}
@@ -1607,7 +1674,7 @@ export default function VagaDados({
                         {/* Bloco - Lista de Skills */}
                         <div className="w-full sm:w-[30%] flex flex-col mt-2">
                           <h3 className="text-md font-semibold text-gray-700 mb-2">
-                            Skills e pesos
+                            {t("tela_vaga_dados.item_label_skill_pesos")}
                           </h3>
 
                           <ul className="grid grid-cols-1 xs:grid-cols-2 gap-2">
@@ -1622,7 +1689,8 @@ export default function VagaDados({
                                     {skill.nome}
                                   </span>
                                   <span className="text-xs text-[#808080]">
-                                    Peso: {skill.peso / 10}/10
+                                    {t("tela_vaga_dados.item_label_peso")}{" "}
+                                    {skill.peso / 10}/10
                                   </span>
                                 </div>
 

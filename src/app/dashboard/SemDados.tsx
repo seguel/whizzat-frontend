@@ -1,4 +1,6 @@
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 
 interface SemDadosProps {
   tipo: "empresa" | "vaga" | "perfil";
@@ -7,6 +9,8 @@ interface SemDadosProps {
 
 export default function SemDados({ tipo, perfil }: SemDadosProps) {
   const router = useRouter();
+  const { t, i18n } = useTranslation("common");
+  const [ready, setReady] = useState(false);
 
   // Map para classes de cor de acordo com o perfil
   const perfilColors: Record<
@@ -35,6 +39,20 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
     ${perfilColors[perfil].hover} 
     ${perfilColors[perfil].text}`;
 
+  useEffect(() => {
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      const onInit = () => setReady(true);
+      i18n.on("initialized", onInit);
+      return () => {
+        i18n.off("initialized", onInit);
+      };
+    }
+  }, [i18n]);
+
+  if (!ready) return null; // ou um loading spinner opcional
+
   const renderBloco = () => {
     switch (tipo) {
       case "empresa":
@@ -55,15 +73,13 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
               />
             </svg>
             <h2 className="text-lg sm:text-xl font-medium text-gray-700">
-              Olá! Sua empresa ainda não possui uma página cadastrada.
+              {t("semdados.empresa_linha_primeiro")}
             </h2>
             <p className="text-sm text-gray-500 mt-2">
-              Complete os dados da sua empresa para poder criar anúncios de
-              vagas e receber sugestões de candidatos compatíveis.
+              {t("semdados.empresa_linha_segundo")}
             </p>
             <p className="text-sm text-gray-500 mb-4 pb-4">
-              Você poderá cadastrar quantas empresas quiser. Clique no botão
-              abaixo para começar.
+              {t("semdados.empresa_linha_terceiro")}
             </p>
             <button
               onClick={() =>
@@ -71,7 +87,7 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
               }
               className={btnClass}
             >
-              Preencher dados da empresa
+              {t("semdados.empresa_linha_botao")}
             </button>
           </div>
         );
@@ -94,10 +110,10 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
               />
             </svg>
             <h2 className="text-lg sm:text-xl font-medium text-gray-700">
-              Nenhuma vaga cadastrada até o momento.
+              {t("semdados.vaga_linha_primeiro")}
             </h2>
             <p className="text-sm text-gray-500 mt-2">
-              Crie a primeira oportunidade clicando no botão abaixo.
+              {t("semdados.vaga_linha_segundo")}
             </p>
             <button
               onClick={() =>
@@ -105,7 +121,7 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
               }
               className={`mt-5 ${btnClass}`}
             >
-              Cadastrar vaga
+              {t("semdados.vaga_linha_botao")}
             </button>
           </div>
         );
@@ -128,17 +144,17 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
               />
             </svg>
             <h2 className="text-lg sm:text-xl font-medium text-gray-700">
-              Olá! Seu perfil de {perfil} ainda não está completo ou ativo.
+              {t("semdados.perfil_linha_primeiro")} {perfil}{" "}
+              {t("semdados.perfil_linha_primeiro_complemento")}
             </h2>
             <p className="text-sm text-gray-500 mt-2">
-              Ative ou complete os dados para poder utilizar os recursos do seu
-              perfil.
+              {t("semdados.perfil_linha_segundo")}
             </p>
             <button
               onClick={() => router.push(`/dashboard/perfil?perfil=${perfil}`)}
               className={`mt-5 ${btnClass}`}
             >
-              Verificar meu perfil
+              {t("semdados.perfil_linha_botao")}
             </button>
           </div>
         );

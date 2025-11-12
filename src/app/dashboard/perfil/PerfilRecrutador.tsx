@@ -11,6 +11,7 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface RecrutadorProps {
   perfil: ProfileType;
@@ -69,6 +70,7 @@ export default function PerfilRecrutador({
   nome_user,
 }: RecrutadorProps) {
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useLocalStorage<RecrutadorForm>(
@@ -114,7 +116,10 @@ export default function PerfilRecrutador({
             credentials: "include",
           }
         );
-        if (!res.ok) throw new Error("Erro ao buscar dados da recrutador");
+        if (!res.ok)
+          throw new Error(
+            t("tela_perfil_recrutador.item_alerta_erro_buscar_dados")
+          );
 
         const data = await res.json();
 
@@ -133,7 +138,10 @@ export default function PerfilRecrutador({
         setRecrutador(data); // se quiser manter o objeto bruto
         router.push(`/dashboard/perfil?perfil=${perfil}&id=${recrutadorId}`);
       } catch (error) {
-        console.error("Erro ao carregar recrutador:", error);
+        console.error(
+          t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setLoadingRecrutador(false);
       }
@@ -151,7 +159,7 @@ export default function PerfilRecrutador({
     localStorage.removeItem(`recrutadorForm_${userId}`);
 
     // Feedback visual
-    toast.error("Alterações descartadas.", {
+    toast.error(t("tela_perfil_recrutador.item_alerta_descartada"), {
       duration: 3000, // 3 segundos
     });
 
@@ -171,7 +179,7 @@ export default function PerfilRecrutador({
 
       // 🔒 Verifica se o tipo MIME é de imagem
       if (!file.type.startsWith("image/")) {
-        toast.error("Envie apenas arquivos de imagem (JPG, PNG, SVG, etc.)", {
+        toast.error(t("tela_perfil_recrutador.item_alerta_erro_tipo_arq"), {
           duration: 5000,
         });
         return;
@@ -179,7 +187,7 @@ export default function PerfilRecrutador({
 
       // 🔒 Verifica tamanho
       if (file.size > maxSize) {
-        toast.error("O arquivo deve ter no máximo 1MB.", {
+        toast.error(t("tela_perfil_recrutador.item_alerta_erro_tamanho_arq"), {
           duration: 5000,
         });
         return;
@@ -270,25 +278,25 @@ export default function PerfilRecrutador({
               ? data.message
               : Array.isArray(data.message)
               ? data.message.join(", ")
-              : "Erro ao salvar recrutador.";
+              : t("tela_perfil_recrutador.item_alerta_erro_salvar");
           throw new Error(errorMessage);
         }
 
         //setRecrutadorPublicado(data);
 
         localStorage.removeItem(`recrutadorForm_${userId}`);
-        toast.success(`Recrutador publicada com sucesso!`, {
+        toast.success(t("tela_perfil_recrutador.item_alerta_sucesso"), {
           duration: 5000,
         });
         setIsSubmitting(false);
         router.push(`/dashboard?perfil=${perfil}`);
       } catch (err: unknown) {
-        console.error("Erro ao enviar dados:", err);
+        console.error(t("tela_perfil_recrutador.item_alerta_erro_salvar"), err);
 
         const message =
           err instanceof Error
             ? err.message
-            : "Erro ao enviar dados da recrutador. Tente novamente.";
+            : t("tela_perfil_recrutador.item_alerta_erro_salvar");
 
         toast.error(message, {
           duration: 5000,
@@ -312,7 +320,11 @@ export default function PerfilRecrutador({
         {step != 5 && (
           <div className="pt-3 pl-6 flex items-center justify-center">
             <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
-              {["1 Dados", "2 Visualizar", "3 Publicar"].map((etapa, index) => (
+              {[
+                `1 ${t("tela_topo_passos.passo_dados")}`,
+                `2 ${t("tela_topo_passos.passo_visualizar")}`,
+                `3 ${t("tela_topo_passos.passo_publicar")}`,
+              ].map((etapa, index) => (
                 <div
                   key={index}
                   className="flex items-center gap-1 flex-1 min-w-0"
@@ -364,7 +376,7 @@ export default function PerfilRecrutador({
                       <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
                     </div>
                     <span className="ml-3 text-sm font-normal text-gray-700">
-                      Ativo
+                      {t("tela_perfil_recrutador.item_ativo")}
                     </span>
                   </label>
                   // </div>
@@ -372,12 +384,14 @@ export default function PerfilRecrutador({
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Nome:
+                    {t("tela_perfil_recrutador.item_label_nome")}
                   </label>
                   <div className="flex items-center border border-blue-400 rounded px-3 py-2 bg-gray-100 cursor-not-allowed opacity-80">
                     <input
                       name="nome_user"
-                      placeholder="Nome"
+                      placeholder={t(
+                        "tela_perfil_recrutador.item_placeholder_nome"
+                      )}
                       className="w-full outline-none"
                       defaultValue={form.nome_user}
                       disabled={true}
@@ -387,13 +401,15 @@ export default function PerfilRecrutador({
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Telefone de contato:
+                    {t("tela_perfil_recrutador.item_label_telefone")}
                   </label>
                   <div className="flex items-center border border-purple-400 rounded px-3 py-2">
                     <input
                       type="tel"
                       name="telefone"
-                      placeholder="Telefone"
+                      placeholder={t(
+                        "tela_perfil_recrutador.item_placeholder_telefone"
+                      )}
                       className="w-full outline-none"
                       defaultValue={form.telefone}
                       onChange={handleChange}
@@ -401,33 +417,35 @@ export default function PerfilRecrutador({
                   </div>
                   {showErrors && !form.telefone && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_perfil_recrutador.item_msg_campo_obt")}
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Localização:
+                    {t("tela_perfil_recrutador.item_label_localizacao")}
                   </label>
                   <input
                     type="text"
                     name="localizacao"
-                    placeholder="Informe o seu local"
+                    placeholder={t(
+                      "tela_perfil_recrutador.item_placeholder_localizacao"
+                    )}
                     className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                     value={form.localizacao}
                     onChange={handleChange}
                   />
                   {showErrors && !form.localizacao && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_perfil_recrutador.item_msg_campo_obt")}
                     </p>
                   )}
                 </div>
 
                 <fieldset className="text-sm text-gray-700 mt-2">
                   <legend className="mb-1 font-medium">
-                    Meio de Notificação:
+                    {t("tela_perfil_recrutador.item_label_notificacao")}
                   </legend>
                   <div className="flex">
                     <label className="flex items-center gap-2 cursor-pointer mr-10">
@@ -455,24 +473,23 @@ export default function PerfilRecrutador({
                   </div>
                   {showErrors && !form.localizacao && (
                     <p className="text-sm text-red-600 mt-1">
-                      Campo obrigatório.
+                      {t("tela_perfil_recrutador.item_msg_campo_obt")}
                     </p>
                   )}
                 </fieldset>
 
                 <div>
                   <label className="block text-sm font-medium mb-1">
-                    Descreva, em algumas linhas, um pouco mais sobre você. Este
-                    texto será sua carta de apresentação para as empresas na
-                    plataforma.{" "}
+                    {t("tela_perfil_recrutador.item_label_descreva")}{" "}
                     <strong>
-                      (Caso você seja de uma única empresa, pode deixar em
-                      branco este campo)
+                      {t("tela_perfil_recrutador.item_label_descreva_negrito")}
                     </strong>
                   </label>
                   <textarea
                     name="apresentacao"
-                    placeholder="Apresente-se "
+                    placeholder={t(
+                      "tela_perfil_recrutador.item_placeholder_apresentacao"
+                    )}
                     className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
                     rows={6}
                     value={form.apresentacao || ""}
@@ -487,8 +504,7 @@ export default function PerfilRecrutador({
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Carregue uma foto, imagem, logo do recrutador (recomendado
-                    512×512 px, até 1MB).
+                    {t("tela_perfil_recrutador.item_label_foto")}
                   </label>
                   <label
                     className={`
@@ -515,7 +531,7 @@ export default function PerfilRecrutador({
                     )}
                     {!form.logoPreview && (
                       <span className="text-sm font-medium text-center sm:text-base">
-                        Clique aqui e carregue sua imagem
+                        {t("tela_perfil_recrutador.item_msg_foto")}
                       </span>
                     )}
                     <input
@@ -528,7 +544,7 @@ export default function PerfilRecrutador({
                   </label>
                   {showErrors && !logoFile && (
                     <p className="text-sm text-red-600 mt-1">
-                      Logo obrigatória.
+                      {t("tela_perfil_recrutador.item_msg_logo_obt")}
                     </p>
                   )}
                 </div>
@@ -539,13 +555,13 @@ export default function PerfilRecrutador({
                     onClick={handleCancel}
                     className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                   >
-                    Cancelar
+                    {t("tela_perfil_recrutador.item_botao_cancelar")}
                   </button>
                   <button
                     type="submit"
                     className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                   >
-                    Avançar
+                    {t("tela_perfil_recrutador.item_botao_avancar")}
                   </button>
                 </div>
               </form>
@@ -568,7 +584,7 @@ export default function PerfilRecrutador({
                         />
                       ) : (
                         <div className="text-xs text-gray-400 flex items-center justify-center h-full">
-                          Sem logo
+                          {t("tela_perfil_recrutador.item_msg_sem_foto")}
                         </div>
                       )}
                     </div>
@@ -592,7 +608,9 @@ export default function PerfilRecrutador({
                               />
                             </svg>
                           </div>
-                          <span className="text-sm text-green-600">Ativa</span>
+                          <span className="text-sm text-green-600">
+                            {t("tela_perfil_recrutador.item_ativo")}
+                          </span>
                         </span>
                       ) : (
                         <span className="flex items-center gap-1">
@@ -610,7 +628,9 @@ export default function PerfilRecrutador({
                               />
                             </svg>
                           </div>
-                          <span className="text-sm text-gray-600">Inativa</span>
+                          <span className="text-sm text-gray-600">
+                            {t("tela_perfil_recrutador.item_inativo")}
+                          </span>
                         </span>
                       )}
 
@@ -726,7 +746,7 @@ export default function PerfilRecrutador({
                         type="button"
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
                       >
-                        Voltar
+                        {t("tela_perfil_recrutador.item_botao_voltar")}
                       </button>
                     </div>
 
@@ -737,7 +757,7 @@ export default function PerfilRecrutador({
                         onClick={handleCancel}
                         className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                       >
-                        Cancelar
+                        {t("tela_perfil_recrutador.item_botao_cancelar")}
                       </button>
                       <button
                         type="submit"
@@ -750,7 +770,7 @@ export default function PerfilRecrutador({
                         {isSubmitting ? (
                           <ImSpinner2 className="animate-spin" />
                         ) : (
-                          "Publicar"
+                          t("tela_perfil_recrutador.item_botao_publicar")
                         )}
                       </button>
                     </div>

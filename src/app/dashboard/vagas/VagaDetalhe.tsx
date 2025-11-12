@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -65,6 +66,8 @@ interface VagaData {
 
 export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
   const router = useRouter();
+  const { t } = useTranslation("common");
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [vaga, setVaga] = useState<VagaData | null>(null);
@@ -97,13 +100,14 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
           }
         );
 
-        if (!res.ok) throw new Error("Erro ao buscar dados da vaga");
+        if (!res.ok)
+          throw new Error(t("tela_vaga_dados.item_alerta_erro_buscar_dados"));
 
         const data = await res.json();
         setVaga(data);
       } catch (error) {
         console.error("Erro ao carregar vaga:", error);
-        toast.error("Problemas ao carregar dados da vaga. Tente novamente.", {
+        toast.error(t("tela_vaga_dados.item_alerta_erro_buscar_dados"), {
           duration: 5000,
         });
       } finally {
@@ -139,7 +143,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                   }}
                   className="px-4 py-2 text-sm rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                 >
-                  ← Voltar para lista de vagas
+                  {t("tela_vaga_dados.item_botao_lista_vagas")}
                 </button>
               </div>
 
@@ -154,7 +158,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                     }
                     className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
                   >
-                    Editar Vaga
+                    {t("tela_vaga_dados.item_botao_editar")}
                   </button>
                 )}
               </div>
@@ -194,7 +198,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                             />
                           ) : (
                             <div className="text-xs text-gray-400 text-center px-2">
-                              Sem logo
+                              {t("tela_vaga_dados.item_msg_sem_foto")}
                             </div>
                           )}
                         </div>
@@ -222,13 +226,16 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                         <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
                           <CalendarDays className="w-4 h-4 text-purple-500" />
                           <span>
-                            Vigência até: <strong>{vaga?.prazo}</strong>
+                            {t("tela_vaga_dados.item_msg_vigencia")}{" "}
+                            <strong>{vaga?.prazo}</strong>
                           </span>
                         </div>
                       </div>
                       {perfil === "recrutador" && (
                         <div className="flex items-center gap-2 w-full sm:w-1/2">
-                          <span className="font-medium">Situação:</span>
+                          <span className="font-medium">
+                            {t("tela_vaga_dados.item_situacao")}
+                          </span>
                           {vaga?.ativo ? (
                             <span className="flex items-center gap-1">
                               <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
@@ -246,7 +253,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                                 </svg>
                               </div>
                               <span className="text-sm  text-green-600">
-                                Ativa
+                                {t("tela_vaga_dados.item_ativo")}
                               </span>
                             </span>
                           ) : (
@@ -267,7 +274,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                               </div>
 
                               <span className="text-sm  text-gray-600">
-                                Inativa
+                                {t("tela_vaga_dados.item_inativo")}
                               </span>
                             </span>
                           )}
@@ -283,12 +290,12 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                       </div>
                       <div className="flex items-center gap-2 w-full sm:w-1/2">
                         <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
-                        Aberta em:{" "}
+                        {t("tela_vaga_dados.item_msg_aberta")}{" "}
                         {vaga?.data_cadastro
                           ? new Date(vaga?.data_cadastro).toLocaleDateString(
                               "pt-BR"
                             )
-                          : "Data não informada"}
+                          : t("tela_vaga_dados.item_msg_sem_data")}
                       </div>
                     </div>
 
@@ -297,12 +304,12 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                       <div className="flex items-center gap-2 w-full sm:w-1/2">
                         <Clock className="w-4 h-4 text-gray-500 shrink-0" />
                         {vaga?.periodo_trabalho?.periodo ||
-                          "Período não informado"}
+                          t("tela_vaga_dados.item_msg_sem_periodo")}
                       </div>
                       <div className="flex items-center gap-2 w-full sm:w-1/2">
                         <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
                         {vaga?.modalidade_trabalho?.modalidade ||
-                          "Modalidade não informada"}
+                          t("tela_vaga_dados.item_msg_sem_modalidade")}
                       </div>
                     </div>
 
@@ -311,14 +318,14 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                       <div className="w-full sm:w-1/2">
                         {vaga?.pcd && (
                           <span role="img" aria-label="acessível">
-                            ♿ Vaga para PCD
+                            ♿ {t("tela_vaga_dados.item_vaga_pcd")}
                           </span>
                         )}
                       </div>
                       <div className="w-full sm:w-1/2">
                         {vaga?.lgbtq && (
                           <span role="img" aria-label="acessível">
-                            🏳️‍🌈 Vaga para LGBTQ+
+                            🏳️‍🌈 {t("tela_vaga_dados.item_vaga_lgbtq")}
                           </span>
                         )}
                       </div>
@@ -327,14 +334,14 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                       <div className="w-full sm:w-1/2">
                         {vaga?.mulheres && (
                           <span role="img" aria-label="acessível">
-                            👩‍💼 Vaga para Mulheres
+                            👩‍💼 {t("tela_vaga_dados.item_vaga_mulheres")}
                           </span>
                         )}
                       </div>
                       <div className="w-full sm:w-1/2">
                         {vaga?.cinquenta_mais && (
                           <span role="img" aria-label="acessível">
-                            👴 Vaga para 50+
+                            👴 {t("tela_vaga_dados.item_vaga_50_mais")}
                           </span>
                         )}
                       </div>
@@ -343,7 +350,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                     {/* Linha 4 - Descrição */}
                     <div>
                       <h3 className="text-md font-semibold text-gray-700 mb-1">
-                        Descrição
+                        {t("tela_vaga_dados.item_label_descricao")}
                       </h3>
                       <p className="text-sm text-gray-600 whitespace-pre-line">
                         {vaga?.descricao}
@@ -356,7 +363,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                   {/* Bloco - Lista de Skills */}
                   <div className="w-full sm:w-[30%] flex flex-col mt-2">
                     <h3 className="text-md font-semibold text-gray-700 mb-2">
-                      Skills e pesos
+                      {t("tela_vaga_dados.item_label_skill_pesos")}
                     </h3>
 
                     <ul className="grid grid-cols-1 xs:grid-cols-2 gap-2">
@@ -371,7 +378,8 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                               {skill.nome}
                             </span>
                             <span className="text-xs text-[#808080]">
-                              Peso: {skill.peso / 10}/10
+                              {t("tela_vaga_dados.item_label_peso")}{" "}
+                              {skill.peso / 10}/10
                             </span>
                           </div>
 
