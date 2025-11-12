@@ -8,9 +8,9 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import Image from "next/image";
 // import { useRouter } from "next/navigation"; // App Router
 import SemDados from "../SemDados";
-// import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
 import { ImSpinner2 } from "react-icons/im";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -34,7 +34,7 @@ export default function EmpresaListar({
   recrutadorId,
   hasPerfilRecrutador,
 }: Props) {
-  // const { t, i18n } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   // const router = useRouter();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -44,9 +44,9 @@ export default function EmpresaListar({
   const [isSubmitRejeita, setIsSubmitRejeita] = useState(false);
 
   const colunas = [
-    { titulo: "Avaliadores Aguardando Confirmação", filtro: -1 },
-    { titulo: "Avaliadores Reprovados", filtro: 0 },
-    { titulo: "Avaliadores Aprovados", filtro: 1 },
+    { titulo: t("tela_lista_avaliadores.item_titulo_aguardando"), filtro: -1 },
+    { titulo: t("tela_lista_avaliadores.item_titulo_reprovados"), filtro: 0 },
+    { titulo: t("tela_lista_avaliadores.item_titulo_aprovados"), filtro: 1 },
   ] as const;
   // const lng = "pt"; //searchParams.get("lng");
 
@@ -71,7 +71,10 @@ export default function EmpresaListar({
         console.log(data);
         setEspecialistas(data);
       } catch (error) {
-        console.error("Erro ao buscar especialistas:", error);
+        console.error(
+          t("tela_lista_avaliadores.item_alerta_erro_buscar_dados"),
+          error
+        );
       } finally {
         setIsLoading(false);
       }
@@ -89,19 +92,24 @@ export default function EmpresaListar({
       const response = await fetch(url, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": i18n.language,
+        },
         body: JSON.stringify({ id, empresa_id }),
       });
 
       const data = await response.json();
       console.log(data);
 
-      toast.success(`Avaliador atualizado com sucesso!`, { duration: 3000 });
+      toast.success(t("tela_lista_avaliadores.item_alerta_sucesso"), {
+        duration: 3000,
+      });
       setTimeout(() => {
         window.location.reload();
       }, 3000);
     } catch (error) {
-      toast.error(`Problemas ao tentar executar a operação!`, {
+      toast.error(t("tela_lista_avaliadores.item_alerta_erro_salvar"), {
         duration: 3000,
       });
       setIsSubmitConfirma(false);
@@ -116,20 +124,25 @@ export default function EmpresaListar({
       const response = await fetch(url, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": i18n.language,
+        },
         body: JSON.stringify({ id, empresa_id }),
       });
 
       const data = await response.json();
       console.log(data);
 
-      toast.success(`Avaliador atualizado com sucesso!`, { duration: 3000 });
+      toast.success(t("tela_lista_avaliadores.item_alerta_sucesso"), {
+        duration: 3000,
+      });
 
       setTimeout(() => {
         window.location.reload();
       }, 3000);
     } catch (error) {
-      toast.error(`Problemas ao tentar executar a operação!`, {
+      toast.error(t("tela_lista_avaliadores.item_alerta_erro_salvar"), {
         duration: 3000,
       });
       setIsSubmitRejeita(false);
@@ -195,7 +208,9 @@ export default function EmpresaListar({
                                 />
                               ) : (
                                 <span className="text-[10px] text-gray-400 text-center px-2">
-                                  Sem logo
+                                  {t(
+                                    "tela_lista_avaliadores.item_msg_sem_foto"
+                                  )}
                                 </span>
                               )}
                             </div>
@@ -227,7 +242,9 @@ export default function EmpresaListar({
                                       {isSubmitConfirma ? (
                                         <ImSpinner2 className="animate-spin text-lg" />
                                       ) : (
-                                        "Aprovar"
+                                        t(
+                                          "tela_lista_avaliadores.item_botao_aprovar"
+                                        )
                                       )}
                                     </button>
                                     <button
@@ -243,7 +260,9 @@ export default function EmpresaListar({
                                       {isSubmitRejeita ? (
                                         <ImSpinner2 className="animate-spin text-lg" />
                                       ) : (
-                                        "Reprovar"
+                                        t(
+                                          "tela_lista_avaliadores.item_botao_reprovar"
+                                        )
                                       )}
                                     </button>
                                   </>
@@ -263,7 +282,9 @@ export default function EmpresaListar({
                                       {isSubmitConfirma ? (
                                         <ImSpinner2 className="animate-spin text-lg" />
                                       ) : (
-                                        "Aprovar"
+                                        t(
+                                          "tela_lista_avaliadores.item_botao_aprovar"
+                                        )
                                       )}
                                     </button>
                                   </div>
@@ -282,7 +303,9 @@ export default function EmpresaListar({
                                       {isSubmitRejeita ? (
                                         <ImSpinner2 className="animate-spin text-lg" />
                                       ) : (
-                                        "Reprovar"
+                                        t(
+                                          "tela_lista_avaliadores.item_botao_reprovar"
+                                        )
                                       )}
                                     </button>
                                   </div>
@@ -293,7 +316,9 @@ export default function EmpresaListar({
                         ))
                       ) : (
                         <p className="text-xs text-gray-400 italic">
-                          Nenhum especialista nesta categoria.
+                          {t(
+                            "tela_lista_avaliadores.item_msg_sem_especialista"
+                          )}
                         </p>
                       )}
                     </div>
