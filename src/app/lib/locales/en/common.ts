@@ -165,7 +165,8 @@ const en = {
     passo_dados: "Information",
     passo_formacao: "Education",
     passo_certificacao: "Certification",
-    passo_skills: "Skills",
+    passo_hardskills: "Hard-Skills",
+    passo_softskills: "Soft-Skills",
     passo_visualizar: "Preview",
     passo_publicar: "Publish",
     passo_localizacao: "Location",
@@ -230,8 +231,14 @@ const en = {
     item_msg_criar_certificacao: "Create new certification:",
     item_botao_remover_certificacao: "Remove Certification",
     item_botao_certificado_atualizado: "Certificate updated!",
-    item_label_informe_skills:
-      "Enter the skills you wish to work with as an evaluator",
+    item_label_informe_hardskills:
+      "Enter the Hard Skills you wish to work with as an evaluator",
+    item_label_informe_hardskills_subitem:
+      "Hard Skills are the technical competencies acquired by professionals throughout their careers.",
+    item_label_informe_softskills:
+      "Enter the Soft Skills you wish to work with as an evaluator",
+    item_label_informe_softskills_subitem:
+      "Soft Skills are the behavioral competencies that are natural or acquired by professionals throughout their careers.",
     item_label_informe_qtde: "(minimum 3 and maximum 12)",
     item_label_skill: "Skills:",
     item_msg_skill: "Type or select a skill",
@@ -446,8 +453,14 @@ const en = {
     item_msg_vigencia: "Valid until: ",
     item_msg_aberta: "Opened on: ",
     item_msg_sem_data: "Date not provided",
-    item_label_informe_skills:
-      "Enter the skills you’re looking for in this professional profile",
+    item_label_informe_hardskills:
+      "Specify the Hard Skills you are looking for in this professional profile",
+    item_label_informe_hardskills_subitem:
+      "Hard Skills are the technical competencies acquired by professionals throughout their careers.",
+    item_label_informe_softskills:
+      "Specify the Soft Skills you are looking for in this professional profile",
+    item_label_informe_softskills_subitem:
+      "Soft Skills are the behavioral competencies that are natural or acquired by professionals throughout their careers.",
     item_label_informe_qtde: "(minimum 3 and maximum 12)",
     item_label_skill: "Skills:",
     item_msg_skill: "Type or select a skill",
@@ -476,8 +489,9 @@ const en = {
     item_tooltip_avaliador_passo12: "selected does not have its own ",
     item_tooltip_avaliador_passo13: "internal evaluator.",
     item_botao_lista_vagas: "← Back to job list",
-    item_label_panel_score: "Average Score",
-    item_label_panel_skill: "Skill Distribution",
+    item_label_panel_score: "Average Score  (Hard+Soft):",
+    item_label_panel_hardskill: "Hard Skill Distribution",
+    item_label_panel_softskill: "Soft Skill Distribution",
   },
 };
 

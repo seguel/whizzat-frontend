@@ -167,7 +167,8 @@ const pt = {
     passo_dados: "Dados",
     passo_formacao: "Formação",
     passo_certificacao: "Certificação",
-    passo_skills: "Skills",
+    passo_hardskills: "Hard-Skills",
+    passo_softskills: "Soft-Skills",
     passo_visualizar: "Visualizar",
     passo_publicar: "Publicar",
     passo_localizacao: "Localização",
@@ -231,8 +232,14 @@ const pt = {
     item_msg_criar_certificacao: "Criar nova certificação:",
     item_botao_remover_certificacao: "Remover Certificação",
     item_botao_certificado_atualizado: "Certificado Atualizado!",
-    item_label_informe_skills:
-      "Informe as Skills que você deseja atuar como avaliador",
+    item_label_informe_hardskills:
+      "Informe as Hard Skills que você deseja atuar como avaliador",
+    item_label_informe_hardskills_subitem:
+      "Hard Skill são as competência técnicas adquiridas pelo profissional ao longo da sua carreira.",
+    item_label_informe_softskills:
+      "Informe as Soft Skills que você deseja atuar como avaliador",
+    item_label_informe_softskills_subitem:
+      "Soft Skills são as competência comportamentais naturais ou adquiridas pelo profissional ao longo da sua carreira.",
     item_label_informe_qtde: "(mínimo 3 e no máximo 12)",
     item_label_skill: "Skills:",
     item_msg_skill: "Digite ou selecione uma skill",
@@ -450,8 +457,14 @@ const pt = {
     item_msg_vigencia: "Vigência até: ",
     item_msg_aberta: "Aberta em: ",
     item_msg_sem_data: "Data não informada",
-    item_label_informe_skills:
-      "Informe as Skills que você busca para este perfil profissional",
+    item_label_informe_hardskills:
+      "Informe as Hard Skills que você busca para este perfil profissional",
+    item_label_informe_hardskills_subitem:
+      "Hard Skill são as competência técnicas adquiridas pelo profissional ao longo da sua carreira.",
+    item_label_informe_softskills:
+      "Informe as Soft Skills que você busca para este perfil profissional",
+    item_label_informe_softskills_subitem:
+      "Soft Skills são as competência comportamentais naturais ou adquiridas pelo profissional ao longo da sua carreira.",
     item_label_informe_qtde: "(mínimo 3 e no máximo 12)",
     item_label_skill: "Skills:",
     item_msg_skill: "Digite ou selecione uma skill",
@@ -480,8 +493,9 @@ const pt = {
     item_tooltip_avaliador_passo12: "selecionada não possuir avaliador ",
     item_tooltip_avaliador_passo13: "próprio.",
     item_botao_lista_vagas: "← Voltar para lista de vagas",
-    item_label_panel_score: "Score Médio",
-    item_label_panel_skill: "Distribuição de skills",
+    item_label_panel_score: "Score Médio (Hard+Soft):",
+    item_label_panel_hardskill: "Distribuição de Hard Skills",
+    item_label_panel_softskill: "Distribuição de Soft Skills",
   },
 };
 
