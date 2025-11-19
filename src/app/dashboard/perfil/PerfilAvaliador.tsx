@@ -53,6 +53,7 @@ interface SkillAvaliacao {
   peso: number;
   favorito: boolean;
   tempo_favorito?: string;
+  tipo_skill_id?: number;
 }
 
 // Tipos de dados do formulário
@@ -119,7 +120,7 @@ export default function PerfilAvaliador({
   nome_user,
 }: AvaliadorProps) {
   const router = useRouter();
-  const { t, i18n } = useTranslation("common");
+  const { t } = useTranslation("common");
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useLocalStorage<AvaliadorForm>(
@@ -199,9 +200,9 @@ export default function PerfilAvaliador({
     { id: number; graduacao: string }[]
   >([]);
 
-  const [skills, setSkills] = useState<{ skill_id: number; skill: string }[]>(
-    []
-  );
+  const [skills, setSkills] = useState<
+    { skill_id: number; skill: string; tipo_skill_id: number }[]
+  >([]);
 
   const [selectedGraduacao, setSelectedGraduacao] = useState<{
     value: string;
@@ -213,6 +214,7 @@ export default function PerfilAvaliador({
   const [selectedSkill, setSelectedSkill] = useState<{
     value: string;
     label: string;
+    tipo_skill_id: number;
   } | null>(null);
 
   useEffect(() => {
@@ -343,6 +345,7 @@ export default function PerfilAvaliador({
             certificacaoRes.json(),
           ]);
 
+        //console.log(skillsData);
         setEmpresas(empresasData.empresas);
         setSkills(skillsData);
         setGraduacoes(graduacoesData);
@@ -498,13 +501,20 @@ export default function PerfilAvaliador({
     }
 
     if (step === 4) {
-      if (form.lista_skills.length <= 0) return;
+      if (form.lista_skills.filter((s) => s.tipo_skill_id == 1).length < 0)
+        return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
     if (step === 5) {
+      setShowErrors(false);
+      nextStep();
+      return;
+    }
+
+    if (step === 6) {
       if (!isFormValid(form)) return;
 
       if (certificadoFiles || certificacaoFiles) {
@@ -615,9 +625,6 @@ export default function PerfilAvaliador({
           method: "POST",
           body: formData,
           credentials: "include",
-          headers: {
-            "Accept-Language": i18n.language,
-          },
         });
 
         const data = await response.json();
@@ -663,10 +670,11 @@ export default function PerfilAvaliador({
       peso: Number(s.peso) || 0,
       favorito: Boolean(s.favorito), // boolean
       tempo_favorito: s.tempo_favorito ?? "",
+      tipo_skill_id: s.tipo_skill_id ?? 1,
     }));
   }
 
-  const handleAddSkill = () => {
+  const handleAddSkill = (tipoSkill: number) => {
     if (!selectedSkill?.value) {
       setShowErrors(true);
       return;
@@ -682,6 +690,7 @@ export default function PerfilAvaliador({
       favorito: false,
       tempo_favorito: "",
       nome: selectedSkill.label, // ← Salva o nome para posterior criação no backend
+      tipo_skill_id: tipoSkill,
     };
 
     setForm((prev) => ({
@@ -692,7 +701,11 @@ export default function PerfilAvaliador({
     if (isNovaSkill) {
       setSkills((prev) => [
         ...prev,
-        { skill_id: id, skill: selectedSkill.label },
+        {
+          skill_id: id,
+          skill: selectedSkill.label,
+          tipo_skill_id: selectedSkill.tipo_skill_id,
+        },
       ]);
     }
 
@@ -940,9 +953,6 @@ export default function PerfilAvaliador({
         {
           method: "POST",
           credentials: "include",
-          headers: {
-            "Accept-Language": i18n.language,
-          },
         }
       );
 
@@ -982,20 +992,21 @@ export default function PerfilAvaliador({
       <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        {step != 6 && (
+        {step != 7 && (
           <div className="pt-3 pl-6 flex items-center justify-center">
             <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
               {[
                 `1 ${t("tela_topo_passos.passo_dados")}`,
                 `2 ${t("tela_topo_passos.passo_formacao")}`,
                 `3 ${t("tela_topo_passos.passo_certificacao")}`,
-                `4 ${t("tela_topo_passos.passo_skills")}`,
-                `5 ${t("tela_topo_passos.passo_visualizar")}`,
-                `6 ${t("tela_topo_passos.passo_publicar")}`,
+                `4 ${t("tela_topo_passos.passo_hardskills")}`,
+                `5 ${t("tela_topo_passos.passo_softskills")}`,
+                `6 ${t("tela_topo_passos.passo_visualizar")}`,
+                `7 ${t("tela_topo_passos.passo_publicar")}`,
               ].map((etapa, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-1 flex-1 min-w-0"
+                  className="flex items-center gap-1 flex-1 min-w-0 "
                 >
                   <div
                     className={`w-6 h-6 rounded-full text-center text-white text-xs flex items-center justify-center ${
@@ -1011,11 +1022,6 @@ export default function PerfilAvaliador({
                   >
                     {etapa.split(" ")[1]}
                   </span>
-                  {index < 5 && (
-                    <span className="mx-1 text-gray-300 hidden sm:inline">
-                      ─────
-                    </span>
-                  )}
                 </div>
               ))}
             </div>
@@ -1887,7 +1893,12 @@ export default function PerfilAvaliador({
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1">
                   <div>
                     <h1 className="block text-sm mb-1 py-3 font-bold">
-                      {t("tela_perfil_avaliador.item_label_informe_skills")}
+                      {t("tela_perfil_avaliador.item_label_informe_hardskills")}
+                      <p className="text-[11px] font-normal italic">
+                        {t(
+                          "tela_perfil_avaliador.item_label_informe_hardskills_subitem"
+                        )}
+                      </p>
                       <p className="block text-[11x] font-light">
                         {t("tela_perfil_avaliador.item_label_informe_qtde")}
                       </p>
@@ -1918,10 +1929,13 @@ export default function PerfilAvaliador({
                           )}
                           value={selectedSkill}
                           onChange={(newValue) => setSelectedSkill(newValue)}
-                          options={skills.map((skill) => ({
-                            value: String(skill.skill_id),
-                            label: skill.skill,
-                          }))}
+                          options={skills
+                            .filter((f) => f.tipo_skill_id == 1)
+                            .map((skill) => ({
+                              value: String(skill.skill_id),
+                              label: skill.skill,
+                              tipo_skill_id: skill.tipo_skill_id,
+                            }))}
                           formatCreateLabel={(inputValue) =>
                             `${t(
                               "tela_perfil_avaliador.item_msg_criar_skill"
@@ -1933,7 +1947,7 @@ export default function PerfilAvaliador({
 
                       <button
                         type="button"
-                        onClick={handleAddSkill}
+                        onClick={() => handleAddSkill(1)}
                         className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
                       >
                         {t("tela_perfil_avaliador.item_botao_adicionar")}
@@ -1948,153 +1962,160 @@ export default function PerfilAvaliador({
                   </div>
 
                   <div className="flex flex-1 flex-col gap-3 mt-5">
-                    {form.lista_skills.map((item) => {
-                      const skill = skills.find(
-                        (s) => s.skill_id === item.skill_id
-                      );
-                      return (
-                        <div
-                          key={item.skill_id}
-                          className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                        >
-                          <div className="flex flex-col gap-2 w-full">
-                            {/* Linha com Skill, Peso e Avaliador */}
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
-                              {/* Nome da skill */}
-                              <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
-                                {skill?.skill ?? item.nome}
-                              </div>
-
-                              {/* Peso com slider */}
-                              <div className="flex items-center gap-2 text-sm min-w-[200px]">
-                                <label className="font-medium whitespace-nowrap">
-                                  {t("tela_perfil_avaliador.item_label_peso")}
-                                </label>
-                                <input
-                                  type="range"
-                                  min={1}
-                                  max={10}
-                                  step={0.5}
-                                  list="tickmarks"
-                                  value={item.peso / 10}
-                                  onChange={(e) =>
-                                    handleSkillChange(
-                                      item.skill_id,
-                                      "peso",
-                                      Number(e.target.value) * 10
-                                    )
-                                  }
-                                  className="w-full sm:w-40 accent-blue-600 cursor-pointer"
-                                />
-                                <datalist id="tickmarks">
-                                  {[...Array(19)].map((_, i) => {
-                                    const val = i * 0.5 + 1;
-                                    return (
-                                      <option
-                                        key={val}
-                                        value={val.toFixed(1)}
-                                      />
-                                    );
-                                  })}
-                                </datalist>
-                                <span className="w-8 text-right">
-                                  {(item.peso / 10).toFixed(1)}
-                                </span>
-                              </div>
-
-                              {/* favorito */}
-                              <div className="flex items-center gap-4 text-sm min-w-[260px]">
-                                <div className="flex items-center gap-1">
-                                  <label className="font-medium whitespace-nowrap">
-                                    {t(
-                                      "tela_perfil_avaliador.item_label_favorito"
-                                    )}
-                                  </label>
+                    {form.lista_skills
+                      .filter((f) => f.tipo_skill_id == 1)
+                      .map((item) => {
+                        const skill = skills.find(
+                          (s) => s.skill_id === item.skill_id
+                        );
+                        return (
+                          <div
+                            key={item.skill_id}
+                            className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <div className="flex flex-col gap-2 w-full">
+                              {/* Linha com Skill, Peso e Avaliador */}
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
+                                {/* Nome da skill */}
+                                <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                  {skill?.skill ?? item.nome}
                                 </div>
 
-                                {/* Estrela de favorito */}
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const totalFavoritos =
+                                {/* Peso com slider */}
+                                <div className="flex items-center gap-2 text-sm min-w-[200px]">
+                                  <label className="font-medium whitespace-nowrap">
+                                    {t("tela_perfil_avaliador.item_label_peso")}
+                                  </label>
+                                  <input
+                                    type="range"
+                                    min={1}
+                                    max={10}
+                                    step={0.5}
+                                    list="tickmarks"
+                                    value={item.peso / 10}
+                                    onChange={(e) =>
+                                      handleSkillChange(
+                                        item.skill_id,
+                                        "peso",
+                                        Number(e.target.value) * 10
+                                      )
+                                    }
+                                    className="w-full sm:w-40 accent-blue-600 cursor-pointer"
+                                  />
+                                  <datalist id="tickmarks">
+                                    {[...Array(19)].map((_, i) => {
+                                      const val = i * 0.5 + 1;
+                                      return (
+                                        <option
+                                          key={val}
+                                          value={val.toFixed(1)}
+                                        />
+                                      );
+                                    })}
+                                  </datalist>
+                                  <span className="w-8 text-right">
+                                    {(item.peso / 10).toFixed(1)}
+                                  </span>
+                                </div>
+
+                                {/* favorito */}
+                                <div className="flex items-center gap-4 text-sm min-w-[260px]">
+                                  <div className="flex items-center gap-1">
+                                    <label className="font-medium whitespace-nowrap">
+                                      {t(
+                                        "tela_perfil_avaliador.item_label_favorito"
+                                      )}
+                                    </label>
+                                  </div>
+
+                                  {/* Estrela de favorito */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const totalFavoritos =
+                                        form.lista_skills.filter(
+                                          (s) => s.favorito
+                                        ).length;
+
+                                      // Se já tem 5 favoritos e este não é favorito → não deixa clicar
+                                      if (
+                                        totalFavoritos >= 5 &&
+                                        !item.favorito
+                                      ) {
+                                        return;
+                                      }
+
+                                      handleSkillChange(
+                                        item.skill_id,
+                                        "favorito",
+                                        !item.favorito
+                                      );
+                                    }}
+                                    className={`flex items-center ${
                                       form.lista_skills.filter(
                                         (s) => s.favorito
-                                      ).length;
-
-                                    // Se já tem 5 favoritos e este não é favorito → não deixa clicar
-                                    if (totalFavoritos >= 5 && !item.favorito) {
-                                      return;
+                                      ).length >= 5 && !item.favorito
+                                        ? "cursor-not-allowed opacity-50"
+                                        : "cursor-pointer"
+                                    }`}
+                                    disabled={
+                                      form.lista_skills.filter(
+                                        (s) => s.favorito
+                                      ).length >= 5 && !item.favorito
                                     }
-
-                                    handleSkillChange(
-                                      item.skill_id,
-                                      "favorito",
-                                      !item.favorito
-                                    );
-                                  }}
-                                  className={`flex items-center ${
-                                    form.lista_skills.filter((s) => s.favorito)
-                                      .length >= 5 && !item.favorito
-                                      ? "cursor-not-allowed opacity-50"
-                                      : "cursor-pointer"
-                                  }`}
-                                  disabled={
-                                    form.lista_skills.filter((s) => s.favorito)
-                                      .length >= 5 && !item.favorito
-                                  }
-                                >
-                                  <TooltipIcon
-                                    message={`${t(
-                                      "tela_perfil_avaliador.item_tooltip_favorite_passo1"
-                                    )}\n${t(
-                                      "tela_perfil_avaliador.item_tooltip_favorite_passo2"
-                                    )}\n${t(
-                                      "tela_perfil_avaliador.item_tooltip_favorite_passo2_1"
-                                    )}`}
-                                    perfil={perfil}
                                   >
-                                    <Star
-                                      className={`w-4 h-4 transition-colors ${
-                                        item.favorito
-                                          ? "fill-yellow-400 text-yellow-400"
-                                          : "text-gray-400"
-                                      }`}
-                                    />
-                                  </TooltipIcon>
-                                </button>
+                                    <TooltipIcon
+                                      message={`${t(
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo1"
+                                      )}\n${t(
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2"
+                                      )}\n${t(
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2_1"
+                                      )}`}
+                                      perfil={perfil}
+                                    >
+                                      <Star
+                                        className={`w-4 h-4 transition-colors ${
+                                          item.favorito
+                                            ? "fill-yellow-400 text-yellow-400"
+                                            : "text-gray-400"
+                                        }`}
+                                      />
+                                    </TooltipIcon>
+                                  </button>
 
-                                {/* Tempo da skill */}
-                                <input
-                                  type="text"
-                                  placeholder={t(
-                                    "tela_perfil_avaliador.item_placeholder_favorito"
-                                  )}
-                                  className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
-                                  value={item.tempo_favorito}
-                                  onChange={(e) =>
-                                    handleSkillChange(
-                                      item.skill_id,
-                                      "tempo_favorito",
-                                      e.target.value
-                                    )
-                                  }
-                                />
+                                  {/* Tempo da skill */}
+                                  <input
+                                    type="text"
+                                    placeholder={t(
+                                      "tela_perfil_avaliador.item_placeholder_favorito"
+                                    )}
+                                    className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
+                                    value={item.tempo_favorito}
+                                    onChange={(e) =>
+                                      handleSkillChange(
+                                        item.skill_id,
+                                        "tempo_favorito",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <button
-                            onClick={() => handleRemoveSkill(item.skill_id)}
-                            className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
-                            title={t(
-                              "tela_perfil_avaliador.item_botao_remover_skill"
-                            )}
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      );
-                    })}
+                            <button
+                              onClick={() => handleRemoveSkill(item.skill_id)}
+                              className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
+                              title={t(
+                                "tela_perfil_avaliador.item_botao_remover_skill"
+                              )}
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        );
+                      })}
                   </div>
 
                   {/* Botões no rodapé */}
@@ -2137,6 +2158,260 @@ export default function PerfilAvaliador({
             )}
 
             {step === 5 && (
+              <div className="w-full h-full flex flex-col">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+                  <div>
+                    <h1 className="block text-sm mb-1 py-3 font-bold">
+                      {t("tela_perfil_avaliador.item_label_informe_softskills")}
+                      <p className="text-[11px] font-normal italic">
+                        {t(
+                          "tela_perfil_avaliador.item_label_informe_softskills_subitem"
+                        )}
+                      </p>
+                    </h1>
+
+                    <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                      {t("tela_perfil_avaliador.item_label_skill")}
+                      <TooltipIcon
+                        message={`${t(
+                          "tela_perfil_avaliador.item_tooltip_skill_titulo"
+                        )}\n${t(
+                          "tela_perfil_avaliador.item_tooltip_skill_passo1"
+                        )}\n${t(
+                          "tela_perfil_avaliador.item_tooltip_skill_passo2"
+                        )}\n${t(
+                          "tela_perfil_avaliador.item_tooltip_skill_passo3"
+                        )}`}
+                        perfil={perfil}
+                      />
+                    </label>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <CreatableSelect
+                          isClearable
+                          placeholder={t(
+                            "tela_perfil_avaliador.item_msg_skill"
+                          )}
+                          value={selectedSkill}
+                          onChange={(newValue) => setSelectedSkill(newValue)}
+                          options={skills
+                            .filter((f) => f.tipo_skill_id == 2)
+                            .map((skill) => ({
+                              value: String(skill.skill_id),
+                              label: skill.skill,
+                              tipo_skill_id: skill.tipo_skill_id,
+                            }))}
+                          formatCreateLabel={(inputValue) =>
+                            `${t(
+                              "tela_perfil_avaliador.item_msg_criar_skill"
+                            )} ${inputValue}`
+                          }
+                          // isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddSkill(2)}
+                        className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
+                      >
+                        {t("tela_perfil_avaliador.item_botao_adicionar")}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-1 flex-col gap-3 mt-5">
+                    {form.lista_skills
+                      .filter((f) => f.tipo_skill_id == 2)
+                      .map((item) => {
+                        const skill = skills.find(
+                          (s) => s.skill_id === item.skill_id
+                        );
+                        return (
+                          <div
+                            key={item.skill_id}
+                            className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <div className="flex flex-col gap-2 w-full">
+                              {/* Linha com Skill, Peso e Avaliador */}
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
+                                {/* Nome da skill */}
+                                <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                  {skill?.skill ?? item.nome}
+                                </div>
+
+                                {/* Peso com slider */}
+                                <div className="flex items-center gap-2 text-sm min-w-[200px]">
+                                  <label className="font-medium whitespace-nowrap">
+                                    {t("tela_perfil_avaliador.item_label_peso")}
+                                  </label>
+                                  <input
+                                    type="range"
+                                    min={1}
+                                    max={10}
+                                    step={0.5}
+                                    list="tickmarks"
+                                    value={item.peso / 10}
+                                    onChange={(e) =>
+                                      handleSkillChange(
+                                        item.skill_id,
+                                        "peso",
+                                        Number(e.target.value) * 10
+                                      )
+                                    }
+                                    className="w-full sm:w-40 accent-blue-600 cursor-pointer"
+                                  />
+                                  <datalist id="tickmarks">
+                                    {[...Array(19)].map((_, i) => {
+                                      const val = i * 0.5 + 1;
+                                      return (
+                                        <option
+                                          key={val}
+                                          value={val.toFixed(1)}
+                                        />
+                                      );
+                                    })}
+                                  </datalist>
+                                  <span className="w-8 text-right">
+                                    {(item.peso / 10).toFixed(1)}
+                                  </span>
+                                </div>
+
+                                {/* favorito */}
+                                <div className="flex items-center gap-4 text-sm min-w-[260px]">
+                                  <div className="flex items-center gap-1">
+                                    <label className="font-medium whitespace-nowrap">
+                                      {t(
+                                        "tela_perfil_avaliador.item_label_favorito"
+                                      )}
+                                    </label>
+                                  </div>
+
+                                  {/* Estrela de favorito */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const totalFavoritos =
+                                        form.lista_skills.filter(
+                                          (s) => s.favorito
+                                        ).length;
+
+                                      // Se já tem 5 favoritos e este não é favorito → não deixa clicar
+                                      if (
+                                        totalFavoritos >= 5 &&
+                                        !item.favorito
+                                      ) {
+                                        return;
+                                      }
+
+                                      handleSkillChange(
+                                        item.skill_id,
+                                        "favorito",
+                                        !item.favorito
+                                      );
+                                    }}
+                                    className={`flex items-center ${
+                                      form.lista_skills.filter(
+                                        (s) => s.favorito
+                                      ).length >= 5 && !item.favorito
+                                        ? "cursor-not-allowed opacity-50"
+                                        : "cursor-pointer"
+                                    }`}
+                                    disabled={
+                                      form.lista_skills.filter(
+                                        (s) => s.favorito
+                                      ).length >= 5 && !item.favorito
+                                    }
+                                  >
+                                    <TooltipIcon
+                                      message={`${t(
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo1"
+                                      )}\n${t(
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2"
+                                      )}\n${t(
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2_1"
+                                      )}`}
+                                      perfil={perfil}
+                                    >
+                                      <Star
+                                        className={`w-4 h-4 transition-colors ${
+                                          item.favorito
+                                            ? "fill-yellow-400 text-yellow-400"
+                                            : "text-gray-400"
+                                        }`}
+                                      />
+                                    </TooltipIcon>
+                                  </button>
+
+                                  {/* Tempo da skill */}
+                                  <input
+                                    type="text"
+                                    placeholder={t(
+                                      "tela_perfil_avaliador.item_placeholder_favorito"
+                                    )}
+                                    className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
+                                    value={item.tempo_favorito}
+                                    onChange={(e) =>
+                                      handleSkillChange(
+                                        item.skill_id,
+                                        "tempo_favorito",
+                                        e.target.value
+                                      )
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() => handleRemoveSkill(item.skill_id)}
+                              className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
+                              title={t(
+                                "tela_perfil_avaliador.item_botao_remover_skill"
+                              )}
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                  </div>
+
+                  {/* Botões no rodapé */}
+                  <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
+                    <div className="flex">
+                      <button
+                        onClick={prevStep}
+                        type="button"
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                      >
+                        {t("tela_perfil_avaliador.item_botao_voltar")}
+                      </button>
+                    </div>
+
+                    {/* Direita: botões cadastrar e editar */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button" // evita submit acidental
+                        onClick={handleCancel}
+                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                      >
+                        {t("tela_perfil_avaliador.item_botao_cancelar")}
+                      </button>
+                      <button
+                        type="submit"
+                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
+                      >
+                        {t("tela_perfil_avaliador.item_botao_avancar")}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {step === 6 && (
               <form
                 onSubmit={handleSubmit}
                 className="flex-1 flex flex-col w-full h-full"
