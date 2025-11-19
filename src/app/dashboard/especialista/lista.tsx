@@ -34,7 +34,7 @@ export default function EmpresaListar({
   recrutadorId,
   hasPerfilRecrutador,
 }: Props) {
-  const { t, i18n } = useTranslation("common");
+  const { t } = useTranslation("common");
   // const router = useRouter();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -94,7 +94,6 @@ export default function EmpresaListar({
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "Accept-Language": i18n.language,
         },
         body: JSON.stringify({ id, empresa_id }),
       });
@@ -126,7 +125,6 @@ export default function EmpresaListar({
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          "Accept-Language": i18n.language,
         },
         body: JSON.stringify({ id, empresa_id }),
       });

@@ -110,7 +110,10 @@ export default function ListaVagas({
         const [empresasRes, skillsRes, sugeridosRes] = await Promise.all([
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/empresas/filtro-ativas/${recrutadorId}`,
-            { method: "GET", credentials: "include" }
+            {
+              method: "GET",
+              credentials: "include",
+            }
           ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/filtro`, {
             method: "GET",
@@ -118,7 +121,10 @@ export default function ListaVagas({
           }),
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/vagas/vagas-abertas/${recrutadorId}`,
-            { method: "GET", credentials: "include" }
+            {
+              method: "GET",
+              credentials: "include",
+            }
           ),
         ]);
 

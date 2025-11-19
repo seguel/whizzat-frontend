@@ -124,6 +124,7 @@ function LoginInner() {
       });
 
       const data = await res.json();
+      console.log(data);
 
       if (!res.ok) {
         setErroLogin(data.message || "Erro ao logar");
@@ -136,6 +137,9 @@ function LoginInner() {
         }, 3000);
         return;
       }
+
+      i18n.changeLanguage(data.user.lang);
+      document.cookie = `lang=${data.user.lang}; path=/`;
 
       setTimeout(() => {
         LimpaTela();
@@ -283,13 +287,12 @@ function LoginInner() {
                 alt="Logo grande"
                 width={180}
                 height={40}
-                
               />
             </Link>
           </div>
 
           {/* Logo pequeno (mobile) */}
-          
+
           {displayTelasqueceuSenha ? (
             <>
               {/* Título e link */}

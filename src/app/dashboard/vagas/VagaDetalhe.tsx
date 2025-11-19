@@ -23,6 +23,7 @@ interface SkillAvaliacao {
   nome?: string;
   peso: number;
   avaliador_proprio: boolean;
+  tipo_skill_id: number;
 }
 
 interface ModalidadeVaga {
