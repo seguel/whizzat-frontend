@@ -85,6 +85,7 @@ export default function VagaDetalhes({
   useEffect(() => {
     if (!vagaId) {
       setLoadingVagaEmpresa(false);
+      console.log(candidatoId);
       return;
     }
 
