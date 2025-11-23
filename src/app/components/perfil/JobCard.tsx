@@ -52,10 +52,14 @@ export default function JobCard({
   if (!ready) return null; // ou um loading spinner opcional
   return (
     <Link
-      href={`/dashboard/vagas?perfil=${perfil}&vagaid=${vaga_id}&id=${empresa_id}`}
+      href={
+        perfil == "candidato"
+          ? `/dashboard/candidato/vagas?perfil=${perfil}&vg=${vaga_id}&emp=${empresa_id}`
+          : `/dashboard/vagas?perfil=${perfil}&vagaid=${vaga_id}&id=${empresa_id}`
+      }
       className="block w-full"
     >
-      <div className="flex flex-col justify-between rounded-lg p-3 sm:p-4 bg-white shadow-sm border border-gray-100 cursor-pointer hover:shadow-md hover:border-purple-200 transition w-full">
+      <div className="flex flex-col lg:min-h-[150px] justify-between rounded-lg p-3 sm:p-2 bg-white shadow-sm border border-gray-100 cursor-pointer hover:shadow-md hover:border-purple-200 transition w-full">
         {/* Linha superior: logo e informações */}
         <div className="flex flex-row justify-start items-start w-full">
           {/* Logo */}
