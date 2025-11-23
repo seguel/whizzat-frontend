@@ -31,19 +31,27 @@ export default function JobList({
 }: JobListProps) {
   return (
     <section>
-      {/* Cabeçalho */}
-      <div
-        className={`px-4 py-1 rounded-full font-semibold text-sm ${colorClass}`}
-      >
-        {title}
-      </div>
+      {title.trim().length > 0 && (
+        <div
+          className={`px-4 py-1 rounded-full font-semibold text-sm ${colorClass}`}
+        >
+          {title}
+        </div>
+      )}
 
-      {/* Lista */}
-      <div className="flex flex-col gap-3 mt-2">
-        {jobs.map((job, idx) => (
-          <JobCard key={idx} {...job} perfil={perfil} />
-        ))}
-      </div>
+      {perfil == "candidato" ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
+          {jobs.map((job, idx) => (
+            <JobCard key={idx} {...job} perfil={perfil} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3 mt-2">
+          {jobs.map((job, idx) => (
+            <JobCard key={idx} {...job} perfil={perfil} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

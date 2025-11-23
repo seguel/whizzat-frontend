@@ -4,7 +4,7 @@ import {
   ProfileProvider,
   ProfileType,
 } from "../../components/perfil/ProfileContext";
-// import PerfilCandidato from "./PerfilCandidato";
+import PerfilCandidato from "./PerfilCandidato";
 import PerfilRecrutador from "./PerfilRecrutador";
 import PerfilAvaliador from "./PerfilAvaliador";
 import PerfilWrapper from "../../components/PageWrapper";
@@ -24,6 +24,7 @@ export default function PerfilPage({ perfil, id }: Props) {
 
   const [recrutadorId, setRecrutadorId] = useState<string>("");
   const [avaliadorId, setAvaliadorId] = useState<string>("");
+  const [candidatoId, setCandidatoId] = useState<string>("");
 
   useEffect(() => {
     const perfilId =
@@ -59,7 +60,7 @@ export default function PerfilPage({ perfil, id }: Props) {
         );
 
         const data = await res.json();
-        
+
         setUserId(data.usuario_id);
         setAvaliadorId(data.id);
         setNomeUser(data.nome_user);
@@ -68,8 +69,30 @@ export default function PerfilPage({ perfil, id }: Props) {
       }
     };
 
+    const verificarHasPerfilCandidato = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/candidato/check-hasperfil-cadastro/${perfilId}`,
+          {
+            method: "GET",
+            credentials: "include", // importante para enviar o cookie JWT
+          }
+        );
+
+        const data = await res.json();
+        console.log(data);
+
+        setUserId(data.usuario_id);
+        setCandidatoId(data.id);
+        setNomeUser(data.nome_user);
+      } catch (error) {
+        console.error("Erro ao verificar perfil:", error);
+      }
+    };
+
     if (perfilId == 2) verificarHasPerfilRecrutador();
     else if (perfilId == 3) verificarHasPerfilAvaliador();
+    else if (perfilId == 1) verificarHasPerfilCandidato();
   }, [perfil]);
 
   if (!isReady || !userId) return <LoadingOverlay />;
@@ -77,7 +100,14 @@ export default function PerfilPage({ perfil, id }: Props) {
   return (
     <ProfileProvider initialProfile={perfil}>
       <PerfilWrapper>
-        {/* {perfil === "candidato" && <PerfilCandidato perfil={perfil} />} */}
+        {perfil === "candidato" && (
+          <PerfilCandidato
+            perfil={perfil}
+            userId={userId}
+            candidatoId={id ?? candidatoId ?? null}
+            nome_user={nomeUser}
+          />
+        )}
         {perfil === "recrutador" && (
           <PerfilRecrutador
             perfil={perfil}

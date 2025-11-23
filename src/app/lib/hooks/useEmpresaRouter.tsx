@@ -101,6 +101,7 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
           perfil={perfil}
           userId={userId}
           recrutadorId={String(recrutadorId) ?? null}
+          hasPerfilRecrutador={hasPerfilRecrutador}
         />
       ),
     };
@@ -144,6 +145,7 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
       perfil={perfil}
       userId={userId}
       recrutadorId={recrutadorId ? String(recrutadorId) : null}
+      hasPerfilRecrutador={hasPerfilRecrutador}
     />
   );
 

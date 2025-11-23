@@ -1,22 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ProfileType } from "../../components/perfil/ProfileContext";
-import Sidebar from "../../components/perfil/Sidebar";
-import TopBar from "../../components/perfil/TopBar";
-import SemDados from "../SemDados";
-import JobList from "../../components/perfil/JobList";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import { useRouter } from "next/navigation";
+import { ProfileType } from "../../../components/perfil/ProfileContext";
+import Sidebar from "../../../components/perfil/Sidebar";
+import TopBar from "../../../components/perfil/TopBar";
+import SemDados from "../../SemDados";
+import JobList from "../../../components/perfil/JobList";
+import LoadingOverlay from "../../../components/LoadingOverlay";
+// import { useRouter } from "next/navigation";
 import Select from "react-select";
 import { ImSpinner2 } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
-  hasEmpresa: boolean | null;
-  hasPerfilRecrutador: boolean | null;
-  recrutadorId: number | null;
+  hasPerfilCandidato: boolean | null;
+  candidatoId: number | null;
 }
 
 interface Job {
@@ -37,11 +36,10 @@ interface Job {
 
 export default function ListaVagas({
   perfil,
-  hasEmpresa,
-  hasPerfilRecrutador,
-  recrutadorId,
+  hasPerfilCandidato,
+  candidatoId,
 }: Props) {
-  const router = useRouter();
+  // const router = useRouter();
   const { t } = useTranslation("common");
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -50,17 +48,15 @@ export default function ListaVagas({
   const [hasVagas, setHasVaga] = useState<boolean>(false);
 
   const [sugeridos, setSugeridos] = useState<Job[]>([]);
-  const [escolhidos, setEscolhidos] = useState<Job[]>([]);
-  const [avaliacao, setAvaliacao] = useState<Job[]>([]);
 
-  const [empresas, setEmpresas] = useState<
-    { id: number; nome_empresa: string }[]
+  const [modalidades, setModalidade] = useState<
+    { modalidade_trabalho_id: number; modalidade: string }[]
   >([]);
   const [skills, setSkills] = useState<{ skill_id: number; skill: string }[]>(
     []
   );
 
-  const [filtroEmpresa, setFiltroEmpresa] = useState("");
+  const [filtroModalidade, setFiltroModalidade] = useState("");
   const [filtroSkill, setFiltroSkill] = useState("");
   const [hasVagasFiltro, setHasVagasFiltro] = useState<boolean | null>(null);
 
@@ -69,14 +65,14 @@ export default function ListaVagas({
     try {
       setIsFiltering(true);
 
-      // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+      // const perfilId = perfil === "candidato" ? 2 : perfil === "avaliador" ? 3 : 1;
 
       // Se não selecionar, envia "todos"
-      const empresaParam = filtroEmpresa || "todos";
+      const modalidadeParam = filtroModalidade || "todos";
       const skillParam = filtroSkill || "todos";
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/vagas/vagas-abertas/${recrutadorId}?empresaId=${empresaParam}&skill=${skillParam}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/vagas?modalidadeId=${modalidadeParam}&skill=${skillParam}`,
         {
           method: "GET",
           credentials: "include",
@@ -86,8 +82,6 @@ export default function ListaVagas({
       const data = await res.json();
 
       setSugeridos(data);
-      setEscolhidos(data);
-      setAvaliacao(data);
       setHasVagasFiltro(data.length > 0);
     } catch (error) {
       console.error(t("tela_lista_vagas.item_alerta_erro_buscar_dados"), error);
@@ -97,7 +91,7 @@ export default function ListaVagas({
   };
 
   useEffect(() => {
-    if (!hasPerfilRecrutador || !hasEmpresa) {
+    if (!hasPerfilCandidato) {
       setLoading(false);
       return;
     }
@@ -105,41 +99,33 @@ export default function ListaVagas({
 
     const fetchSelectData = async () => {
       try {
-        // const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
+        // const perfilId = perfil === "candidato" ? 2 : perfil === "avaliador" ? 3 : 1;
 
-        const [empresasRes, skillsRes, sugeridosRes] = await Promise.all([
-          fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/empresas/filtro-ativas/${recrutadorId}`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          ),
+        const [modalidadeRes, skillsRes, sugeridosRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/modalidades/`, {
+            method: "GET",
+            credentials: "include",
+          }),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/filtro`, {
             method: "GET",
             credentials: "include",
           }),
-          fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/vagas/vagas-abertas/${recrutadorId}`,
-            {
-              method: "GET",
-              credentials: "include",
-            }
-          ),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/vagas/`, {
+            method: "GET",
+            credentials: "include",
+          }),
         ]);
 
-        const [empresasData, skillsData, sugeridosData] = await Promise.all([
-          empresasRes.json(),
+        const [modalidadeData, skillsData, sugeridosData] = await Promise.all([
+          modalidadeRes.json(),
           skillsRes.json(),
           sugeridosRes.json(),
         ]);
         // console.log(sugeridosData);
-        setEmpresas(empresasData.empresas);
+        setModalidade(modalidadeData);
         setSkills(skillsData);
         setSugeridos(sugeridosData);
-        setEscolhidos(sugeridosData);
-        setAvaliacao(sugeridosData);
-        setHasVaga(sugeridosData.length > 0);
+        setHasVaga(sugeridosData.length >= 0);
       } catch (error) {
         console.error(
           t("tela_lista_vagas.item_alerta_erro_buscar_dados"),
@@ -165,10 +151,8 @@ export default function ListaVagas({
       <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        {!hasPerfilRecrutador ? (
+        {!hasPerfilCandidato ? (
           <SemDados tipo="perfil" perfil={perfil} />
-        ) : !hasEmpresa ? (
-          <SemDados tipo="empresa" perfil={perfil} />
         ) : (
           <main className="p-4 w-[98%] mx-auto flex-1">
             {hasVagas ? (
@@ -181,32 +165,38 @@ export default function ListaVagas({
                     <div className="w-full sm:w-[250px]">
                       <Select
                         isClearable
-                        placeholder={t("tela_lista_vagas.item_msg_empresas")}
+                        placeholder={t("tela_lista_vagas.item_msg_modalidades")}
                         value={
-                          filtroEmpresa
+                          filtroModalidade
                             ? {
-                                value: filtroEmpresa,
+                                value: filtroModalidade,
                                 label:
-                                  empresas.find(
-                                    (e) => String(e.id) === filtroEmpresa
-                                  )?.nome_empresa || "",
+                                  modalidades.find(
+                                    (e) =>
+                                      String(e.modalidade_trabalho_id) ===
+                                      filtroModalidade
+                                  )?.modalidade || "",
                               }
                             : {
                                 value: "",
-                                label: t("tela_lista_vagas.item_msg_empresas"),
+                                label: t(
+                                  "tela_lista_vagas.item_msg_modalidades"
+                                ),
                               }
                         }
                         onChange={(option) =>
-                          setFiltroEmpresa(option ? String(option.value) : "")
+                          setFiltroModalidade(
+                            option ? String(option.value) : ""
+                          )
                         }
                         options={[
                           {
                             value: "",
-                            label: t("tela_lista_vagas.item_msg_empresas"),
+                            label: t("tela_lista_vagas.item_msg_modalidades"),
                           },
-                          ...empresas.map((empresa) => ({
-                            value: String(empresa.id),
-                            label: empresa.nome_empresa,
+                          ...modalidades.map((mod) => ({
+                            value: String(mod.modalidade_trabalho_id),
+                            label: mod.modalidade,
                           })),
                         ]}
                         className="text-sm sm:text-base"
@@ -263,51 +253,16 @@ export default function ListaVagas({
                       </button>
                     </div>
                   </div>
-
-                  {/* Botão Cadastrar Vagas à direita */}
-                  <div className="flex-shrink-0 w-full sm:w-auto">
-                    <button
-                      onClick={() =>
-                        router.push(`/dashboard/vagas?perfil=${perfil}&op=N`)
-                      }
-                      className="w-full sm:w-auto px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
-                    >
-                      {t("tela_lista_vagas.item_botao_cadastrar")}
-                    </button>
-                  </div>
                 </div>
 
                 {hasVagasFiltro || hasVagasFiltro === null ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {sugeridos.length > 0 && (
+                  <div className="grid grid-cols-1  gap-6">
+                    {sugeridos.length >= 0 && (
                       <JobList
-                        title={`${t(
-                          "tela_lista_vagas.item_titulo_sugeridos"
-                        )} ${sugeridos.length}`}
+                        title=""
                         jobs={sugeridos}
                         perfil={perfil}
                         colorClass="bg-purple-100 text-purple-700"
-                      />
-                    )}
-
-                    {escolhidos.length > 0 && (
-                      <JobList
-                        title={`${t(
-                          "tela_lista_vagas.item_titulo_escolhidos"
-                        )} ${escolhidos.length}`}
-                        jobs={escolhidos}
-                        perfil={perfil}
-                        colorClass="bg-purple-200 text-purple-800"
-                      />
-                    )}
-                    {avaliacao.length > 0 && (
-                      <JobList
-                        title={`${t(
-                          "tela_lista_vagas.item_titulo_avaliacao"
-                        )} ${avaliacao.length}`}
-                        jobs={avaliacao}
-                        perfil={perfil}
-                        colorClass="bg-purple-300 text-purple-900"
                       />
                     )}
                   </div>
