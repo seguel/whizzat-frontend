@@ -315,6 +315,104 @@ const en = {
     item_alerta_erro_tamanho_arq: "File must be at most 1MB.",
     item_alerta_erro_salvar: "Error saving recruiter.",
   },
+  tela_perfil_candidato: {
+    item_ativo: "Active",
+    item_inativo: "Inactive",
+    item_label_nome: "Name",
+    item_placeholder_nome: "Name",
+    item_label_telefone: "Contact Phone:",
+    item_placeholder_telefone: "Phone",
+    item_label_localizacao: "Location:",
+    item_placeholder_localizacao: "Enter your location",
+    item_label_notificacao: "Notification Method:",
+    item_msg_notificacao_whatsapp: "WhatsApp",
+    item_msg_notificacao_sms: "SMS",
+
+    item_label_descreva:
+      "Describe yourself in a few lines. This text will be your cover letter for companies on the platform.",
+    item_placeholder_apresentacao: "Introduce yourself",
+    item_msg_nenhuma_apresentacao: "No introduction provided.",
+
+    item_label_foto:
+      "Upload a candidate photo, image, or logo (recommended 512×512 px, up to 1MB):",
+    item_msg_foto: "Click here to upload your image",
+    item_msg_sem_foto: "No image",
+
+    item_label_informe_formacao: "Enter your academic background",
+    item_label_graduacao: "Degree:",
+    item_msg_graduacao: "Select a degree",
+    item_label_formacao: "Education:",
+    item_msg_formacao: "Enter your education",
+    item_label_certificado: "Certificate (JPG, PNG, or PDF):",
+    item_msg_certificado: "Select the file",
+    item_botao_adicionar: "+ Add",
+    item_botao_visualizar: "View Certificate",
+    item_botao_substituir: "Replace Certificate",
+    item_msg_nenhuma_graduacao: "No degree found",
+    item_botao_remover_formacao: "Remove Education",
+
+    item_label_informe_certificacao: "Enter your certifications",
+    item_label_certificacao: "Certifications:",
+    item_msg_certificacao: "Type or select",
+    item_msg_criar_certificacao: "Create new certification:",
+    item_botao_remover_certificacao: "Remove Certification",
+    item_botao_certificado_atualizado: "Certificate Updated!",
+
+    item_label_informe_hardskills:
+      "Enter the Hard Skills you want to work with as a candidate",
+    item_label_informe_hardskills_subitem:
+      "Hard Skills are the technical competencies acquired by professionals throughout their careers.",
+    item_label_informe_softskills:
+      "Enter the Soft Skills you want to work with as a candidate",
+    item_label_informe_softskills_subitem:
+      "Soft Skills are the behavioral competencies that are natural or acquired throughout a professional’s career.",
+
+    item_label_informe_qtde: "(minimum 3 and maximum 12)",
+    item_label_skill: "Skills:",
+    item_msg_skill: "Type or select a skill",
+    item_msg_criar_skill: "Create new skill:",
+    item_label_peso: "Weight",
+    item_label_favorito: "Favorite",
+    item_placeholder_favorito: "Skill time",
+    item_botao_remover_skill: "Remove Skill",
+
+    item_label_lista_formacao: "Education",
+    item_msg_nenhuma_formacao: "No education added",
+    item_label_lista_certificacao: "Certifications",
+    item_msg_nenhuma_certificacao: "No certification added",
+
+    item_botao_voltar: "Back",
+    item_botao_cancelar: "Cancel",
+    item_botao_avancar: "Next",
+    item_botao_publicar: "Publish",
+
+    item_msg_campo_obt: "Required Field",
+    item_msg_logo_obt: "Image Required",
+
+    item_alerta_descartada: "Changes discarded.",
+    item_alerta_sucesso: "Candidate published successfully!",
+    item_alerta_erro_buscar_dados: "Error fetching candidate data",
+    item_alerta_erro_tipo_arq: "Upload only image files (JPG, PNG, SVG, etc.)",
+    item_alerta_erro_tamanho_arq: "File must be up to 1MB.",
+    item_alerta_erro_tamanho_arq2: "File must be up to 2MB.",
+    item_alerta_erro_salvar: "Error saving candidate.",
+
+    item_tooltip_certificacao_titulo:
+      "How to add a certification that is not in the list:",
+    item_tooltip_certificacao_passo1: "1. Type the desired certification;",
+    item_tooltip_certificacao_passo2: "2. Select 'Create new certification';",
+    item_tooltip_certificacao_passo3: "3. Click the Add button.",
+
+    item_tooltip_skill_titulo: "How to add a skill that is not in the list:",
+    item_tooltip_skill_passo1: "1. Type the desired skill;",
+    item_tooltip_skill_passo2: "2. Select 'Create new skill';",
+    item_tooltip_skill_passo3: "3. Click the Add button.",
+
+    item_tooltip_favorite_passo1: "- You may select up to 5 favorites.",
+    item_tooltip_favorite_passo2: "- Favorite skills will be used ",
+    item_tooltip_favorite_passo2_1:
+      " as preferred criteria for candidate evaluations.",
+  },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Evaluators Awaiting Confirmation",
     item_titulo_reprovados: "Rejected Evaluators",
@@ -392,6 +490,7 @@ const en = {
     item_titulo_avaliacao: "Candidates under evaluation:",
     item_msg_empresas: "All companies",
     item_msg_skills: "All skills",
+    item_msg_modalidades: "All work modalities",
     item_item_periodo: "Open until:",
     item_msg_sem_foto: "No logo",
     item_botao_filtrar: "Filter",
