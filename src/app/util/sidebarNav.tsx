@@ -57,7 +57,7 @@ export function useNavItems(profile: ProfileType): NavItem[] {
         {
           icon: <Search size={20} />,
           label: t("sidebar.menu_buscar_vagas"),
-          route: "/buscar",
+          route: `/dashboard/candidato/vagas?perfil=${profile}`,
         },
         {
           icon: <User size={20} />,
