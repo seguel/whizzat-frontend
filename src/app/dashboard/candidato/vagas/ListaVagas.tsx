@@ -93,6 +93,7 @@ export default function ListaVagas({
   useEffect(() => {
     if (!hasPerfilCandidato) {
       setLoading(false);
+      console.log(candidatoId);
       return;
     }
     setLoading(true);

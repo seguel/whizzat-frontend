@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { ProfileType } from "../../components/perfil/ProfileContext";
-import { useAuthGuard } from "./useAuthGuard";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import { useCandidato } from "./useCandidato";
+// import { ProfileType } from "../../components/perfil/ProfileContext";
+// import { useAuthGuard } from "./useAuthGuard";
+// import LoadingOverlay from "../../components/LoadingOverlay";
+// import { useCandidato } from "./useCandidato";
 
 // interface Options {
 //   perfil: ProfileType;
