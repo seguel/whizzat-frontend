@@ -12,6 +12,13 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 
+const allowedTypes = [
+  "image/",
+  /* "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", */
+];
+
 interface EmpresaDadosProps {
   perfil: ProfileType;
   empresaId: string | null;
@@ -177,11 +184,13 @@ export default function EmpresaEditar({
     if ((name === "logo" || name === "capa") && files?.[0]) {
       const file = files[0];
       const maxSize = 1 * 1024 * 1024; // 1MB
+      const isImage = file.type.startsWith("image/");
+      const isAllowed = allowedTypes.includes(file.type) || isImage;
 
       // 🔒 Verifica se o tipo MIME é de imagem
-      if (!file.type.startsWith("image/")) {
+      if (!isAllowed) {
         toast.error(t("tela_empresa_dados.item_alerta_erro_tipo_arq"), {
-          duration: 5000,
+          duration: 2000,
         });
         return;
       }
@@ -189,7 +198,7 @@ export default function EmpresaEditar({
       // 🔒 Verifica tamanho
       if (file.size > maxSize) {
         toast.error(t("tela_empresa_dados.item_alerta_erro_tamanho_arq"), {
-          duration: 5000,
+          duration: 2000,
         });
         return;
       }

@@ -14,6 +14,8 @@ import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import SemDados from "../../SemDados";
 
+const allowedTypes = ["image/"];
+
 interface EmpresaDadosProps {
   perfil: ProfileType;
   userId?: number;
@@ -108,11 +110,13 @@ export default function EmpresaCriar({
     if ((name === "logo" || name === "capa") && files?.[0]) {
       const file = files[0];
       const maxSize = 1 * 1024 * 1024; // 1MB
+      const isImage = file.type.startsWith("image/");
+      const isAllowed = allowedTypes.includes(file.type) || isImage;
 
       // 🔒 Verifica se o tipo MIME é de imagem
-      if (!file.type.startsWith("image/")) {
+      if (!isAllowed) {
         toast.error(t("tela_empresa_dados.item_alerta_erro_tipo_arq"), {
-          duration: 5000,
+          duration: 2000,
         });
         return;
       }
@@ -120,7 +124,7 @@ export default function EmpresaCriar({
       // 🔒 Verifica tamanho
       if (file.size > maxSize) {
         toast.error(t("tela_empresa_dados.item_alerta_erro_tamanho_arq"), {
-          duration: 5000,
+          duration: 2000,
         });
         return;
       }
