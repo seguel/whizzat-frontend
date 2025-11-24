@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+const allowedTypes = ["image/"];
+
 interface RecrutadorProps {
   perfil: ProfileType;
   recrutadorId?: string | null;
@@ -176,11 +178,13 @@ export default function PerfilRecrutador({
     if (name === "logo" && files?.[0]) {
       const file = files[0];
       const maxSize = 1 * 1024 * 1024; // 1MB
+      const isImage = file.type.startsWith("image/");
+      const isAllowed = allowedTypes.includes(file.type) || isImage;
 
       // 🔒 Verifica se o tipo MIME é de imagem
-      if (!file.type.startsWith("image/")) {
+      if (!isAllowed) {
         toast.error(t("tela_perfil_recrutador.item_alerta_erro_tipo_arq"), {
-          duration: 5000,
+          duration: 2000,
         });
         return;
       }
@@ -188,7 +192,7 @@ export default function PerfilRecrutador({
       // 🔒 Verifica tamanho
       if (file.size > maxSize) {
         toast.error(t("tela_perfil_recrutador.item_alerta_erro_tamanho_arq"), {
-          duration: 5000,
+          duration: 2000,
         });
         return;
       }
