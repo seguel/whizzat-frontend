@@ -17,6 +17,13 @@ import TooltipIcon from "../../components/TooltipIcon";
 import SkillsPanel from "../../components/perfil/SkillsPanel";
 import { useTranslation } from "react-i18next";
 
+const allowedTypes = [
+  "image/",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
 interface CandidatoProps {
   perfil: ProfileType;
   candidatoId?: string | null;
@@ -349,9 +356,11 @@ export default function PerfilCandidato({
     if (name === "logo" && files?.[0]) {
       const file = files[0];
       const maxSize = 1 * 1024 * 1024; // 1MB
+      const isImage = file.type.startsWith("image/");
+      const isAllowed = allowedTypes.includes(file.type) || isImage;
 
       // 🔒 Verifica se o tipo MIME é de imagem
-      if (!file.type.startsWith("image/")) {
+      if (!isAllowed) {
         toast.error(t("tela_perfil_candidato.item_alerta_erro_tipo_arq"), {
           duration: 5000,
         });
@@ -670,8 +679,22 @@ export default function PerfilCandidato({
     if (!file) return;
 
     const maxSize = 2 * 1024 * 1024; // 2MB
+    const isImage = file.type.startsWith("image/");
+    const isAllowed = allowedTypes.includes(file.type) || isImage;
+
+    // 🔒 Verifica se o tipo MIME é de imagem
+    if (!isAllowed) {
+      toast.error(t("tela_perfil_candidato.item_alerta_erro_tipo_arq"), {
+        duration: 2000,
+      });
+      return;
+    }
+
+    // 🔒 Verifica tamanho
     if (file.size > maxSize) {
-      alert(t("tela_perfil_candidato.item_alerta_erro_tamanho_arq2"));
+      toast.error(t("tela_perfil_candidato.item_alerta_erro_tamanho_arq2"), {
+        duration: 2000,
+      });
       return;
     }
 
@@ -719,8 +742,22 @@ export default function PerfilCandidato({
     if (!file) return;
 
     const maxSize = 2 * 1024 * 1024;
+    const isImage = file.type.startsWith("image/");
+    const isAllowed = allowedTypes.includes(file.type) || isImage;
+
+    // 🔒 Verifica se o tipo MIME é de imagem
+    if (!isAllowed) {
+      toast.error(t("tela_perfil_candidato.item_alerta_erro_tipo_arq"), {
+        duration: 2000,
+      });
+      return;
+    }
+
+    // 🔒 Verifica tamanho
     if (file.size > maxSize) {
-      alert(t("tela_perfil_candidato.item_alerta_erro_tamanho_arq2"));
+      toast.error(t("tela_perfil_candidato.item_alerta_erro_tamanho_arq2"), {
+        duration: 2000,
+      });
       return;
     }
 
@@ -766,8 +803,22 @@ export default function PerfilCandidato({
     if (!file) return;
 
     const maxSize = 2 * 1024 * 1024; // 2MB
+    const isImage = file.type.startsWith("image/");
+    const isAllowed = allowedTypes.includes(file.type) || isImage;
+
+    // 🔒 Verifica se o tipo MIME é de imagem
+    if (!isAllowed) {
+      toast.error(t("tela_perfil_candidato.item_alerta_erro_tipo_arq"), {
+        duration: 2000,
+      });
+      return;
+    }
+
+    // 🔒 Verifica tamanho
     if (file.size > maxSize) {
-      alert(t("tela_perfil_candidato.item_alerta_erro_tamanho_arq2"));
+      toast.error(t("tela_perfil_candidato.item_alerta_erro_tamanho_arq2"), {
+        duration: 2000,
+      });
       return;
     }
 
@@ -825,8 +876,22 @@ export default function PerfilCandidato({
     if (!file) return;
 
     const maxSize = 2 * 1024 * 1024;
+    const isImage = file.type.startsWith("image/");
+    const isAllowed = allowedTypes.includes(file.type) || isImage;
+
+    // 🔒 Verifica se o tipo MIME é de imagem
+    if (!isAllowed) {
+      toast.error(t("tela_perfil_candidato.item_alerta_erro_tipo_arq"), {
+        duration: 2000,
+      });
+      return;
+    }
+
+    // 🔒 Verifica tamanho
     if (file.size > maxSize) {
-      alert(t("tela_perfil_candidato.item_alerta_erro_tamanho_arq2"));
+      toast.error(t("tela_perfil_candidato.item_alerta_erro_tamanho_arq2"), {
+        duration: 2000,
+      });
       return;
     }
 
