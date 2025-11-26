@@ -54,6 +54,19 @@ const pt = {
       "Cadastro efetuado com sucesso, acesse seu e-mail para ativar o cadastro.",
     senha_invalida:
       "A senha deve ter entre 8 e 16 caracteres, com letra maiúscula, minúscula, número e caractere especial.",
+    data_nascimento: "Data Nascimento",
+    placehold_data_nascimento: "Dt. de Nascimento",
+    sexo: "Gênero",
+    placehold_sexo: "Selecione o gênero",
+    nome_social: "Nome Social",
+    placehold_nome_social: "Informe seu nome social se desejar",
+    tooltip_msg_nome_social:
+      "Caso o Nome Social seja informado, será considerado como nome principal a ser utilizado na plataforma.",
+    item_alerta_erro_buscar_dados: "Erro ao buscar os dados",
+    estado: "Estado",
+    placehold_estado: "Selecione o Estado",
+    cidade: "Cidade",
+    placehold_cidade: "Selecione a Cidade",
   },
   redefinir: {
     senha_erro: "A senha deve ter pelo menos 6 caracteres.",

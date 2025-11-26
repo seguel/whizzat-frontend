@@ -80,7 +80,7 @@ export default function PerfilPage({ perfil, id }: Props) {
         );
 
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
 
         setUserId(data.usuario_id);
         setCandidatoId(data.id);

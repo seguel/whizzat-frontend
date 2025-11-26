@@ -9,6 +9,7 @@ export async function isUserAuthenticated(): Promise<boolean> {
     if (!res.ok) return false;
 
     const data = await res.json();
+
     return data.authenticated === true;
   } catch (err) {
     console.error("Erro ao verificar autenticação:", err);

@@ -14,6 +14,7 @@ import {
 } from "@heroicons/react/24/solid";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { useTranslation } from "react-i18next";
+import TooltipIcon from "../../components/TooltipIcon";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,6 +29,15 @@ function LoginInner() {
   const [repeteSenha, setRepeteSenha] = useState("");
   const [nome, setNome] = useState("");
   const [sobrenome, setSobrenome] = useState("");
+  const [dtNasc, setDtNasc] = useState("");
+  const [dtNascDisplay, setDtNascDisplay] = useState("");
+  const [nomeSocial, setNomeSocial] = useState("");
+  const [sexo, setSexo] = useState("");
+  const [generos, setGeneros] = useState<{ id: number; genero: string }[]>([]);
+  const [estado, setEstado] = useState("");
+  const [estados, setEstados] = useState<{ id: number; sigla: string }[]>([]);
+  const [cidade, setCidade] = useState("");
+  const [cidades, setCidades] = useState<{ id: number; cidade: string }[]>([]);
 
   const [displayTelaLogin, setDisplayTelaLogin] = useState(true);
   const [displayTelasqueceuSenha, setDisplayTelaEsqueceuSenha] =
@@ -46,6 +56,10 @@ function LoginInner() {
   const isFormCreateFilled =
     nome.trim() !== "" &&
     sobrenome.trim() !== "" &&
+    dtNasc.trim() !== "" &&
+    sexo.trim() !== "" &&
+    estado.trim() !== "" &&
+    cidade.trim() !== "" &&
     email.trim() !== "" &&
     senha.trim() !== "" &&
     repeteSenha.trim() !== "";
@@ -61,7 +75,43 @@ function LoginInner() {
 
   useEffect(() => {
     LimpaTela();
+    fetchSelectData();
   }, []);
+
+  const fetchSelectData = async () => {
+    setLoadingCadastro(true);
+    try {
+      const [generoRes, estadoRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/generos/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept-Language": i18n.language,
+          },
+        }),
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/estados/`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept-Language": i18n.language,
+          },
+        }),
+      ]);
+
+      const [generosData, estadosData] = await Promise.all([
+        generoRes.json(),
+        estadoRes.json(),
+      ]);
+
+      // console.log(generosData);
+      setGeneros(generosData);
+      setEstados(estadosData);
+    } catch (error) {
+      console.error(t("cadastro.item_alerta_erro_buscar_dados"), error);
+    } finally {
+      setLoadingCadastro(false);
+    }
+  };
 
   type TipoTela = "login" | "cadastro" | "esqueci";
 
@@ -99,6 +149,12 @@ function LoginInner() {
     setEmail("");
     setSenha("");
     setErroEnvio("");
+    setDtNasc("");
+    setDtNascDisplay("");
+    setSexo("");
+    setEstado("");
+    setCidade("");
+    setNomeSocial("");
 
     setErroCadastro("");
     setLoadingCadastro(false);
@@ -124,7 +180,7 @@ function LoginInner() {
       });
 
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
 
       if (!res.ok) {
         setErroLogin(data.message || "Erro ao logar");
@@ -153,6 +209,105 @@ function LoginInner() {
       );
       setLoadingLogin(false);
     }
+  };
+
+  const applyDateMask = (value: string) => {
+    // remove tudo que não for número
+    const digits = value.replace(/\D/g, "");
+
+    if (i18n.language.startsWith("pt")) {
+      // dd/mm/yyyy
+      if (digits.length <= 2) return digits;
+      if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+      return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(
+        4,
+        8
+      )}`;
+    } else {
+      // en-US mm/dd/yyyy
+      if (digits.length <= 2) return digits;
+      if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+      return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(
+        4,
+        8
+      )}`;
+    }
+  };
+
+  const maskedToISO = (value: string) => {
+    const parts = value.split("/");
+
+    if (parts.length !== 3) return null;
+
+    const [p1, p2, p3] = parts;
+
+    if (p3.length !== 4) return null; // só aceita ano completo
+
+    if (i18n.language.startsWith("pt")) {
+      // dd/mm/yyyy
+      return `${p3}-${p2.padStart(2, "0")}-${p1.padStart(2, "0")}`;
+    } else {
+      // mm/dd/yyyy
+      return `${p3}-${p1.padStart(2, "0")}-${p2.padStart(2, "0")}`;
+    }
+  };
+
+  const handleMaskedDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+
+    // aplica máscara
+    const masked = applyDateMask(rawValue);
+
+    // salva sempre o valor mascarado
+    setDtNascDisplay(masked);
+
+    // tenta converter para ISO (somente se estiver completo)
+    const iso = maskedToISO(masked);
+
+    if (iso) setDtNasc(iso);
+  };
+
+  const handleGeneroChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+
+    setSexo(selectedId);
+  };
+
+  const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+
+    setEstado(selectedId);
+    fetchCidades(selectedId);
+  };
+
+  const fetchCidades = async (selectedId: string) => {
+    setLoadingCadastro(true);
+    try {
+      const cidadeRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cidades/estado-cidade/${selectedId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!cidadeRes.ok)
+        throw new Error(t("cadastro.item_alerta_erro_buscar_dados"));
+
+      const data = await cidadeRes.json();
+
+      // console.log(data);
+      setCidades(data);
+    } catch (error) {
+      console.error(t("cadastro.item_alerta_erro_buscar_dados"), error);
+    } finally {
+      setLoadingCadastro(false);
+    }
+  };
+
+  const handleCidadeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+
+    setCidade(selectedId);
   };
 
   const handleCadastro = async () => {
@@ -185,6 +340,10 @@ function LoginInner() {
         body: JSON.stringify({
           primeiro_nome: nome,
           ultimo_nome: sobrenome,
+          data_nascimento: dtNasc,
+          nome_social: nomeSocial ?? "",
+          genero_id: sexo,
+          cidade_id: cidade,
           email,
           senha,
         }),
@@ -276,7 +435,7 @@ function LoginInner() {
 
   return (
     <main className="flex items-center justify-center min-h-screen px-4 bg-white">
-      <div className="flex flex-col sm:flex-row w-full max-w-[800px] h-auto sm:h-[550px] bg-[#E6FEF6] shadow-[0px_20px_40px_0px_rgba(2,227,149,0.25)] rounded-lg overflow-hidden">
+      <div className="flex flex-col sm:flex-row w-full max-w-[800px] h-auto sm:h-[650px] bg-[#E6FEF6] shadow-[0px_20px_40px_0px_rgba(2,227,149,0.25)] rounded-lg overflow-hidden">
         {/* Lado esquerdo - Formulário */}
         <div className="w-full sm:w-1/2 h-auto sm:h-full flex flex-col justify-center items-center px-3 py-10 gap-2">
           {/* Logo */}
@@ -509,7 +668,7 @@ function LoginInner() {
                     {/* Nome e Sobrenome */}
                     <div className="flex gap-2">
                       <div className="w-1/2">
-                        <label className="text-[#010608] text-[14px] mb-1 block">
+                        <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
                           {t("cadastro.nome")}
                         </label>
                         <input
@@ -522,7 +681,7 @@ function LoginInner() {
                       </div>
 
                       <div className="w-1/2">
-                        <label className="text-[#010608] text-[14px] mb-1 block">
+                        <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
                           {t("cadastro.sobrenome")}
                         </label>
                         <input
@@ -535,38 +694,143 @@ function LoginInner() {
                       </div>
                     </div>
 
-                    <label className="text-[#010608] text-[14px] mt-2">
-                      {t("login.email")}
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t("login.placehold_email")}
-                      className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
-                    />
+                    {/* Nascimento e Sexo */}
+                    <div className="flex gap-2">
+                      <div className="w-1/2">
+                        <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
+                          {t("cadastro.data_nascimento")}
+                        </label>
+                        <input
+                          type="text"
+                          value={dtNascDisplay}
+                          onChange={handleMaskedDateChange}
+                          placeholder={t("cadastro.placehold_data_nascimento")}
+                          className="border border-[#7DCBED] rounded-[8px] px-3 py-1 w-full bg-white focus:outline-none"
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
+                          {t("cadastro.sexo")}
+                        </label>
+                        <select
+                          className="border border-[#7DCBED] rounded-[8px] px-1 py-2 w-full bg-white text-gray-700 text-sm focus:outline-none"
+                          name="genero"
+                          value={sexo}
+                          onChange={handleGeneroChange}
+                        >
+                          <option value="">
+                            {t("cadastro.placehold_sexo")}
+                          </option>
+                          {generos.map((gen) => (
+                            <option key={gen.id} value={gen.id}>
+                              {gen.genero}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
-                    <label className="text-[#010608] text-[14px] mt-2">
-                      {t("login.senha")}
-                    </label>
-                    <input
-                      type="password"
-                      value={senha}
-                      onChange={(e) => setSenha(e.target.value)}
-                      placeholder={t("cadastro.placehold_senha")}
-                      className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
-                    />
+                    <div className="flex flex-col w-full">
+                      <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
+                        {t("cadastro.nome_social")}
+                        <TooltipIcon
+                          message={`${t("cadastro.tooltip_msg_nome_social")}`}
+                          perfil={"candidato"}
+                        />
+                      </label>
 
-                    <label className="text-[#010608] text-[14px] mt-2">
-                      {t("cadastro.repete_senha")}
-                    </label>
-                    <input
-                      type="password"
-                      value={repeteSenha}
-                      onChange={(e) => setRepeteSenha(e.target.value)}
-                      placeholder={t("cadastro.placehold_repete_senha")}
-                      className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
-                    />
+                      <input
+                        type="text"
+                        value={nomeSocial}
+                        onChange={(e) => setNomeSocial(e.target.value)}
+                        placeholder={t("cadastro.placehold_nome_social")}
+                        className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    {/* estado e cidade */}
+                    <div className="flex gap-2">
+                      <div className="w-1/2">
+                        <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
+                          {t("cadastro.estado")}
+                        </label>
+                        <select
+                          className="border border-[#7DCBED] rounded-[8px] px-1 py-2 w-full bg-white text-gray-700 text-sm focus:outline-none"
+                          name="estado"
+                          value={estado}
+                          onChange={handleEstadoChange}
+                        >
+                          <option value="">
+                            {t("cadastro.placehold_estado")}
+                          </option>
+                          {estados.map((e) => (
+                            <option key={e.id} value={e.id}>
+                              {e.sigla}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="w-1/2">
+                        <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
+                          {t("cadastro.cidade")}
+                        </label>
+                        <select
+                          className="border border-[#7DCBED] rounded-[8px] px-1 py-2 w-full bg-white text-gray-700 text-sm focus:outline-none"
+                          name="cidade"
+                          value={cidade}
+                          onChange={handleCidadeChange}
+                        >
+                          <option value="">
+                            {t("cadastro.placehold_cidade")}
+                          </option>
+                          {cidades.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.cidade}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col w-full">
+                      <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
+                        {t("login.email")}
+                      </label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={t("login.placehold_email")}
+                        className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-col w-full">
+                      <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
+                        {t("login.senha")}
+                      </label>
+                      <input
+                        type="password"
+                        value={senha}
+                        onChange={(e) => setSenha(e.target.value)}
+                        placeholder={t("cadastro.placehold_senha")}
+                        className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="flex flex-col w-full">
+                      <label className="text-[#010608] text-[14px] mt-1 flex items-center gap-1">
+                        {t("cadastro.repete_senha")}
+                      </label>
+                      <input
+                        type="password"
+                        value={repeteSenha}
+                        onChange={(e) => setRepeteSenha(e.target.value)}
+                        placeholder={t("cadastro.placehold_repete_senha")}
+                        className="border border-[#7DCBED] rounded-[8px] px-3 py-1 bg-white focus:outline-none"
+                      />
+                    </div>
+
                     {erroCadastro ? (
                       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mt-2 text-sm flex items-center gap-2">
                         <ExclamationCircleIcon className="w-6 h-6 text-red-700" />
