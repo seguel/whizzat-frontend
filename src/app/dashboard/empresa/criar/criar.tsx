@@ -34,6 +34,10 @@ interface EmpresaForm {
   apresentacao: string;
   capaPreview: string | null;
   ativo: boolean;
+  estado_id: number;
+  estado_label: string;
+  cidade_id: number;
+  cidade_label: string;
 }
 
 // LocalStorage hook
@@ -65,7 +69,7 @@ export default function EmpresaCriar({
   hasPerfilRecrutador,
 }: EmpresaDadosProps) {
   const router = useRouter();
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useLocalStorage<EmpresaForm>(
@@ -80,6 +84,10 @@ export default function EmpresaCriar({
       apresentacao: "",
       capaPreview: null,
       ativo: true,
+      estado_id: 0,
+      estado_label: "",
+      cidade_id: 0,
+      cidade_label: "",
     }
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -87,6 +95,112 @@ export default function EmpresaCriar({
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const [estado, setEstado] = useState("");
+  const [estados, setEstados] = useState<
+    { id: number; sigla: string; estado: string }[]
+  >([]);
+  const [cidade, setCidade] = useState("");
+  const [cidades, setCidades] = useState<{ id: number; cidade: string }[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    setLoading(true);
+
+    const fetchSelectData = async () => {
+      try {
+        const estadoRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/estados/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept-Language": i18n.language,
+            },
+          }
+        );
+
+        const estadosData = await estadoRes.json();
+
+        // console.log(generosData);
+        setEstados(estadosData);
+      } catch (error) {
+        console.error(
+          t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSelectData();
+  }, []);
+
+  const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const value = Number(e.target.value ?? 0);
+    const estadoSelecionada = estados.find(
+      (e) => e.id.toString() === selectedId
+    );
+
+    setEstado(selectedId);
+    setForm((prev) => ({
+      ...prev,
+      estado_id: value,
+      estado_label: estadoSelecionada?.estado ?? "",
+    }));
+
+    setCidade("");
+
+    setForm((prev) => ({
+      ...prev,
+      cidade_id: 0,
+      cidade_label: "",
+    }));
+
+    fetchCidades(selectedId);
+  };
+
+  const fetchCidades = async (selectedId: string) => {
+    setLoading(true);
+    try {
+      const cidadeRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cidades/estado-cidade/${selectedId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!cidadeRes.ok)
+        throw new Error(t("cadastro.item_alerta_erro_buscar_dados"));
+
+      const data = await cidadeRes.json();
+
+      // console.log(data);
+      setCidades(data);
+    } catch (error) {
+      console.error(t("cadastro.item_alerta_erro_buscar_dados"), error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCidadeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const value = Number(e.target.value ?? 0);
+    const cidadeSelecionada = cidades.find(
+      (e) => e.id.toString() === selectedId
+    );
+
+    setCidade(selectedId);
+
+    setForm((prev) => ({
+      ...prev,
+      cidade_id: value,
+      cidade_label: cidadeSelecionada?.cidade ?? "",
+    }));
+  };
 
   const handleCancel = () => {
     // Limpa o formulário salvo no localStorage
@@ -164,21 +278,14 @@ export default function EmpresaCriar({
     setShowErrors(true);
 
     if (step === 1) {
-      if (
-        !form.nome ||
-        !form.site ||
-        !form.email ||
-        !form.telefone /* ||
-            !logoFile */
-      )
-        return;
+      if (!form.nome || !form.site || !form.email || !form.telefone) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
     if (step === 2) {
-      if (!form.localizacao) return;
+      if (form.cidade_id == 0) return;
       setShowErrors(false);
       nextStep();
       return;
@@ -203,8 +310,9 @@ export default function EmpresaCriar({
         body.append("site", form.site);
         body.append("email", form.email);
         body.append("telefone", form.telefone);
-        body.append("localizacao", form.localizacao);
+        body.append("localizacao", "");
         body.append("apresentacao", form.apresentacao);
+        body.append("cidade_id", String(form.cidade_id));
 
         // só manda o perfilId no create
 
@@ -267,7 +375,7 @@ export default function EmpresaCriar({
     }
   };
 
-  if (!userId) {
+  if (!userId || loading) {
     return <LoadingOverlay />;
   }
 
@@ -488,53 +596,85 @@ export default function EmpresaCriar({
                       onSubmit={handleSubmit}
                       className="flex flex-col flex-1"
                     >
-                      <div className="flex-1">
-                        <h1 className="block text-sm mb-1 py-3 font-bold">
-                          {t(
-                            "tela_empresa_dados.item_label_titulo_localizacao"
+                      <h1 className="block text-sm mb-1 py-3 font-bold">
+                        {t("tela_empresa_dados.item_label_titulo_localizacao")}
+                      </h1>
+                      {/* Linha: Estado + Cidade */}
+                      <div className="grid grid-cols-12 gap-2">
+                        {/* Estado (coluna pequena) */}
+                        <div className="col-span-4 md:col-span-3">
+                          <label className="text-sm font-medium mb-1">
+                            {t("cadastro.estado")}
+                          </label>
+
+                          <select
+                            className="border border-purple-400 rounded px-3 py-2 focus:outline-none w-full"
+                            name="estado"
+                            value={estado}
+                            onChange={handleEstadoChange}
+                          >
+                            <option value="">
+                              {t("cadastro.placehold_estado")}
+                            </option>
+                            {estados.map((e) => (
+                              <option key={e.id} value={e.id}>
+                                {e.sigla}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Cidade (largura maior) */}
+                        <div className="col-span-8 md:col-span-9">
+                          <label className="text-sm font-medium mb-1">
+                            {t("cadastro.cidade")}
+                          </label>
+
+                          <select
+                            className="border border-purple-400 rounded px-3 py-2 focus:outline-none w-full"
+                            name="cidade"
+                            value={cidade}
+                            onChange={handleCidadeChange}
+                          >
+                            <option value="">
+                              {t("cadastro.placehold_cidade")}
+                            </option>
+                            {cidades.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.cidade}
+                              </option>
+                            ))}
+                          </select>
+
+                          {showErrors && !form.cidade_id && (
+                            <p className="text-sm text-red-600 mt-1">
+                              {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                            </p>
                           )}
-                        </h1>
-                        <label className="block text-sm font-medium mb-1">
-                          {t("tela_empresa_dados.item_label_localizacao")}
-                        </label>
-                        <input
-                          type="text"
-                          name="localizacao"
-                          placeholder={t(
-                            "tela_empresa_dados.item_placeholder_localizacao"
-                          )}
-                          className="w-full border border-purple-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
-                          value={form.localizacao}
-                          onChange={handleChange}
-                        />
-                        {showErrors && !form.localizacao && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {t("tela_empresa_dados.item_msg_campo_obt")}
-                          </p>
-                        )}
+                        </div>
                       </div>
 
                       {/* Botões no rodapé */}
-                      <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                        <div className="flex">
-                          <button
-                            onClick={prevStep}
-                            type="button"
-                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                          >
-                            {t("tela_empresa_dados.item_botao_voltar")}
-                          </button>
-                        </div>
+                      <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                        {/* Botão voltar */}
+                        <button
+                          onClick={prevStep}
+                          type="button"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                        >
+                          {t("tela_empresa_dados.item_botao_voltar")}
+                        </button>
 
-                        {/* Direita: botões cadastrar e editar */}
+                        {/* Área direita: cancelar + avançar */}
                         <div className="flex gap-2">
                           <button
-                            type="button" // evita submit acidental
+                            type="button"
                             onClick={handleCancel}
                             className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                           >
                             {t("tela_empresa_dados.item_botao_cancelar")}
                           </button>
+
                           <button
                             type="submit"
                             className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
@@ -747,6 +887,7 @@ export default function EmpresaCriar({
                           {/* Bloco 2 colunas */}
                           <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800">
                             {/* Localização */}
+                            {/* Estado */}
                             <div className="flex items-center gap-2">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -759,16 +900,30 @@ export default function EmpresaCriar({
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth={2}
-                                  d="M12 11c1.656 0 3-1.344 3-3s-1.344-3-3-3-3 1.344-3 3 1.344 3 3 3z"
+                                  d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
                                 />
+                              </svg>
+                              {form.estado_label}
+                            </div>
+
+                            {/* Cidade */}
+                            <div className="flex items-center gap-2">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-gray-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth={2}
-                                  d="M12 22s8-4.5 8-12a8 8 0 10-16 0c0 7.5 8 12 8 12z"
+                                  d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
                                 />
+                                <circle cx="12" cy="10" r="3" />
                               </svg>
-                              {form.localizacao}
+                              {form.cidade_label}
                             </div>
 
                             {/* Telefone */}
@@ -902,7 +1057,7 @@ const isFormValid = (form: EmpresaForm) => {
     form.site.trim() !== "" &&
     form.email.trim() !== "" &&
     form.telefone.trim() !== "" &&
-    form.localizacao.trim() !== "" &&
+    form.cidade_id !== 0 &&
     form.apresentacao.trim() !== "" /* &&
       form.logoPreview !== null &&
       form.capaPreview !== null */

@@ -5,7 +5,7 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import Sidebar from "../../components/perfil/Sidebar";
 import TopBar from "../../components/perfil/TopBar";
 import LoadingOverlay from "../../components/LoadingOverlay";
-import { Clock, Building2, MapPin, CalendarDays } from "lucide-react";
+import { Clock, Building2, CalendarDays } from "lucide-react";
 import SkillsPanel from "../../components/perfil/SkillsPanel";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
@@ -63,6 +63,8 @@ interface VagaData {
   logo: string;
   prazo: string;
   ativo: boolean;
+  estado_label: string;
+  cidade_label: string;
 }
 
 export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
@@ -283,12 +285,49 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                       )}
                     </div>
 
+                    <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
+                      {/* Estado */}
+                      <div className="flex items-center gap-2 w-full sm:w-1/2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
+                          />
+                        </svg>
+                        {vaga?.estado_label}
+                      </div>
+
+                      {/* Cidade */}
+                      <div className="flex items-center gap-2 w-full sm:w-1/2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-gray-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
+                          />
+                          <circle cx="12" cy="10" r="3" />
+                        </svg>
+                        {vaga?.cidade_label}
+                      </div>
+                    </div>
+
                     {/* Linha 1 - Local e Data de Cadastro */}
                     <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
-                      <div className="flex items-center gap-2 w-full sm:w-1/2">
-                        <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
-                        {vaga?.local_vaga || "Local não informado"}
-                      </div>
                       <div className="flex items-center gap-2 w-full sm:w-1/2">
                         <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
                         {t("tela_vaga_dados.item_msg_aberta")}{" "}
