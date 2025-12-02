@@ -18,6 +18,8 @@ interface JobCardProps {
   lgbtq?: boolean;
   mulheres?: boolean;
   cinquenta_mais?: boolean;
+  cidade_label: string;
+  estado_sigla: string;
 }
 
 export default function JobCard({
@@ -27,12 +29,13 @@ export default function JobCard({
   logo,
   nome_vaga,
   nome_empresa,
-  localizacao,
   prazo,
   pcd,
   lgbtq,
   mulheres,
   cinquenta_mais,
+  cidade_label,
+  estado_sigla,
 }: JobCardProps) {
   const { t, i18n } = useTranslation("common");
   const [ready, setReady] = useState(false);
@@ -86,7 +89,9 @@ export default function JobCard({
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm break-words">{nome_vaga}</h3>
             <p className="text-xs text-gray-500 break-words">{nome_empresa}</p>
-            <p className="text-xs text-gray-500 break-words">{localizacao}</p>
+            <p className="text-xs text-gray-500 break-words">
+              {cidade_label}/{estado_sigla}
+            </p>
             <p className="flex items-center justify-center text-xs px-2 py-1 rounded-lg bg-purple-100 mt-2 sm:mt-4 max-w-full">
               <strong>
                 {t("tela_lista_vagas.item_item_periodo")} {prazo}

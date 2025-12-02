@@ -20,7 +20,6 @@ interface Props {
 export default function PerfilPage({ perfil, id }: Props) {
   const { isReady } = useAuthGuard("/cadastro/login");
   const [userId, setUserId] = useState<string>("");
-  const [nomeUser, setNomeUser] = useState<string>("");
 
   const [recrutadorId, setRecrutadorId] = useState<string>("");
   const [avaliadorId, setAvaliadorId] = useState<string>("");
@@ -43,7 +42,6 @@ export default function PerfilPage({ perfil, id }: Props) {
         const data = await res.json();
         setUserId(data.usuario_id);
         setRecrutadorId(data.id);
-        setNomeUser(data.nome_user);
       } catch (error) {
         console.error("Erro ao verificar perfil:", error);
       }
@@ -63,7 +61,6 @@ export default function PerfilPage({ perfil, id }: Props) {
 
         setUserId(data.usuario_id);
         setAvaliadorId(data.id);
-        setNomeUser(data.nome_user);
       } catch (error) {
         console.error("Erro ao verificar perfil:", error);
       }
@@ -80,11 +77,10 @@ export default function PerfilPage({ perfil, id }: Props) {
         );
 
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
 
         setUserId(data.usuario_id);
         setCandidatoId(data.id);
-        setNomeUser(data.nome_user);
       } catch (error) {
         console.error("Erro ao verificar perfil:", error);
       }
@@ -105,7 +101,6 @@ export default function PerfilPage({ perfil, id }: Props) {
             perfil={perfil}
             userId={userId}
             candidatoId={id ?? candidatoId ?? null}
-            nome_user={nomeUser}
           />
         )}
         {perfil === "recrutador" && (
@@ -113,7 +108,6 @@ export default function PerfilPage({ perfil, id }: Props) {
             perfil={perfil}
             userId={userId}
             recrutadorId={id ?? recrutadorId ?? null}
-            nome_user={nomeUser}
           />
         )}
         {perfil === "avaliador" && (
@@ -121,7 +115,6 @@ export default function PerfilPage({ perfil, id }: Props) {
             perfil={perfil}
             userId={userId}
             avaliadorId={id ?? avaliadorId ?? null}
-            nome_user={nomeUser}
           />
         )}
       </PerfilWrapper>

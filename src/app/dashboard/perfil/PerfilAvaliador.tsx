@@ -35,7 +35,6 @@ interface AvaliadorProps {
   perfil: ProfileType;
   avaliadorId?: string | null;
   userId?: string;
-  nome_user: string;
 }
 
 interface FormacaoAvaliacao {
@@ -77,9 +76,18 @@ interface AvaliadorForm {
   lista_certificado: CertificadoAvaliacao[];
   ativo: boolean;
   trabalha_empresa: string;
-  nome_user: string;
   status_cadastro: number;
   data_envio_link: string | null;
+  primeiro_nome: string;
+  ultimo_nome: string;
+  nome_social?: string;
+  data_nascimento: string;
+  genero_id: number;
+  sexo_label: string;
+  estado_id: number;
+  estado_label: string;
+  cidade_id: number;
+  cidade_label: string;
 }
 
 interface AvaliadorData {
@@ -96,6 +104,16 @@ interface AvaliadorData {
   certificacoes: CertificadoAvaliacao[];
   ativo: boolean;
   data_envio_link: string;
+  primeiro_nome: string;
+  ultimo_nome: string;
+  nome_social?: string;
+  data_nascimento: string;
+  genero_id: number;
+  sexo_label: string;
+  estado_id: number;
+  estado_label: string;
+  cidade_id: number;
+  cidade_label: string;
 }
 
 // LocalStorage hook
@@ -124,10 +142,9 @@ export default function PerfilAvaliador({
   perfil,
   avaliadorId,
   userId,
-  nome_user,
 }: AvaliadorProps) {
   const router = useRouter();
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
 
   const [step, setStep] = useState(1);
   const [form, setForm] = useLocalStorage<AvaliadorForm>(
@@ -145,9 +162,18 @@ export default function PerfilAvaliador({
       lista_certificado: [],
       ativo: true,
       trabalha_empresa: "",
-      nome_user: "",
       status_cadastro: -1,
       data_envio_link: null,
+      primeiro_nome: "",
+      ultimo_nome: "",
+      nome_social: "",
+      data_nascimento: "",
+      genero_id: 0,
+      sexo_label: "",
+      estado_id: 0,
+      estado_label: "",
+      cidade_id: 0,
+      cidade_label: "",
     }
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -155,6 +181,17 @@ export default function PerfilAvaliador({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const [dtNasc, setDtNasc] = useState("");
+  const [dtNascDisplay, setDtNascDisplay] = useState("");
+  const [sexo, setSexo] = useState("");
+  const [generos, setGeneros] = useState<{ id: number; genero: string }[]>([]);
+  const [estado, setEstado] = useState("");
+  const [estados, setEstados] = useState<
+    { id: number; sigla: string; estado: string }[]
+  >([]);
+  const [cidade, setCidade] = useState("");
+  const [cidades, setCidades] = useState<{ id: number; cidade: string }[]>([]);
 
   /***** formacao ******/
   const [formacaoInput, setFormacaoInput] = useState<string>("");
@@ -225,10 +262,109 @@ export default function PerfilAvaliador({
   } | null>(null);
 
   useEffect(() => {
-    if (nome_user && !form.nome_user) {
-      setForm((prev) => ({ ...prev, nome_user }));
-    }
-  }, [nome_user]);
+    const fetchSelectData = async () => {
+      setLoadingAvaliador(true);
+      try {
+        const [generoRes, estadoRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/generos/`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept-Language": i18n.language,
+            },
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/estados/`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept-Language": i18n.language,
+            },
+          }),
+        ]);
+
+        const [generosData, estadosData] = await Promise.all([
+          generoRes.json(),
+          estadoRes.json(),
+        ]);
+
+        // console.log(generosData);
+        setGeneros(generosData);
+        setEstados(estadosData);
+      } catch (error) {
+        console.error(
+          t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
+          error
+        );
+      } finally {
+        setLoadingAvaliador(false);
+      }
+    };
+
+    const fetchUserData = async () => {
+      setLoadingAvaliador(true);
+      try {
+        const userRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/avaliador/user`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        const userData = await userRes.json();
+
+        const avaliadorFormData: AvaliadorForm = {
+          empresa_id: "",
+          telefone: "",
+          localizacao: "",
+          apresentacao: "",
+          meioNotificacao: "",
+          logoPreview: null,
+          avaliar_todos: "",
+          lista_skills: [],
+          lista_formacao: [],
+          lista_certificado: [],
+          ativo: true,
+          trabalha_empresa: "",
+          status_cadastro: -1,
+          data_envio_link: null,
+          primeiro_nome: userData.primeiro_nome,
+          ultimo_nome: userData.ultimo_nome,
+          nome_social: userData.nome_social,
+          data_nascimento: maskedToISO(userData.data_nascimento) ?? "",
+          genero_id: userData.genero_id,
+          sexo_label: userData.genero,
+          estado_id: userData.estado_id,
+          estado_label: userData.estado,
+          cidade_id: userData.cidade_id,
+          cidade_label: userData.cidade,
+        };
+
+        // console.log("passei aqui sem idrecrutador");
+        // console.log(userData);
+
+        setDtNascDisplay(userData.data_nascimento);
+        setDtNasc(maskedToISO(userData.data_nascimento) ?? ""); // mantém ISO interno
+        setEstado(userData.estado_id);
+        setSexo(userData.genero_id);
+        setCidade(userData.cidade_id);
+
+        setForm(avaliadorFormData); // <- preenche estado + localStorage
+
+        fetchCidades(userData.estado_id);
+      } catch (error) {
+        console.error(
+          t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
+          error
+        );
+      } finally {
+        setLoadingAvaliador(false);
+      }
+    };
+
+    fetchSelectData();
+    if (!avaliadorId) fetchUserData();
+  }, []);
 
   useEffect(() => {
     if (!avaliadorId) return;
@@ -258,7 +394,7 @@ export default function PerfilAvaliador({
         const avaliadorFormData: AvaliadorForm = {
           empresa_id: data.empresa_id || "",
           telefone: data.telefone || "",
-          localizacao: data.localizacao || "",
+          localizacao: "",
           apresentacao: data.apresentacao || "",
           meioNotificacao: data.meio_notificacao || "",
           logoPreview: data.logo || null,
@@ -268,14 +404,31 @@ export default function PerfilAvaliador({
           lista_certificado: data.certificacoes || [],
           ativo: data.ativo ?? true,
           trabalha_empresa: data.empresa_id ? "SIM" : "NAO",
-          nome_user: data.nomeUser,
           status_cadastro: data.status_cadastro ?? -1,
           data_envio_link: data.data_envio_link || null,
+          primeiro_nome: data.usuario.primeiro_nome,
+          ultimo_nome: data.usuario.ultimo_nome,
+          nome_social: data.usuario.nome_social,
+          data_nascimento: maskedToISO(data.usuario.data_nascimento) ?? "",
+          genero_id: data.usuario.genero_id,
+          sexo_label: data.usuario.genero,
+          estado_id: data.usuario.estado_id,
+          estado_label: data.usuario.estado,
+          cidade_id: data.usuario.cidade_id,
+          cidade_label: data.usuario.cidade,
         };
+
+        setDtNascDisplay(data.usuario.data_nascimento);
+        setDtNasc(maskedToISO(data.usuario.data_nascimento) ?? ""); // mantém ISO interno
+        setEstado(data.usuario.estado_id);
+        setSexo(data.usuario.genero_id);
+        setCidade(data.usuario.cidade_id);
 
         setForm(avaliadorFormData); // <- preenche estado + localStorage
         setAvaliador(data.avaliador); // se quiser manter o objeto bruto
         // setNomeUSer(data.nomeUser);
+
+        fetchCidades(data.usuario.estado_id);
 
         router.push(`/dashboard/perfil?perfil=${perfil}&id=${avaliadorId}`);
       } catch (error) {
@@ -369,6 +522,182 @@ export default function PerfilAvaliador({
 
     fetchSelectData();
   }, [perfil]);
+
+  const applyDateMask = (value: string) => {
+    // remove tudo que não for número
+    const digits = value.replace(/\D/g, "");
+
+    if (i18n.language.startsWith("pt")) {
+      // dd/mm/yyyy
+      if (digits.length <= 2) return digits;
+      if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+      return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(
+        4,
+        8
+      )}`;
+    } else {
+      // en-US mm/dd/yyyy
+      if (digits.length <= 2) return digits;
+      if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+      return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(
+        4,
+        8
+      )}`;
+    }
+  };
+
+  /* const isoToMasked = (iso: string | null | undefined): string => {
+      if (!iso) return "";
+  
+      const date = new Date(iso);
+  
+      const day = String(date.getUTCDate()).padStart(2, "0");
+      const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const year = String(date.getUTCFullYear());
+  
+      if (i18n.language.startsWith("pt")) {
+        return `${day}/${month}/${year}`;
+      } else {
+        return `${month}/${day}/${year}`;
+      }
+    }; */
+
+  const maskedToISO = (value: string) => {
+    const parts = value.split("/");
+
+    if (parts.length !== 3) return null;
+
+    const [p1, p2, p3] = parts;
+
+    if (p3.length !== 4) return null; // só aceita ano completo
+
+    if (i18n.language.startsWith("pt")) {
+      // dd/mm/yyyy
+      return `${p3}-${p2.padStart(2, "0")}-${p1.padStart(2, "0")}`;
+    } else {
+      // mm/dd/yyyy
+      return `${p3}-${p1.padStart(2, "0")}-${p2.padStart(2, "0")}`;
+    }
+  };
+
+  const isValidDate = (iso: string) => {
+    const date = new Date(iso);
+
+    if (isNaN(date.getTime())) return false;
+
+    // Confirma que a data gerada bate com a original (corrige coisas como 32/01 virar 01/02)
+    const [year, month, day] = iso.split("-").map(Number);
+
+    return (
+      date.getUTCFullYear() === year &&
+      date.getUTCMonth() + 1 === month &&
+      date.getUTCDate() === day
+    );
+  };
+
+  const handleMaskedDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value;
+
+    // aplica máscara
+    const masked = applyDateMask(rawValue);
+
+    // salva sempre o valor mascarado
+    setDtNascDisplay(masked);
+
+    // tenta converter para ISO (somente se estiver completo)
+    const iso = maskedToISO(masked);
+
+    if (!iso) {
+      // ainda não está completa, não valida
+      setForm((prev) => ({ ...prev, data_nascimento: "" }));
+      return;
+    }
+
+    // valida
+    if (!isValidDate(iso)) {
+      toast.error(t("cadastro.data_invalida"), { duration: 2000 });
+      setDtNasc("");
+      setDtNascDisplay(""); // impede envio errado
+      return;
+    }
+
+    // data válida → salva ISO interno
+    setDtNasc(iso);
+    setForm((prev) => ({ ...prev, data_nascimento: iso }));
+  };
+
+  const handleGeneroChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const value = Number(e.target.value ?? 0);
+    const generoSelecionada = generos.find(
+      (e) => e.id.toString() === selectedId
+    );
+
+    setSexo(selectedId);
+
+    setForm((prev) => ({
+      ...prev,
+      genero_id: value,
+      sexo_label: generoSelecionada?.genero ?? "",
+    }));
+  };
+
+  const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const value = Number(e.target.value ?? 0);
+    const estadoSelecionada = estados.find(
+      (e) => e.id.toString() === selectedId
+    );
+
+    setEstado(selectedId);
+    setForm((prev) => ({
+      ...prev,
+      estado_id: value,
+      estado_label: estadoSelecionada?.estado ?? "",
+    }));
+
+    fetchCidades(selectedId);
+  };
+
+  const fetchCidades = async (selectedId: string) => {
+    setLoadingAvaliador(true);
+    try {
+      const cidadeRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cidades/estado-cidade/${selectedId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!cidadeRes.ok)
+        throw new Error(t("cadastro.item_alerta_erro_buscar_dados"));
+
+      const data = await cidadeRes.json();
+
+      // console.log(data);
+      setCidades(data);
+    } catch (error) {
+      console.error(t("cadastro.item_alerta_erro_buscar_dados"), error);
+    } finally {
+      setLoadingAvaliador(false);
+    }
+  };
+
+  const handleCidadeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const value = Number(e.target.value ?? 0);
+    const cidadeSelecionada = cidades.find(
+      (e) => e.id.toString() === selectedId
+    );
+
+    setCidade(selectedId);
+
+    setForm((prev) => ({
+      ...prev,
+      cidade_id: value,
+      cidade_label: cidadeSelecionada?.cidade ?? "",
+    }));
+  };
 
   if (avaliadorId && loadingAvaliador) {
     return <LoadingOverlay />;
@@ -478,9 +807,13 @@ export default function PerfilAvaliador({
 
     if (step === 1) {
       if (
-        !form.telefone ||
-        !form.localizacao ||
+        !form.primeiro_nome ||
+        !form.ultimo_nome ||
         !form.meioNotificacao ||
+        !form.telefone ||
+        !form.data_nascimento ||
+        form.genero_id == 0 ||
+        form.cidade_id == 0 ||
         !form.avaliar_todos
       )
         return;
@@ -544,13 +877,20 @@ export default function PerfilAvaliador({
         );
         formData.append("perfilId", String(perfilId));
         formData.append("telefone", form.telefone);
-        formData.append("localizacao", form.localizacao);
+        formData.append("localizacao", "");
         formData.append("apresentacao", form.apresentacao);
         formData.append("meio_notificacao", form.meioNotificacao);
         formData.append(
           "avaliar_todos",
           form.avaliar_todos === "1" ? "true" : "false"
         );
+
+        formData.append("primeiro_nome", form.primeiro_nome);
+        formData.append("ultimo_nome", form.ultimo_nome);
+        formData.append("nome_social", form.nome_social ?? "");
+        formData.append("data_nascimento", dtNasc);
+        formData.append("genero_id", String(form.genero_id));
+        formData.append("cidade_id", String(form.cidade_id));
 
         if (logoFile) formData.append("logo", logoFile);
 
@@ -1194,19 +1534,154 @@ export default function PerfilAvaliador({
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t("tela_perfil_avaliador.item_label_nome")}
+                  <label className="text-sm font-medium mb-1">
+                    {t("tela_perfil_recrutador.item_label_nome")}
                   </label>
-                  <div className="flex items-center border border-blue-400 rounded px-3 py-2 bg-gray-100 cursor-not-allowed opacity-80">
-                    <input
-                      name="nome_user"
-                      placeholder={t(
-                        "tela_perfil_avaliador.item_placeholder_nome"
-                      )}
-                      className="w-full outline-none"
-                      defaultValue={form.nome_user}
-                      disabled={true}
+                  <div className="flex flex-row gap-3">
+                    <div className="flex items-center border border-blue-600 rounded px-3 py-2 w-1/2">
+                      <input
+                        name="primeiro_nome"
+                        placeholder={t(
+                          "tela_perfil_recrutador.item_placeholder_primeiro_nome"
+                        )}
+                        className="w-full outline-none"
+                        defaultValue={form.primeiro_nome}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="flex items-center border border-blue-600 rounded px-3 py-2 w-1/2">
+                      <input
+                        name="ultimo_nome"
+                        placeholder={t(
+                          "tela_perfil_recrutador.item_placeholder_ultimo_nome"
+                        )}
+                        className="w-full outline-none"
+                        defaultValue={form.ultimo_nome}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  {showErrors && (!form.primeiro_nome || !form.ultimo_nome) && (
+                    <p className="text-sm text-red-600 mt-1">
+                      {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                    {t("cadastro.nome_social")}
+                    <TooltipIcon
+                      message={`${t("cadastro.tooltip_msg_nome_social")}`}
+                      perfil={perfil}
                     />
+                  </label>
+                  <div className="flex items-center border border-blue-600 rounded px-3 py-2">
+                    <input
+                      type="text"
+                      name="nome_social"
+                      placeholder={t("cadastro.placehold_nome_social")}
+                      className="w-full outline-none"
+                      defaultValue={form.nome_social}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  {/* Campo 1 - Data de nascimento */}
+                  <div className="col-span-1">
+                    <label className="text-sm font-medium mb-1">
+                      {t("cadastro.data_nascimento")}
+                    </label>
+
+                    <input
+                      type="text"
+                      value={dtNascDisplay}
+                      onChange={handleMaskedDateChange}
+                      placeholder={t("cadastro.placehold_data_nascimento")}
+                      className="flex items-center border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                    />
+
+                    {showErrors && !form.data_nascimento && (
+                      <p className="text-sm text-red-600 mt-1">
+                        {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Campo 2 - Sexo */}
+                  <div className="col-span-1">
+                    <label className="text-sm font-medium mb-1">
+                      {t("cadastro.sexo")}
+                    </label>
+                    <select
+                      className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                      name="genero"
+                      value={sexo}
+                      onChange={handleGeneroChange}
+                    >
+                      <option value="">{t("cadastro.placehold_sexo")}</option>
+                      {generos.map((gen) => (
+                        <option key={gen.id} value={gen.id}>
+                          {gen.genero}
+                        </option>
+                      ))}
+                    </select>
+
+                    {showErrors && !form.genero_id && (
+                      <p className="text-sm text-red-600 mt-1">
+                        {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Campo 3 - Estado */}
+                  <div className="col-span-1">
+                    <label className="text-sm font-medium mb-1">
+                      {t("cadastro.estado")}
+                    </label>
+
+                    <select
+                      className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                      name="estado"
+                      value={estado}
+                      onChange={handleEstadoChange}
+                    >
+                      <option value="">{t("cadastro.placehold_estado")}</option>
+                      {estados.map((e) => (
+                        <option key={e.id} value={e.id}>
+                          {e.sigla}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Campo 4 - Cidade (maior no desktop) */}
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="text-sm font-medium mb-1">
+                      {t("cadastro.cidade")}
+                    </label>
+
+                    <select
+                      className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                      name="cidade"
+                      value={cidade}
+                      onChange={handleCidadeChange}
+                    >
+                      <option value="">{t("cadastro.placehold_cidade")}</option>
+                      {cidades.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.cidade}
+                        </option>
+                      ))}
+                    </select>
+
+                    {showErrors && !form.cidade_id && (
+                      <p className="text-sm text-red-600 mt-1">
+                        {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -1358,27 +1833,6 @@ export default function PerfilAvaliador({
                     />
                   </div>
                   {showErrors && !form.telefone && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {t("tela_perfil_avaliador.item_msg_campo_obt")}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t("tela_perfil_avaliador.item_label_localizacao")}
-                  </label>
-                  <input
-                    type="text"
-                    name="localizacao"
-                    placeholder={t(
-                      "tela_perfil_avaliador.item_placeholder_localizacao"
-                    )}
-                    className="w-full border border-blue-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    value={form.localizacao}
-                    onChange={handleChange}
-                  />
-                  {showErrors && !form.localizacao && (
                     <p className="text-sm text-red-600 mt-1">
                       {t("tela_perfil_avaliador.item_msg_campo_obt")}
                     </p>
@@ -2552,11 +3006,109 @@ export default function PerfilAvaliador({
                                 </span>
                               </span>
                             )}
-                            <div className="flex items-center gap-2 font-bold">
-                              {form.nome_user}
-                            </div>
+
+                            {form.nome_social ? (
+                              <div className="flex items-center">
+                                <div className="flex flex-col leading-tight">
+                                  <p className="font-bold">
+                                    {form.nome_social}
+                                  </p>
+                                  <p className="text-sm">
+                                    {form.primeiro_nome} {form.ultimo_nome}
+                                  </p>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-center">
+                                <div className="flex flex-col leading-tight">
+                                  <p className="font-bold">
+                                    {form.primeiro_nome} {form.ultimo_nome}
+                                  </p>
+                                  <p className="text-sm">{form.nome_social}</p>
+                                </div>
+                              </div>
+                            )}
+
                             {/* Bloco 2 colunas */}
                             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800 w-full">
+                              {/* Dt Nasc */}
+                              <div className="flex items-center gap-2">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 text-gray-500"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                {dtNascDisplay}
+                              </div>
+
+                              {/* Sexo */}
+                              <div className="flex items-center gap-2">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 text-gray-500"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 11a4 4 0 100-8 4 4 0 000 8zm0 0c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z"
+                                  />
+                                </svg>
+
+                                {form.sexo_label}
+                              </div>
+
+                              {/* Estado */}
+                              <div className="flex items-center gap-2">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 text-gray-500"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
+                                  />
+                                </svg>
+                                {form.estado_label}
+                              </div>
+
+                              {/* Cidade */}
+                              <div className="flex items-center gap-2">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 text-gray-500"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
+                                  />
+                                  <circle cx="12" cy="10" r="3" />
+                                </svg>
+                                {form.cidade_label}
+                              </div>
+
                               {/* empresa */}
                               <div className="flex items-center gap-2">
                                 <Building2 className="h-4 w-4 text-gray-500" />
@@ -2586,31 +3138,6 @@ export default function PerfilAvaliador({
                                         "tela_perfil_avaliador.item_msg_avaliar_minha"
                                       )}
                                 </p>
-                              </div>
-
-                              {/* Localização */}
-                              <div className="flex items-center gap-2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 11c1.656 0 3-1.344 3-3s-1.344-3-3-3-3 1.344-3 3 1.344 3 3 3z"
-                                  />
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 22s8-4.5 8-12a8 8 0 10-16 0c0 7.5 8 12 8 12z"
-                                  />
-                                </svg>
-                                {form.localizacao}
                               </div>
 
                               {/* Telefone */}
@@ -2775,11 +3302,11 @@ export default function PerfilAvaliador({
 const isFormValid = (form: AvaliadorForm) => {
   return (
     form.telefone.trim() !== "" &&
-    form.localizacao.trim() !== "" &&
-    form.meioNotificacao.trim() !== "" /*&&
-    form.avaliar_todos !== ""
-    form.apresentacao.trim() !== ""  &&
-    form.logoPreview !== null &&
-    form.capaPreview !== null */
+    form.meioNotificacao.trim() !== "" &&
+    form.primeiro_nome.trim() !== "" &&
+    form.ultimo_nome.trim() !== "" &&
+    form.data_nascimento.trim() !== "" &&
+    form.genero_id !== 0 &&
+    form.cidade_id !== 0
   );
 };

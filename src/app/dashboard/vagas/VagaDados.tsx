@@ -67,6 +67,10 @@ interface VagasForm {
   data_cadastro: string;
   logo: string;
   ativo: boolean;
+  estado_id: number;
+  estado_label: string;
+  cidade_id: number;
+  cidade_label: string;
 }
 
 interface VagaData {
@@ -90,6 +94,10 @@ interface VagaData {
   data_cadastro: string;
   logo: string;
   ativo: boolean;
+  estado_id: number;
+  estado_label: string;
+  cidade_id: number;
+  cidade_label: string;
 }
 
 function useLocalStorage<T>(key: string, initialValue: T) {
@@ -121,7 +129,7 @@ export default function VagaDados({
   recrutadorId,
 }: Props) {
   const router = useRouter();
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [step, setStep] = useState(1);
@@ -142,6 +150,10 @@ export default function VagaDados({
     data_cadastro: new Date().toISOString(),
     logo: "",
     ativo: true,
+    estado_id: 0,
+    estado_label: "",
+    cidade_id: 0,
+    cidade_label: "",
   });
   const [showErrors, setShowErrors] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -152,6 +164,13 @@ export default function VagaDados({
   const [diasDisponiveis, setDiasDisponiveis] = useState(0);
   const [quantidadeVagas, setQuantidadeVagas] = useState(0);
   const [hasAvaliadorProprio, setHasAvaliadorProprio] = useState(false);
+
+  const [estado, setEstado] = useState("");
+  const [estados, setEstados] = useState<
+    { id: number; sigla: string; estado: string }[]
+  >([]);
+  const [cidade, setCidade] = useState("");
+  const [cidades, setCidades] = useState<{ id: number; cidade: string }[]>([]);
 
   const [empresas, setEmpresas] = useState<
     { id: number; nome_empresa: string; logo: string }[]
@@ -195,6 +214,39 @@ export default function VagaDados({
   const dataFormatada = format(dataVigencia, "dd 'de' MMMM", { locale: ptBR });
 
   useEffect(() => {
+    setLoadingVagaEmpresa(true);
+
+    const fetchSelectData = async () => {
+      try {
+        const estadoRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/estados/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept-Language": i18n.language,
+            },
+          }
+        );
+
+        const estadosData = await estadoRes.json();
+
+        // console.log(generosData);
+        setEstados(estadosData);
+      } catch (error) {
+        console.error(
+          t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
+          error
+        );
+      } finally {
+        setLoadingVagaEmpresa(false);
+      }
+    };
+
+    fetchSelectData();
+  }, []);
+
+  useEffect(() => {
     setHasAvaliadorProprio(false);
     if (!vagaId) return;
 
@@ -234,11 +286,20 @@ export default function VagaDados({
             : new Date().toISOString(),
           logo: data.logo || "",
           ativo: data.ativo ?? true,
+          estado_id: data.estado_id,
+          estado_label: data.estado_label,
+          cidade_id: data.cidade_id,
+          cidade_label: data.cidade_label,
         };
+        setEstado(data.estado_id);
+        setCidade(data.cidade_id);
+
         setDiasDisponiveis(data.qtde_dias_aberta);
         setQuantidadeVagas(data.qtde_posicao);
         setForm(vagaFormData);
         setVaga(data);
+
+        fetchCidades(data.estado_id);
       } catch (error) {
         console.error(
           t("tela_vaga_dados.item_alerta_erro_buscar_dados"),
@@ -322,6 +383,63 @@ export default function VagaDados({
     }
   }, [empresaId, empresas]);
 
+  const handleEstadoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const value = Number(e.target.value ?? 0);
+    const estadoSelecionada = estados.find(
+      (e) => e.id.toString() === selectedId
+    );
+
+    setEstado(selectedId);
+    setForm((prev) => ({
+      ...prev,
+      estado_id: value,
+      estado_label: estadoSelecionada?.estado ?? "",
+    }));
+
+    fetchCidades(selectedId);
+  };
+
+  const fetchCidades = async (selectedId: string) => {
+    setLoadingVagaEmpresa(true);
+    try {
+      const cidadeRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cidades/estado-cidade/${selectedId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!cidadeRes.ok)
+        throw new Error(t("cadastro.item_alerta_erro_buscar_dados"));
+
+      const data = await cidadeRes.json();
+
+      // console.log(data);
+      setCidades(data);
+    } catch (error) {
+      console.error(t("cadastro.item_alerta_erro_buscar_dados"), error);
+    } finally {
+      setLoadingVagaEmpresa(false);
+    }
+  };
+
+  const handleCidadeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = e.target.value;
+    const value = Number(e.target.value ?? 0);
+    const cidadeSelecionada = cidades.find(
+      (e) => e.id.toString() === selectedId
+    );
+
+    setCidade(selectedId);
+
+    setForm((prev) => ({
+      ...prev,
+      cidade_id: value,
+      cidade_label: cidadeSelecionada?.cidade ?? "",
+    }));
+  };
+
   if ((vagaId || empresaId) && loadingVagaEmpresa) {
     return <LoadingOverlay />;
   }
@@ -370,7 +488,7 @@ export default function VagaDados({
       if (
         !form.empresa_id ||
         !form.nome_vaga ||
-        !form.local_vaga ||
+        form.cidade_id === 0 ||
         !form.descricao ||
         !form.modalidade_trabalho_id ||
         !form.periodo_trabalho_id ||
@@ -426,6 +544,7 @@ export default function VagaDados({
           skills: form.lista_skills.filter((s) => s.skill_id > 0), // ← SkillAvaliacao[]
           novas_skills: form.lista_skills.filter((s) => s.skill_id < 0), // ← opcional
           ...(vagaId ? { vaga_id: Number(vagaId), ativo: form.ativo } : {}),
+          cidade_id: form.cidade_id,
         };
 
         const url = !vagaId
@@ -673,25 +792,60 @@ export default function VagaDados({
                         )}
                       </label>
 
-                      {/* Local da vaga */}
-                      <label className="flex flex-col text-sm text-gray-700">
-                        {t("tela_vaga_dados.item_label_local")}
-                        <input
-                          name="local_vaga"
-                          type="text"
-                          className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
-                          placeholder={t(
-                            "tela_vaga_dados.item_placeholder_local"
+                      {/* Linha Estado + Cidade */}
+                      <div className="grid grid-cols-12 gap-2">
+                        {/* Estado - col-3 */}
+                        <div className="col-span-12 md:col-span-5">
+                          <label className="text-sm font-medium mb-1">
+                            {t("cadastro.estado")}
+                          </label>
+
+                          <select
+                            className="border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                            name="estado"
+                            value={estado}
+                            onChange={handleEstadoChange}
+                          >
+                            <option value="">
+                              {t("cadastro.placehold_estado")}
+                            </option>
+                            {estados.map((e) => (
+                              <option key={e.id} value={e.id}>
+                                {e.sigla}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Cidade - col-9 */}
+                        <div className="col-span-12 md:col-span-7">
+                          <label className="text-sm font-medium mb-1">
+                            {t("cadastro.cidade")}
+                          </label>
+
+                          <select
+                            className="border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                            name="cidade"
+                            value={cidade}
+                            onChange={handleCidadeChange}
+                          >
+                            <option value="">
+                              {t("cadastro.placehold_cidade")}
+                            </option>
+                            {cidades.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.cidade}
+                              </option>
+                            ))}
+                          </select>
+
+                          {showErrors && !form.cidade_id && (
+                            <p className="text-sm text-red-600 mt-1">
+                              {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                            </p>
                           )}
-                          defaultValue={form.local_vaga ?? vaga?.local_vaga}
-                          onChange={handleChange_dinamicos}
-                        />
-                        {showErrors && !form.local_vaga && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {t("tela_vaga_dados.item_msg_campo_obt")}
-                          </p>
-                        )}
-                      </label>
+                        </div>
+                      </div>
 
                       {/* Modalidade */}
                       <fieldset className="text-sm text-gray-700 mt-2">
@@ -1655,14 +1809,50 @@ export default function VagaDados({
                               </div>
                             </div>
 
+                            <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
+                              {/* Estado */}
+                              <div className="flex items-center gap-2 w-full sm:w-1/2">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 text-gray-500"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
+                                  />
+                                </svg>
+                                {form.estado_label}
+                              </div>
+
+                              {/* Cidade */}
+                              <div className="flex items-center gap-2 w-full sm:w-1/2">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 text-gray-500"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
+                                  />
+                                  <circle cx="12" cy="10" r="3" />
+                                </svg>
+                                {form.cidade_label}
+                              </div>
+                            </div>
+
                             {/* Linha 1 - Local e Data de Cadastro */}
                             <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
-                              <div className="flex items-center gap-2 w-full sm:w-1/2">
-                                <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
-                                {form.local_vaga ||
-                                  t("tela_vaga_dados.item_msg_sem_local")}
-                              </div>
-                              <div className="flex items-center gap-2 w-full sm:w-1/2">
+                              <div className="flex items-center gap-2 w-full">
                                 <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
                                 {t("tela_vaga_dados.item_msg_aberta")}{" "}
                                 {form.data_cadastro ?? dataBase
@@ -2026,7 +2216,7 @@ const isFormValid = (form: VagasForm) => {
   return (
     form.empresa_id !== "" &&
     form.nome_vaga.trim() !== "" &&
-    form.local_vaga.trim() !== "" &&
+    form.cidade_id !== 0 &&
     form.descricao.trim() !== "" &&
     form.modalidade_trabalho_id !== null &&
     form.periodo_trabalho_id !== null &&
