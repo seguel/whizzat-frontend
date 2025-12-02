@@ -14,6 +14,8 @@ interface Job {
   lgbtq?: boolean;
   mulheres?: boolean;
   cinquenta_mais?: boolean;
+  cidade_label: string;
+  estado_sigla: string;
 }
 
 interface JobListProps {

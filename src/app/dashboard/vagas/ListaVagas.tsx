@@ -33,6 +33,8 @@ interface Job {
   lgbtq?: boolean;
   mulheres?: boolean;
   cinquenta_mais?: boolean;
+  cidade_label: string;
+  estado_sigla: string;
 }
 
 export default function ListaVagas({

@@ -30,6 +30,8 @@ interface EmpresaData {
   logo?: string;
   imagem_fundo?: string;
   ativo: boolean;
+  estado_label: string;
+  cidade_label: string;
 }
 
 interface VagaData {
@@ -56,6 +58,8 @@ interface VagaData {
   logo: string;
   prazo: string;
   ativo: boolean;
+  cidade_label: string;
+  estado_sigla: string;
 }
 
 export default function EmpresaDetalhe({
@@ -104,7 +108,7 @@ export default function EmpresaDetalhe({
           empresasRes.json(),
           vagasRes.json(),
         ]);
-        console.log(vagasData);
+        console.log(empresasData);
         setEmpresas(empresasData);
         setListVagas(vagasData);
         setHasVaga(vagasData.length > 0);
@@ -278,7 +282,7 @@ export default function EmpresaDetalhe({
 
                   {/* Bloco 2 colunas */}
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800">
-                    {/* Localização */}
+                    {/* Estado */}
                     <div className="flex items-center gap-2">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -291,16 +295,30 @@ export default function EmpresaDetalhe({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M12 11c1.656 0 3-1.344 3-3s-1.344-3-3-3-3 1.344-3 3 1.344 3 3 3z"
+                          d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
                         />
+                      </svg>
+                      {empresas?.estado_label}
+                    </div>
+
+                    {/* Cidade */}
+                    <div className="flex items-center gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 text-gray-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M12 22s8-4.5 8-12a8 8 0 10-16 0c0 7.5 8 12 8 12z"
+                          d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
                         />
+                        <circle cx="12" cy="10" r="3" />
                       </svg>
-                      {empresas?.localizacao}
+                      {empresas?.cidade_label}
                     </div>
 
                     {/* Telefone */}
@@ -409,7 +427,7 @@ export default function EmpresaDetalhe({
                                 {job.nome_vaga}
                               </h3>
                               <p className="text-xs text-gray-500 break-words">
-                                {job.local_vaga}
+                                {job.cidade_label}/{job.estado_sigla}
                               </p>
                               <p className="text-xs text-gray-500 break-words">
                                 {job.qtde_posicao}{" "}
