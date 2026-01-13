@@ -11,7 +11,7 @@ export function useAvaliador(perfil: Perfil) {
   const [userId, setUserId] = useState<number | null>(null);
   const [avaliadorId, setAvaliadorId] = useState<number | null>(null);
   const [hasPerfilAvaliador, setHasPerfilAvaliador] = useState(false);
-  //const [hasEmpresa, setHasEmpresa] = useState(false);
+  const [hasRedirectPlano, setRedirectPlano] = useState("");
   const [loading, setLoading] = useState(true);
 
   const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
@@ -30,6 +30,7 @@ export function useAvaliador(perfil: Perfil) {
 
         const data = await res.json();
         setUserId(data.usuario_id);
+        setRedirectPlano(data.redirect_to);
 
         if (data.id != null) {
           setHasPerfilAvaliador(true);
@@ -56,5 +57,6 @@ export function useAvaliador(perfil: Perfil) {
     avaliadorId,
     hasPerfilAvaliador,
     loading,
+    hasRedirectPlano,
   };
 }

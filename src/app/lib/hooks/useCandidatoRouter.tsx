@@ -18,6 +18,7 @@ export function useCandidatoRouter() {
   const [candidatoId, setCandidatoId] = useState<number | null>(null);
   const [hasPerfilCandidato, setHasPerfilCandidato] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [hasRedirectPlano, setRedirectPlano] = useState("");
 
   const perfilId = 1;
 
@@ -34,7 +35,9 @@ export function useCandidatoRouter() {
         );
 
         const data = await res.json();
+        // console.log(data);
         setUserId(data.usuario_id);
+        setRedirectPlano(data.redirect_to);
 
         if (data.id != null) {
           setHasPerfilCandidato(true);
@@ -58,5 +61,6 @@ export function useCandidatoRouter() {
     candidatoId,
     hasPerfilCandidato,
     loading, // <- quem usa o hook decide se mostra "Carregando..."
+    hasRedirectPlano,
   };
 }

@@ -12,13 +12,15 @@ export function useCandidato(perfil: Perfil) {
   const [candidatoId, setCandidatoId] = useState<number | null>(null);
   const [hasPerfilCandidato, setHasPerfilCandidato] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [hasRedirectPlano, setRedirectPlano] = useState("");
 
-  const perfilId = 1;
+  const perfilId =
+    perfil === "recrutador" ? "2" : perfil === "avaliador" ? "3" : "1";
 
   useEffect(() => {
     const verificarHasPerfilCandidato = async () => {
       setLoading(true);
-      console.log(perfil);
+      // console.log(perfil);
       try {
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/candidato/check-hasperfil/${perfilId}`,
@@ -32,6 +34,7 @@ export function useCandidato(perfil: Perfil) {
         // console.log(data);
 
         setUserId(data.usuario_id);
+        setRedirectPlano(data.redirect_to);
 
         if (data.id != null) {
           setHasPerfilCandidato(true);
@@ -58,5 +61,6 @@ export function useCandidato(perfil: Perfil) {
     candidatoId,
     hasPerfilCandidato,
     loading,
+    hasRedirectPlano,
   };
 }

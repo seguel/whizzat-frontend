@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { LuBlocks, LuUsers, LuLogIn } from "react-icons/lu";
+import { LuBlocks, LuUsers, LuLogIn, LuLayers } from "react-icons/lu";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 
@@ -17,6 +17,11 @@ export default function Header() {
       label: t("header.mnu_primeiro"),
       href: "/funciona",
       icon: <LuBlocks size={20} />,
+    },
+    {
+      label: t("header.mnu_planos"),
+      href: "/planos",
+      icon: <LuLayers size={20} />,
     },
     {
       label: t("header.mnu_segundo"),

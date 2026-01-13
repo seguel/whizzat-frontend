@@ -9,6 +9,7 @@ import { useCandidatoRouter } from "../../../lib/hooks/useCandidatoRouter";
 import { useAuthGuard } from "../../../lib/hooks/useAuthGuard";
 import Vagas from "./ListaVagas";
 import VagaDetalhes from "./VagaDetalhe";
+import { useRouter } from "next/navigation"; // App Router
 
 interface Props {
   perfil: ProfileType;
@@ -17,11 +18,17 @@ interface Props {
 }
 
 export default function Middleware({ perfil, vaga, emp }: Props) {
+  const router = useRouter();
   const { isReady } = useAuthGuard("/cadastro/login");
-  const { loading, userId, candidatoId, hasPerfilCandidato } =
+  const { loading, userId, candidatoId, hasPerfilCandidato, hasRedirectPlano } =
     useCandidatoRouter();
 
   if (!isReady || loading || !userId) return <LoadingOverlay />;
+
+  if (hasRedirectPlano) {
+    router.push(hasRedirectPlano);
+    return null;
+  }
 
   const componente = vaga ? (
     <VagaDetalhes

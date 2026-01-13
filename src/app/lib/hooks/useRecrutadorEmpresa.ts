@@ -5,6 +5,7 @@ type Perfil = "recrutador" | "avaliador" | "candidato";
 interface RecrutadorResponse {
   id: number | null;
   usuario_id: number;
+  redirect_to: string;
 }
 
 export function useRecrutadorEmpresa(perfil: Perfil) {
@@ -13,6 +14,7 @@ export function useRecrutadorEmpresa(perfil: Perfil) {
   const [hasPerfilRecrutador, setHasPerfilRecrutador] = useState(false);
   const [hasEmpresa, setHasEmpresa] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [hasRedirectPlano, setRedirectPlano] = useState("");
 
   const perfilId = perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
@@ -30,6 +32,7 @@ export function useRecrutadorEmpresa(perfil: Perfil) {
 
         const data: RecrutadorResponse = await res.json();
         setUserId(data.usuario_id);
+        setRedirectPlano(data.redirect_to);
 
         if (data.id != null) {
           setHasPerfilRecrutador(true);
@@ -79,5 +82,6 @@ export function useRecrutadorEmpresa(perfil: Perfil) {
     hasPerfilRecrutador,
     hasEmpresa,
     loading, // <- quem usa o hook decide se mostra "Carregando..."
+    hasRedirectPlano,
   };
 }
