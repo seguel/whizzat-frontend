@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // App Route
 import Sidebar from "../components/perfil/Sidebar";
 import TopBar from "../components/perfil/TopBar";
 import JobList from "../components/perfil/JobList";
@@ -16,11 +17,21 @@ interface Props {
 }
 
 export default function DashboardRecrutador({ perfil }: Props) {
+  const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { hasPerfilRecrutador, hasEmpresa, loading } =
+  const { hasPerfilRecrutador, hasEmpresa, loading, hasRedirectPlano } =
     useRecrutadorEmpresa(perfil);
 
+  useEffect(() => {
+    if (hasRedirectPlano) {
+      router.push(hasRedirectPlano);
+    }
+  }, [hasRedirectPlano, router]);
+
   if (loading) return <LoadingOverlay />;
+
+  // 🔹 Se estiver redirecionando, não renderiza nada
+  if (hasRedirectPlano) return null;
 
   return (
     <div className="flex h-screen overflow-hidden">

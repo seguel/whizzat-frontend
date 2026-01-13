@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // App Router
 import Sidebar from "../components/perfil/Sidebar";
 import TopBar from "../components/perfil/TopBar";
 import EvaluationList from "../components/perfil/EvaluationList";
@@ -14,10 +15,22 @@ interface Props {
 }
 
 export default function DashboardCandidato({ perfil }: Props) {
+  const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { hasPerfilCandidato, loading } = useCandidato(perfil);
+
+  const { hasPerfilCandidato, loading, hasRedirectPlano } =
+    useCandidato(perfil);
+
+  useEffect(() => {
+    if (hasRedirectPlano) {
+      router.push(hasRedirectPlano);
+    }
+  }, [hasRedirectPlano, router]);
 
   if (loading) return <LoadingOverlay />;
+
+  // 🔹 Se estiver redirecionando, não renderiza nada
+  if (hasRedirectPlano) return null;
 
   return (
     <div className="flex h-screen overflow-hidden">

@@ -11,7 +11,7 @@ export default async function Page({
   searchParams: { perfil?: string; expirado?: string };
 }) {
   const perfil = searchParams.perfil;
-  const expirado = searchParams.expirado ?? undefined;
+  // const expirado = searchParams.expirado ?? undefined;
 
   if (!perfil) {
     redirect("?perfil=candidato");
