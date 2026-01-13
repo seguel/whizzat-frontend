@@ -42,7 +42,7 @@ export default function NotFound() {
 
       <button
         onClick={() => router.push("/")}
-        className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition"
+        className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition cursor-pointer"
       >
         <ArrowLeftCircle className="w-5 h-5" />
         {t("notfound.btn_voltar")}

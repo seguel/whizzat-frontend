@@ -4,15 +4,25 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import { useAuthGuard } from "./useAuthGuard";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { useRecrutadorEmpresa } from "./useRecrutadorEmpresa";
+import { useRouter } from "next/navigation"; // App Route
 
 interface Options {
   perfil: ProfileType;
 }
 
 export function useEspecialistaRouter({ perfil }: Options) {
+  const router = useRouter();
   const { isReady } = useAuthGuard("/cadastro/login");
-  const { userId, recrutadorId, hasPerfilRecrutador, hasEmpresa, loading } =
-    useRecrutadorEmpresa(perfil);
+  const {
+    userId,
+    recrutadorId,
+    hasPerfilRecrutador,
+    hasEmpresa,
+    loading,
+    hasRedirectPlano,
+  } = useRecrutadorEmpresa(perfil);
+
+  if (hasRedirectPlano) router.push(hasRedirectPlano);
 
   // só renderiza depois que userId estiver definido
   if (!userId || loading) {
