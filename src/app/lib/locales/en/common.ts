@@ -9,6 +9,7 @@ const en = {
     mnu_primeiro: "How It Works",
     mnu_segundo: "About Us",
     mnu_terceiro: "Get Started",
+    mnu_planos: "Plans",
   },
   home: {
     titulo: "The best opportunities",

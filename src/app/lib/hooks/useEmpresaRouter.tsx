@@ -7,6 +7,7 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import { useAuthGuard } from "./useAuthGuard";
 //import LoadingOverlay from "../../components/LoadingOverlay";
 import { useRecrutadorEmpresa } from "./useRecrutadorEmpresa";
+import { useRouter } from "next/navigation"; // App Route
 
 interface Options {
   perfil: ProfileType;
@@ -16,6 +17,7 @@ interface Options {
 }
 
 export function useEmpresaRouter({ perfil, op, id }: Options) {
+  const router = useRouter();
   const isCadastro = op === "N";
   const isEdicao = op === "E" && id;
 
@@ -26,64 +28,16 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
   const [hasEmpresa, setHasEmpresa] = useState<boolean | null>(false);
   const [userId, setUserId] = useState<string>(""); // <-- aqui */
 
-  const { userId, recrutadorId, hasPerfilRecrutador, hasEmpresa, loading } =
-    useRecrutadorEmpresa(perfil);
+  const {
+    userId,
+    recrutadorId,
+    hasPerfilRecrutador,
+    hasEmpresa,
+    loading,
+    hasRedirectPlano,
+  } = useRecrutadorEmpresa(perfil);
 
-  /* useEffect(() => {
-    const perfilId =
-      perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
-
-    const verificarHasPerfilRecrutador = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/recrutador/check-hasperfil/${perfilId}`,
-          {
-            method: "GET",
-            credentials: "include", // importante para enviar o cookie JWT
-          }import EmpresaEditar from './../../dashboard/empresa/editar/[id]/page';
-
-        );
-
-        const data = await res.json();
-        setUserId(data.usuario_id);
-        if (data.id != null) {
-          setHasPerfilRecrutador(true);
-          fetchVinculoEmpresa(data.id); // se quiser armazenar o id
-          // <-- usa state agora
-        } else {
-          setHasPerfilRecrutador(false);
-        }
-      } catch (error) {
-        console.error("Erro ao verificar perfil:", error);
-        setHasPerfilRecrutador(false);
-      }
-    };
-
-    const fetchVinculoEmpresa = async (recrutadorId: number) => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/recrutador/vinculo-empresa/${recrutadorId}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-
-        if (!res.ok) {
-          setHasEmpresa(false);
-        } else {
-          const data = await res.json();
-          console.log(data);
-
-          setHasEmpresa(true);
-        }
-      } catch (error) {
-        console.error("Erro ao verificar vínculo:", error);
-        setHasEmpresa(false);
-      }
-    };
-    verificarHasPerfilRecrutador();
-  }, [perfil]); */
+  if (hasRedirectPlano) router.push(hasRedirectPlano);
 
   // só renderiza depois que userId estiver definido
   if (!userId || loading) {

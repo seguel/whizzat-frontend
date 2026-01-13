@@ -9,6 +9,7 @@ const pt = {
     mnu_primeiro: "Como Funciona",
     mnu_segundo: "Sobre Nós",
     mnu_terceiro: "Comece Agora",
+    mnu_planos: "Planos",
   },
   home: {
     titulo: "As melhores oportunidades",

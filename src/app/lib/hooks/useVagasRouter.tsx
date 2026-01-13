@@ -6,6 +6,7 @@ import Vagas from "../../dashboard/vagas/ListaVagas";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import VagaDetalhes from "./../../dashboard/vagas/VagaDetalhe";
 import { useRecrutadorEmpresa } from "./useRecrutadorEmpresa";
+import { useRouter } from "next/navigation"; // App Route
 
 interface Options {
   perfil: ProfileType;
@@ -15,12 +16,21 @@ interface Options {
 }
 
 export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
+  const router = useRouter();
   const isCadastro = op === "N";
   const isEdicao = op === "E" && vagaId;
 
   const { isReady } = useAuthGuard("/cadastro/login");
-  const { userId, recrutadorId, hasPerfilRecrutador, hasEmpresa, loading } =
-    useRecrutadorEmpresa(perfil);
+  const {
+    userId,
+    recrutadorId,
+    hasPerfilRecrutador,
+    hasEmpresa,
+    loading,
+    hasRedirectPlano,
+  } = useRecrutadorEmpresa(perfil);
+
+  if (hasRedirectPlano) router.push(hasRedirectPlano);
 
   // só renderiza depois que userId estiver definido
   if (!userId || loading) {
