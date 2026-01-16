@@ -1,9 +1,18 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
 type PeriodType = "monthly" | "yearly";
+
+interface PlanoSelecionado {
+  planoPeriodoId: number;
+  nomePlano: string;
+  valor: string;
+  period: PeriodType;
+}
 
 interface PlanItens {
   id: number;
@@ -29,7 +38,7 @@ interface PlanCardProps {
   buttonColor: "blue" | "yellow";
   defaultPeriod?: PeriodType;
   selectedPlanoPeriodoId?: number;
-  onSelect: (planoPeriodoId: number, period: PeriodType) => void;
+  onSelect: (plano: PlanoSelecionado) => void;
   exibirBotao: boolean;
 }
 
@@ -37,9 +46,11 @@ interface PlanCardProps {
 function PeriodToggle({
   value,
   onChange,
+  t,
 }: {
   value: PeriodType;
   onChange: (value: PeriodType) => void;
+  t: TFunction;
 }) {
   return (
     <div className="flex items-center justify-center gap-3 mt-4">
@@ -49,7 +60,7 @@ function PeriodToggle({
         }`}
         onClick={() => onChange("monthly")}
       >
-        Mensal
+        {t("planos.mensal")}
       </span>
 
       <div
@@ -71,7 +82,7 @@ function PeriodToggle({
         }`}
         onClick={() => onChange("yearly")}
       >
-        Anual
+        {t("planos.anual")}
       </span>
     </div>
   );
@@ -90,10 +101,26 @@ export default function PlanCard({
   onSelect,
   exibirBotao,
 }: PlanCardProps) {
+  const { t, i18n } = useTranslation("common");
   const [period, setPeriod] = useState<PeriodType>(defaultPeriod);
+  const [ready, setReady] = useState(false);
 
   const data = period === "monthly" ? monthly : yearly;
   const isSelected = selectedPlanoPeriodoId === data.planoPeriodoId;
+
+  useEffect(() => {
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      const onInit = () => setReady(true);
+      i18n.on("initialized", onInit);
+      return () => {
+        i18n.off("initialized", onInit);
+      };
+    }
+  }, [i18n]);
+
+  console.log(ready);
 
   const buttonClass =
     buttonColor === "blue"
@@ -125,14 +152,14 @@ export default function PlanCard({
     >
       {highlight && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-yellow-400 px-4 py-1 rounded-full text-xs font-bold">
-          Recomendado
+          {t("planos.recomendado")}
         </div>
       )}
 
       <h2 className="text-xl font-bold text-gray-800">{title}</h2>
       <p className="text-sm text-gray-600">{description}</p>
 
-      <PeriodToggle value={period} onChange={setPeriod} />
+      <PeriodToggle value={period} onChange={setPeriod} t={t} />
 
       {data.oldPrice && (
         <div className="mt-4 flex items-center gap-2">
@@ -151,24 +178,35 @@ export default function PlanCard({
       {/* Preço principal */}
       <p className="mt-2 text-2xl sm:text-3xl font-extrabold text-gray-900">
         {data.price}
-        <span className="text-lg font-semibold">{data.periodLabel}</span>
+        <span className="text-lg font-semibold">
+          /{period === "yearly" ? t("planos.ano") : t("planos.mes")}
+        </span>
       </p>
 
       {/* Valor mensal equivalente do anual */}
       {period === "yearly" && annualMonthlyValue !== null && (
         <p className="mt-1 text-gray-400 text-xs sm:text-sm">
-          {formatCurrency(annualMonthlyValue)}/mês
+          {formatCurrency(annualMonthlyValue)}/{t("planos.mes")}
         </p>
       )}
 
       {exibirBotao && (
         <button
-          onClick={() => onSelect(data.planoPeriodoId, period)}
+          onClick={() =>
+            onSelect({
+              planoPeriodoId: data.planoPeriodoId,
+              nomePlano: title,
+              valor: data.price,
+              period,
+            })
+          }
           className={`mt-6 w-full py-2 rounded-lg font-semibold cursor-pointer ${
             isSelected ? "bg-yellow-400 text-black" : buttonClass
           }`}
         >
-          {isSelected ? "Plano selecionado" : "Selecionar plano"}
+          {isSelected
+            ? t("planos.botao_selecionado")
+            : t("planos.botao_selecionar")}
         </button>
       )}
 
