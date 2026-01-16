@@ -11,6 +11,11 @@ const pt = {
     mnu_terceiro: "Comece Agora",
     mnu_planos: "Planos",
   },
+  pages_home: {
+    titulo_funciona: "Como Funciona",
+    titulo_sobre: "Sobre Nós",
+    titulo_planos: "Nossos Planos",
+  },
   home: {
     titulo: "As melhores oportunidades",
     subtitulo: "para as melhores pessoas e empresas",
@@ -599,6 +604,16 @@ const pt = {
     item_label_panel_score: "Score Médio (Hard+Soft):",
     item_label_panel_hardskill: "Distribuição de Hard Skills",
     item_label_panel_softskill: "Distribuição de Soft Skills",
+  },
+  planos: {
+    titulo: "Você ainda não possui um plano, selecione abaixo.",
+    recomendado: "Recomendado",
+    botao_selecionar: "Selecionar Plano",
+    botao_selecionado: "Plano Selecionado",
+    mensal: "Mensal",
+    anual: "Anual",
+    mes: "mês",
+    ano: "ano",
   },
 };
 

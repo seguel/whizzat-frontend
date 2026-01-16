@@ -11,6 +11,11 @@ const en = {
     mnu_terceiro: "Get Started",
     mnu_planos: "Plans",
   },
+  pages_home: {
+    titulo_funciona: "How It Works",
+    titulo_sobre: "About Us",
+    titulo_planos: "Our Pricing Plans",
+  },
   home: {
     titulo: "The best opportunities",
     subtitulo: "for the best people and companies",
@@ -607,6 +612,16 @@ const en = {
     item_label_panel_score: "Average Score  (Hard+Soft):",
     item_label_panel_hardskill: "Hard Skill Distribution",
     item_label_panel_softskill: "Soft Skill Distribution",
+  },
+  planos: {
+    titulo: "You don’t have a plan yet. Please select one below.",
+    recomendado: "Recommended",
+    botao_selecionar: "Select Plan",
+    botao_selecionado: "Selected Plan",
+    mensal: "Monthly",
+    anual: "Yearly",
+    mes: "month",
+    ano: "year",
   },
 };
 

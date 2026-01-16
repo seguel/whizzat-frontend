@@ -15,6 +15,9 @@ module.exports = {
     "bg-green-400",
     "bg-blue-400",
     "bg-purple-400",
+    "bg-green-200",
+    "bg-blue-200",
+    "bg-purple-200",
 
     // Borders
     "border-green-400",
