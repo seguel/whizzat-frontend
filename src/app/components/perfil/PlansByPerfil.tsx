@@ -5,6 +5,15 @@ import PlanCard from "./PlanCard";
 import LoadingOverlay from "../LoadingOverlay";
 import { useTranslation } from "react-i18next";
 
+type PeriodType = "monthly" | "yearly";
+
+interface PlanoSelecionado {
+  planoPeriodoId: number;
+  nomePlano: string;
+  valor: string;
+  period: PeriodType;
+}
+
 interface Periodo {
   id: number;
   periodo: string;
@@ -20,10 +29,14 @@ interface PlanItens {
   descricao: string;
 }
 
-interface PlanoData {
-  id: number;
+interface PlanLang {
   plano: string;
   descricao: string;
+}
+
+interface PlanoData {
+  id: number;
+  plano_lang: PlanLang[]; // 🔹 mapeado a partir de "linguagem" do backend
   periodos: Periodo[];
   itens: PlanItens[];
   highlight: boolean;
@@ -31,7 +44,7 @@ interface PlanoData {
 
 interface PlansByPerfilProps {
   perfil: string;
-  onSelect: (planoPeriodoId: number, period: "monthly" | "yearly") => void;
+  onSelect: (plano: PlanoSelecionado) => void;
   selectedPlanoId?: number | null;
   exibirBotao: boolean;
 }
@@ -49,6 +62,7 @@ export default function PlansByPerfil({
   useEffect(() => {
     const fetchPlanos = async () => {
       setLoading(true);
+
       const perfilId =
         perfil === "recrutador"
           ? 2
@@ -68,9 +82,21 @@ export default function PlansByPerfil({
           }
         );
 
-        const data: PlanoData[] = await res.json();
-        console.log(data);
-        setPlanos(data);
+        const dataFromAPI: any[] = await res.json();
+
+        // 🔹 Mapeando "linguagem" para "plano_lang" para bater com a interface
+        const planosMapped: PlanoData[] = dataFromAPI.map((p) => ({
+          id: p.id,
+          highlight: p.highlight,
+          plano_lang: p.linguagem.map((l: any) => ({
+            plano: l.plano,
+            descricao: l.descricao ?? "",
+          })),
+          periodos: p.periodos,
+          itens: p.itens,
+        }));
+
+        setPlanos(planosMapped);
       } catch (err) {
         console.error("Erro ao buscar planos:", err);
       } finally {
@@ -107,16 +133,14 @@ export default function PlansByPerfil({
         const mensal = periodos.find((p) => p.validade_dias !== 365);
         const anual = periodos.find((p) => p.validade_dias === 365);
 
-        // Se faltar algum período, não renderiza o card
-        if (!mensal || !anual) {
+        if (!mensal || !anual)
           return <div key={`plano-${plano.id}-incompleto`} />;
-        }
 
         return (
           <PlanCard
             key={`plano-${plano.id}`}
-            title={plano.plano}
-            description={plano.descricao}
+            title={plano.plano_lang[0]?.plano ?? ""}
+            description={plano.plano_lang[0]?.descricao ?? ""}
             buttonColor="blue"
             highlight={plano.highlight}
             monthly={{

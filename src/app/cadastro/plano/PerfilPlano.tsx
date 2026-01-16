@@ -15,11 +15,21 @@ type PerfilKey = "candidato" | "recrutador" | "avaliador";
 //   avaliador: { ilustracao: "/assets/imagem_perfil.png" },
 // } as const;
 
+type PeriodType = "monthly" | "yearly";
+
+interface PlanoSelecionado {
+  planoPeriodoId: number;
+  nomePlano: string;
+  valor: string;
+  period: PeriodType;
+}
+
 export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
   const { t } = useTranslation("common");
   const router = useRouter();
 
-  const [planoSelecionado, setPlanoSelecionado] = useState<number | null>(null);
+  const [planoSelecionado, setPlanoSelecionado] =
+    useState<PlanoSelecionado | null>(null);
   const [openPagamento, setOpenPagamento] = useState(false);
 
   // const cor = t(`perfil.selecionado_${perfil}_cor`);
@@ -31,7 +41,7 @@ export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
   // const hoverTextClass = `hover:text-${cor_css}-300`;
   const hoverBgClass = `hover:bg-${cor_css}-400`;
 
-  const inserePlano = async (planoPeriodoId: number) => {
+  const inserePlano = async (planoPeriodoId: number, token_pagto: string) => {
     const perfilId =
       perfil === "recrutador" ? 2 : perfil === "avaliador" ? 3 : 1;
 
@@ -40,10 +50,15 @@ export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ perfilId, planoPeriodoId }),
+        body: JSON.stringify({
+          perfilId,
+          planoPeriodoId,
+          token_pagto,
+        }),
       });
 
       if (!res.ok) throw new Error("Erro ao gravar o plano");
+      console.log(await res.json());
 
       router.push(`/dashboard?perfil=${perfil}`);
     } catch (err) {
@@ -53,7 +68,8 @@ export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
 
   const onPagamentoSucesso = async () => {
     if (!planoSelecionado) return;
-    await inserePlano(planoSelecionado);
+    await inserePlano(planoSelecionado.planoPeriodoId, "ABC123456");
+
     setOpenPagamento(false);
   };
 
@@ -85,13 +101,11 @@ export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
             {t(`perfil.selecionado_${perfil}_titulo`)}
           </h1>
 
-          <p className="text-gray-700">
-            Você ainda não possui um plano, selecione abaixo.
-          </p>
+          <p className="text-gray-700">{t(`planos.titulo`)}</p>
 
           <PlansByPerfil
             perfil={perfil}
-            selectedPlanoId={planoSelecionado}
+            selectedPlanoId={planoSelecionado?.planoPeriodoId}
             onSelect={setPlanoSelecionado}
             exibirBotao={true}
           />
@@ -124,8 +138,10 @@ export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
           <div className="bg-white rounded-lg p-6 max-w-md w-full text-center">
             <h2 className="text-xl font-bold mb-4">Pagamento</h2>
             <p className="mb-6">
-              Você selecionou o plano ID: {planoSelecionado}. Aqui você pode
-              integrar o checkout.
+              <strong>Plano:</strong> {planoSelecionado?.nomePlano} <br />
+              <strong>Valor:</strong> {planoSelecionado?.valor} <br />
+              <strong>Período:</strong>{" "}
+              {planoSelecionado?.period === "monthly" ? "Mensal" : "Anual"}
             </p>
             <div className="flex justify-center gap-4">
               <button

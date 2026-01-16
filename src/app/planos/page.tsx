@@ -1,44 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/header/header";
-// import { useTranslation } from "react-i18next";
-// import LoadingOverlay from "../components/LoadingOverlay";
+import { useTranslation } from "react-i18next";
+import LoadingOverlay from "../components/LoadingOverlay";
 import PlansByPerfil from "../components/perfil/PlansByPerfil";
-/* 
-interface PlanCardProps {
-  title: string;
-  description: string;
-  oldPrice: string;
-  price: string;
-  monthLabel: string;
-  total: string;
-  discount: string;
-  features: string[];
-  buttonColor: "blue" | "yellow";
-  highlight?: boolean;
-} */
-/* 
-interface Periodo {
-  id: number;
-  periodo: string;
-  validade_dias: number;
-  valor: string;
-  perfil_id: number;
-  valor_old: string;
-  desconto: string;
-} */
 
-// interface PlanoData {
-//   id: number;
-//   plano: string;
-//   descricao: string;
-//   periodos: Periodo[];
-// }
+type PeriodType = "monthly" | "yearly";
+
+interface PlanoSelecionado {
+  planoPeriodoId: number;
+  nomePlano: string;
+  valor: string;
+  period: PeriodType;
+}
 
 export default function PlansPage() {
-  /* const { i18n } = useTranslation("common");
-  const [loadingPlano, setLoadingPlano] = useState(false); */
-  const [planoSelecionado, setPlanoSelecionado] = useState<number | null>(null);
+  const { t, i18n } = useTranslation("common");
+  const [ready, setReady] = useState(false);
+  const [planoSelecionado, setPlanoSelecionado] =
+    useState<PlanoSelecionado | null>(null);
 
   const perfilMap: Record<number, { nome: string; cor: string }> = {
     1: { nome: "Candidato", cor: "#22c55e" }, // verde
@@ -46,24 +26,19 @@ export default function PlansPage() {
     // 3: { nome: "Avaliador", cor: "#3b82f6" }, // azul
   };
 
-  /* useEffect(() => {
-    const fetchSelectData = async () => {
-      setLoadingPlano(true);
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/planos/`, {
-          headers: { "Accept-Language": i18n.language },
-        });
-        const data: PlanoData[] = await res.json();
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoadingPlano(false);
-      }
-    };
-    fetchSelectData();
-  }, [i18n.language]); */
+  useEffect(() => {
+    if (i18n.isInitialized) {
+      setReady(true);
+    } else {
+      const onInit = () => setReady(true);
+      i18n.on("initialized", onInit);
+      return () => {
+        i18n.off("initialized", onInit);
+      };
+    }
+  }, [i18n]);
 
-  // if (loadingPlano) return <LoadingOverlay />;
+  if (!ready) return <LoadingOverlay />;
 
   const renderPerfilSection = (perfilId: number) => {
     const perfil = perfilMap[perfilId];
@@ -84,7 +59,7 @@ export default function PlansPage() {
         <div className="flex flex-wrap justify-center gap-6 py-8">
           <PlansByPerfil
             perfil={perfil.nome.toLowerCase()}
-            selectedPlanoId={planoSelecionado}
+            selectedPlanoId={planoSelecionado?.planoPeriodoId}
             onSelect={setPlanoSelecionado}
             exibirBotao={false}
           />
@@ -99,7 +74,7 @@ export default function PlansPage() {
       <main className="p-4">
         <div className="flex flex-col items-center justify-center w-full max-w-[1400px] mx-auto">
           <h1 className="text-3xl md:text-4xl font-extralight mb-12">
-            Nossos Planos
+            {t("pages_home.titulo_planos")}
           </h1>
           {/* Perfil Sections */}
           {renderPerfilSection(1)} {/* Candidato */}
