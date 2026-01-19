@@ -58,7 +58,7 @@ export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
       });
 
       if (!res.ok) throw new Error("Erro ao gravar o plano");
-      console.log(await res.json());
+      // console.log(await res.json());
 
       router.push(`/dashboard?perfil=${perfil}`);
     } catch (err) {
