@@ -120,6 +120,8 @@ export default function PlanCard({
     }
   }, [i18n]);
 
+  if (!ready) console.log("x");
+
   const buttonClass =
     buttonColor === "blue"
       ? "bg-blue-600 hover:bg-blue-700 text-white"
