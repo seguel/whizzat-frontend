@@ -68,7 +68,10 @@ export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
 
   const onPagamentoSucesso = async () => {
     if (!planoSelecionado) return;
-    await inserePlano(planoSelecionado.planoPeriodoId, "ABC123456");
+
+    const token = crypto.randomUUID();
+
+    await inserePlano(planoSelecionado.planoPeriodoId, token);
 
     setOpenPagamento(false);
   };
