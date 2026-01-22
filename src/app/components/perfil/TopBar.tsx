@@ -1,8 +1,10 @@
 // components/perfil/TopBar.tsx
 "use client";
 
+import { useEffect } from "react";
 import { Menu } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 
 interface TopBarProps {
   setIsDrawerOpen?: (open: boolean) => void;
@@ -38,11 +40,24 @@ export default function TopBar({
   setIsDrawerOpen,
   onStartLoading,
 }: TopBarProps) {
+  const { t, i18n } = useTranslation("common");
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentProfile = searchParams.get("perfil") || "candidato";
 
   const colors = profileColorMap[currentProfile] || profileColorMap.candidato;
+
+  useEffect(() => {
+    /* if (i18n.isInitialized) {
+        setReady(true);
+      } else {
+        const onInit = () => setReady(true);
+        i18n.on("initialized", onInit);
+        return () => {
+          i18n.off("initialized", onInit);
+        };
+      } */
+  }, [i18n]);
 
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     onStartLoading?.();
@@ -82,9 +97,9 @@ export default function TopBar({
             onChange={handleChange}
             className={`bg-transparent text-sm px-2 py-1 cursor-pointer rounded-md focus:outline-none focus:ring-2 ${colors.ring}`}
           >
-            <option value="candidato">Candidato(a)</option>
-            <option value="recrutador">Recrutador(a)</option>
-            <option value="avaliador">Avaliador(a)</option>
+            <option value="candidato">{t("perfil.candidato")}</option>
+            <option value="recrutador">{t("perfil.recrutador")}</option>
+            <option value="avaliador">{t("perfil.avaliador")}</option>
           </select>
         </div>
       </div>
