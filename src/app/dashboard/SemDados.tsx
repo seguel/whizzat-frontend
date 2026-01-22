@@ -144,7 +144,7 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
               />
             </svg>
             <h2 className="text-lg sm:text-xl font-medium text-gray-700">
-              {t("semdados.perfil_linha_primeiro")} {perfil}{" "}
+              {t("semdados.perfil_linha_primeiro")} {t(`perfil.${perfil}`)}{" "}
               {t("semdados.perfil_linha_primeiro_complemento")}
             </h2>
             <p className="text-sm text-gray-500 mt-2">
