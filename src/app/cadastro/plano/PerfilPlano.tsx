@@ -101,7 +101,7 @@ export default function PerfilPlanoPage({ perfil }: { perfil: PerfilKey }) {
       <main className="flex-1 flex flex-col px-6 py-6 items-center">
         <div className="max-w-7xl w-full flex flex-col gap-8 items-center">
           <h1 className="text-3xl lg:text-4xl font-semibold text-gray-800">
-            {t(`perfil.selecionado_${perfil}_titulo`)}
+            {t(`perfil.selecionado_ola`) + " " + t(`perfil.${perfil}`)}
           </h1>
 
           <p className="text-gray-700">{t(`planos.titulo`)}</p>

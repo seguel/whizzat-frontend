@@ -110,6 +110,9 @@ const pt = {
     info: "Para reenviar o link, acesse a página de login.",
   },
   perfil: {
+    candidato: "Candidato(a)",
+    recrutador: "Recrutador(a)",
+    avaliador: "Avaliador(a)",
     titulo_primeiro: "Olá, seja bem vindo(a) ao Whizzat!",
     titulo_segundo: "Para iniciar, escolha uma opção de perfil",
     titulo_terceiro:
@@ -124,7 +127,7 @@ const pt = {
     card_avaliador_descricao:
       "Desejo avaliar candidatos para receber benefícios",
     btn_sair: "Sair",
-    selecionado_candidato_titulo: "Olá, Candidato(a)",
+    selecionado_ola: "Olá, ",
     selecionado_candidato_descricao_curta: "Sou um(a) Candidato(a)",
     selecionado_candidato_cor: "verde",
     selecionado_candidato_cor_css: "green",
@@ -133,7 +136,6 @@ const pt = {
 
     selecionado_recrutador_cor: "roxo",
     selecionado_recrutador_cor_css: "purple",
-    selecionado_avaliador_titulo: "Olá, Avaliador(a)",
     selecionado_avaliador_descricao_curta: "Sou um(a) Avaliador(a)",
     selecionado_avaliador_cor: "azul",
     selecionado_avaliador_cor_css: "blue",
