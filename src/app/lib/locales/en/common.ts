@@ -109,6 +109,9 @@ const en = {
     info: "To resend the link, go to the login page.",
   },
   perfil: {
+    candidato: "Candidate",
+    recrutador: "Recruiter",
+    avaliador: "Evaluator",
     titulo_primeiro: "Hello, welcome to whizzat!",
     titulo_segundo: "To get started, choose a profile option",
     titulo_terceiro:
@@ -123,7 +126,7 @@ const en = {
     card_avaliador_descricao:
       "I want to evaluate candidates in exchange for benefits",
     btn_sair: "Logout",
-    selecionado_candidato_titulo: "Hello, Candidate",
+    selecionado_ola: "Hello, ",
     selecionado_candidato_descricao_curta: "I’m a Candidate",
     selecionado_candidato_cor: "green",
     selecionado_candidato_cor_css: "green",
@@ -131,7 +134,6 @@ const en = {
     selecionado_recrutador_descricao_curta: "I’m a Recruiter",
     selecionado_recrutador_cor: "blue",
     selecionado_recrutador_cor_css: "blue",
-    selecionado_avaliador_titulo: "Hello, Evaluator",
     selecionado_avaliador_descricao_curta: "I’m an Evaluator",
     selecionado_avaliador_cor: "purple",
     selecionado_avaliador_cor_css: "purple",

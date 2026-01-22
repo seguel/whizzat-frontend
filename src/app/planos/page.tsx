@@ -20,10 +20,13 @@ export default function PlansPage() {
   const [planoSelecionado, setPlanoSelecionado] =
     useState<PlanoSelecionado | null>(null);
 
-  const perfilMap: Record<number, { nome: string; cor: string }> = {
-    1: { nome: "Candidato", cor: "#22c55e" }, // verde
-    2: { nome: "Recrutador", cor: "#7c3aed" }, // roxo
-    // 3: { nome: "Avaliador", cor: "#3b82f6" }, // azul
+  const perfilMap: Record<
+    number,
+    { nome: string; cor: string; titulo: string }
+  > = {
+    1: { nome: "Candidato", cor: "#22c55e", titulo: t("perfil.candidato") }, // verde
+    2: { nome: "Recrutador", cor: "#7c3aed", titulo: t("perfil.recrutador") }, // roxo
+    // 3: { nome: "Avaliador", cor: "#3b82f6", titulo: t("perfil.avaliador") }, // azul
   };
 
   useEffect(() => {
@@ -52,7 +55,7 @@ export default function PlansPage() {
           className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-t-lg text-white font-bold text-sm"
           style={{ backgroundColor: perfil.cor }}
         >
-          {perfil.nome}
+          {perfil.titulo}
         </div>
 
         {/* Grid dos planos */}
