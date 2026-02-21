@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { Menu } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { useProfile } from "./ProfileContext";
 
 interface TopBarProps {
   setIsDrawerOpen?: (open: boolean) => void;
@@ -47,6 +48,8 @@ export default function TopBar({
 
   const colors = profileColorMap[currentProfile] || profileColorMap.candidato;
 
+  const { setProfile } = useProfile();
+
   useEffect(() => {
     /* if (i18n.isInitialized) {
         setReady(true);
@@ -61,7 +64,13 @@ export default function TopBar({
 
   function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     onStartLoading?.();
-    const newProfile = e.target.value;
+
+    const newProfile = e.target.value as
+      | "candidato"
+      | "recrutador"
+      | "avaliador";
+
+    setProfile(newProfile); // 👈 atualiza contexto
     router.push(`/dashboard?perfil=${newProfile}`);
   }
 

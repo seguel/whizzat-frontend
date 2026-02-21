@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ProfileType } from "./ProfileContext";
 import { useNavItems, NavItem } from "../../util/sidebarNav";
 import Image from "next/image";
+import { useNotifications } from "./NotificationContext";
 
 interface SidebarProps {
   profile: ProfileType;
@@ -21,7 +22,10 @@ export default function Sidebar({
 }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const navItems = useNavItems(profile);
+
+  const { count } = useNotifications();
+
+  const navItems = useNavItems(profile, count);
 
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -53,7 +57,7 @@ export default function Sidebar({
         {
           method: "POST",
           credentials: "include",
-        }
+        },
       );
       // fecha o drawer no mobile
       setIsDrawerOpen?.(false);

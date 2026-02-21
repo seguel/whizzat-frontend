@@ -25,7 +25,10 @@ export interface NavItem {
   action?: NavAction;
 }
 
-export function useNavItems(profile: ProfileType): NavItem[] {
+export function useNavItems(
+  profile: ProfileType,
+  notificationCount: number,
+): NavItem[] {
   const { t, i18n } = useTranslation("common");
   const [ready, setReady] = useState(false);
 
@@ -78,7 +81,7 @@ export function useNavItems(profile: ProfileType): NavItem[] {
           icon: <Bell size={20} />,
           label: t("sidebar.menu_notificacoes"),
           route: "/notificacoes",
-          badge: 3,
+          badge: notificationCount > 0 ? notificationCount : undefined,
         },
         {
           icon: <LogOut size={20} />,
@@ -123,7 +126,7 @@ export function useNavItems(profile: ProfileType): NavItem[] {
           icon: <Bell size={20} />,
           label: t("sidebar.menu_notificacoes"),
           route: "/notificacoes",
-          badge: 5,
+          badge: notificationCount > 0 ? notificationCount : undefined,
         },
         {
           icon: <LogOut size={20} />,
@@ -157,8 +160,8 @@ export function useNavItems(profile: ProfileType): NavItem[] {
         {
           icon: <Bell size={20} />,
           label: t("sidebar.menu_notificacoes"),
-          route: "/notificacoes",
-          badge: 2,
+          route: `/dashboard/notificacao?perfil=${profile}`,
+          badge: notificationCount > 0 ? notificationCount : undefined,
         },
         {
           icon: <LogOut size={20} />,
