@@ -3,6 +3,7 @@ import {
   ProfileProvider,
   ProfileType,
 } from "../components/perfil/ProfileContext";
+import { NotificationProvider } from "../components/perfil/NotificationContext";
 import DashboardCandidato from "./DashboardCandidato";
 import DashboardRecrutador from "./DashboardRecrutador";
 import DashboardAvaliador from "./DashboardAvaliador";
@@ -21,11 +22,13 @@ export default function DashboardPage({ perfil }: Props) {
 
   return (
     <ProfileProvider initialProfile={perfil}>
-      <DashboardWrapper>
-        {perfil === "candidato" && <DashboardCandidato perfil={perfil} />}
-        {perfil === "recrutador" && <DashboardRecrutador perfil={perfil} />}
-        {perfil === "avaliador" && <DashboardAvaliador perfil={perfil} />}
-      </DashboardWrapper>
+      <NotificationProvider>
+        <DashboardWrapper>
+          {perfil === "candidato" && <DashboardCandidato perfil={perfil} />}
+          {perfil === "recrutador" && <DashboardRecrutador perfil={perfil} />}
+          {perfil === "avaliador" && <DashboardAvaliador perfil={perfil} />}
+        </DashboardWrapper>
+      </NotificationProvider>
     </ProfileProvider>
   );
 }

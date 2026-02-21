@@ -4,6 +4,7 @@ import {
   ProfileProvider,
   ProfileType,
 } from "../../components/perfil/ProfileContext";
+import { NotificationProvider } from "../../components/perfil/NotificationContext";
 import PerfilCandidato from "./PerfilCandidato";
 import PerfilRecrutador from "./PerfilRecrutador";
 import PerfilAvaliador from "./PerfilAvaliador";
@@ -36,7 +37,7 @@ export default function PerfilPage({ perfil, id }: Props) {
           {
             method: "GET",
             credentials: "include", // importante para enviar o cookie JWT
-          }
+          },
         );
 
         const data = await res.json();
@@ -54,7 +55,7 @@ export default function PerfilPage({ perfil, id }: Props) {
           {
             method: "GET",
             credentials: "include", // importante para enviar o cookie JWT
-          }
+          },
         );
 
         const data = await res.json();
@@ -73,7 +74,7 @@ export default function PerfilPage({ perfil, id }: Props) {
           {
             method: "GET",
             credentials: "include", // importante para enviar o cookie JWT
-          }
+          },
         );
 
         const data = await res.json();
@@ -95,29 +96,31 @@ export default function PerfilPage({ perfil, id }: Props) {
 
   return (
     <ProfileProvider initialProfile={perfil}>
-      <PerfilWrapper>
-        {perfil === "candidato" && (
-          <PerfilCandidato
-            perfil={perfil}
-            userId={userId}
-            candidatoId={id ?? candidatoId ?? null}
-          />
-        )}
-        {perfil === "recrutador" && (
-          <PerfilRecrutador
-            perfil={perfil}
-            userId={userId}
-            recrutadorId={id ?? recrutadorId ?? null}
-          />
-        )}
-        {perfil === "avaliador" && (
-          <PerfilAvaliador
-            perfil={perfil}
-            userId={userId}
-            avaliadorId={id ?? avaliadorId ?? null}
-          />
-        )}
-      </PerfilWrapper>
+      <NotificationProvider>
+        <PerfilWrapper>
+          {perfil === "candidato" && (
+            <PerfilCandidato
+              perfil={perfil}
+              userId={userId}
+              candidatoId={id ?? candidatoId ?? null}
+            />
+          )}
+          {perfil === "recrutador" && (
+            <PerfilRecrutador
+              perfil={perfil}
+              userId={userId}
+              recrutadorId={id ?? recrutadorId ?? null}
+            />
+          )}
+          {perfil === "avaliador" && (
+            <PerfilAvaliador
+              perfil={perfil}
+              userId={userId}
+              avaliadorId={id ?? avaliadorId ?? null}
+            />
+          )}
+        </PerfilWrapper>
+      </NotificationProvider>
     </ProfileProvider>
   );
 }
