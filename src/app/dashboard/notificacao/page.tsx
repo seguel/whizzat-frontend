@@ -21,7 +21,7 @@ export default async function Page({
 
   const perfil = params.perfil ?? "candidato";
   //const op = params.op as "N" | "E" | undefined;
-  const id = params.id ?? undefined;
+  // const id = params.id ?? undefined;
 
   if (!perfil) {
     redirect("?perfil=candidato");
