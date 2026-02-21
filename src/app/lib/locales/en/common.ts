@@ -266,7 +266,7 @@ const en = {
     item_msg_skill: "Type or select a skill",
     item_msg_criar_skill: "Create new skill:",
     item_label_peso: "Weight",
-    item_label_favorito: "Favorite",
+    item_label_favorito: "I want to be an evaluator:",
     item_placeholder_favorito: "Skill duration",
     item_botao_remover_skill: "Remove Skill",
     item_label_lista_formacao: "Education",
@@ -298,9 +298,10 @@ const en = {
     item_tooltip_skill_passo1: "1. Type the desired skill;",
     item_tooltip_skill_passo2: "2. Select 'Create new skill';",
     item_tooltip_skill_passo3: "3. Click the Add button.",
-    item_tooltip_favorite_passo1: "- You can select up to 5 favorites.",
-    item_tooltip_favorite_passo2: "- Favorite skills will be considered",
-    item_tooltip_favorite_passo2_1: " as preferred for candidate evaluations.",
+    item_tooltip_favorite_passo1:
+      "- You can select up to 6 skills to be an evaluator.",
+    item_tooltip_favorite_passo2: "- The selected skills will be considered ",
+    item_tooltip_favorite_passo2_1: "as preferred for candidate evaluations.",
   },
   tela_perfil_recrutador: {
     item_ativo: "Active",

@@ -4,6 +4,7 @@ import {
   ProfileProvider,
   ProfileType,
 } from "../../components/perfil/ProfileContext";
+import { NotificationProvider } from "../../components/perfil/NotificationContext";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { useEmpresaRouter } from "../../lib/hooks/useEmpresaRouter";
 
@@ -20,6 +21,8 @@ export default function Middleware({ perfil, op, id }: Props) {
   if (isLoading) return <LoadingOverlay />;
 
   return (
-    <ProfileProvider initialProfile={perfil}>{componente}</ProfileProvider>
+    <ProfileProvider initialProfile={perfil}>
+      <NotificationProvider>{componente}</NotificationProvider>
+    </ProfileProvider>
   );
 }

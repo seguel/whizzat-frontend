@@ -174,7 +174,7 @@ export default function PerfilAvaliador({
       estado_label: "",
       cidade_id: 0,
       cidade_label: "",
-    }
+    },
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showErrors, setShowErrors] = useState(false);
@@ -196,7 +196,7 @@ export default function PerfilAvaliador({
   /***** formacao ******/
   const [formacaoInput, setFormacaoInput] = useState<string>("");
   const [novoCertificadoFile, setNovoCertificadoFile] = useState<File | null>(
-    null
+    null,
   );
   const [novoCertificadoPreview, setNovoCertificadoPreview] = useState<
     string | null
@@ -212,7 +212,7 @@ export default function PerfilAvaliador({
 
   /***** certificacoes ******/
   const [novoCertificacaoFile, setNovoCertificacaoFile] = useState<File | null>(
-    null
+    null,
   );
   const [novoCertificacaoPreview, setNovoCertificacaoPreview] = useState<
     string | null
@@ -293,7 +293,7 @@ export default function PerfilAvaliador({
       } catch (error) {
         console.error(
           t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingAvaliador(false);
@@ -308,7 +308,7 @@ export default function PerfilAvaliador({
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
 
         const userData = await userRes.json();
@@ -355,7 +355,7 @@ export default function PerfilAvaliador({
       } catch (error) {
         console.error(
           t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingAvaliador(false);
@@ -380,11 +380,11 @@ export default function PerfilAvaliador({
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
         if (!res.ok)
           throw new Error(
-            t("tela_perfil_avaliador.item_alerta_erro_buscar_dados")
+            t("tela_perfil_avaliador.item_alerta_erro_buscar_dados"),
           );
 
         const data = await res.json();
@@ -434,7 +434,7 @@ export default function PerfilAvaliador({
       } catch (error) {
         console.error(
           t("tela_perfil_avaliador.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingAvaliador(false);
@@ -481,7 +481,7 @@ export default function PerfilAvaliador({
               {
                 method: "GET",
                 credentials: "include",
-              }
+              },
             ),
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/`, {
               method: "GET",
@@ -513,7 +513,7 @@ export default function PerfilAvaliador({
       } catch (error) {
         console.error(
           t("tela_perfil_avaliador.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingAvaliador(false);
@@ -533,7 +533,7 @@ export default function PerfilAvaliador({
       if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
       return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(
         4,
-        8
+        8,
       )}`;
     } else {
       // en-US mm/dd/yyyy
@@ -541,7 +541,7 @@ export default function PerfilAvaliador({
       if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
       return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(
         4,
-        8
+        8,
       )}`;
     }
   };
@@ -630,7 +630,7 @@ export default function PerfilAvaliador({
     const selectedId = e.target.value;
     const value = Number(e.target.value ?? 0);
     const generoSelecionada = generos.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setSexo(selectedId);
@@ -646,7 +646,7 @@ export default function PerfilAvaliador({
     const selectedId = e.target.value;
     const value = Number(e.target.value ?? 0);
     const estadoSelecionada = estados.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setEstado(selectedId);
@@ -666,7 +666,7 @@ export default function PerfilAvaliador({
         `${process.env.NEXT_PUBLIC_API_URL}/cidades/estado-cidade/${selectedId}`,
         {
           method: "GET",
-        }
+        },
       );
 
       if (!cidadeRes.ok)
@@ -687,7 +687,7 @@ export default function PerfilAvaliador({
     const selectedId = e.target.value;
     const value = Number(e.target.value ?? 0);
     const cidadeSelecionada = cidades.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setCidade(selectedId);
@@ -873,7 +873,7 @@ export default function PerfilAvaliador({
         // Campos simples
         formData.append(
           "empresaId",
-          form.empresa_id ? String(form.empresa_id) : ""
+          form.empresa_id ? String(form.empresa_id) : "",
         );
         formData.append("perfilId", String(perfilId));
         formData.append("telefone", form.telefone);
@@ -882,7 +882,7 @@ export default function PerfilAvaliador({
         formData.append("meio_notificacao", form.meioNotificacao);
         formData.append(
           "avaliar_todos",
-          form.avaliar_todos === "1" ? "true" : "false"
+          form.avaliar_todos === "1" ? "true" : "false",
         );
 
         formData.append("primeiro_nome", form.primeiro_nome);
@@ -905,15 +905,15 @@ export default function PerfilAvaliador({
         formData.append(
           "skills",
           JSON.stringify(
-            serializeSkills(form.lista_skills.filter((s) => s.skill_id > 0))
-          )
+            serializeSkills(form.lista_skills.filter((s) => s.skill_id > 0)),
+          ),
         );
 
         formData.append(
           "novas_skills",
           JSON.stringify(
-            serializeSkills(form.lista_skills.filter((s) => s.skill_id < 0))
-          )
+            serializeSkills(form.lista_skills.filter((s) => s.skill_id < 0)),
+          ),
         );
 
         // ================================
@@ -936,7 +936,7 @@ export default function PerfilAvaliador({
           if (f.certificado_file instanceof File) {
             formData.append(
               `formacao_certificado_${index}`,
-              f.certificado_file
+              f.certificado_file,
             );
           }
         });
@@ -956,11 +956,15 @@ export default function PerfilAvaliador({
         // console.log(certificacoesData.filter((c) => c.certificacao_id > 0));
         formData.append(
           "certificacoes",
-          JSON.stringify(certificacoesData.filter((c) => c.certificacao_id > 0))
+          JSON.stringify(
+            certificacoesData.filter((c) => c.certificacao_id > 0),
+          ),
         );
         formData.append(
           "novas_certificacoes",
-          JSON.stringify(certificacoesData.filter((c) => c.certificacao_id < 0))
+          JSON.stringify(
+            certificacoesData.filter((c) => c.certificacao_id < 0),
+          ),
         );
 
         // ================================
@@ -983,8 +987,8 @@ export default function PerfilAvaliador({
             typeof data.message === "string"
               ? data.message
               : Array.isArray(data.message)
-              ? data.message.join(", ")
-              : t("tela_perfil_avaliador.item_alerta_erro_salvar");
+                ? data.message.join(", ")
+                : t("tela_perfil_avaliador.item_alerta_erro_salvar");
           throw new Error(errorMessage);
         }
 
@@ -1064,7 +1068,7 @@ export default function PerfilAvaliador({
   const handleSkillChange = (
     skill_id: number,
     field: "peso" | "favorito" | "tempo_favorito",
-    value: number | boolean | string
+    value: number | boolean | string,
   ) => {
     const atualizadas = form.lista_skills.map((s) => {
       if (s.skill_id !== skill_id) return s;
@@ -1090,7 +1094,7 @@ export default function PerfilAvaliador({
   /*** formacao ***/
 
   const handleNovoCertificadoChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1153,7 +1157,7 @@ export default function PerfilAvaliador({
 
   const handleCertificadoItemChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    id: number
+    id: number,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1190,7 +1194,7 @@ export default function PerfilAvaliador({
               certificado_file: file, // substitui o arquivo
               certificado_preview: previewUrl, // substitui o preview
             }
-          : f
+          : f,
       );
       return { ...prev, lista_formacao: novaLista };
     });
@@ -1201,7 +1205,7 @@ export default function PerfilAvaliador({
 
     toast.success(
       t("tela_perfil_avaliador.item_botao_certificado_atualizado"),
-      { duration: 2000 }
+      { duration: 2000 },
     );
   };
 
@@ -1214,7 +1218,7 @@ export default function PerfilAvaliador({
 
   /*** certificacoes ***/
   const handleNovoCertificacaoChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1287,7 +1291,7 @@ export default function PerfilAvaliador({
 
   const handleCertificacaoItemChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    id: number
+    id: number,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1324,7 +1328,7 @@ export default function PerfilAvaliador({
               certificado_file: file, // substitui o arquivo
               certificado_preview: previewUrl, // substitui o preview
             }
-          : f
+          : f,
       );
       return { ...prev, lista_certificado: novaLista };
     });
@@ -1335,7 +1339,7 @@ export default function PerfilAvaliador({
 
     toast.success(
       t("tela_perfil_avaliador.item_botao_certificado_atualizado"),
-      { duration: 2000 }
+      { duration: 2000 },
     );
   };
 
@@ -1343,7 +1347,7 @@ export default function PerfilAvaliador({
     setForm((prev) => ({
       ...prev,
       lista_certificado: prev.lista_certificado.filter(
-        (s) => s.certificacao_id !== id
+        (s) => s.certificacao_id !== id,
       ),
     }));
   };
@@ -1358,12 +1362,12 @@ export default function PerfilAvaliador({
         {
           method: "POST",
           credentials: "include",
-        }
+        },
       );
 
       if (!res.ok) {
         throw new Error(
-          t("tela_perfil_avaliador.item_alerta_erro_reenviar_solicitacao")
+          t("tela_perfil_avaliador.item_alerta_erro_reenviar_solicitacao"),
         );
       }
       toast.success(t("tela_perfil_avaliador.item_alerta_reenviar_sucesso"), {
@@ -1375,11 +1379,11 @@ export default function PerfilAvaliador({
         t("tela_perfil_avaliador.item_alerta_erro_reenviar_solicitacao"),
         {
           duration: 5000,
-        }
+        },
       );
       console.error(
         t("tela_perfil_avaliador.item_alerta_erro_reenviar_solicitacao"),
-        error
+        error,
       );
       setIsResending(false);
     }
@@ -1464,7 +1468,7 @@ export default function PerfilAvaliador({
                     <div className="text-sm text-right">
                       <span className="block font-medium text-gray-700">
                         {t(
-                          "tela_perfil_avaliador.item_label_situacao_cadastro"
+                          "tela_perfil_avaliador.item_label_situacao_cadastro",
                         )}
                       </span>
 
@@ -1476,7 +1480,7 @@ export default function PerfilAvaliador({
                           const cadastroDate = new Date(form.data_envio_link);
                           const diffDias = Math.floor(
                             (Date.now() - cadastroDate.getTime()) /
-                              (1000 * 60 * 60 * 24)
+                              (1000 * 60 * 60 * 24),
                           );
 
                           if (diffDias > 3) {
@@ -1491,12 +1495,12 @@ export default function PerfilAvaliador({
                                   <span className="flex items-center gap-1">
                                     <ImSpinner2 className="animate-spin" />
                                     {t(
-                                      "tela_perfil_avaliador.item_label_enviando"
+                                      "tela_perfil_avaliador.item_label_enviando",
                                     )}
                                   </span>
                                 ) : (
                                   t(
-                                    "tela_perfil_avaliador.item_botao_situacao_cadastro"
+                                    "tela_perfil_avaliador.item_botao_situacao_cadastro",
                                   )
                                 )}
                               </button>
@@ -1511,21 +1515,21 @@ export default function PerfilAvaliador({
                               form.status_cadastro === 1
                                 ? "text-green-600 font-semibold"
                                 : form.status_cadastro === -1
-                                ? "text-yellow-600 font-medium"
-                                : "text-red-600 font-medium"
+                                  ? "text-yellow-600 font-medium"
+                                  : "text-red-600 font-medium"
                             }`}
                           >
                             {form.status_cadastro === 1
                               ? t(
-                                  "tela_perfil_avaliador.item_msg_situacao_cadastro_confirmado"
+                                  "tela_perfil_avaliador.item_msg_situacao_cadastro_confirmado",
                                 )
                               : form.status_cadastro === -1
-                              ? t(
-                                  "tela_perfil_avaliador.item_msg_situacao_cadastro_aguardando"
-                                )
-                              : t(
-                                  "tela_perfil_avaliador.item_msg_situacao_cadastro_rejeitado"
-                                )}
+                                ? t(
+                                    "tela_perfil_avaliador.item_msg_situacao_cadastro_aguardando",
+                                  )
+                                : t(
+                                    "tela_perfil_avaliador.item_msg_situacao_cadastro_rejeitado",
+                                  )}
                           </span>
                         );
                       })()}
@@ -1542,7 +1546,7 @@ export default function PerfilAvaliador({
                       <input
                         name="primeiro_nome"
                         placeholder={t(
-                          "tela_perfil_recrutador.item_placeholder_primeiro_nome"
+                          "tela_perfil_recrutador.item_placeholder_primeiro_nome",
                         )}
                         className="w-full outline-none"
                         defaultValue={form.primeiro_nome}
@@ -1553,7 +1557,7 @@ export default function PerfilAvaliador({
                       <input
                         name="ultimo_nome"
                         placeholder={t(
-                          "tela_perfil_recrutador.item_placeholder_ultimo_nome"
+                          "tela_perfil_recrutador.item_placeholder_ultimo_nome",
                         )}
                         className="w-full outline-none"
                         defaultValue={form.ultimo_nome}
@@ -1701,7 +1705,7 @@ export default function PerfilAvaliador({
                       />
                       <span>
                         {t(
-                          "tela_perfil_avaliador.item_msg_empresa_whizzat_sim"
+                          "tela_perfil_avaliador.item_msg_empresa_whizzat_sim",
                         )}
                       </span>
                     </label>
@@ -1716,7 +1720,7 @@ export default function PerfilAvaliador({
                       />
                       <span>
                         {t(
-                          "tela_perfil_avaliador.item_msg_empresa_whizzat_nao"
+                          "tela_perfil_avaliador.item_msg_empresa_whizzat_nao",
                         )}
                       </span>
                     </label>
@@ -1739,7 +1743,7 @@ export default function PerfilAvaliador({
                     value={
                       form.trabalha_empresa !== "SIM"
                         ? ""
-                        : form.empresa_id ?? ""
+                        : (form.empresa_id ?? "")
                     }
                     onChange={handleEmpresaChange}
                     disabled={form.trabalha_empresa !== "SIM"}
@@ -1783,7 +1787,7 @@ export default function PerfilAvaliador({
                       />
                       <span>
                         {t(
-                          "tela_perfil_avaliador.item_msg_avaliar_vagas_todas"
+                          "tela_perfil_avaliador.item_msg_avaliar_vagas_todas",
                         )}
                       </span>
                     </label>
@@ -1808,7 +1812,7 @@ export default function PerfilAvaliador({
                       />
                       <span>
                         {t(
-                          "tela_perfil_avaliador.item_msg_avaliar_vagas_minha"
+                          "tela_perfil_avaliador.item_msg_avaliar_vagas_minha",
                         )}
                       </span>
                     </label>
@@ -1825,7 +1829,7 @@ export default function PerfilAvaliador({
                       type="tel"
                       name="telefone"
                       placeholder={t(
-                        "tela_perfil_avaliador.item_placeholder_telefone"
+                        "tela_perfil_avaliador.item_placeholder_telefone",
                       )}
                       className="w-full outline-none"
                       defaultValue={avaliador?.telefone ?? form.telefone}
@@ -1884,7 +1888,7 @@ export default function PerfilAvaliador({
                   <textarea
                     name="apresentacao"
                     placeholder={t(
-                      "tela_perfil_avaliador.item_placeholder_apresentacao"
+                      "tela_perfil_avaliador.item_placeholder_apresentacao",
                     )}
                     className="w-full border border-blue-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     rows={6}
@@ -2004,7 +2008,7 @@ export default function PerfilAvaliador({
                           type="text"
                           name="formacao"
                           placeholder={t(
-                            "tela_perfil_avaliador.item_msg_formacao"
+                            "tela_perfil_avaliador.item_msg_formacao",
                           )}
                           className="w-full border border-blue-400 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-blue-300"
                           value={formacaoInput}
@@ -2069,7 +2073,7 @@ export default function PerfilAvaliador({
                   <div className="flex flex-1 flex-col gap-3 mt-5">
                     {form.lista_formacao?.map((item) => {
                       const graduacaoObj = graduacoes.find(
-                        (g) => g.id === item.graduacao_id
+                        (g) => g.id === item.graduacao_id,
                       );
 
                       return (
@@ -2084,7 +2088,7 @@ export default function PerfilAvaliador({
                                 <span>
                                   {graduacaoObj?.graduacao ??
                                     t(
-                                      "tela_perfil_avaliador.item_msg_nenhuma_graduacao"
+                                      "tela_perfil_avaliador.item_msg_nenhuma_graduacao",
                                     )}
                                 </span>
                               </div>
@@ -2103,12 +2107,12 @@ export default function PerfilAvaliador({
                                     onClick={() =>
                                       window.open(
                                         certificadoPreviews[item.id],
-                                        "_blank"
+                                        "_blank",
                                       )
                                     }
                                     className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
                                     title={t(
-                                      "tela_perfil_avaliador.item_botao_visualizar"
+                                      "tela_perfil_avaliador.item_botao_visualizar",
                                     )}
                                   >
                                     <FileText size={20} />
@@ -2120,7 +2124,7 @@ export default function PerfilAvaliador({
                                   htmlFor={`certificado-${item.id}`}
                                   className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
                                   title={t(
-                                    "tela_perfil_avaliador.item_botao_substituir"
+                                    "tela_perfil_avaliador.item_botao_substituir",
                                   )}
                                 >
                                   <Upload size={20} />
@@ -2143,7 +2147,7 @@ export default function PerfilAvaliador({
                             onClick={() => handleRemoveFormacao(item.id)}
                             className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 self-end sm:self-auto cursor-pointer"
                             title={t(
-                              "tela_perfil_avaliador.item_botao_remover_formacao"
+                              "tela_perfil_avaliador.item_botao_remover_formacao",
                             )}
                           >
                             <X size={18} />
@@ -2191,7 +2195,7 @@ export default function PerfilAvaliador({
                   <div>
                     <h1 className="block text-sm mb-1 py-3 font-bold">
                       {t(
-                        "tela_perfil_avaliador.item_label_informe_certificacao"
+                        "tela_perfil_avaliador.item_label_informe_certificacao",
                       )}
                       {/* <p className="block text-[11x] font-light">(mínimo 1)</p> */}
                     </h1>
@@ -2204,13 +2208,13 @@ export default function PerfilAvaliador({
                             {t("tela_perfil_avaliador.item_label_certificacao")}
                             <TooltipIcon
                               message={`${t(
-                                "tela_perfil_avaliador.item_tooltip_certificacao_titulo"
+                                "tela_perfil_avaliador.item_tooltip_certificacao_titulo",
                               )}\n${t(
-                                "tela_perfil_avaliador.item_tooltip_certificacao_passo1"
+                                "tela_perfil_avaliador.item_tooltip_certificacao_passo1",
                               )}\n${t(
-                                "tela_perfil_avaliador.item_tooltip_certificacao_passo2"
+                                "tela_perfil_avaliador.item_tooltip_certificacao_passo2",
                               )}\n${t(
-                                "tela_perfil_avaliador.item_tooltip_certificacao_passo3"
+                                "tela_perfil_avaliador.item_tooltip_certificacao_passo3",
                               )}`}
                               perfil={perfil}
                             />
@@ -2218,7 +2222,7 @@ export default function PerfilAvaliador({
                           <CreatableSelect
                             isClearable
                             placeholder={t(
-                              "tela_perfil_avaliador.item_msg_certificacao"
+                              "tela_perfil_avaliador.item_msg_certificacao",
                             )}
                             value={selectedCertificacao}
                             onChange={(newValue) =>
@@ -2230,7 +2234,7 @@ export default function PerfilAvaliador({
                             }))}
                             formatCreateLabel={(inputValue) =>
                               `${t(
-                                "tela_perfil_avaliador.item_msg_criar_certificacao"
+                                "tela_perfil_avaliador.item_msg_criar_certificacao",
                               )} ${inputValue}`
                             }
                           />
@@ -2260,7 +2264,7 @@ export default function PerfilAvaliador({
                               {novoCertificacaoFile
                                 ? novoCertificacaoFile.name
                                 : t(
-                                    "tela_perfil_avaliador.item_msg_certificado"
+                                    "tela_perfil_avaliador.item_msg_certificado",
                                   )}
                             </span>
                           </label>
@@ -2294,7 +2298,7 @@ export default function PerfilAvaliador({
                   <div className="flex flex-1 flex-col gap-3 mt-5">
                     {form.lista_certificado.map((item) => {
                       const cert = certificacao.find(
-                        (s) => s.id === item.certificacao_id
+                        (s) => s.id === item.certificacao_id,
                       );
                       return (
                         <div
@@ -2320,12 +2324,12 @@ export default function PerfilAvaliador({
                                         certificacaoPreview[
                                           item.certificacao_id
                                         ],
-                                        "_blank"
+                                        "_blank",
                                       )
                                     }
                                     className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
                                     title={t(
-                                      "tela_perfil_avaliador.item_botao_visualizar"
+                                      "tela_perfil_avaliador.item_botao_visualizar",
                                     )}
                                   >
                                     <FileText size={20} />
@@ -2337,7 +2341,7 @@ export default function PerfilAvaliador({
                                   htmlFor={`certificado-${item.certificacao_id}`}
                                   className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
                                   title={t(
-                                    "tela_perfil_avaliador.item_botao_substituir"
+                                    "tela_perfil_avaliador.item_botao_substituir",
                                   )}
                                 >
                                   <Upload size={20} />
@@ -2350,7 +2354,7 @@ export default function PerfilAvaliador({
                                   onChange={(e) =>
                                     handleCertificacaoItemChange(
                                       e,
-                                      item.certificacao_id
+                                      item.certificacao_id,
                                     )
                                   }
                                 />
@@ -2364,7 +2368,7 @@ export default function PerfilAvaliador({
                             }
                             className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 cursor-pointer"
                             title={t(
-                              "tela_perfil_avaliador.item_botao_remover_certificacao"
+                              "tela_perfil_avaliador.item_botao_remover_certificacao",
                             )}
                           >
                             <X size={18} />
@@ -2415,7 +2419,7 @@ export default function PerfilAvaliador({
                       {t("tela_perfil_avaliador.item_label_informe_hardskills")}
                       <p className="text-[11px] font-normal italic">
                         {t(
-                          "tela_perfil_avaliador.item_label_informe_hardskills_subitem"
+                          "tela_perfil_avaliador.item_label_informe_hardskills_subitem",
                         )}
                       </p>
                       <p className="block text-[11x] font-light">
@@ -2427,13 +2431,13 @@ export default function PerfilAvaliador({
                       {t("tela_perfil_avaliador.item_label_skill")}
                       <TooltipIcon
                         message={`${t(
-                          "tela_perfil_avaliador.item_tooltip_skill_titulo"
+                          "tela_perfil_avaliador.item_tooltip_skill_titulo",
                         )}\n${t(
-                          "tela_perfil_avaliador.item_tooltip_skill_passo1"
+                          "tela_perfil_avaliador.item_tooltip_skill_passo1",
                         )}\n${t(
-                          "tela_perfil_avaliador.item_tooltip_skill_passo2"
+                          "tela_perfil_avaliador.item_tooltip_skill_passo2",
                         )}\n${t(
-                          "tela_perfil_avaliador.item_tooltip_skill_passo3"
+                          "tela_perfil_avaliador.item_tooltip_skill_passo3",
                         )}`}
                         perfil={perfil}
                       />
@@ -2444,7 +2448,7 @@ export default function PerfilAvaliador({
                         <CreatableSelect
                           isClearable
                           placeholder={t(
-                            "tela_perfil_avaliador.item_msg_skill"
+                            "tela_perfil_avaliador.item_msg_skill",
                           )}
                           value={selectedSkill}
                           onChange={(newValue) => setSelectedSkill(newValue)}
@@ -2457,7 +2461,7 @@ export default function PerfilAvaliador({
                             }))}
                           formatCreateLabel={(inputValue) =>
                             `${t(
-                              "tela_perfil_avaliador.item_msg_criar_skill"
+                              "tela_perfil_avaliador.item_msg_criar_skill",
                             )} ${inputValue}`
                           }
                           isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
@@ -2485,7 +2489,7 @@ export default function PerfilAvaliador({
                       .filter((f) => f.tipo_skill_id == 1)
                       .map((item) => {
                         const skill = skills.find(
-                          (s) => s.skill_id === item.skill_id
+                          (s) => s.skill_id === item.skill_id,
                         );
                         return (
                           <div
@@ -2516,7 +2520,7 @@ export default function PerfilAvaliador({
                                       handleSkillChange(
                                         item.skill_id,
                                         "peso",
-                                        Number(e.target.value) * 10
+                                        Number(e.target.value) * 10,
                                       )
                                     }
                                     className="w-full sm:w-40 accent-blue-600 cursor-pointer"
@@ -2542,7 +2546,7 @@ export default function PerfilAvaliador({
                                   <div className="flex items-center gap-1">
                                     <label className="font-medium whitespace-nowrap">
                                       {t(
-                                        "tela_perfil_avaliador.item_label_favorito"
+                                        "tela_perfil_avaliador.item_label_favorito",
                                       )}
                                     </label>
                                   </div>
@@ -2553,12 +2557,12 @@ export default function PerfilAvaliador({
                                     onClick={() => {
                                       const totalFavoritos =
                                         form.lista_skills.filter(
-                                          (s) => s.favorito
+                                          (s) => s.favorito,
                                         ).length;
 
-                                      // Se já tem 5 favoritos e este não é favorito → não deixa clicar
+                                      // Se já tem 6 favoritos e este não é favorito → não deixa clicar
                                       if (
-                                        totalFavoritos >= 5 &&
+                                        totalFavoritos >= 6 &&
                                         !item.favorito
                                       ) {
                                         return;
@@ -2567,29 +2571,29 @@ export default function PerfilAvaliador({
                                       handleSkillChange(
                                         item.skill_id,
                                         "favorito",
-                                        !item.favorito
+                                        !item.favorito,
                                       );
                                     }}
                                     className={`flex items-center ${
                                       form.lista_skills.filter(
-                                        (s) => s.favorito
-                                      ).length >= 5 && !item.favorito
+                                        (s) => s.favorito,
+                                      ).length >= 6 && !item.favorito
                                         ? "cursor-not-allowed opacity-50"
                                         : "cursor-pointer"
                                     }`}
                                     disabled={
                                       form.lista_skills.filter(
-                                        (s) => s.favorito
-                                      ).length >= 5 && !item.favorito
+                                        (s) => s.favorito,
+                                      ).length >= 6 && !item.favorito
                                     }
                                   >
                                     <TooltipIcon
                                       message={`${t(
-                                        "tela_perfil_avaliador.item_tooltip_favorite_passo1"
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo1",
                                       )}\n${t(
-                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2"
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2",
                                       )}\n${t(
-                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2_1"
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2_1",
                                       )}`}
                                       perfil={perfil}
                                     >
@@ -2607,7 +2611,7 @@ export default function PerfilAvaliador({
                                   <input
                                     type="text"
                                     placeholder={t(
-                                      "tela_perfil_avaliador.item_placeholder_favorito"
+                                      "tela_perfil_avaliador.item_placeholder_favorito",
                                     )}
                                     className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
                                     value={item.tempo_favorito}
@@ -2615,7 +2619,7 @@ export default function PerfilAvaliador({
                                       handleSkillChange(
                                         item.skill_id,
                                         "tempo_favorito",
-                                        e.target.value
+                                        e.target.value,
                                       )
                                     }
                                   />
@@ -2627,7 +2631,7 @@ export default function PerfilAvaliador({
                               onClick={() => handleRemoveSkill(item.skill_id)}
                               className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
                               title={t(
-                                "tela_perfil_avaliador.item_botao_remover_skill"
+                                "tela_perfil_avaliador.item_botao_remover_skill",
                               )}
                             >
                               <X size={18} />
@@ -2684,7 +2688,7 @@ export default function PerfilAvaliador({
                       {t("tela_perfil_avaliador.item_label_informe_softskills")}
                       <p className="text-[11px] font-normal italic">
                         {t(
-                          "tela_perfil_avaliador.item_label_informe_softskills_subitem"
+                          "tela_perfil_avaliador.item_label_informe_softskills_subitem",
                         )}
                       </p>
                     </h1>
@@ -2693,13 +2697,13 @@ export default function PerfilAvaliador({
                       {t("tela_perfil_avaliador.item_label_skill")}
                       <TooltipIcon
                         message={`${t(
-                          "tela_perfil_avaliador.item_tooltip_skill_titulo"
+                          "tela_perfil_avaliador.item_tooltip_skill_titulo",
                         )}\n${t(
-                          "tela_perfil_avaliador.item_tooltip_skill_passo1"
+                          "tela_perfil_avaliador.item_tooltip_skill_passo1",
                         )}\n${t(
-                          "tela_perfil_avaliador.item_tooltip_skill_passo2"
+                          "tela_perfil_avaliador.item_tooltip_skill_passo2",
                         )}\n${t(
-                          "tela_perfil_avaliador.item_tooltip_skill_passo3"
+                          "tela_perfil_avaliador.item_tooltip_skill_passo3",
                         )}`}
                         perfil={perfil}
                       />
@@ -2710,7 +2714,7 @@ export default function PerfilAvaliador({
                         <CreatableSelect
                           isClearable
                           placeholder={t(
-                            "tela_perfil_avaliador.item_msg_skill"
+                            "tela_perfil_avaliador.item_msg_skill",
                           )}
                           value={selectedSkill}
                           onChange={(newValue) => setSelectedSkill(newValue)}
@@ -2723,7 +2727,7 @@ export default function PerfilAvaliador({
                             }))}
                           formatCreateLabel={(inputValue) =>
                             `${t(
-                              "tela_perfil_avaliador.item_msg_criar_skill"
+                              "tela_perfil_avaliador.item_msg_criar_skill",
                             )} ${inputValue}`
                           }
                           // isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
@@ -2745,7 +2749,7 @@ export default function PerfilAvaliador({
                       .filter((f) => f.tipo_skill_id == 2)
                       .map((item) => {
                         const skill = skills.find(
-                          (s) => s.skill_id === item.skill_id
+                          (s) => s.skill_id === item.skill_id,
                         );
                         return (
                           <div
@@ -2776,7 +2780,7 @@ export default function PerfilAvaliador({
                                       handleSkillChange(
                                         item.skill_id,
                                         "peso",
-                                        Number(e.target.value) * 10
+                                        Number(e.target.value) * 10,
                                       )
                                     }
                                     className="w-full sm:w-40 accent-blue-600 cursor-pointer"
@@ -2802,7 +2806,7 @@ export default function PerfilAvaliador({
                                   <div className="flex items-center gap-1">
                                     <label className="font-medium whitespace-nowrap">
                                       {t(
-                                        "tela_perfil_avaliador.item_label_favorito"
+                                        "tela_perfil_avaliador.item_label_favorito",
                                       )}
                                     </label>
                                   </div>
@@ -2813,12 +2817,12 @@ export default function PerfilAvaliador({
                                     onClick={() => {
                                       const totalFavoritos =
                                         form.lista_skills.filter(
-                                          (s) => s.favorito
+                                          (s) => s.favorito,
                                         ).length;
 
                                       // Se já tem 5 favoritos e este não é favorito → não deixa clicar
                                       if (
-                                        totalFavoritos >= 5 &&
+                                        totalFavoritos >= 6 &&
                                         !item.favorito
                                       ) {
                                         return;
@@ -2827,29 +2831,29 @@ export default function PerfilAvaliador({
                                       handleSkillChange(
                                         item.skill_id,
                                         "favorito",
-                                        !item.favorito
+                                        !item.favorito,
                                       );
                                     }}
                                     className={`flex items-center ${
                                       form.lista_skills.filter(
-                                        (s) => s.favorito
-                                      ).length >= 5 && !item.favorito
+                                        (s) => s.favorito,
+                                      ).length >= 6 && !item.favorito
                                         ? "cursor-not-allowed opacity-50"
                                         : "cursor-pointer"
                                     }`}
                                     disabled={
                                       form.lista_skills.filter(
-                                        (s) => s.favorito
-                                      ).length >= 5 && !item.favorito
+                                        (s) => s.favorito,
+                                      ).length >= 6 && !item.favorito
                                     }
                                   >
                                     <TooltipIcon
                                       message={`${t(
-                                        "tela_perfil_avaliador.item_tooltip_favorite_passo1"
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo1",
                                       )}\n${t(
-                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2"
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2",
                                       )}\n${t(
-                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2_1"
+                                        "tela_perfil_avaliador.item_tooltip_favorite_passo2_1",
                                       )}`}
                                       perfil={perfil}
                                     >
@@ -2867,7 +2871,7 @@ export default function PerfilAvaliador({
                                   <input
                                     type="text"
                                     placeholder={t(
-                                      "tela_perfil_avaliador.item_placeholder_favorito"
+                                      "tela_perfil_avaliador.item_placeholder_favorito",
                                     )}
                                     className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
                                     value={item.tempo_favorito}
@@ -2875,7 +2879,7 @@ export default function PerfilAvaliador({
                                       handleSkillChange(
                                         item.skill_id,
                                         "tempo_favorito",
-                                        e.target.value
+                                        e.target.value,
                                       )
                                     }
                                   />
@@ -2887,7 +2891,7 @@ export default function PerfilAvaliador({
                               onClick={() => handleRemoveSkill(item.skill_id)}
                               className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
                               title={t(
-                                "tela_perfil_avaliador.item_botao_remover_skill"
+                                "tela_perfil_avaliador.item_botao_remover_skill",
                               )}
                             >
                               <X size={18} />
@@ -3117,10 +3121,10 @@ export default function PerfilAvaliador({
                                   {empresas.find(
                                     (e) =>
                                       e.id.toString() ===
-                                      form.empresa_id.toString()
+                                      form.empresa_id.toString(),
                                   )?.nome_empresa ??
                                     t(
-                                      "tela_perfil_avaliador.item_msg_sem_empresa"
+                                      "tela_perfil_avaliador.item_msg_sem_empresa",
                                     )}
                                 </p>
                               </div>
@@ -3132,10 +3136,10 @@ export default function PerfilAvaliador({
                                 <p className="text-sm text-gray-500 ">
                                   {form.avaliar_todos == "1"
                                     ? t(
-                                        "tela_perfil_avaliador.item_msg_avaliar_todas"
+                                        "tela_perfil_avaliador.item_msg_avaliar_todas",
                                       )
                                     : t(
-                                        "tela_perfil_avaliador.item_msg_avaliar_minha"
+                                        "tela_perfil_avaliador.item_msg_avaliar_minha",
                                       )}
                                 </p>
                               </div>
@@ -3186,14 +3190,14 @@ export default function PerfilAvaliador({
                         <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-5">
                           {form.apresentacao ||
                             t(
-                              "tela_perfil_avaliador.item_msg_nenhuma_apresentacao"
+                              "tela_perfil_avaliador.item_msg_nenhuma_apresentacao",
                             )}
                         </div>
                         <div className="flex flex-row w-[95%] mt-5">
                           <div className="w-1/2 rounded-xl p-1 shadow-sm">
                             <p className="ml-1">
                               {t(
-                                "tela_perfil_avaliador.item_label_lista_formacao"
+                                "tela_perfil_avaliador.item_label_lista_formacao",
                               )}
                             </p>
                             {Array.isArray(form.lista_formacao) &&
@@ -3211,7 +3215,7 @@ export default function PerfilAvaliador({
                             ) : (
                               <p className="text-sm text-gray-500 font-bold mt-3 text-center">
                                 {t(
-                                  "tela_perfil_avaliador.item_msg_nenhuma_formacao"
+                                  "tela_perfil_avaliador.item_msg_nenhuma_formacao",
                                 )}
                               </p>
                             )}
@@ -3219,7 +3223,7 @@ export default function PerfilAvaliador({
                           <div className="ml-2 w-1/2 rounded-xl p-1 shadow-sm">
                             <p className="ml-1">
                               {t(
-                                "tela_perfil_avaliador.item_label_lista_certificacao"
+                                "tela_perfil_avaliador.item_label_lista_certificacao",
                               )}
                             </p>
                             {Array.isArray(form.lista_certificado) &&
@@ -3237,7 +3241,7 @@ export default function PerfilAvaliador({
                             ) : (
                               <p className="text-sm text-gray-500 font-bold mt-3 text-center">
                                 {t(
-                                  "tela_perfil_avaliador.item_msg_nenhuma_certificacao"
+                                  "tela_perfil_avaliador.item_msg_nenhuma_certificacao",
                                 )}
                               </p>
                             )}
