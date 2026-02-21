@@ -267,7 +267,7 @@ const pt = {
     item_msg_skill: "Digite ou selecione uma skill",
     item_msg_criar_skill: "Criar nova skill:",
     item_label_peso: "Peso",
-    item_label_favorito: "Favorito",
+    item_label_favorito: "Quero ser um avaliador:",
     item_placeholder_favorito: "Tempo skill",
     item_botao_remover_skill: "Remover Skill",
     item_label_lista_formacao: "Formações",
@@ -299,8 +299,9 @@ const pt = {
     item_tooltip_skill_passo1: "1. Digite a skill desejada;",
     item_tooltip_skill_passo2: "2. Selecione 'Criar nova skill';",
     item_tooltip_skill_passo3: "3. Clique no botão Adicionar.",
-    item_tooltip_favorite_passo1: "- Pode ser selecionado até 5 favoritos.",
-    item_tooltip_favorite_passo2: "- Os Skills favoritos serão assumidos ",
+    item_tooltip_favorite_passo1:
+      "- Pode ser selecionado até 6 skills para ser um avaliador.",
+    item_tooltip_favorite_passo2: "- Os Skills marcados serão assumidos ",
     item_tooltip_favorite_passo2_1:
       " como preferenciais para avaliações de candidatos.",
   },
