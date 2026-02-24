@@ -5,7 +5,7 @@ import Sidebar from "../../components/perfil/Sidebar";
 import TopBar from "../../components/perfil/TopBar";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
-import { Trash2, Star } from "lucide-react";
+import { Trash2, Star, CheckCircle } from "lucide-react";
 import { useNotifications } from "../../components/perfil/NotificationContext";
 // import { useTranslation } from "react-i18next";
 
@@ -294,31 +294,33 @@ export default function NotificacoesListar({ perfil }: Props) {
                 </div>
 
                 {/* 🔹 Rodapé */}
-                <div className="flex items-center mt-4 pt-3 border-t text-xs">
-                  {/* Esquerda */}
-                  <div className="flex-1">
-                    {!notificacao.lida ? (
-                      <button
-                        onClick={() => marcarComoLida(notificacao.id)}
-                        className="text-green-600 hover:text-green-700 font-medium transition-opacity opacity-80 hover:opacity-100 cursor-pointer"
-                      >
-                        ✓ Marcar como lida
-                      </button>
-                    ) : (
-                      <span className="text-green-500 font-medium">✓ Lido</span>
-                    )}
-                  </div>
-
-                  {/* Direita */}
+                <div className="flex items-center justify-between mt-4 pt-3 border-t text-xs">
+                  {/* Esquerda → Trash */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setConfirmDeleteId(notificacao.id);
                     }}
-                    className="text-gray-400 hover:text-red-600 transition opacity-70 hover:opacity-100  cursor-pointer"
+                    className="text-gray-400 hover:text-red-600 transition opacity-70 hover:opacity-100 cursor-pointer"
                   >
                     <Trash2 size={16} />
                   </button>
+
+                  {/* Direita → Marcar como lida */}
+                  {!notificacao.lida ? (
+                    <button
+                      onClick={() => marcarComoLida(notificacao.id)}
+                      className="flex items-center gap-2 text-red-400 hover:text-green-600 transition-colors cursor-pointer"
+                    >
+                      <CheckCircle size={16} />
+                      <span>Marcar como lida</span>
+                    </button>
+                  ) : (
+                    <span className="text-green-500 font-medium flex items-center gap-1">
+                      <CheckCircle size={14} />
+                      Lido
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
