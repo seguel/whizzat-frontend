@@ -7,7 +7,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { Trash2, Star, CheckCircle } from "lucide-react";
 import { useNotifications } from "../../components/perfil/NotificationContext";
-// import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -30,7 +30,7 @@ interface Notificacao {
 }
 
 export default function NotificacoesListar({ perfil }: Props) {
-  // const { t, i18n } = useTranslation("common");
+  const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
@@ -92,12 +92,12 @@ export default function NotificacoesListar({ perfil }: Props) {
       refresh();
 
       setToast({
-        message: "Notificação excluída com sucesso",
+        message: t("notificacao.msg_exclusao"),
         type: "success",
       });
     } catch (error) {
       setToast({
-        message: "Erro ao excluir notificação",
+        message: t("notificacao.msg_erro"),
         type: "error",
       });
     } finally {
@@ -217,14 +217,14 @@ export default function NotificacoesListar({ perfil }: Props) {
               <button
                 onClick={() => setFiltro("todas")}
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition  cursor-pointer
-        ${
-          filtro === "todas"
-            ? "bg-blue-600 text-white shadow"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }
-      `}
+                    ${
+                      filtro === "todas"
+                        ? "bg-blue-600 text-white shadow"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }
+                  `}
               >
-                Todas
+                {t("notificacao.filtro_todas")}
               </button>
 
               <button
@@ -237,7 +237,7 @@ export default function NotificacoesListar({ perfil }: Props) {
         }
       `}
               >
-                Não lidas
+                {t("notificacao.filtro_nao_lidas")}
               </button>
             </div>
 
@@ -247,7 +247,7 @@ export default function NotificacoesListar({ perfil }: Props) {
                 onClick={marcarTodas}
                 className="px-4 py-2 text-sm font-semibold rounded-full bg-blue-100 text-blue-900 hover:bg-blue-200 transition cursor-pointer"
               >
-                Marcar todas como lidas
+                {t("notificacao.marcar_todos")}
               </button>
             )}
           </div>
@@ -270,7 +270,7 @@ export default function NotificacoesListar({ perfil }: Props) {
 
                     {!notificacao.lida && (
                       <span className="ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500 text-white">
-                        Novo
+                        {t("notificacao.novo")}
                       </span>
                     )}
                   </div>
@@ -284,12 +284,13 @@ export default function NotificacoesListar({ perfil }: Props) {
 
                   <p className="text-[11px] text-gray-400 mt-1">
                     <span className="font-medium text-gray-700">
-                      Candidato: {notificacao.contexto?.nome}
+                      {t("notificacao.candidato")} {notificacao.contexto?.nome}
                     </span>
                   </p>
 
                   <p className="text-[11px] text-gray-400 mt-1">
-                    Enviado: {new Date(notificacao.criado_em).toLocaleString()}
+                    {t("notificacao.enviado")}{" "}
+                    {new Date(notificacao.criado_em).toLocaleString()}
                   </p>
                 </div>
 
@@ -313,12 +314,12 @@ export default function NotificacoesListar({ perfil }: Props) {
                       className="flex items-center gap-2 text-red-400 hover:text-green-600 transition-colors cursor-pointer"
                     >
                       <CheckCircle size={16} />
-                      <span>Marcar como lida</span>
+                      <span>{t("notificacao.marcar")}</span>
                     </button>
                   ) : (
                     <span className="text-green-500 font-medium flex items-center gap-1">
                       <CheckCircle size={14} />
-                      Lido
+                      {t("notificacao.lida")}
                     </span>
                   )}
                 </div>
@@ -333,7 +334,7 @@ export default function NotificacoesListar({ perfil }: Props) {
             >
               {loadingMore && (
                 <div className="text-sm text-gray-400 animate-pulse">
-                  Carregando mais...
+                  {t("notificacao.carregando")}
                 </div>
               )}
             </div>
@@ -343,11 +344,11 @@ export default function NotificacoesListar({ perfil }: Props) {
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
               <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm animate-fadeIn">
                 <h2 className="text-lg font-semibold text-gray-800">
-                  Confirmar exclusão
+                  {t("notificacao.titulo_confirma_exclusao")}
                 </h2>
 
                 <p className="text-sm text-gray-600 mt-2">
-                  Deseja realmente excluir esta notificação?
+                  {t("notificacao.msg_confirma_exclusao")}
                 </p>
 
                 <div className="flex justify-end gap-3 mt-6">
@@ -355,14 +356,14 @@ export default function NotificacoesListar({ perfil }: Props) {
                     onClick={() => setConfirmDeleteId(null)}
                     className="px-4 py-2 rounded-md text-sm bg-gray-100 hover:bg-gray-200 transition cursor-pointer"
                   >
-                    Cancelar
+                    {t("notificacao.botao_cancelar")}
                   </button>
 
                   <button
                     onClick={() => excluirNotificacao(confirmDeleteId)}
                     className="px-4 py-2 rounded-md text-sm bg-red-500 text-white hover:bg-red-600 transition cursor-pointer"
                   >
-                    Excluir
+                    {t("notificacao.botao_excluir")}
                   </button>
                 </div>
               </div>

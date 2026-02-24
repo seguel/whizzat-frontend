@@ -618,6 +618,23 @@ const pt = {
     mes: "mês",
     ano: "ano",
   },
+  notificacao: {
+    novo: "Novo",
+    candidato: "Candidato:",
+    enviado: "Enviado",
+    marcar: "Marcar como lida",
+    lida: "Lido",
+    marcar_todos: "Marcar todas como lidas",
+    filtro_todas: "Todas",
+    filtro_nao_lidas: "Não lidas",
+    titulo_confirma_exclusao: "Confirmar exclusão",
+    msg_confirma_exclusao: "Deseja realmente excluir esta notificação?",
+    botao_cancelar: "Cancelar",
+    botao_excluir: "Excluir",
+    msg_exclusao: "Notificação excluída com sucesso",
+    msg_erro: "Erro ao excluir notificação",
+    carregando: "Carregando mais...",
+  },
 };
 
 export default pt;
