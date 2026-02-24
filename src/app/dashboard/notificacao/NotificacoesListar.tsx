@@ -7,7 +7,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { Trash2, Star } from "lucide-react";
 import { useNotifications } from "../../components/perfil/NotificationContext";
-import { useTranslation } from "react-i18next";
+// import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -30,7 +30,7 @@ interface Notificacao {
 }
 
 export default function NotificacoesListar({ perfil }: Props) {
-  const { t, i18n } = useTranslation("common");
+  // const { t, i18n } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
