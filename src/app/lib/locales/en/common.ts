@@ -626,6 +626,23 @@ const en = {
     mes: "month",
     ano: "year",
   },
+  notificacao: {
+    novo: "New",
+    candidato: "Candidate:",
+    enviado: "Sent",
+    marcar: "Mark as read",
+    lida: "Read",
+    marcar_todos: "Mark all as read",
+    filtro_todas: "All",
+    filtro_nao_lidas: "Unread",
+    titulo_confirma_exclusao: "Confirm deletion",
+    msg_confirma_exclusao: "Do you really want to delete this notification?",
+    botao_cancelar: "Cancel",
+    botao_excluir: "Delete",
+    msg_exclusao: "Notification successfully deleted",
+    msg_erro: "Error deleting notification",
+    carregando: "Loading more...",
+  },
 };
 
 export default en;
