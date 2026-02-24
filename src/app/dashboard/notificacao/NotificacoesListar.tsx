@@ -7,6 +7,7 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { Trash2, Star } from "lucide-react";
 import { useNotifications } from "../../components/perfil/NotificationContext";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -14,6 +15,7 @@ interface Props {
 
 interface NotificacaoContexto {
   skill: string | null;
+  nome: string;
 }
 
 interface Notificacao {
@@ -28,6 +30,7 @@ interface Notificacao {
 }
 
 export default function NotificacoesListar({ perfil }: Props) {
+  const { t, i18n } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
@@ -213,7 +216,7 @@ export default function NotificacoesListar({ perfil }: Props) {
             <div className="flex gap-2">
               <button
                 onClick={() => setFiltro("todas")}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition  cursor-pointer
         ${
           filtro === "todas"
             ? "bg-blue-600 text-white shadow"
@@ -226,7 +229,7 @@ export default function NotificacoesListar({ perfil }: Props) {
 
               <button
                 onClick={() => setFiltro("naoLidas")}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition  cursor-pointer
         ${
           filtro === "naoLidas"
             ? "bg-blue-600 text-white shadow"
@@ -242,7 +245,7 @@ export default function NotificacoesListar({ perfil }: Props) {
             {temNaoLidas && (
               <button
                 onClick={marcarTodas}
-                className="px-4 py-2 text-sm font-semibold rounded-full bg-blue-100 text-blue-900 hover:bg-blue-200 transition"
+                className="px-4 py-2 text-sm font-semibold rounded-full bg-blue-100 text-blue-900 hover:bg-blue-200 transition cursor-pointer"
               >
                 Marcar todas como lidas
               </button>
@@ -253,42 +256,68 @@ export default function NotificacoesListar({ perfil }: Props) {
             {notificacoes.map((notificacao) => (
               <div
                 key={notificacao.id}
-                onClick={() =>
-                  !notificacao.lida && marcarComoLida(notificacao.id)
-                }
-                className={`bg-white rounded-lg shadow-md p-4 flex flex-col justify-between border-2 transition-all duration-300 transform cursor-pointer
-  ${removingId === notificacao.id ? "opacity-0 scale-95" : ""}
-  ${notificacao.lida ? "border-green-500" : "border-red-500"}`}
+                className={`group bg-white rounded-xl border shadow-sm p-4 flex flex-col justify-between
+    transition-all duration-300 hover:shadow-md hover:-translate-y-0.5
+    ${removingId === notificacao.id ? "opacity-0 scale-95" : ""}
+    ${notificacao.lida ? "border-gray-200" : "border-red-400 bg-red-50/30"}`}
               >
+                {/* 🔹 Conteúdo */}
                 <div>
-                  <h3 className="font-semibold text-gray-800">
-                    {notificacao.titulo}
-                  </h3>
+                  <div className="flex items-start justify-between">
+                    <h3 className="font-semibold text-gray-800 text-sm leading-snug">
+                      {notificacao.titulo}
+                    </h3>
+
+                    {!notificacao.lida && (
+                      <span className="ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500 text-white">
+                        Novo
+                      </span>
+                    )}
+                  </div>
 
                   {notificacao.contexto?.skill && (
-                    <div className="mt-3 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 border border-indigo-200">
-                      <Star size={14} className="text-indigo-600" />
-                      <span className="text-sm font-semibold text-indigo-700">
-                        {notificacao.contexto.skill}
-                      </span>
+                    <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium">
+                      <Star size={12} />
+                      {notificacao.contexto.skill}
                     </div>
                   )}
 
-                  <p className="text-xs text-gray-400 mt-4 text-center">
-                    Enviado em:{" "}
-                    {new Date(notificacao.criado_em).toLocaleString()}
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    <span className="font-medium text-gray-700">
+                      Candidato: {notificacao.contexto?.nome}
+                    </span>
+                  </p>
+
+                  <p className="text-[11px] text-gray-400 mt-1">
+                    Enviado: {new Date(notificacao.criado_em).toLocaleString()}
                   </p>
                 </div>
 
-                <div className="flex justify-end mt-4">
+                {/* 🔹 Rodapé */}
+                <div className="flex items-center mt-4 pt-3 border-t text-xs">
+                  {/* Esquerda */}
+                  <div className="flex-1">
+                    {!notificacao.lida ? (
+                      <button
+                        onClick={() => marcarComoLida(notificacao.id)}
+                        className="text-green-600 hover:text-green-700 font-medium transition-opacity opacity-80 hover:opacity-100 cursor-pointer"
+                      >
+                        ✓ Marcar como lida
+                      </button>
+                    ) : (
+                      <span className="text-green-500 font-medium">✓ Lido</span>
+                    )}
+                  </div>
+
+                  {/* Direita */}
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // impede marcar como lida
+                      e.stopPropagation();
                       setConfirmDeleteId(notificacao.id);
                     }}
-                    className="text-gray-400 cursor-pointer hover:text-red-600 transition"
+                    className="text-gray-400 hover:text-red-600 transition opacity-70 hover:opacity-100  cursor-pointer"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>
