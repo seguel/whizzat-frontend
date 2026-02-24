@@ -30,7 +30,7 @@ interface Notificacao {
 }
 
 export default function NotificacoesListar({ perfil }: Props) {
-  const { t, i18n } = useTranslation("common");
+  const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
