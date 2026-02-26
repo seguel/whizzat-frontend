@@ -1,10 +1,8 @@
-// import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Lista from "../../dashboard/especialista/lista";
 import { ProfileType } from "../../components/perfil/ProfileContext";
-import { useAuthGuard } from "./useAuthGuard";
-import LoadingOverlay from "../../components/LoadingOverlay";
 import { useRecrutadorEmpresa } from "./useRecrutadorEmpresa";
-import { useRouter } from "next/navigation"; // App Route
+import { useRouter } from "next/navigation";
 
 interface Options {
   perfil: ProfileType;
@@ -12,7 +10,7 @@ interface Options {
 
 export function useEspecialistaRouter({ perfil }: Options) {
   const router = useRouter();
-  const { isReady } = useAuthGuard("/cadastro/login");
+
   const {
     userId,
     recrutadorId,
@@ -22,25 +20,23 @@ export function useEspecialistaRouter({ perfil }: Options) {
     hasRedirectPlano,
   } = useRecrutadorEmpresa(perfil);
 
-  if (hasRedirectPlano) router.push(hasRedirectPlano);
+  useEffect(() => {
+    if (hasRedirectPlano) {
+      router.push(hasRedirectPlano);
+    }
+  }, [hasRedirectPlano, router]);
 
-  // só renderiza depois que userId estiver definido
   if (!userId || loading) {
     return {
       isLoading: true,
-      componente: <div>Carregando...</div>, // pode trocar por um loader/spinner
+      componente: null,
     };
   }
 
-  // Visualização de lista de vagas
   const isLoading =
-    !isReady ||
-    loading ||
-    (hasEmpresa === null && hasPerfilRecrutador === null);
+    loading || (hasEmpresa === null && hasPerfilRecrutador === null);
 
-  const componente = isLoading ? (
-    <LoadingOverlay />
-  ) : (
+  const componente = (
     <Lista
       perfil={perfil}
       recrutadorId={recrutadorId ?? null}

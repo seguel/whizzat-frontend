@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import MiddlewarePage from "./middleware";
+import CandidatoPage from "./CandidatoPage";
 import { ProfileType } from "../../../components/perfil/ProfileContext";
 
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
@@ -22,7 +22,7 @@ export default async function Page({
     notFound();
   }
   return (
-    <MiddlewarePage
+    <CandidatoPage
       perfil={perfil as ProfileType}
       vaga={vagaId}
       emp={empresaId}

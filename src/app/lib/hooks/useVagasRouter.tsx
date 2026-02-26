@@ -1,7 +1,6 @@
-// import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import VagasDados from "../../dashboard/vagas/VagaDados";
 import { ProfileType } from "../../components/perfil/ProfileContext";
-import { useAuthGuard } from "./useAuthGuard";
 import Vagas from "../../dashboard/vagas/ListaVagas";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import VagaDetalhes from "./../../dashboard/vagas/VagaDetalhe";
@@ -20,7 +19,6 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
   const isCadastro = op === "N";
   const isEdicao = op === "E" && vagaId;
 
-  const { isReady } = useAuthGuard("/cadastro/login");
   const {
     userId,
     recrutadorId,
@@ -30,7 +28,11 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
     hasRedirectPlano,
   } = useRecrutadorEmpresa(perfil);
 
-  if (hasRedirectPlano) router.push(hasRedirectPlano);
+  useEffect(() => {
+    if (hasRedirectPlano) {
+      router.push(hasRedirectPlano);
+    }
+  }, [hasRedirectPlano, router]);
 
   // só renderiza depois que userId estiver definido
   if (!userId || loading) {
@@ -42,7 +44,7 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
 
   // Cadastro ou edição de vaga
   if (isCadastro || isEdicao) {
-    const isLoading = hasEmpresa === null || !isReady || loading;
+    const isLoading = hasEmpresa === null || loading;
 
     return {
       isLoading,
@@ -63,9 +65,7 @@ export function useVagasRouter({ perfil, op, vagaId, empresaId }: Options) {
 
   // Visualização de lista de vagas
   const isLoading =
-    !isReady ||
-    loading ||
-    (hasEmpresa === null && hasPerfilRecrutador === null);
+    loading || (hasEmpresa === null && hasPerfilRecrutador === null);
 
   const componente = isLoading ? (
     <LoadingOverlay />
