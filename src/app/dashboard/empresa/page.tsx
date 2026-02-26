@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound, redirect } from "next/navigation";
-import MiddlewarePage from "./middleware";
+import EmpresaPage from "./EmpresaPage";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
@@ -36,5 +36,5 @@ export default async function Page({
     notFound();
   }
 
-  return <MiddlewarePage perfil={perfil as ProfileType} op={op} id={id} />;
+  return <EmpresaPage perfil={perfil as ProfileType} op={op} id={id} />;
 }

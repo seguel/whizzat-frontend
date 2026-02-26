@@ -29,6 +29,44 @@ interface Notificacao {
   contexto?: NotificacaoContexto;
 }
 
+function renderNotificacaoConteudo(notificacao: Notificacao, t: any) {
+  switch (notificacao.tipo) {
+    case "NOVA_SKILL":
+      return (
+        <>
+          {notificacao.contexto?.skill && (
+            <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium">
+              <Star size={12} />
+              {notificacao.contexto.skill}
+            </div>
+          )}
+
+          {notificacao.contexto?.nome && (
+            <p className="text-[11px] text-gray-400 mt-1">
+              <span className="font-medium text-gray-700">
+                {t("notificacao.candidato")} {notificacao.contexto.nome}
+              </span>
+            </p>
+          )}
+        </>
+      );
+
+    case "CADASTRO_AVALIADOR":
+      return (
+        <p className="text-[11px] text-gray-400 mt-1">
+          <span className="font-medium text-gray-700">
+            {notificacao.mensagem}
+          </span>
+        </p>
+      );
+
+    default:
+      return (
+        <p className="text-[11px] text-gray-400 mt-2">{notificacao.mensagem}</p>
+      );
+  }
+}
+
 export default function NotificacoesListar({ perfil }: Props) {
   const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -142,6 +180,8 @@ export default function NotificacoesListar({ perfil }: Props) {
       } else {
         setNotificacoes((prev) => [...prev, ...novas]);
       }
+
+      console.log(novas);
 
       if (novas.length < 20) {
         setHasMore(false);
@@ -275,20 +315,9 @@ export default function NotificacoesListar({ perfil }: Props) {
                     )}
                   </div>
 
-                  {notificacao.contexto?.skill && (
-                    <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium">
-                      <Star size={12} />
-                      {notificacao.contexto.skill}
-                    </div>
-                  )}
+                  {renderNotificacaoConteudo(notificacao, t)}
 
-                  <p className="text-[11px] text-gray-400 mt-1">
-                    <span className="font-medium text-gray-700">
-                      {t("notificacao.candidato")} {notificacao.contexto?.nome}
-                    </span>
-                  </p>
-
-                  <p className="text-[11px] text-gray-400 mt-1">
+                  <p className="text-[11px] text-gray-400 mt-3">
                     {t("notificacao.enviado")}{" "}
                     {new Date(notificacao.criado_em).toLocaleString()}
                   </p>

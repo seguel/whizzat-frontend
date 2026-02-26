@@ -1,11 +1,9 @@
-// import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import EmpresaCriar from "../../dashboard/empresa/criar/criar";
 import EmpresaListar from "../../dashboard/empresa/lista";
 import EmpresaEditar from "../../dashboard/empresa/editar/[id]/editar";
 import EmpresaDetalhe from "../../dashboard/empresa/detalhe/[id]/detalhe";
 import { ProfileType } from "../../components/perfil/ProfileContext";
-import { useAuthGuard } from "./useAuthGuard";
-//import LoadingOverlay from "../../components/LoadingOverlay";
 import { useRecrutadorEmpresa } from "./useRecrutadorEmpresa";
 import { useRouter } from "next/navigation"; // App Route
 
@@ -21,13 +19,6 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
   const isCadastro = op === "N";
   const isEdicao = op === "E" && id;
 
-  const { isReady } = useAuthGuard("/cadastro/login");
-  /*  const [hasPerfilRecrutador, setHasPerfilRecrutador] = useState<
-    boolean | null
-  >(null);
-  const [hasEmpresa, setHasEmpresa] = useState<boolean | null>(false);
-  const [userId, setUserId] = useState<string>(""); // <-- aqui */
-
   const {
     userId,
     recrutadorId,
@@ -37,7 +28,11 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
     hasRedirectPlano,
   } = useRecrutadorEmpresa(perfil);
 
-  if (hasRedirectPlano) router.push(hasRedirectPlano);
+  useEffect(() => {
+    if (hasRedirectPlano) {
+      router.push(hasRedirectPlano);
+    }
+  }, [hasRedirectPlano, router]);
 
   // só renderiza depois que userId estiver definido
   if (!userId || loading) {
@@ -74,11 +69,6 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
     };
   }
 
-  const isLoading =
-    !isReady ||
-    loading ||
-    (hasEmpresa === null && hasPerfilRecrutador === null);
-
   const componente = hasEmpresa ? (
     id ? (
       <EmpresaDetalhe
@@ -103,5 +93,5 @@ export function useEmpresaRouter({ perfil, op, id }: Options) {
     />
   );
 
-  return { isLoading, componente };
+  return { loading, componente };
 }
