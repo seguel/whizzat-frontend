@@ -1,12 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import {
   ProfileProvider,
   ProfileType,
 } from "../../../components/perfil/ProfileContext";
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import { useCandidatoRouter } from "../../../lib/hooks/useCandidatoRouter";
-import { useAuthGuard } from "../../../lib/hooks/useAuthGuard";
 import Vagas from "./ListaVagas";
 import VagaDetalhes from "./VagaDetalhe";
 import { useRouter } from "next/navigation"; // App Router
@@ -17,18 +17,18 @@ interface Props {
   emp?: string | undefined;
 }
 
-export default function Middleware({ perfil, vaga, emp }: Props) {
+export default function CandidatoPage({ perfil, vaga, emp }: Props) {
   const router = useRouter();
-  const { isReady } = useAuthGuard("/cadastro/login");
   const { loading, userId, candidatoId, hasPerfilCandidato, hasRedirectPlano } =
     useCandidatoRouter();
 
-  if (!isReady || loading || !userId) return <LoadingOverlay />;
+  useEffect(() => {
+    if (hasRedirectPlano) {
+      router.push(hasRedirectPlano);
+    }
+  }, [hasRedirectPlano, router]);
 
-  if (hasRedirectPlano) {
-    router.push(hasRedirectPlano);
-    return null;
-  }
+  if (loading || !userId) return <LoadingOverlay />;
 
   const componente = vaga ? (
     <VagaDetalhes

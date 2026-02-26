@@ -5,21 +5,18 @@ import {
   ProfileType,
 } from "../../components/perfil/ProfileContext";
 import { NotificationProvider } from "../../components/perfil/NotificationContext";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import { useEspecialistaRouter } from "../../lib/hooks/useEspecialistaRouter";
+import Notificacoes from "./NotificacoesListar";
 
 interface Props {
   perfil: ProfileType;
 }
 
 export default function Middleware({ perfil }: Props) {
-  const { isLoading, componente } = useEspecialistaRouter({ perfil });
-
-  if (isLoading) return <LoadingOverlay />;
-
   return (
     <ProfileProvider initialProfile={perfil}>
-      <NotificationProvider>{componente}</NotificationProvider>
+      <NotificationProvider>
+        <Notificacoes perfil={perfil} />
+      </NotificationProvider>
     </ProfileProvider>
   );
 }

@@ -4,7 +4,6 @@ import {
   ProfileProvider,
   ProfileType,
 } from "../../components/perfil/ProfileContext";
-import { NotificationProvider } from "../../components/perfil/NotificationContext";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { useVagasRouter } from "../../lib/hooks/useVagasRouter";
 
@@ -15,7 +14,7 @@ interface Props {
   empresaId?: string;
 }
 
-export default function Middleware({ perfil, op, vagaId, empresaId }: Props) {
+export default function VagaPage({ perfil, op, vagaId, empresaId }: Props) {
   const { isLoading, componente } = useVagasRouter({
     perfil,
     op,
@@ -26,8 +25,6 @@ export default function Middleware({ perfil, op, vagaId, empresaId }: Props) {
   if (isLoading) return <LoadingOverlay />;
 
   return (
-    <ProfileProvider initialProfile={perfil}>
-      <NotificationProvider>{componente}</NotificationProvider>
-    </ProfileProvider>
+    <ProfileProvider initialProfile={perfil}>{componente}</ProfileProvider>
   );
 }
