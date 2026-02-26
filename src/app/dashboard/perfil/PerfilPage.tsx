@@ -9,7 +9,6 @@ import PerfilCandidato from "./PerfilCandidato";
 import PerfilRecrutador from "./PerfilRecrutador";
 import PerfilAvaliador from "./PerfilAvaliador";
 import PerfilWrapper from "../../components/PageWrapper";
-import { useAuthGuard } from "../../lib/hooks/useAuthGuard";
 import LoadingOverlay from "../../components/LoadingOverlay";
 
 interface Props {
@@ -19,7 +18,6 @@ interface Props {
 }
 
 export default function PerfilPage({ perfil, id }: Props) {
-  const { isReady } = useAuthGuard("/cadastro/login");
   const [userId, setUserId] = useState<string>("");
 
   const [recrutadorId, setRecrutadorId] = useState<string>("");
@@ -92,7 +90,7 @@ export default function PerfilPage({ perfil, id }: Props) {
     else if (perfilId == 1) verificarHasPerfilCandidato();
   }, [perfil]);
 
-  if (!isReady || !userId) return <LoadingOverlay />;
+  if (!userId) return <LoadingOverlay />;
 
   return (
     <ProfileProvider initialProfile={perfil}>
