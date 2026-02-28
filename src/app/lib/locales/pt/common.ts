@@ -174,7 +174,8 @@ const pt = {
   },
   sidebar: {
     menu_dashboard: "Dashboard",
-    menu_avaliacoes: "Avaliações",
+    menu_avaliacoes: "Minhas Avaliações",
+    menu_convite: "Convite/Avaliar",
     menu_meu_perfil: "Meu Perfil",
     menu_agenda: "Agenda",
     menu_notificacoes: "Notificações",
