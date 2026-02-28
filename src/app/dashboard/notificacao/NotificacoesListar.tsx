@@ -5,7 +5,7 @@ import Sidebar from "../../components/perfil/Sidebar";
 import TopBar from "../../components/perfil/TopBar";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
-import { Trash2, Star, CheckCircle } from "lucide-react";
+import { Star, CheckCircle } from "lucide-react";
 import { useNotifications } from "../../components/perfil/NotificationContext";
 import { useTranslation } from "react-i18next";
 
@@ -292,65 +292,79 @@ export default function NotificacoesListar({ perfil }: Props) {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
             {notificacoes.map((notificacao) => (
               <div
                 key={notificacao.id}
-                className={`group bg-white rounded-xl border shadow-sm p-4 flex flex-col justify-between
-    transition-all duration-300 hover:shadow-md hover:-translate-y-0.5
-    ${removingId === notificacao.id ? "opacity-0 scale-95" : ""}
-    ${notificacao.lida ? "border-gray-200" : "border-red-400 bg-red-50/30"}`}
+                className={`relative bg-white rounded-xl border shadow-sm
+  flex flex-col h-full overflow-hidden
+  transition-all duration-300 hover:shadow-md hover:-translate-y-0.5
+  ${removingId === notificacao.id ? "opacity-0 scale-95" : ""}
+  ${notificacao.lida ? "border-gray-200" : "border-red-300 bg-red-50/30"}`}
               >
-                {/* 🔹 Conteúdo */}
-                <div>
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-semibold text-gray-800 text-sm leading-snug">
-                      {notificacao.titulo}
-                    </h3>
+                {/* 🔹 Barra lateral */}
+                <div
+                  className={`absolute left-0 top-0 h-full w-1.5 ${
+                    notificacao.lida ? "bg-green-500" : "bg-red-500"
+                  }`}
+                />
 
-                    {!notificacao.lida && (
-                      <span className="ml-2 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-500 text-white">
-                        {t("notificacao.novo")}
+                <div className="p-3 pl-4 flex flex-col h-full">
+                  {/* 🔹 CONTEÚDO */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <h3 className="font-semibold text-gray-800 text-sm leading-snug">
+                        {notificacao.titulo}
+                      </h3>
+
+                      <span
+                        className={`ml-1 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1
+  ${
+    notificacao.lida ? "bg-green-100 text-green-700" : "bg-red-500 text-white"
+  }`}
+                      >
+                        {notificacao.lida && <CheckCircle size={12} />}
+                        {notificacao.lida
+                          ? t("notificacao.lida")
+                          : t("notificacao.novo")}
                       </span>
-                    )}
+                    </div>
+
+                    {renderNotificacaoConteudo(notificacao, t)}
+
+                    <p className="text-[11px] text-gray-400 mt-3">
+                      {t("notificacao.enviado")}{" "}
+                      {new Date(notificacao.criado_em).toLocaleString()}
+                    </p>
                   </div>
 
-                  {renderNotificacaoConteudo(notificacao, t)}
-
-                  <p className="text-[11px] text-gray-400 mt-3">
-                    {t("notificacao.enviado")}{" "}
-                    {new Date(notificacao.criado_em).toLocaleString()}
-                  </p>
-                </div>
-
-                {/* 🔹 Rodapé */}
-                <div className="flex items-center justify-between mt-4 pt-3 border-t text-xs">
-                  {/* Esquerda → Trash */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setConfirmDeleteId(notificacao.id);
-                    }}
-                    className="text-gray-400 hover:text-red-600 transition opacity-70 hover:opacity-100 cursor-pointer"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-
-                  {/* Direita → Marcar como lida */}
-                  {!notificacao.lida ? (
+                  {/* 🔹 AÇÕES NO RODAPÉ */}
+                  <div className="mt-4 pt-3 border-t flex gap-2">
+                    {/* Excluir */}
                     <button
-                      onClick={() => marcarComoLida(notificacao.id)}
-                      className="flex items-center gap-2 text-red-400 hover:text-green-600 transition-colors cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConfirmDeleteId(notificacao.id);
+                      }}
+                      className="flex-1 py-2 rounded-lg border text-xs font-semibold cursor-pointer
+                   text-red-600 border-red-200
+                   hover:bg-red-50 transition"
                     >
-                      <CheckCircle size={16} />
-                      <span>{t("notificacao.marcar")}</span>
+                      Excluir
                     </button>
-                  ) : (
-                    <span className="text-green-500 font-medium flex items-center gap-1">
-                      <CheckCircle size={14} />
-                      {t("notificacao.lida")}
-                    </span>
-                  )}
+
+                    {/* Marcar como lida */}
+                    {!notificacao.lida && (
+                      <button
+                        onClick={() => marcarComoLida(notificacao.id)}
+                        className="flex-1 py-2 rounded-lg text-xs font-semibold cursor-pointer
+               bg-green-600 text-white
+               hover:bg-green-700 transition"
+                      >
+                        {t("notificacao.marcar")}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
