@@ -80,7 +80,7 @@ export function useNavItems(
         {
           icon: <Bell size={20} />,
           label: t("sidebar.menu_notificacoes"),
-          route: "/notificacoes",
+          route: `/dashboard/notificacao?perfil=${profile}`,
           badge: notificationCount > 0 ? notificationCount : undefined,
         },
         {
@@ -125,7 +125,7 @@ export function useNavItems(
         {
           icon: <Bell size={20} />,
           label: t("sidebar.menu_notificacoes"),
-          route: "/notificacoes",
+          route: `/dashboard/notificacao?perfil=${profile}`,
           badge: notificationCount > 0 ? notificationCount : undefined,
         },
         {
@@ -145,7 +145,7 @@ export function useNavItems(
         {
           icon: <CheckSquare size={20} />,
           label: t("sidebar.menu_avaliacoes"),
-          route: "/avaliacoes",
+          route: `/dashboard/avaliacao?perfil=${profile}`,
         },
         {
           icon: <User size={20} />,

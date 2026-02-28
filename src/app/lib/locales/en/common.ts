@@ -172,7 +172,8 @@ const en = {
   },
   sidebar: {
     menu_dashboard: "Dashboard",
-    menu_avaliacoes: "Evaluations",
+    menu_avaliacoes: "My Evaluations",
+    menu_convite: "Invitation / Evaluate",
     menu_meu_perfil: "My Profile",
     menu_agenda: "Schedule",
     menu_notificacoes: "Notifications",
