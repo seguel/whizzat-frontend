@@ -350,7 +350,7 @@ export default function NotificacoesListar({ perfil }: Props) {
                    text-red-600 border-red-200
                    hover:bg-red-50 transition"
                     >
-                      Excluir
+                      {t("notificacao.botao_excluir")}
                     </button>
 
                     {/* Marcar como lida */}
