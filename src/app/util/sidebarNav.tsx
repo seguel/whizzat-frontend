@@ -148,6 +148,11 @@ export function useNavItems(
           route: `/dashboard/avaliacao?perfil=${profile}`,
         },
         {
+          icon: <ClipboardCheck size={20} />,
+          label: t("sidebar.menu_questionario"),
+          route: `/dashboard/questionario?perfil=${profile}`,
+        },
+        {
           icon: <User size={20} />,
           label: t("sidebar.menu_meu_perfil"),
           route: `/dashboard/perfil?perfil=${profile}`,
