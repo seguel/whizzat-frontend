@@ -5,7 +5,8 @@ import Sidebar from "../../components/perfil/Sidebar";
 import TopBar from "../../components/perfil/TopBar";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
-// import { Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { TFunction } from "i18next";
 
 interface Props {
   perfil: ProfileType;
@@ -32,11 +33,13 @@ function ConviteCard({
   tipo,
   onAceitar,
   onRecusar,
+  t,
 }: {
   convite: Convite;
   tipo: "PENDENTE" | "ACEITO" | "AGENDADO";
   onAceitar?: (id: number) => void;
   onRecusar?: (id: number) => void;
+  t: TFunction;
 }) {
   const pesoNota = convite.peso ? convite.peso / 10 : 0;
 
@@ -104,7 +107,9 @@ function ConviteCard({
           {convite.peso && (
             <div className="mt-4">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-xs text-gray-500">Peso</span>
+                <span className="text-xs text-gray-500">
+                  {t("minha_avaliacao.peso")}
+                </span>
                 <span className="text-xs text-gray-400">{pesoNota}/10</span>
               </div>
 
@@ -136,7 +141,7 @@ function ConviteCard({
                          text-red-600 border-red-200
                          hover:bg-red-50 transition"
               >
-                Rejeitar
+                {t("minha_avaliacao.btn_recusar")}
               </button>
 
               <button
@@ -145,14 +150,14 @@ function ConviteCard({
                          bg-green-600 text-white
                          hover:bg-green-700 transition"
               >
-                Aceitar
+                {t("minha_avaliacao.btn_aceitar")}
               </button>
             </div>
           )}
           {tipo === "ACEITO" && (
             <div className="mt-4 pt-3 border-t">
               <div className="w-full py-2 rounded-lg text-center text-xs font-semibold bg-yellow-50 text-yellow-700">
-                ⏳ Aguardando agendamento
+                ⏳ {t("minha_avaliacao.aguardando_avaliacao")}
               </div>
             </div>
           )}
@@ -160,12 +165,14 @@ function ConviteCard({
           {tipo === "AGENDADO" && (
             <div className="mt-4 pt-3 border-t">
               <div className="w-full py-2 rounded-lg text-center text-xs font-semibold bg-blue-50 text-blue-700">
-                📅 Aguardando finalização
+                📅 {t("minha_avaliacao.aguardando_finalizacao")}
               </div>
             </div>
           )}
           <p className="text-[10px] text-gray-400 mt-2 text-center">
-            {tipo === "PENDENTE" ? "Enviado em" : "Aceito em"}{" "}
+            {tipo === "PENDENTE"
+              ? t("minha_avaliacao.enviado_em")
+              : t("minha_avaliacao.aceito_em")}{" "}
             {new Date(convite.criado_em).toLocaleString()}
           </p>
         </div>
@@ -179,6 +186,7 @@ function ConviteCard({
 ====================================================== */
 
 export default function AvaliacaoConvites({ perfil }: Props) {
+  const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -269,13 +277,13 @@ export default function AvaliacaoConvites({ perfil }: Props) {
             {/* COLUNA 1 */}
             <div>
               <h2 className="font-bold text-gray-800 mb-4 text-center">
-                Convites Recebidos ({convitesPendentes.length})
+                {t("minha_avaliacao.recebido")} ({convitesPendentes.length})
               </h2>
 
               <div className="space-y-4 flex flex-col items-center">
                 {convitesPendentes.length === 0 && (
                   <p className="text-sm text-gray-400">
-                    Nenhum convite pendente
+                    {t("minha_avaliacao.sem_convite")}
                   </p>
                 )}
 
@@ -286,6 +294,7 @@ export default function AvaliacaoConvites({ perfil }: Props) {
                     tipo="PENDENTE"
                     onAceitar={handleAceitar}
                     onRecusar={handleRecusar}
+                    t={t}
                   />
                 ))}
               </div>
@@ -294,12 +303,14 @@ export default function AvaliacaoConvites({ perfil }: Props) {
             {/* COLUNA 2 */}
             <div>
               <h2 className="font-bold text-gray-800 mb-4 text-center">
-                Aceitos ({convitesAceitos.length})
+                {t("minha_avaliacao.aceito")} ({convitesAceitos.length})
               </h2>
 
               <div className="space-y-4 flex flex-col items-center">
                 {convitesAceitos.length === 0 && (
-                  <p className="text-sm text-gray-400">Nenhum convite aceito</p>
+                  <p className="text-sm text-gray-400">
+                    {t("minha_avaliacao.sem_aceito")}
+                  </p>
                 )}
 
                 {convitesAceitos.map((convite) => (
@@ -307,6 +318,7 @@ export default function AvaliacaoConvites({ perfil }: Props) {
                     key={convite.id}
                     convite={convite}
                     tipo="ACEITO"
+                    t={t}
                   />
                 ))}
               </div>
@@ -315,13 +327,13 @@ export default function AvaliacaoConvites({ perfil }: Props) {
             {/* COLUNA 3 */}
             <div>
               <h2 className="font-bold text-gray-800 mb-4 text-center">
-                Agendados ({convitesAgendados.length})
+                {t("minha_avaliacao.agendado")} ({convitesAgendados.length})
               </h2>
 
               <div className="space-y-4 flex flex-col items-center">
                 {convitesAgendados.length === 0 && (
                   <p className="text-sm text-gray-400">
-                    Nenhum agendamento pendente
+                    {t("minha_avaliacao.sem_agenda")}
                   </p>
                 )}
 
@@ -330,6 +342,7 @@ export default function AvaliacaoConvites({ perfil }: Props) {
                     key={convite.id}
                     convite={convite}
                     tipo="AGENDADO"
+                    t={t}
                   />
                 ))}
               </div>
