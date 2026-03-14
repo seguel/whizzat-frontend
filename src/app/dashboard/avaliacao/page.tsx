@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import AvaliacaoPage from "./AvaliacaoPage";
+import AvaliacaoConvite from "./AvaliacaoConvites";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
@@ -31,5 +31,5 @@ export default async function Page({
     notFound();
   }
 
-  return <AvaliacaoPage perfil={perfil as ProfileType} />;
+  return <AvaliacaoConvite perfil={perfil as ProfileType} />;
 }
