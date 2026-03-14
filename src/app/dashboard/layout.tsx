@@ -3,11 +3,14 @@
 import { ReactNode } from "react";
 import AuthGuard from "../components/AuthGuard";
 import { NotificationProvider } from "../components/perfil/NotificationContext";
+import { ProfileProvider } from "../components/perfil/ProfileContext";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <AuthGuard>
-      <NotificationProvider>{children}</NotificationProvider>
+      <ProfileProvider>
+        <NotificationProvider>{children}</NotificationProvider>
+      </ProfileProvider>
     </AuthGuard>
   );
 }
