@@ -207,7 +207,8 @@ export default function EditarPage({ perfil, id }: Props) {
               <textarea
                 value={comentario}
                 onChange={(e) => setComentario(e.target.value)}
-                className="border rounded-lg px-3 py-2 text-sm"
+                rows={4}
+                className="border rounded-lg px-3 py-2 text-sm w-full overflow-y-auto"
               />
             </div>
 
