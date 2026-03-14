@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import {
-  ProfileProvider,
+  // ProfileProvider,
   ProfileType,
 } from "../../components/perfil/ProfileContext";
-import { NotificationProvider } from "../../components/perfil/NotificationContext";
+// import { NotificationProvider } from "../../components/perfil/NotificationContext";
 import PerfilCandidato from "./PerfilCandidato";
 import PerfilRecrutador from "./PerfilRecrutador";
 import PerfilAvaliador from "./PerfilAvaliador";
@@ -93,32 +93,32 @@ export default function PerfilPage({ perfil, id }: Props) {
   if (!userId) return <LoadingOverlay />;
 
   return (
-    <ProfileProvider initialProfile={perfil}>
-      <NotificationProvider>
-        <PerfilWrapper>
-          {perfil === "candidato" && (
-            <PerfilCandidato
-              perfil={perfil}
-              userId={userId}
-              candidatoId={id ?? candidatoId ?? null}
-            />
-          )}
-          {perfil === "recrutador" && (
-            <PerfilRecrutador
-              perfil={perfil}
-              userId={userId}
-              recrutadorId={id ?? recrutadorId ?? null}
-            />
-          )}
-          {perfil === "avaliador" && (
-            <PerfilAvaliador
-              perfil={perfil}
-              userId={userId}
-              avaliadorId={id ?? avaliadorId ?? null}
-            />
-          )}
-        </PerfilWrapper>
-      </NotificationProvider>
-    </ProfileProvider>
+    // <ProfileProvider initialProfile={perfil}>
+    //   <NotificationProvider>
+    <PerfilWrapper>
+      {perfil === "candidato" && (
+        <PerfilCandidato
+          perfil={perfil}
+          userId={userId}
+          candidatoId={id ?? candidatoId ?? null}
+        />
+      )}
+      {perfil === "recrutador" && (
+        <PerfilRecrutador
+          perfil={perfil}
+          userId={userId}
+          recrutadorId={id ?? recrutadorId ?? null}
+        />
+      )}
+      {perfil === "avaliador" && (
+        <PerfilAvaliador
+          perfil={perfil}
+          userId={userId}
+          avaliadorId={id ?? avaliadorId ?? null}
+        />
+      )}
+    </PerfilWrapper>
+    //   </NotificationProvider>
+    // </ProfileProvider>
   );
 }

@@ -76,8 +76,15 @@ export default function Sidebar({
   const renderItem = (item: NavItem, idx: number) => {
     // Itens de link: calculamos ativo
     if (item.route) {
-      const itemPath = item.route.split("?")[0];
-      const isActive = pathname === itemPath;
+      const itemPath = item.route?.split("?")[0] ?? "";
+      const isActive = item.activeRoutes
+        ? item.activeRoutes.some((route) => {
+            if (route === "/dashboard") {
+              return pathname === "/dashboard";
+            }
+            return pathname === route || pathname.startsWith(route + "/");
+          })
+        : pathname === itemPath;
 
       return (
         <Link href={item.route} key={idx}>

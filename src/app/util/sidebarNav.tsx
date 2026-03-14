@@ -23,6 +23,7 @@ export interface NavItem {
   route?: string;
   badge?: number;
   action?: NavAction;
+  activeRoutes?: string[];
 }
 
 export function useNavItems(
@@ -51,37 +52,44 @@ export function useNavItems(
           icon: <Home size={20} />,
           label: t("sidebar.menu_dashboard"),
           route: `/dashboard?perfil=${profile}`,
+          activeRoutes: ["/dashboard"],
         },
         {
           icon: <Star size={20} />,
           label: t("sidebar.menu_minhas_vagas"),
           route: "/vagas",
+          activeRoutes: ["/dashboard/notificacao"],
         },
         {
           icon: <Search size={20} />,
           label: t("sidebar.menu_buscar_vagas"),
           route: `/dashboard/candidato/vagas?perfil=${profile}`,
+          activeRoutes: ["/dashboard/candidato"],
         },
         {
           icon: <User size={20} />,
           label: t("sidebar.menu_meu_perfil"),
           route: `/dashboard/perfil?perfil=${profile}`,
+          activeRoutes: ["/dashboard/perfil"],
         },
         {
           icon: <CheckSquare size={20} />,
           label: t("sidebar.menu_avaliacoes"),
           route: "/avaliacoes",
+          activeRoutes: ["/dashboard/notificacao"],
         },
         {
           icon: <Calendar size={20} />,
           label: t("sidebar.menu_agenda"),
           route: "/agenda",
+          activeRoutes: ["/dashboard/agenda"],
         },
         {
           icon: <Bell size={20} />,
           label: t("sidebar.menu_notificacoes"),
           route: `/dashboard/notificacao?perfil=${profile}`,
           badge: notificationCount > 0 ? notificationCount : undefined,
+          activeRoutes: ["/dashboard/notificacao"],
         },
         {
           icon: <LogOut size={20} />,
@@ -96,37 +104,44 @@ export function useNavItems(
           icon: <Home size={20} />,
           label: t("sidebar.menu_dashboard"),
           route: `/dashboard?perfil=${profile}`,
+          activeRoutes: ["/dashboard"],
         },
         {
           icon: <Star size={20} />,
           label: t("sidebar.menu_vagas_abertas"),
           route: `/dashboard/vagas?perfil=${profile}`,
+          activeRoutes: ["/dashboard/vagas"],
         },
         {
           icon: <Store size={20} />,
           label: t("sidebar.menu_empresas"),
           route: `/dashboard/empresa?perfil=${profile}`,
+          activeRoutes: ["/dashboard/empresa"],
         },
         {
           icon: <ClipboardCheck size={20} />,
           label: t("sidebar.menu_avaliadores"),
           route: `/dashboard/especialista?perfil=${profile}`,
+          activeRoutes: ["/dashboard/especialista"],
         },
         {
           icon: <User size={20} />,
           label: t("sidebar.menu_meu_perfil"),
           route: `/dashboard/perfil?perfil=${profile}`,
+          activeRoutes: ["/dashboard/perfil"],
         },
         {
           icon: <Calendar size={20} />,
           label: t("sidebar.menu_agenda"),
           route: "/agenda",
+          activeRoutes: ["/dashboard/agenda"],
         },
         {
           icon: <Bell size={20} />,
           label: t("sidebar.menu_notificacoes"),
           route: `/dashboard/notificacao?perfil=${profile}`,
           badge: notificationCount > 0 ? notificationCount : undefined,
+          activeRoutes: ["/dashboard/notificacao"],
         },
         {
           icon: <LogOut size={20} />,
@@ -141,32 +156,38 @@ export function useNavItems(
           icon: <Home size={20} />,
           label: t("sidebar.menu_dashboard"),
           route: `/dashboard?perfil=${profile}`,
+          activeRoutes: ["/dashboard"],
         },
         {
           icon: <CheckSquare size={20} />,
           label: t("sidebar.menu_avaliacoes"),
           route: `/dashboard/avaliacao?perfil=${profile}`,
+          activeRoutes: ["/dashboard/avaliacao"],
         },
         {
           icon: <ClipboardCheck size={20} />,
           label: t("sidebar.menu_questionario"),
           route: `/dashboard/questionario?perfil=${profile}`,
+          activeRoutes: ["/dashboard/questionario"],
         },
         {
           icon: <User size={20} />,
           label: t("sidebar.menu_meu_perfil"),
           route: `/dashboard/perfil?perfil=${profile}`,
+          activeRoutes: ["/dashboard/perfil"],
         },
         {
           icon: <Calendar size={20} />,
           label: t("sidebar.menu_agenda"),
           route: "/agenda",
+          activeRoutes: ["/dashboard/agenda"],
         },
         {
           icon: <Bell size={20} />,
           label: t("sidebar.menu_notificacoes"),
           route: `/dashboard/notificacao?perfil=${profile}`,
           badge: notificationCount > 0 ? notificationCount : undefined,
+          activeRoutes: ["/dashboard/notificacao"],
         },
         {
           icon: <LogOut size={20} />,
