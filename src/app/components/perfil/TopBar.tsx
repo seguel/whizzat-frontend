@@ -6,6 +6,7 @@ import { Menu } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useProfile } from "./ProfileContext";
+import { useUser } from "./UserContext";
 
 interface TopBarProps {
   setIsDrawerOpen?: (open: boolean) => void;
@@ -49,6 +50,8 @@ export default function TopBar({
   const colors = profileColorMap[currentProfile] || profileColorMap.candidato;
 
   const { setProfile } = useProfile();
+
+  const { initials } = useUser();
 
   useEffect(() => {
     /* if (i18n.isInitialized) {
@@ -98,7 +101,7 @@ export default function TopBar({
           <span
             className={`rounded-full w-7 h-7 flex items-center justify-center text-sm font-bold ${colors.avatar}`}
           >
-            JP
+            {initials}
           </span>
 
           <select
