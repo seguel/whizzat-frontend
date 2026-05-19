@@ -3,32 +3,24 @@ import {
   // ProfileProvider,
   ProfileType,
 } from "../components/perfil/ProfileContext";
-// import { NotificationProvider } from "../components/perfil/NotificationContext";
 import DashboardCandidato from "./DashboardCandidato";
 import DashboardRecrutador from "./DashboardRecrutador";
 import DashboardAvaliador from "./DashboardAvaliador";
 import DashboardWrapper from "../components/PageWrapper";
-import { useAuthGuard } from "../lib/hooks/useAuthGuard";
-import LoadingOverlay from "../components/LoadingOverlay";
+// import LoadingOverlay from "../components/LoadingOverlay";
 
 interface Props {
   perfil: ProfileType;
 }
 
 export default function DashboardPage({ perfil }: Props) {
-  const { isReady } = useAuthGuard("/cadastro/login");
-
-  if (!isReady) return <LoadingOverlay />;
+  // if (!isReady) return <LoadingOverlay />;
 
   return (
-    // <ProfileProvider initialProfile={perfil}>
-    // <NotificationProvider>
     <DashboardWrapper>
       {perfil === "candidato" && <DashboardCandidato perfil={perfil} />}
       {perfil === "recrutador" && <DashboardRecrutador perfil={perfil} />}
       {perfil === "avaliador" && <DashboardAvaliador perfil={perfil} />}
     </DashboardWrapper>
-    //  </NotificationProvider>
-    // </ProfileProvider>
   );
 }

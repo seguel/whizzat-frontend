@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import PageContainer from "@/app/components/PageContainer";
 
 interface Props {
   perfil: ProfileType;
@@ -100,7 +101,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
 
         if (!res.ok)
@@ -132,12 +133,13 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-      <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
+
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        <main className="p-4 grid grid-cols-1 gap-4 w-[98%] mx-auto">
-          <div className="flex flex-col items-start p-4 bg-white rounded-lg shadow-sm w-full min-h-[500px]">
-            <div className="pt-1 px-1 flex justify-between w-full">
+        <PageContainer>
+          <div className="flex flex-col flex-1 w-full min-h-[500px] ">
+            <div className="pt-1 px-1 flex justify-between w-full mb-4">
               {/* Esquerda: botão voltar */}
               <div className="flex mb-1">
                 <button
@@ -156,7 +158,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                   <button
                     onClick={() =>
                       router.push(
-                        `/dashboard/vagas?perfil=${perfil}&op=E&vagaid=${vagaId}&id=${empresaId}`
+                        `/dashboard/vagas?perfil=${perfil}&op=E&vagaid=${vagaId}&id=${empresaId}`,
                       )
                     }
                     className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
@@ -333,7 +335,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                         {t("tela_vaga_dados.item_msg_aberta")}{" "}
                         {vaga?.data_cadastro
                           ? new Date(vaga?.data_cadastro).toLocaleDateString(
-                              "pt-BR"
+                              "pt-BR",
                             )
                           : t("tela_vaga_dados.item_msg_sem_data")}
                       </div>
@@ -447,7 +449,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
               </div>
             </div>
           </div>
-        </main>
+        </PageContainer>
       </div>
     </div>
   );

@@ -13,10 +13,15 @@ export default function AuthGuard({
   children,
   redirectTo = "/cadastro/login",
 }: AuthGuardProps) {
-  const { isReady } = useAuthGuard(redirectTo);
+  const { isReady, isAuthenticated } = useAuthGuard(redirectTo);
 
   if (!isReady) {
     return <LoadingOverlay />;
+  }
+
+  // 🔒 Não autenticado → não renderiza nada
+  if (!isAuthenticated) {
+    return <LoadingOverlay />; // ou null
   }
 
   return <>{children}</>;

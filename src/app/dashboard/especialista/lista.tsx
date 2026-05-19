@@ -11,6 +11,7 @@ import SemDados from "../SemDados";
 import { toast } from "react-hot-toast";
 import { ImSpinner2 } from "react-icons/im";
 import { useTranslation } from "react-i18next";
+import PageContainer from "@/app/components/PageContainer";
 
 interface Props {
   perfil: ProfileType;
@@ -65,7 +66,7 @@ export default function EmpresaListar({
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
         const data = await res.json();
         console.log(data);
@@ -73,7 +74,7 @@ export default function EmpresaListar({
       } catch (error) {
         console.error(
           t("tela_lista_avaliadores.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setIsLoading(false);
@@ -156,176 +157,180 @@ export default function EmpresaListar({
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-      <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
+
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        <main className="p-4 grid grid-cols-1 gap-4 w-[98%] mx-auto">
-          {!hasPerfilRecrutador ? (
-            <SemDados tipo="perfil" perfil={perfil} />
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {colunas.map((coluna) => {
-                const especialistasFiltradas = especialistas.filter(
-                  (e) => e.status_cadastro === coluna.filtro
-                );
+        {!hasPerfilRecrutador ? (
+          <SemDados tipo="perfil" perfil={perfil} />
+        ) : (
+          <PageContainer>
+            <div className="flex flex-col flex-1 w-full min-h-[500px] ">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {colunas.map((coluna) => {
+                  const especialistasFiltradas = especialistas.filter(
+                    (e) => e.status_cadastro === coluna.filtro,
+                  );
 
-                return (
-                  <div key={coluna.filtro}>
-                    <h3 className="text-sm font-semibold text-purple-700 bg-purple-100 px-4 py-2 rounded-full inline-block mb-4">
-                      {coluna.titulo}
-                    </h3>
+                  return (
+                    <div key={coluna.filtro}>
+                      <h3 className="text-sm font-semibold text-purple-700 bg-purple-100 px-4 py-2 rounded-full inline-block mb-4">
+                        {coluna.titulo}
+                      </h3>
 
-                    <div className="flex flex-col gap-4">
-                      {especialistasFiltradas.length > 0 ? (
-                        especialistasFiltradas.map((espec) => (
-                          <div
-                            key={espec.id}
-                            className={`flex items-start gap-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md 
+                      <div className="flex flex-col gap-4">
+                        {especialistasFiltradas.length > 0 ? (
+                          especialistasFiltradas.map((espec) => (
+                            <div
+                              key={espec.id}
+                              className={`flex items-start gap-3 p-4 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md 
                                 ${
                                   espec.ativo && espec.status_cadastro === 1
                                     ? "border-green-400"
                                     : !espec.ativo ||
-                                      espec.status_cadastro === 0
-                                    ? "border-gray-400"
-                                    : espec.status_cadastro === -1
-                                    ? "border-orange-400"
-                                    : ""
+                                        espec.status_cadastro === 0
+                                      ? "border-gray-400"
+                                      : espec.status_cadastro === -1
+                                        ? "border-orange-400"
+                                        : ""
                                 }
                               `}
-                          >
-                            {/* Logo */}
-                            <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                              {espec.logo ? (
-                                <Image
-                                  src={espec.logo}
-                                  alt={espec.nome_empresa}
-                                  width={56}
-                                  height={56}
-                                  className="w-full h-full object-cover"
-                                  unoptimized
-                                />
-                              ) : (
-                                <span className="text-[10px] text-gray-400 text-center px-2">
-                                  {t(
-                                    "tela_lista_avaliadores.item_msg_sem_foto"
-                                  )}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Infos */}
-                            <div className="flex flex-col min-w-0 w-full">
-                              <h3 className="font-semibold text-sm break-words">
-                                {espec.nomeUser}
-                              </h3>
-                              <p className="text-xs text-gray-500 truncate">
-                                {espec.localizacao}
-                              </p>
-                              <p className="text-xs truncate">
-                                {espec.nome_empresa}
-                              </p>
-                              <div className="flex justify-between mt-3 gap-2">
-                                {espec.ativo && espec.status_cadastro === -1 ? (
-                                  <>
-                                    <button
-                                      type="button"
-                                      className="flex-1 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1 cursor-pointer"
-                                      onClick={() =>
-                                        handleClickConfirmar(
-                                          espec.id,
-                                          espec.empresa_id
-                                        )
-                                      }
-                                    >
-                                      {isSubmitConfirma ? (
-                                        <ImSpinner2 className="animate-spin text-lg" />
-                                      ) : (
-                                        t(
-                                          "tela_lista_avaliadores.item_botao_aprovar"
-                                        )
-                                      )}
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className="flex-1 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 cursor-pointer"
-                                      onClick={() =>
-                                        handleClickRejeitar(
-                                          espec.id,
-                                          espec.empresa_id
-                                        )
-                                      }
-                                    >
-                                      {isSubmitRejeita ? (
-                                        <ImSpinner2 className="animate-spin text-lg" />
-                                      ) : (
-                                        t(
-                                          "tela_lista_avaliadores.item_botao_reprovar"
-                                        )
-                                      )}
-                                    </button>
-                                  </>
-                                ) : espec.ativo &&
-                                  espec.status_cadastro === 0 ? (
-                                  <div className="flex justify-center w-full gap-2">
-                                    <button
-                                      type="button"
-                                      className="flex-1 max-w-[50%] flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1 cursor-pointer"
-                                      onClick={() =>
-                                        handleClickConfirmar(
-                                          espec.id,
-                                          espec.empresa_id
-                                        )
-                                      }
-                                    >
-                                      {isSubmitConfirma ? (
-                                        <ImSpinner2 className="animate-spin text-lg" />
-                                      ) : (
-                                        t(
-                                          "tela_lista_avaliadores.item_botao_aprovar"
-                                        )
-                                      )}
-                                    </button>
-                                  </div>
+                            >
+                              {/* Logo */}
+                              <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                                {espec.logo ? (
+                                  <Image
+                                    src={espec.logo}
+                                    alt={espec.nome_empresa}
+                                    width={56}
+                                    height={56}
+                                    className="w-full h-full object-cover"
+                                    unoptimized
+                                  />
                                 ) : (
-                                  <div className="flex justify-center w-full gap-2">
-                                    <button
-                                      type="button"
-                                      className="flex-1 max-w-[50%] flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 cursor-pointer"
-                                      onClick={() =>
-                                        handleClickRejeitar(
-                                          espec.id,
-                                          espec.empresa_id
-                                        )
-                                      }
-                                    >
-                                      {isSubmitRejeita ? (
-                                        <ImSpinner2 className="animate-spin text-lg" />
-                                      ) : (
-                                        t(
-                                          "tela_lista_avaliadores.item_botao_reprovar"
-                                        )
-                                      )}
-                                    </button>
-                                  </div>
+                                  <span className="text-[10px] text-gray-400 text-center px-2">
+                                    {t(
+                                      "tela_lista_avaliadores.item_msg_sem_foto",
+                                    )}
+                                  </span>
                                 )}
                               </div>
+
+                              {/* Infos */}
+                              <div className="flex flex-col min-w-0 w-full">
+                                <h3 className="font-semibold text-sm break-words">
+                                  {espec.nomeUser}
+                                </h3>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {espec.localizacao}
+                                </p>
+                                <p className="text-xs truncate">
+                                  {espec.nome_empresa}
+                                </p>
+                                <div className="flex justify-between mt-3 gap-2">
+                                  {espec.ativo &&
+                                  espec.status_cadastro === -1 ? (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className="flex-1 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1 cursor-pointer"
+                                        onClick={() =>
+                                          handleClickConfirmar(
+                                            espec.id,
+                                            espec.empresa_id,
+                                          )
+                                        }
+                                      >
+                                        {isSubmitConfirma ? (
+                                          <ImSpinner2 className="animate-spin text-lg" />
+                                        ) : (
+                                          t(
+                                            "tela_lista_avaliadores.item_botao_aprovar",
+                                          )
+                                        )}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="flex-1 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 cursor-pointer"
+                                        onClick={() =>
+                                          handleClickRejeitar(
+                                            espec.id,
+                                            espec.empresa_id,
+                                          )
+                                        }
+                                      >
+                                        {isSubmitRejeita ? (
+                                          <ImSpinner2 className="animate-spin text-lg" />
+                                        ) : (
+                                          t(
+                                            "tela_lista_avaliadores.item_botao_reprovar",
+                                          )
+                                        )}
+                                      </button>
+                                    </>
+                                  ) : espec.ativo &&
+                                    espec.status_cadastro === 0 ? (
+                                    <div className="flex justify-center w-full gap-2">
+                                      <button
+                                        type="button"
+                                        className="flex-1 max-w-[50%] flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1 cursor-pointer"
+                                        onClick={() =>
+                                          handleClickConfirmar(
+                                            espec.id,
+                                            espec.empresa_id,
+                                          )
+                                        }
+                                      >
+                                        {isSubmitConfirma ? (
+                                          <ImSpinner2 className="animate-spin text-lg" />
+                                        ) : (
+                                          t(
+                                            "tela_lista_avaliadores.item_botao_aprovar",
+                                          )
+                                        )}
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex justify-center w-full gap-2">
+                                      <button
+                                        type="button"
+                                        className="flex-1 max-w-[50%] flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-0.5 px-1 rounded-md shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 cursor-pointer"
+                                        onClick={() =>
+                                          handleClickRejeitar(
+                                            espec.id,
+                                            espec.empresa_id,
+                                          )
+                                        }
+                                      >
+                                        {isSubmitRejeita ? (
+                                          <ImSpinner2 className="animate-spin text-lg" />
+                                        ) : (
+                                          t(
+                                            "tela_lista_avaliadores.item_botao_reprovar",
+                                          )
+                                        )}
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-xs text-gray-400 italic">
-                          {t(
-                            "tela_lista_avaliadores.item_msg_sem_especialista"
-                          )}
-                        </p>
-                      )}
+                          ))
+                        ) : (
+                          <p className="text-xs text-gray-400 italic">
+                            {t(
+                              "tela_lista_avaliadores.item_msg_sem_especialista",
+                            )}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          )}
-        </main>
+          </PageContainer>
+        )}
       </div>
     </div>
   );
