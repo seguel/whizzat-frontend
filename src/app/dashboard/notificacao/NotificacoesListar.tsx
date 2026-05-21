@@ -5,9 +5,12 @@ import Sidebar from "../../components/perfil/Sidebar";
 import TopBar from "../../components/perfil/TopBar";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
-import { Star, CheckCircle } from "lucide-react";
+import { Star, CheckCircle, Trash2 } from "lucide-react";
 import { useNotifications } from "../../components/perfil/NotificationContext";
 import { useTranslation } from "react-i18next";
+import PageContainer from "@/app/components/PageContainer";
+import { useAvaliador } from "../../lib/hooks/useAvaliador";
+import SemDados from "../SemDados";
 
 interface Props {
   perfil: ProfileType;
@@ -68,6 +71,8 @@ function renderNotificacaoConteudo(notificacao: Notificacao, t: any) {
 }
 
 export default function NotificacoesListar({ perfil }: Props) {
+  const { hasPerfilAvaliador, loading } = useAvaliador(perfil);
+
   const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -237,7 +242,7 @@ export default function NotificacoesListar({ perfil }: Props) {
     }
   }, [toast]);
 
-  if (isLoading) return <LoadingOverlay />;
+  if (isLoading || loading) return <LoadingOverlay />;
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -247,183 +252,209 @@ export default function NotificacoesListar({ perfil }: Props) {
         profile={perfil}
       />
 
-      <div className="flex flex-col flex-1 overflow-y-auto bg-[#F5F6F6]">
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        <main className="p-6 w-[98%] mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            {/* Filtros */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setFiltro("todas")}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition  cursor-pointer
+        {!hasPerfilAvaliador ? (
+          <SemDados tipo="perfil" perfil={perfil} />
+        ) : (
+          <div className="flex-1 overflow-y-auto">
+            <PageContainer>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                {/* Filtros */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setFiltro("todas")}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition  cursor-pointer
                     ${
                       filtro === "todas"
                         ? "bg-blue-600 text-white shadow"
                         : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }
                   `}
-              >
-                {t("notificacao.filtro_todas")}
-              </button>
+                  >
+                    {t("notificacao.filtro_todas")}
+                  </button>
 
-              <button
-                onClick={() => setFiltro("naoLidas")}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition  cursor-pointer
-        ${
-          filtro === "naoLidas"
-            ? "bg-blue-600 text-white shadow"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }
-      `}
-              >
-                {t("notificacao.filtro_nao_lidas")}
-              </button>
-            </div>
-
-            {/* Marcar todas */}
-            {temNaoLidas && (
-              <button
-                onClick={marcarTodas}
-                className="px-4 py-2 text-sm font-semibold rounded-full bg-blue-100 text-blue-900 hover:bg-blue-200 transition cursor-pointer"
-              >
-                {t("notificacao.marcar_todos")}
-              </button>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
-            {notificacoes.map((notificacao) => (
-              <div
-                key={notificacao.id}
-                className={`relative bg-white rounded-xl border shadow-sm
-  flex flex-col h-full overflow-hidden
-  transition-all duration-300 hover:shadow-md hover:-translate-y-0.5
-  ${removingId === notificacao.id ? "opacity-0 scale-95" : ""}
-  ${notificacao.lida ? "border-gray-200" : "border-red-300 bg-red-50/30"}`}
-              >
-                {/* 🔹 Barra lateral */}
-                <div
-                  className={`absolute left-0 top-0 h-full w-1.5 ${
-                    notificacao.lida ? "bg-green-500" : "bg-red-500"
-                  }`}
-                />
-
-                <div className="p-3 pl-4 flex flex-col h-full">
-                  {/* 🔹 CONTEÚDO */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-semibold text-gray-800 text-sm leading-snug">
-                        {notificacao.titulo}
-                      </h3>
-
-                      <span
-                        className={`ml-1 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1
-  ${
-    notificacao.lida ? "bg-green-100 text-green-700" : "bg-red-500 text-white"
-  }`}
-                      >
-                        {notificacao.lida && <CheckCircle size={12} />}
-                        {notificacao.lida
-                          ? t("notificacao.lida")
-                          : t("notificacao.novo")}
-                      </span>
-                    </div>
-
-                    {renderNotificacaoConteudo(notificacao, t)}
-
-                    <p className="text-[11px] text-gray-400 mt-3">
-                      {t("notificacao.enviado")}{" "}
-                      {new Date(notificacao.criado_em).toLocaleString()}
-                    </p>
-                  </div>
-
-                  {/* 🔹 AÇÕES NO RODAPÉ */}
-                  <div className="mt-4 pt-3 border-t flex gap-2">
-                    {/* Excluir */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setConfirmDeleteId(notificacao.id);
-                      }}
-                      className="flex-1 py-2 rounded-lg border text-xs font-semibold cursor-pointer
-                   text-red-600 border-red-200
-                   hover:bg-red-50 transition"
-                    >
-                      {t("notificacao.botao_excluir")}
-                    </button>
-
-                    {/* Marcar como lida */}
-                    {!notificacao.lida && (
-                      <button
-                        onClick={() => marcarComoLida(notificacao.id)}
-                        className="flex-1 py-2 rounded-lg text-xs font-semibold cursor-pointer
-               bg-green-600 text-white
-               hover:bg-green-700 transition"
-                      >
-                        {t("notificacao.marcar")}
-                      </button>
-                    )}
-                  </div>
+                  <button
+                    onClick={() => setFiltro("naoLidas")}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition  cursor-pointer
+                      ${
+                        filtro === "naoLidas"
+                          ? "bg-blue-600 text-white shadow"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }
+                    `}
+                  >
+                    {t("notificacao.filtro_nao_lidas")}
+                  </button>
                 </div>
-              </div>
-            ))}
-          </div>
 
-          {hasMore && (
-            <div
-              ref={observerRef}
-              className="h-10 flex justify-center items-center"
-            >
-              {loadingMore && (
-                <div className="text-sm text-gray-400 animate-pulse">
-                  {t("notificacao.carregando")}
+                {/* Marcar todas */}
+                {temNaoLidas && (
+                  <button
+                    onClick={marcarTodas}
+                    className="px-4 py-2 text-sm font-semibold rounded-lg text-indigo-900 bg-blue-100 
+                      border border-transparent 
+                      hover:bg-blue-200 hover:border-blue-300 transition cursor-pointer"
+                  >
+                    {t("notificacao.marcar_todos")}
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+                {notificacoes.map((notificacao) => (
+                  <div
+                    key={notificacao.id}
+                    className={`relative bg-white rounded-xl border shadow-sm
+                  flex flex-col h-full overflow-hidden
+                  transition-all duration-300 hover:shadow-md hover:-translate-y-0.5
+                  ${removingId === notificacao.id ? "opacity-0 scale-95" : ""}
+                  ${notificacao.lida ? "border-gray-200" : "border-red-300 bg-red-50/30"}`}
+                  >
+                    {/* 🔹 Barra lateral */}
+                    <div
+                      className={`absolute left-0 top-0 h-full w-1.5 ${
+                        notificacao.lida ? "bg-green-500" : "bg-red-500"
+                      }`}
+                    />
+
+                    <div className="p-3 pl-4 flex flex-col h-full">
+                      {/* 🔹 CONTEÚDO */}
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between">
+                          <h3 className="font-semibold text-gray-800 text-sm leading-snug">
+                            {notificacao.titulo}
+                          </h3>
+
+                          <span
+                            className={`ml-1 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1
+                          ${
+                            notificacao.lida
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-500 text-white"
+                          }`}
+                          >
+                            {notificacao.lida && <CheckCircle size={12} />}
+                            {notificacao.lida
+                              ? t("notificacao.lida")
+                              : t("notificacao.novo")}
+                          </span>
+                        </div>
+
+                        {renderNotificacaoConteudo(notificacao, t)}
+
+                        <p className="text-[11px] text-gray-400 mt-3">
+                          {t("notificacao.enviado")}{" "}
+                          {new Date(notificacao.criado_em).toLocaleString()}
+                        </p>
+                      </div>
+
+                      {/* 🔹 AÇÕES NO RODAPÉ */}
+                      <div className="mt-4 pt-3 border-t flex gap-2">
+                        {/* Excluir */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setConfirmDeleteId(notificacao.id);
+                          }}
+                          className="flex-1 flex items-center justify-center gap-2 
+                            py-2 px-3 rounded-lg text-xs font-semibold cursor-pointer
+                            text-red-600 bg-blue-100 
+                            border border-transparent 
+                            hover:bg-blue-200 hover:border-blue-300 
+                            transition whitespace-nowrap"
+                        >
+                          <Trash2 size={14} className="flex-shrink-0" />
+                          {t("notificacao.botao_excluir")}
+                        </button>
+
+                        {/* Marcar como lida */}
+                        {!notificacao.lida && (
+                          <button
+                            onClick={() => marcarComoLida(notificacao.id)}
+                            className="flex-1 py-2 rounded-lg text-xs font-semibold cursor-pointer
+                           text-indigo-900 bg-blue-100 
+                      border border-transparent 
+                      hover:bg-blue-200 hover:border-blue-300 transition"
+                          >
+                            {t("notificacao.marcar")}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {hasMore && (
+                <div
+                  ref={observerRef}
+                  className="h-10 flex justify-center items-center"
+                >
+                  {loadingMore && (
+                    <div className="text-sm text-gray-400 animate-pulse">
+                      {t("notificacao.carregando")}
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {confirmDeleteId && (
-            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm animate-fadeIn">
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {t("notificacao.titulo_confirma_exclusao")}
-                </h2>
+              {confirmDeleteId && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm animate-fadeIn">
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {t("notificacao.titulo_confirma_exclusao")}
+                    </h2>
 
-                <p className="text-sm text-gray-600 mt-2">
-                  {t("notificacao.msg_confirma_exclusao")}
-                </p>
+                    <p className="text-sm text-gray-600 mt-2">
+                      {t("notificacao.msg_confirma_exclusao")}
+                    </p>
 
-                <div className="flex justify-end gap-3 mt-6">
-                  <button
-                    onClick={() => setConfirmDeleteId(null)}
-                    className="px-4 py-2 rounded-md text-sm bg-gray-100 hover:bg-gray-200 transition cursor-pointer"
-                  >
-                    {t("notificacao.botao_cancelar")}
-                  </button>
+                    <div className="flex justify-end gap-3 mt-6 w-full max-w-xs ml-auto">
+                      <button
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="flex-1 flex items-center justify-center
+                            px-4 py-2 rounded-md text-sm 
+                            text-indigo-900 bg-blue-100 
+                            border border-transparent 
+                            hover:bg-blue-200 hover:border-blue-300 
+                            transition cursor-pointer whitespace-nowrap"
+                      >
+                        {t("notificacao.botao_cancelar")}
+                      </button>
 
-                  <button
-                    onClick={() => excluirNotificacao(confirmDeleteId)}
-                    className="px-4 py-2 rounded-md text-sm bg-red-500 text-white hover:bg-red-600 transition cursor-pointer"
-                  >
-                    {t("notificacao.botao_excluir")}
-                  </button>
+                      <button
+                        onClick={() => excluirNotificacao(confirmDeleteId)}
+                        className="flex-1 flex items-center justify-center gap-2 
+                          px-4 py-2 rounded-md text-sm font-semibold
+                          text-red-600 bg-blue-100 
+                          border border-transparent 
+                          hover:bg-blue-200 hover:border-blue-300 
+                          transition cursor-pointer whitespace-nowrap"
+                      >
+                        <Trash2 size={14} className="flex-shrink-0" />
+                        {t("notificacao.botao_excluir")}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
 
-          {toast && (
-            <div className="fixed bottom-6 right-6 z-50">
-              <div
-                className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white transition-all duration-300
-      ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
-              >
-                {toast.message}
-              </div>
-            </div>
-          )}
-        </main>
+              {toast && (
+                <div className="fixed bottom-6 right-6 z-50">
+                  <div
+                    className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-white transition-all duration-300
+                    ${toast.type === "success" ? "bg-green-500" : "bg-red-500"}`}
+                  >
+                    {toast.message}
+                  </div>
+                </div>
+              )}
+            </PageContainer>
+          </div>
+        )}
       </div>
     </div>
   );

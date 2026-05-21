@@ -3,10 +3,14 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/perfil/Sidebar";
 import TopBar from "../../components/perfil/TopBar";
+import { useAvaliador } from "../../lib/hooks/useAvaliador";
+import SemDados from "../SemDados";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
+import PageContainer from "@/app/components/PageContainer";
+import Link from "next/link";
 
 interface Props {
   perfil: ProfileType;
@@ -18,6 +22,7 @@ interface Convite {
   localizacao: string;
   skill: string;
   peso?: number; // 10 a 100
+  peso_avaliador?: number;
   logo?: string;
   data_agenda?: string | null;
   status: "PENDENTE" | "ACEITO" | "AGENDADO" | "FINALIZADO";
@@ -34,19 +39,27 @@ function ConviteCard({
   onAceitar,
   onRecusar,
   t,
+  perfil,
 }: {
   convite: Convite;
-  tipo: "PENDENTE" | "ACEITO" | "AGENDADO";
+  tipo: "PENDENTE" | "ACEITO" | "AGENDADO" | "FINALIZADO";
   onAceitar?: (id: number) => void;
   onRecusar?: (id: number) => void;
   t: TFunction;
+  perfil: ProfileType;
 }) {
-  const pesoNota = convite.peso ? convite.peso / 10 : 0;
+  const pesoNota = convite.peso_avaliador
+    ? convite.peso_avaliador / 10
+    : convite.peso
+      ? convite.peso / 10
+      : 0;
 
   const getPesoColor = () => {
     if (!convite.peso) return "bg-gray-300";
-    if (convite.peso >= 80) return "bg-green-500";
-    if (convite.peso >= 50) return "bg-yellow-500";
+    if (convite.peso < 30) return "bg-red-400";
+    if (convite.peso < 60) return "bg-yellow-400";
+    if (convite.peso > 60) return "bg-green-500";
+
     return "bg-red-500";
   };
 
@@ -55,9 +68,11 @@ function ConviteCard({
       case "PENDENTE":
         return "bg-amber-400";
       case "ACEITO":
-        return "bg-emerald-500";
-      case "AGENDADO":
         return "bg-blue-500";
+      case "AGENDADO":
+        return "bg-yellow-500";
+      case "FINALIZADO":
+        return "bg-green-500";
       default:
         return "bg-gray-300";
     }
@@ -80,57 +95,61 @@ function ConviteCard({
       {/* Conteúdo */}
       <div className="p-4 pl-5 flex flex-col h-full ">
         {/* BLOCO QUE CRESCE */}
-        <div className="flex-1">
-          {/* TOPO */}
-          <div className="flex items-start gap-3">
-            <img
-              src={convite.logo || "/avatar-placeholder.png"}
-              alt={convite.candidato_nome}
-              className="w-12 h-12 rounded-full object-cover border"
-            />
+        <Link
+          className="cursor-pointer"
+          href={`/dashboard/avaliacao/${convite.id}?perfil=${perfil}`}
+        >
+          <div className="flex-1">
+            {/* TOPO */}
+            <div className="flex items-start gap-3">
+              <img
+                src={convite.logo || "/avatar-placeholder.png"}
+                alt={convite.candidato_nome}
+                className="w-12 h-12 rounded-full object-cover border"
+              />
 
-            <div className="flex flex-col">
-              <h3 className="font-semibold text-gray-800 text-sm">
-                {convite.candidato_nome}
-              </h3>
-              <span className="font-normal text-gray-800 text-xs">
-                {convite.localizacao}
-              </span>
-
-              <div className="mt-1 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium w-fit">
-                {convite.skill}
-              </div>
-            </div>
-          </div>
-
-          {/* PESO */}
-          {convite.peso && (
-            <div className="mt-4">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-xs text-gray-500">
-                  {t("minha_avaliacao.peso")}
+              <div className="flex flex-col">
+                <h3 className="font-semibold text-gray-800 text-sm">
+                  {convite.candidato_nome}
+                </h3>
+                <span className="font-normal text-gray-800 text-xs">
+                  {convite.localizacao}
                 </span>
-                <span className="text-xs text-gray-400">{pesoNota}/10</span>
-              </div>
 
-              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${getPesoColor()}`}
-                  style={{
-                    width: `${convite.peso}%`,
-                  }}
-                />
+                <div className="mt-1 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium w-fit">
+                  {convite.skill}
+                </div>
               </div>
             </div>
-          )}
 
-          {convite.data_agenda && (
-            <p className="text-[11px] text-blue-600 mt-3">
-              📅 {new Date(convite.data_agenda).toLocaleString()}
-            </p>
-          )}
-        </div>
+            {/* PESO */}
+            {convite.peso && (
+              <div className="mt-4">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs text-gray-500">
+                    {t("minha_avaliacao.peso")}
+                  </span>
+                  <span className="text-xs text-gray-400">{pesoNota}/10</span>
+                </div>
 
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${getPesoColor()}`}
+                    style={{
+                      width: `${convite.peso}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {convite.data_agenda && (
+              <p className="text-[11px] text-blue-600 mt-3">
+                📅 {new Date(convite.data_agenda).toLocaleDateString("pt-BR")}
+              </p>
+            )}
+          </div>
+        </Link>
         <div className="absolute bottom-1 left-4 w-[90%]">
           {/* AÇÕES (sempre no rodapé) */}
           {tipo === "PENDENTE" && (
@@ -186,6 +205,8 @@ function ConviteCard({
 ====================================================== */
 
 export default function AvaliacaoConvites({ perfil }: Props) {
+  const { hasPerfilAvaliador, loading } = useAvaliador(perfil);
+
   const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -193,6 +214,7 @@ export default function AvaliacaoConvites({ perfil }: Props) {
   const [convitesPendentes, setConvitesPendentes] = useState<Convite[]>([]);
   const [convitesAceitos, setConvitesAceitos] = useState<Convite[]>([]);
   const [convitesAgendados, setConvitesAgendados] = useState<Convite[]>([]);
+  const [convitesFinalizados, setConvitesFinalizados] = useState<Convite[]>([]);
 
   useEffect(() => {
     fetchConvites();
@@ -220,6 +242,7 @@ export default function AvaliacaoConvites({ perfil }: Props) {
 
       setConvitesAceitos(dataAvaliacoes.aguardando_agendamento || []);
       setConvitesAgendados(dataAvaliacoes.agendadas || []);
+      setConvitesFinalizados(dataAvaliacoes.finalizadas || []);
     } catch (error) {
       console.error("Erro ao buscar dados", error);
     } finally {
@@ -259,96 +282,129 @@ export default function AvaliacaoConvites({ perfil }: Props) {
     }
   };
 
-  if (isLoading) return <LoadingOverlay />;
+  if (isLoading || loading) return <LoadingOverlay />;
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex">
       <Sidebar
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
 
-      <div className="flex flex-col flex-1 overflow-y-auto bg-[#F5F6F6]">
+      <div className="flex flex-col flex-1  bg-[#F5F6F6]">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        <main className="p-6 w-[98%] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* COLUNA 1 */}
-            <div>
-              <h2 className="font-bold text-gray-800 mb-4 text-center">
-                {t("minha_avaliacao.recebido")} ({convitesPendentes.length})
-              </h2>
+        {!hasPerfilAvaliador ? (
+          <SemDados tipo="perfil" perfil={perfil} />
+        ) : (
+          <PageContainer>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
+              {/* RECEBIDO */}
+              <div className="flex flex-col bg-white shadow-SM rounded-xl border p-4 h-[80vh]">
+                <h2 className="font-semibold text-gray-800 mb-4 text-center border-b pb-2">
+                  {t("minha_avaliacao.recebido")} ({convitesPendentes.length})
+                </h2>
 
-              <div className="space-y-4 flex flex-col items-center">
-                {convitesPendentes.length === 0 && (
-                  <p className="text-sm text-gray-400">
-                    {t("minha_avaliacao.sem_convite")}
-                  </p>
-                )}
+                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                  {convitesPendentes.length === 0 && (
+                    <p className="text-sm text-gray-400 text-center">
+                      {t("minha_avaliacao.sem_convite")}
+                    </p>
+                  )}
 
-                {convitesPendentes.map((convite) => (
-                  <ConviteCard
-                    key={convite.id}
-                    convite={convite}
-                    tipo="PENDENTE"
-                    onAceitar={handleAceitar}
-                    onRecusar={handleRecusar}
-                    t={t}
-                  />
-                ))}
+                  {convitesPendentes.map((convite) => (
+                    <ConviteCard
+                      key={convite.id}
+                      convite={convite}
+                      tipo="PENDENTE"
+                      onAceitar={handleAceitar}
+                      onRecusar={handleRecusar}
+                      t={t}
+                      perfil={perfil}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* ACEITO */}
+              <div className="flex flex-col bg-white shadow-SM rounded-xl border p-4 h-[80vh]">
+                <h2 className="font-semibold text-gray-800 mb-4 text-center border-b pb-2">
+                  {t("minha_avaliacao.aceito")} ({convitesAceitos.length})
+                </h2>
+
+                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                  {convitesAceitos.length === 0 && (
+                    <p className="text-sm text-gray-400 text-center">
+                      {t("minha_avaliacao.sem_aceito")}
+                    </p>
+                  )}
+
+                  {convitesAceitos.map((convite) => (
+                    <ConviteCard
+                      key={convite.id}
+                      convite={convite}
+                      tipo="ACEITO"
+                      t={t}
+                      perfil={perfil}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* AGENDADO */}
+              <div className="flex flex-col bg-white shadow-SM rounded-xl border p-4 h-[80vh]">
+                <h2 className="font-semibold text-gray-800 mb-4 text-center border-b pb-2">
+                  {t("minha_avaliacao.agendado")} ({convitesAgendados.length})
+                </h2>
+
+                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                  {convitesAgendados.length === 0 && (
+                    <p className="text-sm text-gray-400 text-center">
+                      {t("minha_avaliacao.sem_agenda")}
+                    </p>
+                  )}
+
+                  {convitesAgendados.map((convite) => (
+                    <ConviteCard
+                      key={convite.id}
+                      convite={convite}
+                      tipo="AGENDADO"
+                      t={t}
+                      perfil={perfil}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* FINALIZADOS */}
+              <div className="flex flex-col bg-white shadow-SM rounded-xl border p-4 h-[80vh]">
+                <h2 className="font-semibold text-gray-800 mb-4 text-center border-b pb-2">
+                  {t("minha_avaliacao.finalizado")} (
+                  {convitesFinalizados.length})
+                </h2>
+
+                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                  {convitesFinalizados.length === 0 && (
+                    <p className="text-sm text-gray-400 text-center">
+                      {t("minha_avaliacao.sem_finalizacao")}
+                    </p>
+                  )}
+
+                  {convitesFinalizados.map((convite) => (
+                    <ConviteCard
+                      key={convite.id}
+                      convite={convite}
+                      tipo="FINALIZADO"
+                      t={t}
+                      perfil={perfil}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-
-            {/* COLUNA 2 */}
-            <div>
-              <h2 className="font-bold text-gray-800 mb-4 text-center">
-                {t("minha_avaliacao.aceito")} ({convitesAceitos.length})
-              </h2>
-
-              <div className="space-y-4 flex flex-col items-center">
-                {convitesAceitos.length === 0 && (
-                  <p className="text-sm text-gray-400">
-                    {t("minha_avaliacao.sem_aceito")}
-                  </p>
-                )}
-
-                {convitesAceitos.map((convite) => (
-                  <ConviteCard
-                    key={convite.id}
-                    convite={convite}
-                    tipo="ACEITO"
-                    t={t}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* COLUNA 3 */}
-            <div>
-              <h2 className="font-bold text-gray-800 mb-4 text-center">
-                {t("minha_avaliacao.agendado")} ({convitesAgendados.length})
-              </h2>
-
-              <div className="space-y-4 flex flex-col items-center">
-                {convitesAgendados.length === 0 && (
-                  <p className="text-sm text-gray-400">
-                    {t("minha_avaliacao.sem_agenda")}
-                  </p>
-                )}
-
-                {convitesAgendados.map((convite) => (
-                  <ConviteCard
-                    key={convite.id}
-                    convite={convite}
-                    tipo="AGENDADO"
-                    t={t}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </main>
+          </PageContainer>
+        )}
       </div>
     </div>
   );

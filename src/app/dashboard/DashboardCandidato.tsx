@@ -39,7 +39,8 @@ export default function DashboardCandidato({ perfil }: Props) {
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-      <div className="flex flex-col flex-1 overflow-y-auto transition-all">
+
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
         {!hasPerfilCandidato ? (
           <SemDados tipo="perfil" perfil={perfil} />
