@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Sidebar from "../../../components/perfil/Sidebar";
 import TopBar from "../../../components/perfil/TopBar";
 import LoadingOverlay from "../../../components/LoadingOverlay";
-import { useTranslation } from "react-i18next";
+// import { useTranslation } from "react-i18next";
 import { ProfileType } from "../../../components/perfil/ProfileContext";
 import PageContainer from "@/app/components/PageContainer";
 
@@ -38,18 +38,22 @@ interface Props {
 export default function AvaliacaoPage({ perfil, id }: Props) {
   const { hasPerfilAvaliador, avaliadorId, loading } = useAvaliador(perfil);
 
-  const { t } = useTranslation("common");
+  // const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [naoEnviarQuestionario, setNaoEnviarQuestionario] = useState(false);
   const [entrevistaRealizada, setEntrevistaRealizada] = useState(false);
 
   const { avaliacao, loading: loadingAvaliacao } = useAvaliacaoDetalhe(id);
 
+  console.log(avaliacao);
+
   if (loading || loadingAvaliacao) return <LoadingOverlay />;
 
   const podeAgendar =
     avaliacao.pode_agendar &&
     (naoEnviarQuestionario || avaliacao.data_envio_formulario);
+
+  //if (avaliacao.status == "FINALIZADO") setEntrevistaRealizada(true);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -95,7 +99,14 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
                 {/* <AvaliacaoActions avaliacao={avaliacao} /> */}
               </div>
 
-              <CardFinalizarAvaliacao habilitado={entrevistaRealizada} />
+              <CardFinalizarAvaliacao
+                habilitado={entrevistaRealizada}
+                avaliacaoId={id}
+                avaliadorId={avaliadorId ?? 0}
+                status={avaliacao.status}
+                peso_av={avaliacao.peso_avaliador ?? 50}
+                comentario_av={avaliacao.comentario}
+              />
             </PageContainer>
           </div>
         )}

@@ -319,7 +319,7 @@ export default function CardAgenda({
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input
               type="checkbox"
-              checked={entrevistaRealizada}
+              checked={entrevistaRealizada || status == "FINALIZADO"}
               onChange={(e) => setEntrevistaRealizada(e.target.checked)}
               className="w-4 h-4 accent-blue-600"
             />

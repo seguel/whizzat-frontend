@@ -22,6 +22,7 @@ interface Convite {
   localizacao: string;
   skill: string;
   peso?: number; // 10 a 100
+  peso_avaliador?: number;
   logo?: string;
   data_agenda?: string | null;
   status: "PENDENTE" | "ACEITO" | "AGENDADO" | "FINALIZADO";
@@ -47,7 +48,11 @@ function ConviteCard({
   t: TFunction;
   perfil: ProfileType;
 }) {
-  const pesoNota = convite.peso ? convite.peso / 10 : 0;
+  const pesoNota = convite.peso_avaliador
+    ? convite.peso_avaliador / 10
+    : convite.peso
+      ? convite.peso / 10
+      : 0;
 
   const getPesoColor = () => {
     if (!convite.peso) return "bg-gray-300";
@@ -140,7 +145,7 @@ function ConviteCard({
 
             {convite.data_agenda && (
               <p className="text-[11px] text-blue-600 mt-3">
-                📅 {new Date(convite.data_agenda).toLocaleString()}
+                📅 {new Date(convite.data_agenda).toLocaleDateString("pt-BR")}
               </p>
             )}
           </div>
@@ -237,7 +242,7 @@ export default function AvaliacaoConvites({ perfil }: Props) {
 
       setConvitesAceitos(dataAvaliacoes.aguardando_agendamento || []);
       setConvitesAgendados(dataAvaliacoes.agendadas || []);
-      setConvitesFinalizados(dataAvaliacoes.finalizados || []);
+      setConvitesFinalizados(dataAvaliacoes.finalizadas || []);
     } catch (error) {
       console.error("Erro ao buscar dados", error);
     } finally {

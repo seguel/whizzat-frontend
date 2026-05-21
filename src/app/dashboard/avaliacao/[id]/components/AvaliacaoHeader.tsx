@@ -145,14 +145,20 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoProps) {
         {/* Última avaliação */}
         <MetricCard
           label="Última avaliação"
-          value={avaliacao.peso_avaliador ? avaliacao.peso_avaliador : "--"}
+          value={
+            avaliacao.ultimo_peso_avaliador
+              ? avaliacao.ultimo_peso_avaliador
+              : "--"
+          }
         />
 
         {/* Data */}
         <MetricCard
           label="Dt. Últ. Avaliação"
           value={
-            avaliacao.ultima_avaliacao?.data ? avaliacao.ultima_avaliacao : "--"
+            avaliacao.ultima_avaliacao
+              ? new Date(avaliacao.ultima_avaliacao).toLocaleDateString("pt-BR")
+              : "--"
           }
           isDate
         />
