@@ -18,6 +18,7 @@ import { toast } from "react-hot-toast";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import PageContainer from "@/app/components/PageContainer";
 
 interface Props {
   perfil: ProfileType;
@@ -226,7 +227,7 @@ export default function VagaDados({
               "Content-Type": "application/json",
               "Accept-Language": i18n.language,
             },
-          }
+          },
         );
 
         const estadosData = await estadoRes.json();
@@ -236,7 +237,7 @@ export default function VagaDados({
       } catch (error) {
         console.error(
           t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingVagaEmpresa(false);
@@ -260,7 +261,7 @@ export default function VagaDados({
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
         if (!res.ok)
           throw new Error(t("tela_vaga_dados.item_alerta_erro_buscar_dados"));
@@ -303,7 +304,7 @@ export default function VagaDados({
       } catch (error) {
         console.error(
           t("tela_vaga_dados.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingVagaEmpresa(false);
@@ -326,7 +327,7 @@ export default function VagaDados({
               {
                 method: "GET",
                 credentials: "include",
-              }
+              },
             ),
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/modalidades/`, {
               method: "GET",
@@ -357,7 +358,7 @@ export default function VagaDados({
       } catch (error) {
         console.error(
           t("tela_vaga_dados.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingVagaEmpresa(false);
@@ -371,7 +372,7 @@ export default function VagaDados({
     if (!empresaId || empresas.length === 0) return;
 
     const empresaSelecionada = empresas.find(
-      (e) => e.id.toString() === empresaId.toString()
+      (e) => e.id.toString() === empresaId.toString(),
     );
 
     if (empresaSelecionada) {
@@ -387,7 +388,7 @@ export default function VagaDados({
     const selectedId = e.target.value;
     const value = Number(e.target.value ?? 0);
     const estadoSelecionada = estados.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setEstado(selectedId);
@@ -407,7 +408,7 @@ export default function VagaDados({
         `${process.env.NEXT_PUBLIC_API_URL}/cidades/estado-cidade/${selectedId}`,
         {
           method: "GET",
-        }
+        },
       );
 
       if (!cidadeRes.ok)
@@ -428,7 +429,7 @@ export default function VagaDados({
     const selectedId = e.target.value;
     const value = Number(e.target.value ?? 0);
     const cidadeSelecionada = cidades.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setCidade(selectedId);
@@ -447,7 +448,7 @@ export default function VagaDados({
   const handleChange_dinamicos = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => {
     const { name, type } = e.target;
     const value =
@@ -573,15 +574,15 @@ export default function VagaDados({
         setIsSubmitting(false);
         toast.success(
           `${t("tela_vaga_dados.item_alerta_sucesso_1")} ${data.nome_vaga} ${t(
-            "tela_vaga_dados.item_alerta_sucesso_2"
+            "tela_vaga_dados.item_alerta_sucesso_2",
           )}`,
           {
             duration: 5000, // ← 5 segundos
-          }
+          },
         );
         //nextStep();
         router.push(
-          `/dashboard/vagas?perfil=${perfil}&vagaid=${data.vaga_id}&id=${data.empresa_id}`
+          `/dashboard/vagas?perfil=${perfil}&vagaid=${data.vaga_id}&id=${data.empresa_id}`,
         );
       } catch (err) {
         console.error("Erro ao enviar dados:", err);
@@ -633,10 +634,10 @@ export default function VagaDados({
   const handleSkillChange = (
     skill_id: number,
     field: "peso" | "avaliador_proprio",
-    value: number | boolean
+    value: number | boolean,
   ) => {
     const atualizadas = form.lista_skills.map((s) =>
-      s.skill_id === skill_id ? { ...s, [field]: value } : s
+      s.skill_id === skill_id ? { ...s, [field]: value } : s,
     );
     setForm((prev) => ({ ...prev, lista_skills: atualizadas }));
   };
@@ -651,7 +652,7 @@ export default function VagaDados({
   const handleEmpresaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
     const empresaSelecionada = empresas.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setForm((prev) => ({
@@ -668,87 +669,89 @@ export default function VagaDados({
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-      <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
+
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
         {!hasEmpresa ? (
           <SemDados tipo="empresa" perfil={perfil} />
         ) : (
           <>
-            {step != 5 && (
-              <div className="pt-3 pl-6 flex items-center justify-center">
-                <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
-                  {[
-                    `1 ${t("tela_topo_passos.passo_dados")}`,
-                    `2 ${t("tela_topo_passos.passo_hardskills")}`,
-                    `3 ${t("tela_topo_passos.passo_softskills")}`,
-                    `4 ${t("tela_topo_passos.passo_visualizar")}`,
-                    `5 ${t("tela_topo_passos.passo_publicar")}`,
-                  ].map((etapa, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-1 flex-1 min-w-0"
-                    >
+            <div className="flex-1 overflow-y-auto">
+              {step != 5 && (
+                <div className="pt-3 pl-6 flex items-center justify-center">
+                  <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
+                    {[
+                      `1 ${t("tela_topo_passos.passo_dados")}`,
+                      `2 ${t("tela_topo_passos.passo_hardskills")}`,
+                      `3 ${t("tela_topo_passos.passo_softskills")}`,
+                      `4 ${t("tela_topo_passos.passo_visualizar")}`,
+                      `5 ${t("tela_topo_passos.passo_publicar")}`,
+                    ].map((etapa, index) => (
                       <div
-                        className={`w-6 h-6 rounded-full text-center text-white text-xs flex items-center justify-center ${
-                          step === index + 1 ? "bg-purple-600" : "bg-gray-300"
-                        }`}
+                        key={index}
+                        className="flex items-center gap-1 flex-1 min-w-0"
                       >
-                        {index + 1}
-                      </div>
-                      <span
-                        className={`truncate ${
-                          step === index + 1 ? "text-black" : "text-gray-400"
-                        }`}
-                      >
-                        {etapa.split(" ")[1]}
-                      </span>
-                      {index < 4 && (
-                        <span className="mx-1 text-gray-300 hidden sm:inline">
-                          ───────
+                        <div
+                          className={`w-6 h-6 rounded-full text-center text-white text-xs flex items-center justify-center ${
+                            step === index + 1 ? "bg-purple-600" : "bg-gray-300"
+                          }`}
+                        >
+                          {index + 1}
+                        </div>
+                        <span
+                          className={`truncate ${
+                            step === index + 1 ? "text-black" : "text-gray-400"
+                          }`}
+                        >
+                          {etapa.split(" ")[1]}
                         </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <main className="p-4 grid grid-cols-1 gap-4 w-[98%] mx-auto">
-              <div className="flex flex-col items-start p-4 bg-white rounded-lg shadow-sm w-full min-h-[500px]">
-                {step === 1 && (
-                  <form
-                    onSubmit={handleSubmit}
-                    className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full"
-                  >
-                    {vagaId && (
-                      <div className="col-span-1 md:col-span-2 flex justify-start">
-                        <label className="flex items-center cursor-pointer">
-                          <div className="relative">
-                            <input
-                              type="checkbox"
-                              name="ativo"
-                              checked={form.ativo ?? vaga?.ativo ?? true}
-                              onChange={handleChange_dinamicos}
-                              className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
-                            <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
-                          </div>
-                          <span className="ml-3 text-sm font-normal text-gray-700">
-                            {t("tela_vaga_dados.item_ativo")}
+                        {index < 4 && (
+                          <span className="mx-1 text-gray-300 hidden sm:inline">
+                            ───────
                           </span>
-                        </label>
+                        )}
                       </div>
-                    )}
+                    ))}
+                  </div>
+                </div>
+              )}
 
-                    {/* Coluna Esquerda */}
-                    <div className="flex flex-col gap-4">
-                      {/* Empresa */}
-                      <label className="flex flex-col text-sm text-gray-700">
-                        {t("tela_vaga_dados.item_label_nome")}
-                        <select
-                          className={`
+              <PageContainer>
+                <div className="flex flex-col flex-1 w-full min-h-[500px] ">
+                  {step === 1 && (
+                    <form
+                      onSubmit={handleSubmit}
+                      className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full"
+                    >
+                      {vagaId && (
+                        <div className="col-span-1 md:col-span-2 flex justify-start">
+                          <label className="flex items-center cursor-pointer">
+                            <div className="relative">
+                              <input
+                                type="checkbox"
+                                name="ativo"
+                                checked={form.ativo ?? vaga?.ativo ?? true}
+                                onChange={handleChange_dinamicos}
+                                className="sr-only peer"
+                              />
+                              <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
+                              <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
+                            </div>
+                            <span className="ml-3 text-sm font-normal text-gray-700">
+                              {t("tela_vaga_dados.item_ativo")}
+                            </span>
+                          </label>
+                        </div>
+                      )}
+
+                      {/* Coluna Esquerda */}
+                      <div className="flex flex-col gap-4">
+                        {/* Empresa */}
+                        <label className="flex flex-col text-sm text-gray-700">
+                          {t("tela_vaga_dados.item_label_nome")}
+                          <select
+                            className={`
                           border border-purple-600 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-purple-300
                           ${
                             empresaId
@@ -756,1003 +759,1283 @@ export default function VagaDados({
                               : ""
                           }
                         `}
-                          name="empresa_id"
-                          value={empresaId ?? form.empresa_id ?? ""}
-                          onChange={handleEmpresaChange}
-                          disabled={!!empresaId}
-                        >
-                          <option value="">
-                            {t("tela_vaga_dados.item_placeholder_nome")}
-                          </option>
-                          {empresas.map((empresa) => (
-                            <option key={empresa.id} value={empresa.id}>
-                              {empresa.nome_empresa}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-
-                      {/* Nome da vaga */}
-                      <label className="flex flex-col text-sm text-gray-700">
-                        {t("tela_vaga_dados.item_label_site")}
-                        <input
-                          name="nome_vaga"
-                          type="text"
-                          className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
-                          placeholder={t(
-                            "tela_vaga_dados.item_placeholder_site"
-                          )}
-                          defaultValue={form.nome_vaga ?? vaga?.nome_vaga}
-                          onChange={handleChange_dinamicos}
-                        />
-                        {showErrors && !form.nome_vaga && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {t("tela_vaga_dados.item_msg_campo_obt")}
-                          </p>
-                        )}
-                      </label>
-
-                      {/* Linha Estado + Cidade */}
-                      <div className="grid grid-cols-12 gap-2">
-                        {/* Estado - col-3 */}
-                        <div className="col-span-12 md:col-span-5">
-                          <label className="text-sm font-medium mb-1">
-                            {t("cadastro.estado")}
-                          </label>
-
-                          <select
-                            className="border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
-                            name="estado"
-                            value={estado}
-                            onChange={handleEstadoChange}
+                            name="empresa_id"
+                            value={empresaId ?? form.empresa_id ?? ""}
+                            onChange={handleEmpresaChange}
+                            disabled={!!empresaId}
                           >
                             <option value="">
-                              {t("cadastro.placehold_estado")}
+                              {t("tela_vaga_dados.item_placeholder_nome")}
                             </option>
-                            {estados.map((e) => (
-                              <option key={e.id} value={e.id}>
-                                {e.sigla}
+                            {empresas.map((empresa) => (
+                              <option key={empresa.id} value={empresa.id}>
+                                {empresa.nome_empresa}
                               </option>
                             ))}
                           </select>
-                        </div>
-
-                        {/* Cidade - col-9 */}
-                        <div className="col-span-12 md:col-span-7">
-                          <label className="text-sm font-medium mb-1">
-                            {t("cadastro.cidade")}
-                          </label>
-
-                          <select
-                            className="border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
-                            name="cidade"
-                            value={cidade}
-                            onChange={handleCidadeChange}
-                          >
-                            <option value="">
-                              {t("cadastro.placehold_cidade")}
-                            </option>
-                            {cidades.map((c) => (
-                              <option key={c.id} value={c.id}>
-                                {c.cidade}
-                              </option>
-                            ))}
-                          </select>
-
-                          {showErrors && !form.cidade_id && (
-                            <p className="text-sm text-red-600 mt-1">
-                              {t("tela_perfil_recrutador.item_msg_campo_obt")}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Modalidade */}
-                      <fieldset className="text-sm text-gray-700 mt-2">
-                        <legend className="mb-1 font-medium">
-                          {t("tela_vaga_dados.item_label_modalidade")}
-                        </legend>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                          {modalidades.map((mod) => (
-                            <label
-                              key={mod.modalidade_trabalho_id}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <input
-                                type="radio"
-                                name="modalidade_trabalho_id"
-                                value={mod.modalidade_trabalho_id}
-                                checked={
-                                  String(mod.modalidade_trabalho_id) ===
-                                  String(
-                                    form.modalidade_trabalho_id ??
-                                      vaga?.modalidade_trabalho_id
-                                  )
-                                }
-                                onChange={handleChange_dinamicos}
-                                className="appearance-none w-4 h-4 rounded-full border-2 border-purple-600 checked:bg-purple-600 checked:border-purple-600 cursor-pointer transition-all duration-200"
-                              />
-                              <span>{mod.modalidade}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </fieldset>
-
-                      {/* Período */}
-                      <fieldset className="text-sm text-gray-700 mt-2">
-                        <legend className="mb-1 font-medium">
-                          {t("tela_vaga_dados.item_label_periodo")}
-                        </legend>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                          {periodos.map((per) => (
-                            <label
-                              key={per.periodo_trabalho_id}
-                              className="flex items-center gap-2 cursor-pointer"
-                            >
-                              <input
-                                type="radio"
-                                name="periodo_trabalho_id"
-                                value={per.periodo_trabalho_id}
-                                onChange={handleChange_dinamicos}
-                                checked={
-                                  String(per.periodo_trabalho_id) ===
-                                  String(
-                                    form.periodo_trabalho_id ??
-                                      vaga?.periodo_trabalho_id
-                                  )
-                                }
-                                className="appearance-none w-4 h-4 rounded-full border-2 border-purple-600 checked:bg-purple-600 checked:border-purple-600 cursor-pointer transition-all duration-200"
-                              />
-                              <span>{per.periodo}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </fieldset>
-
-                      {/* Inclusiva */}
-                      <div className="mt-4 w-full">
-                        {/* Título */}
-                        <p className="text-sm sm:text-base font-normal mb-3 text-[#14342A]">
-                          {t("tela_vaga_dados.item_label_vaga_afirmativa")}
-                        </p>
-
-                        {/* Grid responsivo */}
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-x-6">
-                          {/* Coluna esquerda */}
-                          <div className="flex flex-col space-y-2">
-                            {/* Checkbox PCD */}
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                              <div className="relative w-4 h-4 sm:w-5 sm:h-5">
-                                <input
-                                  type="checkbox"
-                                  name="pcd"
-                                  checked={form.pcd ?? vaga?.pcd ?? false}
-                                  onChange={handleChange_dinamicos}
-                                  className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
-                                />
-                                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
-                                  ✔
-                                </span>
-                              </div>
-                              <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                PCD
-                              </span>
-                            </label>
-
-                            {/* Checkbox Mulheres */}
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                              <div className="relative w-4 h-4 sm:w-5 sm:h-5">
-                                <input
-                                  type="checkbox"
-                                  name="mulheres"
-                                  checked={
-                                    form.mulheres ?? vaga?.mulheres ?? false
-                                  }
-                                  onChange={handleChange_dinamicos}
-                                  className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
-                                />
-                                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
-                                  ✔
-                                </span>
-                              </div>
-                              <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                {t("tela_vaga_dados.item_msg_item_mulher")}
-                              </span>
-                            </label>
-                          </div>
-
-                          {/* Coluna direita */}
-                          <div className="flex flex-col space-y-2">
-                            {/* Checkbox LGBTQ+ */}
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                              <div className="relative w-4 h-4 sm:w-5 sm:h-5">
-                                <input
-                                  type="checkbox"
-                                  name="lgbtq"
-                                  checked={form.lgbtq ?? vaga?.lgbtq ?? false}
-                                  onChange={handleChange_dinamicos}
-                                  className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
-                                />
-                                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
-                                  ✔
-                                </span>
-                              </div>
-                              <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                LGBTQ+
-                              </span>
-                            </label>
-
-                            {/* Checkbox 50+ */}
-                            <label className="flex items-center space-x-2 cursor-pointer">
-                              <div className="relative w-4 h-4 sm:w-5 sm:h-5">
-                                <input
-                                  type="checkbox"
-                                  name="cinquenta_mais"
-                                  checked={
-                                    form.cinquenta_mais ??
-                                    vaga?.cinquenta_mais ??
-                                    false
-                                  }
-                                  onChange={handleChange_dinamicos}
-                                  className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
-                                />
-                                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
-                                  ✔
-                                </span>
-                              </div>
-                              <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                50+
-                              </span>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Coluna Direita */}
-                    <div className="flex flex-col gap-4">
-                      {/* Descrição */}
-                      <label className="flex flex-col text-sm text-gray-700">
-                        {t("tela_vaga_dados.item_label_descricao")}
-                        <textarea
-                          name="descricao"
-                          maxLength={5000}
-                          rows={9}
-                          defaultValue={form.descricao ?? vaga?.descricao}
-                          className="border rounded-md px-3 py-2 resize-none border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
-                          placeholder={t(
-                            "tela_vaga_dados.item_placeholder_descricao"
-                          )}
-                          onChange={handleChange_dinamicos}
-                        />
-                        {showErrors && !form.descricao && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {t("tela_vaga_dados.item_msg_campo_obt")}
-                          </p>
-                        )}
-                      </label>
-
-                      {/* Dias disponíveis */}
-                      <label className="flex flex-col text-sm text-gray-700">
-                        {t("tela_vaga_dados.item_label_dias_vaga")}
-                        <div className="flex items-center gap-2 mt-1">
-                          {/* Botão de diminuir */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setDiasDisponiveis((prev) => {
-                                const novoValor = Math.max(prev - 1, 1);
-                                handleChange_dinamicos({
-                                  target: {
-                                    name: "qtde_dias_aberta",
-                                    value: novoValor.toString(),
-                                  },
-                                } as React.ChangeEvent<HTMLInputElement>);
-                                return novoValor;
-                              });
-                            }}
-                            className="px-3 py-1 rounded-full bg-purple-100 text-purple-600"
-                          >
-                            -
-                          </button>
-
-                          {/* Input que permite digitar */}
-                          <input
-                            name="qtde_dias_aberta"
-                            type="number"
-                            min={1}
-                            max={60}
-                            className="border rounded-md w-16 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300
-                                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-                                  [&::-moz-appearance]:textfield"
-                            value={form.qtde_dias_aberta ?? diasDisponiveis}
-                            onChange={(e) => {
-                              let valor = parseInt(e.target.value || "1", 10);
-                              if (isNaN(valor)) valor = 1;
-                              if (valor > 60) valor = 60;
-                              if (valor < 1) valor = 1;
-
-                              setDiasDisponiveis(valor);
-                              handleChange_dinamicos({
-                                target: {
-                                  name: "qtde_dias_aberta",
-                                  value: valor.toString(),
-                                },
-                              } as React.ChangeEvent<HTMLInputElement>);
-                            }}
-                          />
-
-                          {/* Botão de aumentar */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setDiasDisponiveis((prev) => {
-                                const novoValor = Math.min(prev + 1, 60);
-                                handleChange_dinamicos({
-                                  target: {
-                                    name: "qtde_dias_aberta",
-                                    value: novoValor.toString(),
-                                  },
-                                } as React.ChangeEvent<HTMLInputElement>);
-                                return novoValor;
-                              });
-                            }}
-                            className="px-3 py-1 rounded-full bg-purple-100 text-purple-600"
-                          >
-                            +
-                          </button>
-                        </div>
-                        {showErrors &&
-                          (!diasDisponiveis || diasDisponiveis === 0) && (
-                            <p className="text-sm text-red-600 mt-1">
-                              {t("tela_vaga_dados.item_msg_campo_obt")}
-                            </p>
-                          )}
-                      </label>
-
-                      {/* Quantidade de vagas */}
-                      <label className="flex flex-col text-sm text-gray-700">
-                        {t("tela_vaga_dados.item_label_qtde_vaga")}
-                        <div className="flex items-center gap-2 mt-1">
-                          {/* Botão de diminuir */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setQuantidadeVagas((prev) => {
-                                const novoValor = Math.max(prev - 1, 0);
-                                handleChange_dinamicos({
-                                  target: {
-                                    name: "qtde_posicao",
-                                    value: novoValor.toString(),
-                                  },
-                                } as React.ChangeEvent<HTMLInputElement>);
-                                return novoValor;
-                              });
-                            }}
-                            className="px-3 py-1 rounded-full bg-purple-100 text-purple-600"
-                          >
-                            -
-                          </button>
-
-                          {/* Input que permite digitar */}
-                          <input
-                            name="qtde_posicao"
-                            type="number"
-                            min={0}
-                            max={100}
-                            className="border rounded-md w-16 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300
-                                [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-                                [&::-moz-appearance]:textfield"
-                            value={form.qtde_posicao ?? quantidadeVagas}
-                            onChange={(e) => {
-                              let valor = parseInt(e.target.value || "0", 10);
-                              if (isNaN(valor)) valor = 0;
-                              if (valor > 100) valor = 100;
-                              if (valor < 0) valor = 0;
-
-                              setQuantidadeVagas(valor);
-                              handleChange_dinamicos({
-                                target: {
-                                  name: "qtde_posicao",
-                                  value: valor.toString(),
-                                },
-                              } as React.ChangeEvent<HTMLInputElement>);
-                            }}
-                          />
-
-                          {/* Botão de aumentar */}
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setQuantidadeVagas((prev) => {
-                                const novoValor = Math.min(prev + 1, 100);
-                                handleChange_dinamicos({
-                                  target: {
-                                    name: "qtde_posicao",
-                                    value: novoValor.toString(),
-                                  },
-                                } as React.ChangeEvent<HTMLInputElement>);
-                                return novoValor;
-                              });
-                            }}
-                            className="px-3 py-1 rounded-full bg-purple-100 text-purple-600"
-                          >
-                            +
-                          </button>
-                        </div>
-                        {showErrors &&
-                          (!quantidadeVagas || quantidadeVagas === 0) && (
-                            <p className="text-sm text-red-600 mt-1">
-                              {t("tela_vaga_dados.item_msg_campo_obt")}
-                            </p>
-                          )}
-                      </label>
-                    </div>
-
-                    <div className="col-span-1 mt-4 md:col-span-2 flex justify-center md:justify-end">
-                      <button
-                        type="button" // evita submit acidental
-                        onClick={handleCancel}
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                      >
-                        {t("tela_vaga_dados.item_botao_cancelar")}
-                      </button>
-                      <button
-                        type="submit"
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                      >
-                        {t("tela_vaga_dados.item_botao_avancar")}
-                      </button>
-                    </div>
-                  </form>
-                )}
-
-                {step === 2 && (
-                  <div className="w-full h-full flex flex-col">
-                    <form
-                      onSubmit={handleSubmit}
-                      className="flex flex-col flex-1"
-                    >
-                      <div>
-                        <h1 className="block text-sm mb-1 py-3 font-bold">
-                          {t("tela_vaga_dados.item_label_informe_hardskills")}
-                          <p className="text-[11px] font-normal italic">
-                            {t(
-                              "tela_vaga_dados.item_label_informe_hardskills_subitem"
-                            )}
-                          </p>
-                          <p className="block text-[11x] font-light">
-                            {t("tela_vaga_dados.item_label_informe_qtde")}
-                          </p>
-                        </h1>
-
-                        <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                          {t("tela_vaga_dados.item_label_skill")}
-                          <TooltipIcon
-                            message={`${t(
-                              "tela_vaga_dados.item_tooltip_skill_titulo"
-                            )}\n${t(
-                              "tela_vaga_dados.item_tooltip_skill_passo1"
-                            )}\n${t(
-                              "tela_vaga_dados.item_tooltip_skill_passo2"
-                            )}\n${t(
-                              "tela_vaga_dados.item_tooltip_skill_passo3"
-                            )}`}
-                            perfil={perfil}
-                          />
                         </label>
 
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1">
-                            <CreatableSelect
-                              isClearable
-                              placeholder={t("tela_vaga_dados.item_msg_skill")}
-                              value={selectedSkill}
-                              onChange={(newValue) =>
-                                setSelectedSkill(newValue)
-                              }
-                              options={skills
-                                .filter((f) => f.tipo_skill_id == 1)
-                                .map((skill) => ({
-                                  value: String(skill.skill_id),
-                                  label: skill.skill,
-                                  tipo_skill_id: skill.tipo_skill_id,
-                                }))}
-                              formatCreateLabel={(inputValue) =>
-                                `${t(
-                                  "tela_vaga_dados.item_msg_criar_skill"
-                                )} "${inputValue}"`
-                              }
-                              isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
-                            />
+                        {/* Nome da vaga */}
+                        <label className="flex flex-col text-sm text-gray-700">
+                          {t("tela_vaga_dados.item_label_site")}
+                          <input
+                            name="nome_vaga"
+                            type="text"
+                            className="border rounded-md px-3 py-2 border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
+                            placeholder={t(
+                              "tela_vaga_dados.item_placeholder_site",
+                            )}
+                            defaultValue={form.nome_vaga ?? vaga?.nome_vaga}
+                            onChange={handleChange_dinamicos}
+                          />
+                          {showErrors && !form.nome_vaga && (
+                            <p className="text-sm text-red-600 mt-1">
+                              {t("tela_vaga_dados.item_msg_campo_obt")}
+                            </p>
+                          )}
+                        </label>
+
+                        {/* Linha Estado + Cidade */}
+                        <div className="grid grid-cols-12 gap-2">
+                          {/* Estado - col-3 */}
+                          <div className="col-span-12 md:col-span-5">
+                            <label className="text-sm font-medium mb-1">
+                              {t("cadastro.estado")}
+                            </label>
+
+                            <select
+                              className="border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                              name="estado"
+                              value={estado}
+                              onChange={handleEstadoChange}
+                            >
+                              <option value="">
+                                {t("cadastro.placehold_estado")}
+                              </option>
+                              {estados.map((e) => (
+                                <option key={e.id} value={e.id}>
+                                  {e.sigla}
+                                </option>
+                              ))}
+                            </select>
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleAddSkill(1)}
-                            className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-700 transition whitespace-nowrap cursor-pointer"
-                          >
-                            {t("tela_vaga_dados.item_botao_adicionar")}
-                          </button>
+                          {/* Cidade - col-9 */}
+                          <div className="col-span-12 md:col-span-7">
+                            <label className="text-sm font-medium mb-1">
+                              {t("cadastro.cidade")}
+                            </label>
+
+                            <select
+                              className="border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                              name="cidade"
+                              value={cidade}
+                              onChange={handleCidadeChange}
+                            >
+                              <option value="">
+                                {t("cadastro.placehold_cidade")}
+                              </option>
+                              {cidades.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                  {c.cidade}
+                                </option>
+                              ))}
+                            </select>
+
+                            {showErrors && !form.cidade_id && (
+                              <p className="text-sm text-red-600 mt-1">
+                                {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                              </p>
+                            )}
+                          </div>
                         </div>
 
-                        {showErrors && form.lista_skills.length <= 0 && (
-                          <p className="text-sm text-red-600 mt-1">
-                            {t("tela_vaga_dados.item_msg_campo_obt")}
+                        {/* Modalidade */}
+                        <fieldset className="text-sm text-gray-700 mt-2">
+                          <legend className="mb-1 font-medium">
+                            {t("tela_vaga_dados.item_label_modalidade")}
+                          </legend>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                            {modalidades.map((mod) => (
+                              <label
+                                key={mod.modalidade_trabalho_id}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <input
+                                  type="radio"
+                                  name="modalidade_trabalho_id"
+                                  value={mod.modalidade_trabalho_id}
+                                  checked={
+                                    String(mod.modalidade_trabalho_id) ===
+                                    String(
+                                      form.modalidade_trabalho_id ??
+                                        vaga?.modalidade_trabalho_id,
+                                    )
+                                  }
+                                  onChange={handleChange_dinamicos}
+                                  className="appearance-none w-4 h-4 rounded-full border-2 border-purple-600 checked:bg-purple-600 checked:border-purple-600 cursor-pointer transition-all duration-200"
+                                />
+                                <span>{mod.modalidade}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </fieldset>
+
+                        {/* Período */}
+                        <fieldset className="text-sm text-gray-700 mt-2">
+                          <legend className="mb-1 font-medium">
+                            {t("tela_vaga_dados.item_label_periodo")}
+                          </legend>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                            {periodos.map((per) => (
+                              <label
+                                key={per.periodo_trabalho_id}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <input
+                                  type="radio"
+                                  name="periodo_trabalho_id"
+                                  value={per.periodo_trabalho_id}
+                                  onChange={handleChange_dinamicos}
+                                  checked={
+                                    String(per.periodo_trabalho_id) ===
+                                    String(
+                                      form.periodo_trabalho_id ??
+                                        vaga?.periodo_trabalho_id,
+                                    )
+                                  }
+                                  className="appearance-none w-4 h-4 rounded-full border-2 border-purple-600 checked:bg-purple-600 checked:border-purple-600 cursor-pointer transition-all duration-200"
+                                />
+                                <span>{per.periodo}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </fieldset>
+
+                        {/* Inclusiva */}
+                        <div className="mt-4 w-full">
+                          {/* Título */}
+                          <p className="text-sm sm:text-base font-normal mb-3 text-[#14342A]">
+                            {t("tela_vaga_dados.item_label_vaga_afirmativa")}
                           </p>
-                        )}
+
+                          {/* Grid responsivo */}
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-x-6">
+                            {/* Coluna esquerda */}
+                            <div className="flex flex-col space-y-2">
+                              {/* Checkbox PCD */}
+                              <label className="flex items-center space-x-2 cursor-pointer">
+                                <div className="relative w-4 h-4 sm:w-5 sm:h-5">
+                                  <input
+                                    type="checkbox"
+                                    name="pcd"
+                                    checked={form.pcd ?? vaga?.pcd ?? false}
+                                    onChange={handleChange_dinamicos}
+                                    className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
+                                  />
+                                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+                                    ✔
+                                  </span>
+                                </div>
+                                <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
+                                  PCD
+                                </span>
+                              </label>
+
+                              {/* Checkbox Mulheres */}
+                              <label className="flex items-center space-x-2 cursor-pointer">
+                                <div className="relative w-4 h-4 sm:w-5 sm:h-5">
+                                  <input
+                                    type="checkbox"
+                                    name="mulheres"
+                                    checked={
+                                      form.mulheres ?? vaga?.mulheres ?? false
+                                    }
+                                    onChange={handleChange_dinamicos}
+                                    className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
+                                  />
+                                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+                                    ✔
+                                  </span>
+                                </div>
+                                <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
+                                  {t("tela_vaga_dados.item_msg_item_mulher")}
+                                </span>
+                              </label>
+                            </div>
+
+                            {/* Coluna direita */}
+                            <div className="flex flex-col space-y-2">
+                              {/* Checkbox LGBTQ+ */}
+                              <label className="flex items-center space-x-2 cursor-pointer">
+                                <div className="relative w-4 h-4 sm:w-5 sm:h-5">
+                                  <input
+                                    type="checkbox"
+                                    name="lgbtq"
+                                    checked={form.lgbtq ?? vaga?.lgbtq ?? false}
+                                    onChange={handleChange_dinamicos}
+                                    className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
+                                  />
+                                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+                                    ✔
+                                  </span>
+                                </div>
+                                <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
+                                  LGBTQ+
+                                </span>
+                              </label>
+
+                              {/* Checkbox 50+ */}
+                              <label className="flex items-center space-x-2 cursor-pointer">
+                                <div className="relative w-4 h-4 sm:w-5 sm:h-5">
+                                  <input
+                                    type="checkbox"
+                                    name="cinquenta_mais"
+                                    checked={
+                                      form.cinquenta_mais ??
+                                      vaga?.cinquenta_mais ??
+                                      false
+                                    }
+                                    onChange={handleChange_dinamicos}
+                                    className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
+                                  />
+                                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
+                                    ✔
+                                  </span>
+                                </div>
+                                <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
+                                  50+
+                                </span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="flex flex-1 flex-col gap-3 mt-5">
-                        {form.lista_skills
-                          .filter((f) => f.tipo_skill_id == 1)
-                          .map((item) => {
-                            const skill = skills.find(
-                              (s) => s.skill_id === item.skill_id
-                            );
-                            return (
-                              <div
-                                key={item.skill_id}
-                                className="border border-purple-300 bg-purple-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                              >
-                                <div className="flex flex-col gap-2 w-full">
-                                  {/* Linha com Skill, Peso e Avaliador */}
-                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
-                                    {/* Nome da skill */}
-                                    <div className="bg-purple-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
-                                      {skill?.skill ?? item.nome}
-                                    </div>
+                      {/* Coluna Direita */}
+                      <div className="flex flex-col gap-4">
+                        {/* Descrição */}
+                        <label className="flex flex-col text-sm text-gray-700">
+                          {t("tela_vaga_dados.item_label_descricao")}
+                          <textarea
+                            name="descricao"
+                            maxLength={5000}
+                            rows={9}
+                            defaultValue={form.descricao ?? vaga?.descricao}
+                            className="border rounded-md px-3 py-2 resize-none border-purple-600 focus:outline-none focus:ring-1 focus:ring-purple-300"
+                            placeholder={t(
+                              "tela_vaga_dados.item_placeholder_descricao",
+                            )}
+                            onChange={handleChange_dinamicos}
+                          />
+                          {showErrors && !form.descricao && (
+                            <p className="text-sm text-red-600 mt-1">
+                              {t("tela_vaga_dados.item_msg_campo_obt")}
+                            </p>
+                          )}
+                        </label>
 
-                                    {/* Peso com slider */}
-                                    <div className="flex items-center gap-2 text-sm min-w-[200px]">
-                                      <label className="font-medium whitespace-nowrap">
-                                        {t("tela_vaga_dados.item_label_peso")}
-                                      </label>
-                                      <input
-                                        type="range"
-                                        min={1}
-                                        max={10}
-                                        step={0.5}
-                                        list="tickmarks"
-                                        value={item.peso / 10}
-                                        onChange={(e) =>
-                                          handleSkillChange(
-                                            item.skill_id,
-                                            "peso",
-                                            Number(e.target.value) * 10
-                                          )
-                                        }
-                                        className="w-full sm:w-40 accent-purple-600 cursor-pointer"
-                                      />
-                                      <datalist id="tickmarks">
-                                        {[...Array(19)].map((_, i) => {
-                                          const val = i * 0.5 + 1;
-                                          return (
-                                            <option
-                                              key={val}
-                                              value={val.toFixed(1)}
-                                            />
-                                          );
-                                        })}
-                                      </datalist>
-                                      <span className="w-8 text-right">
-                                        {(item.peso / 10).toFixed(1)}
-                                      </span>
-                                    </div>
+                        {/* Dias disponíveis */}
+                        <label className="flex flex-col text-sm text-gray-700">
+                          {t("tela_vaga_dados.item_label_dias_vaga")}
+                          <div className="flex items-center gap-2 mt-1">
+                            {/* Botão de diminuir */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDiasDisponiveis((prev) => {
+                                  const novoValor = Math.max(prev - 1, 1);
+                                  handleChange_dinamicos({
+                                    target: {
+                                      name: "qtde_dias_aberta",
+                                      value: novoValor.toString(),
+                                    },
+                                  } as React.ChangeEvent<HTMLInputElement>);
+                                  return novoValor;
+                                });
+                              }}
+                              className="px-3 py-1 rounded-full bg-purple-100 text-purple-600"
+                            >
+                              -
+                            </button>
 
-                                    {/* Avaliador */}
-                                    <div className="flex items-center gap-4 text-sm min-w-[260px]">
-                                      <div className="flex items-center gap-1">
+                            {/* Input que permite digitar */}
+                            <input
+                              name="qtde_dias_aberta"
+                              type="number"
+                              min={1}
+                              max={60}
+                              className="border rounded-md w-16 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300
+                                  [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
+                                  [&::-moz-appearance]:textfield"
+                              value={form.qtde_dias_aberta ?? diasDisponiveis}
+                              onChange={(e) => {
+                                let valor = parseInt(e.target.value || "1", 10);
+                                if (isNaN(valor)) valor = 1;
+                                if (valor > 60) valor = 60;
+                                if (valor < 1) valor = 1;
+
+                                setDiasDisponiveis(valor);
+                                handleChange_dinamicos({
+                                  target: {
+                                    name: "qtde_dias_aberta",
+                                    value: valor.toString(),
+                                  },
+                                } as React.ChangeEvent<HTMLInputElement>);
+                              }}
+                            />
+
+                            {/* Botão de aumentar */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDiasDisponiveis((prev) => {
+                                  const novoValor = Math.min(prev + 1, 60);
+                                  handleChange_dinamicos({
+                                    target: {
+                                      name: "qtde_dias_aberta",
+                                      value: novoValor.toString(),
+                                    },
+                                  } as React.ChangeEvent<HTMLInputElement>);
+                                  return novoValor;
+                                });
+                              }}
+                              className="px-3 py-1 rounded-full bg-purple-100 text-purple-600"
+                            >
+                              +
+                            </button>
+                          </div>
+                          {showErrors &&
+                            (!diasDisponiveis || diasDisponiveis === 0) && (
+                              <p className="text-sm text-red-600 mt-1">
+                                {t("tela_vaga_dados.item_msg_campo_obt")}
+                              </p>
+                            )}
+                        </label>
+
+                        {/* Quantidade de vagas */}
+                        <label className="flex flex-col text-sm text-gray-700">
+                          {t("tela_vaga_dados.item_label_qtde_vaga")}
+                          <div className="flex items-center gap-2 mt-1">
+                            {/* Botão de diminuir */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setQuantidadeVagas((prev) => {
+                                  const novoValor = Math.max(prev - 1, 0);
+                                  handleChange_dinamicos({
+                                    target: {
+                                      name: "qtde_posicao",
+                                      value: novoValor.toString(),
+                                    },
+                                  } as React.ChangeEvent<HTMLInputElement>);
+                                  return novoValor;
+                                });
+                              }}
+                              className="px-3 py-1 rounded-full bg-purple-100 text-purple-600"
+                            >
+                              -
+                            </button>
+
+                            {/* Input que permite digitar */}
+                            <input
+                              name="qtde_posicao"
+                              type="number"
+                              min={0}
+                              max={100}
+                              className="border rounded-md w-16 px-3 py-2 border-purple-600 text-center focus:outline-none focus:ring-1 focus:ring-purple-300
+                                [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
+                                [&::-moz-appearance]:textfield"
+                              value={form.qtde_posicao ?? quantidadeVagas}
+                              onChange={(e) => {
+                                let valor = parseInt(e.target.value || "0", 10);
+                                if (isNaN(valor)) valor = 0;
+                                if (valor > 100) valor = 100;
+                                if (valor < 0) valor = 0;
+
+                                setQuantidadeVagas(valor);
+                                handleChange_dinamicos({
+                                  target: {
+                                    name: "qtde_posicao",
+                                    value: valor.toString(),
+                                  },
+                                } as React.ChangeEvent<HTMLInputElement>);
+                              }}
+                            />
+
+                            {/* Botão de aumentar */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setQuantidadeVagas((prev) => {
+                                  const novoValor = Math.min(prev + 1, 100);
+                                  handleChange_dinamicos({
+                                    target: {
+                                      name: "qtde_posicao",
+                                      value: novoValor.toString(),
+                                    },
+                                  } as React.ChangeEvent<HTMLInputElement>);
+                                  return novoValor;
+                                });
+                              }}
+                              className="px-3 py-1 rounded-full bg-purple-100 text-purple-600"
+                            >
+                              +
+                            </button>
+                          </div>
+                          {showErrors &&
+                            (!quantidadeVagas || quantidadeVagas === 0) && (
+                              <p className="text-sm text-red-600 mt-1">
+                                {t("tela_vaga_dados.item_msg_campo_obt")}
+                              </p>
+                            )}
+                        </label>
+                      </div>
+
+                      <div className="col-span-1 mt-4 md:col-span-2 flex justify-center md:justify-end">
+                        <button
+                          type="button" // evita submit acidental
+                          onClick={handleCancel}
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                        >
+                          {t("tela_vaga_dados.item_botao_cancelar")}
+                        </button>
+                        <button
+                          type="submit"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                        >
+                          {t("tela_vaga_dados.item_botao_avancar")}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {step === 2 && (
+                    <div className="w-full flex flex-col flex-1">
+                      <form
+                        onSubmit={handleSubmit}
+                        className="flex flex-col flex-1"
+                      >
+                        <div>
+                          <h1 className="block text-sm mb-1 py-3 font-bold">
+                            {t("tela_vaga_dados.item_label_informe_hardskills")}
+                            <p className="text-[11px] font-normal italic">
+                              {t(
+                                "tela_vaga_dados.item_label_informe_hardskills_subitem",
+                              )}
+                            </p>
+                            <p className="block text-[11x] font-light">
+                              {t("tela_vaga_dados.item_label_informe_qtde")}
+                            </p>
+                          </h1>
+
+                          <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                            {t("tela_vaga_dados.item_label_skill")}
+                            <TooltipIcon
+                              message={`${t(
+                                "tela_vaga_dados.item_tooltip_skill_titulo",
+                              )}\n${t(
+                                "tela_vaga_dados.item_tooltip_skill_passo1",
+                              )}\n${t(
+                                "tela_vaga_dados.item_tooltip_skill_passo2",
+                              )}\n${t(
+                                "tela_vaga_dados.item_tooltip_skill_passo3",
+                              )}`}
+                              perfil={perfil}
+                            />
+                          </label>
+
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1">
+                              <CreatableSelect
+                                isClearable
+                                placeholder={t(
+                                  "tela_vaga_dados.item_msg_skill",
+                                )}
+                                value={selectedSkill}
+                                onChange={(newValue) =>
+                                  setSelectedSkill(newValue)
+                                }
+                                options={skills
+                                  .filter((f) => f.tipo_skill_id == 1)
+                                  .map((skill) => ({
+                                    value: String(skill.skill_id),
+                                    label: skill.skill,
+                                    tipo_skill_id: skill.tipo_skill_id,
+                                  }))}
+                                formatCreateLabel={(inputValue) =>
+                                  `${t(
+                                    "tela_vaga_dados.item_msg_criar_skill",
+                                  )} "${inputValue}"`
+                                }
+                                isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
+                              />
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleAddSkill(1)}
+                              className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-700 transition whitespace-nowrap cursor-pointer"
+                            >
+                              {t("tela_vaga_dados.item_botao_adicionar")}
+                            </button>
+                          </div>
+
+                          {showErrors && form.lista_skills.length <= 0 && (
+                            <p className="text-sm text-red-600 mt-1">
+                              {t("tela_vaga_dados.item_msg_campo_obt")}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex flex-1 flex-col gap-3 mt-5">
+                          {form.lista_skills
+                            .filter((f) => f.tipo_skill_id == 1)
+                            .map((item) => {
+                              const skill = skills.find(
+                                (s) => s.skill_id === item.skill_id,
+                              );
+                              return (
+                                <div
+                                  key={item.skill_id}
+                                  className="border border-purple-300 bg-purple-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                                >
+                                  <div className="flex flex-col gap-2 w-full">
+                                    {/* Linha com Skill, Peso e Avaliador */}
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
+                                      {/* Nome da skill */}
+                                      <div className="bg-purple-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                        {skill?.skill ?? item.nome}
+                                      </div>
+
+                                      {/* Peso com slider */}
+                                      <div className="flex items-center gap-2 text-sm min-w-[200px]">
                                         <label className="font-medium whitespace-nowrap">
+                                          {t("tela_vaga_dados.item_label_peso")}
+                                        </label>
+                                        <input
+                                          type="range"
+                                          min={1}
+                                          max={10}
+                                          step={0.5}
+                                          list="tickmarks"
+                                          value={item.peso / 10}
+                                          onChange={(e) =>
+                                            handleSkillChange(
+                                              item.skill_id,
+                                              "peso",
+                                              Number(e.target.value) * 10,
+                                            )
+                                          }
+                                          className="w-full sm:w-40 accent-purple-600 cursor-pointer"
+                                        />
+                                        <datalist id="tickmarks">
+                                          {[...Array(19)].map((_, i) => {
+                                            const val = i * 0.5 + 1;
+                                            return (
+                                              <option
+                                                key={val}
+                                                value={val.toFixed(1)}
+                                              />
+                                            );
+                                          })}
+                                        </datalist>
+                                        <span className="w-8 text-right">
+                                          {(item.peso / 10).toFixed(1)}
+                                        </span>
+                                      </div>
+
+                                      {/* Avaliador */}
+                                      <div className="flex items-center gap-4 text-sm min-w-[260px]">
+                                        <div className="flex items-center gap-1">
+                                          <label className="font-medium whitespace-nowrap">
+                                            {t(
+                                              "tela_vaga_dados.item_label_avaliador",
+                                            )}
+                                          </label>
+                                          <TooltipIcon
+                                            message={
+                                              hasAvaliadorProprio
+                                                ? `${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo1",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo2",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo3",
+                                                  )}\n\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo4",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo5",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo6",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo7",
+                                                  )}`
+                                                : `${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo8",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo9",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo10",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo11",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo12",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo13",
+                                                  )}`
+                                            }
+                                            perfil={perfil}
+                                          />
+                                        </div>
+                                        <label className="flex items-center gap-1">
+                                          <input
+                                            type="radio"
+                                            checked={
+                                              hasAvaliadorProprio === true &&
+                                              item.avaliador_proprio
+                                                ? true
+                                                : false
+                                            }
+                                            disabled={!hasAvaliadorProprio}
+                                            onChange={() =>
+                                              handleSkillChange(
+                                                item.skill_id,
+                                                "avaliador_proprio",
+                                                true,
+                                              )
+                                            }
+                                          />
                                           {t(
-                                            "tela_vaga_dados.item_label_avaliador"
+                                            "tela_vaga_dados.item_label_proprio",
                                           )}
                                         </label>
-                                        <TooltipIcon
-                                          message={
-                                            hasAvaliadorProprio
-                                              ? `${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo1"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo2"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo3"
-                                                )}\n\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo4"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo5"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo6"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo7"
-                                                )}`
-                                              : `${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo8"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo9"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo10"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo11"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo12"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo13"
-                                                )}`
-                                          }
-                                          perfil={perfil}
-                                        />
+                                        <label className="flex items-center gap-1">
+                                          <input
+                                            type="radio"
+                                            checked={
+                                              hasAvaliadorProprio === false
+                                                ? true
+                                                : !item.avaliador_proprio
+                                            }
+                                            onChange={() =>
+                                              handleSkillChange(
+                                                item.skill_id,
+                                                "avaliador_proprio",
+                                                false,
+                                              )
+                                            }
+                                          />
+                                          {t(
+                                            "tela_vaga_dados.item_label_whizzat",
+                                          )}
+                                        </label>
                                       </div>
-                                      <label className="flex items-center gap-1">
-                                        <input
-                                          type="radio"
-                                          checked={
-                                            hasAvaliadorProprio === true &&
-                                            item.avaliador_proprio
-                                              ? true
-                                              : false
-                                          }
-                                          disabled={!hasAvaliadorProprio}
-                                          onChange={() =>
-                                            handleSkillChange(
-                                              item.skill_id,
-                                              "avaliador_proprio",
-                                              true
-                                            )
-                                          }
-                                        />
-                                        {t(
-                                          "tela_vaga_dados.item_label_proprio"
-                                        )}
-                                      </label>
-                                      <label className="flex items-center gap-1">
-                                        <input
-                                          type="radio"
-                                          checked={
-                                            hasAvaliadorProprio === false
-                                              ? true
-                                              : !item.avaliador_proprio
-                                          }
-                                          onChange={() =>
-                                            handleSkillChange(
-                                              item.skill_id,
-                                              "avaliador_proprio",
-                                              false
-                                            )
-                                          }
-                                        />
-                                        {t(
-                                          "tela_vaga_dados.item_label_whizzat"
-                                        )}
-                                      </label>
                                     </div>
                                   </div>
+
+                                  <button
+                                    onClick={() =>
+                                      handleRemoveSkill(item.skill_id)
+                                    }
+                                    className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
+                                    title={t(
+                                      "tela_vaga_dados.item_botao_remover_skill",
+                                    )}
+                                  >
+                                    <X size={18} />
+                                  </button>
                                 </div>
-
-                                <button
-                                  onClick={() =>
-                                    handleRemoveSkill(item.skill_id)
-                                  }
-                                  className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
-                                  title={t(
-                                    "tela_vaga_dados.item_botao_remover_skill"
-                                  )}
-                                >
-                                  <X size={18} />
-                                </button>
-                              </div>
-                            );
-                          })}
-                      </div>
-
-                      {/* Botões no rodapé */}
-                      <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                        <div className="flex">
-                          <button
-                            onClick={prevStep}
-                            type="button"
-                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                          >
-                            {t("tela_vaga_dados.item_botao_voltar")}
-                          </button>
+                              );
+                            })}
                         </div>
 
-                        {/* Direita: botões cadastrar e editar */}
-                        <div className="flex gap-2">
-                          <button
-                            type="button" // evita submit acidental
-                            onClick={handleCancel}
-                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                          >
-                            {t("tela_vaga_dados.item_botao_cancelar")}
-                          </button>
-                          <button
-                            type="submit"
-                            disabled={form.lista_skills.length < 3} // só habilita se >= 3
-                            className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
+                        {/* Botões no rodapé */}
+                        <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                          <div className="flex">
+                            <button
+                              onClick={prevStep}
+                              type="button"
+                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                            >
+                              {t("tela_vaga_dados.item_botao_voltar")}
+                            </button>
+                          </div>
+
+                          {/* Direita: botões cadastrar e editar */}
+                          <div className="flex gap-2">
+                            <button
+                              type="button" // evita submit acidental
+                              onClick={handleCancel}
+                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                            >
+                              {t("tela_vaga_dados.item_botao_cancelar")}
+                            </button>
+                            <button
+                              type="submit"
+                              disabled={form.lista_skills.length < 3} // só habilita se >= 3
+                              className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
                           ${
                             form.lista_skills.length < 3
                               ? "bg-gray-300 cursor-not-allowed"
                               : "bg-purple-100 hover:bg-purple-200 cursor-pointer"
                           }`}
-                          >
-                            {t("tela_vaga_dados.item_botao_avancar")}
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                )}
-
-                {step === 3 && (
-                  <div className="w-full h-full flex flex-col">
-                    <form
-                      onSubmit={handleSubmit}
-                      className="flex flex-col flex-1"
-                    >
-                      <div>
-                        <h1 className="block text-sm mb-1 py-3 font-bold">
-                          {t("tela_vaga_dados.item_label_informe_softskills")}
-                          <p className="text-[11px] font-normal italic">
-                            {t(
-                              "tela_vaga_dados.item_label_informe_softskills_subitem"
-                            )}
-                          </p>
-                        </h1>
-
-                        <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                          {t("tela_vaga_dados.item_label_skill")}
-                          <TooltipIcon
-                            message={`${t(
-                              "tela_vaga_dados.item_tooltip_skill_titulo"
-                            )}\n${t(
-                              "tela_vaga_dados.item_tooltip_skill_passo1"
-                            )}\n${t(
-                              "tela_vaga_dados.item_tooltip_skill_passo2"
-                            )}\n${t(
-                              "tela_vaga_dados.item_tooltip_skill_passo3"
-                            )}`}
-                            perfil={perfil}
-                          />
-                        </label>
-
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1">
-                            <CreatableSelect
-                              isClearable
-                              placeholder={t("tela_vaga_dados.item_msg_skill")}
-                              value={selectedSkill}
-                              onChange={(newValue) =>
-                                setSelectedSkill(newValue)
-                              }
-                              options={skills
-                                .filter((f) => f.tipo_skill_id == 2)
-                                .map((skill) => ({
-                                  value: String(skill.skill_id),
-                                  label: skill.skill,
-                                  tipo_skill_id: skill.tipo_skill_id,
-                                }))}
-                              formatCreateLabel={(inputValue) =>
-                                `${t(
-                                  "tela_vaga_dados.item_msg_criar_skill"
-                                )} "${inputValue}"`
-                              }
-                            />
+                            >
+                              {t("tela_vaga_dados.item_botao_avancar")}
+                            </button>
                           </div>
-
-                          <button
-                            type="button"
-                            onClick={() => handleAddSkill(2)}
-                            className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-700 transition whitespace-nowrap cursor-pointer"
-                          >
-                            {t("tela_vaga_dados.item_botao_adicionar")}
-                          </button>
                         </div>
-                      </div>
+                      </form>
+                    </div>
+                  )}
 
-                      <div className="flex flex-1 flex-col gap-3 mt-5">
-                        {form.lista_skills
-                          .filter((f) => f.tipo_skill_id == 2)
-                          .map((item) => {
-                            const skill = skills.find(
-                              (s) => s.skill_id === item.skill_id
-                            );
-                            return (
-                              <div
-                                key={item.skill_id}
-                                className="border border-purple-300 bg-purple-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                              >
-                                <div className="flex flex-col gap-2 w-full">
-                                  {/* Linha com Skill, Peso e Avaliador */}
-                                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
-                                    {/* Nome da skill */}
-                                    <div className="bg-purple-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
-                                      {skill?.skill ?? item.nome}
-                                    </div>
+                  {step === 3 && (
+                    <div className="w-full flex flex-col flex-1">
+                      <form
+                        onSubmit={handleSubmit}
+                        className="flex flex-col flex-1"
+                      >
+                        <div>
+                          <h1 className="block text-sm mb-1 py-3 font-bold">
+                            {t("tela_vaga_dados.item_label_informe_softskills")}
+                            <p className="text-[11px] font-normal italic">
+                              {t(
+                                "tela_vaga_dados.item_label_informe_softskills_subitem",
+                              )}
+                            </p>
+                          </h1>
 
-                                    {/* Peso com slider */}
-                                    <div className="flex items-center gap-2 text-sm min-w-[200px]">
-                                      <label className="font-medium whitespace-nowrap">
-                                        {t("tela_vaga_dados.item_label_peso")}
-                                      </label>
-                                      <input
-                                        type="range"
-                                        min={1}
-                                        max={10}
-                                        step={0.5}
-                                        list="tickmarks"
-                                        value={item.peso / 10}
-                                        onChange={(e) =>
-                                          handleSkillChange(
-                                            item.skill_id,
-                                            "peso",
-                                            Number(e.target.value) * 10
-                                          )
-                                        }
-                                        className="w-full sm:w-40 accent-purple-600 cursor-pointer"
-                                      />
-                                      <datalist id="tickmarks">
-                                        {[...Array(19)].map((_, i) => {
-                                          const val = i * 0.5 + 1;
-                                          return (
-                                            <option
-                                              key={val}
-                                              value={val.toFixed(1)}
-                                            />
-                                          );
-                                        })}
-                                      </datalist>
-                                      <span className="w-8 text-right">
-                                        {(item.peso / 10).toFixed(1)}
-                                      </span>
-                                    </div>
+                          <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                            {t("tela_vaga_dados.item_label_skill")}
+                            <TooltipIcon
+                              message={`${t(
+                                "tela_vaga_dados.item_tooltip_skill_titulo",
+                              )}\n${t(
+                                "tela_vaga_dados.item_tooltip_skill_passo1",
+                              )}\n${t(
+                                "tela_vaga_dados.item_tooltip_skill_passo2",
+                              )}\n${t(
+                                "tela_vaga_dados.item_tooltip_skill_passo3",
+                              )}`}
+                              perfil={perfil}
+                            />
+                          </label>
 
-                                    {/* Avaliador */}
-                                    <div className="flex items-center gap-4 text-sm min-w-[260px]">
-                                      <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-3">
+                            <div className="flex-1">
+                              <CreatableSelect
+                                isClearable
+                                placeholder={t(
+                                  "tela_vaga_dados.item_msg_skill",
+                                )}
+                                value={selectedSkill}
+                                onChange={(newValue) =>
+                                  setSelectedSkill(newValue)
+                                }
+                                options={skills
+                                  .filter((f) => f.tipo_skill_id == 2)
+                                  .map((skill) => ({
+                                    value: String(skill.skill_id),
+                                    label: skill.skill,
+                                    tipo_skill_id: skill.tipo_skill_id,
+                                  }))}
+                                formatCreateLabel={(inputValue) =>
+                                  `${t(
+                                    "tela_vaga_dados.item_msg_criar_skill",
+                                  )} "${inputValue}"`
+                                }
+                              />
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleAddSkill(2)}
+                              className="bg-purple-600 text-white px-4 py-1 rounded-full hover:bg-purple-700 transition whitespace-nowrap cursor-pointer"
+                            >
+                              {t("tela_vaga_dados.item_botao_adicionar")}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-1 flex-col gap-3 mt-5">
+                          {form.lista_skills
+                            .filter((f) => f.tipo_skill_id == 2)
+                            .map((item) => {
+                              const skill = skills.find(
+                                (s) => s.skill_id === item.skill_id,
+                              );
+                              return (
+                                <div
+                                  key={item.skill_id}
+                                  className="border border-purple-300 bg-purple-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                                >
+                                  <div className="flex flex-col gap-2 w-full">
+                                    {/* Linha com Skill, Peso e Avaliador */}
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
+                                      {/* Nome da skill */}
+                                      <div className="bg-purple-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                        {skill?.skill ?? item.nome}
+                                      </div>
+
+                                      {/* Peso com slider */}
+                                      <div className="flex items-center gap-2 text-sm min-w-[200px]">
                                         <label className="font-medium whitespace-nowrap">
+                                          {t("tela_vaga_dados.item_label_peso")}
+                                        </label>
+                                        <input
+                                          type="range"
+                                          min={1}
+                                          max={10}
+                                          step={0.5}
+                                          list="tickmarks"
+                                          value={item.peso / 10}
+                                          onChange={(e) =>
+                                            handleSkillChange(
+                                              item.skill_id,
+                                              "peso",
+                                              Number(e.target.value) * 10,
+                                            )
+                                          }
+                                          className="w-full sm:w-40 accent-purple-600 cursor-pointer"
+                                        />
+                                        <datalist id="tickmarks">
+                                          {[...Array(19)].map((_, i) => {
+                                            const val = i * 0.5 + 1;
+                                            return (
+                                              <option
+                                                key={val}
+                                                value={val.toFixed(1)}
+                                              />
+                                            );
+                                          })}
+                                        </datalist>
+                                        <span className="w-8 text-right">
+                                          {(item.peso / 10).toFixed(1)}
+                                        </span>
+                                      </div>
+
+                                      {/* Avaliador */}
+                                      <div className="flex items-center gap-4 text-sm min-w-[260px]">
+                                        <div className="flex items-center gap-1">
+                                          <label className="font-medium whitespace-nowrap">
+                                            {t(
+                                              "tela_vaga_dados.item_label_avaliador",
+                                            )}
+                                          </label>
+                                          <TooltipIcon
+                                            message={
+                                              hasAvaliadorProprio
+                                                ? `${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo1",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo2",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo3",
+                                                  )}\n\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo4",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo5",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo6",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo7",
+                                                  )}`
+                                                : `${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo8",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo9",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo10",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo11",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo12",
+                                                  )}\n${t(
+                                                    "tela_vaga_dados.item_tooltip_avaliador_passo13",
+                                                  )}`
+                                            }
+                                            perfil={perfil}
+                                          />
+                                        </div>
+                                        <label className="flex items-center gap-1">
+                                          <input
+                                            type="radio"
+                                            checked={
+                                              hasAvaliadorProprio === true &&
+                                              item.avaliador_proprio
+                                                ? true
+                                                : false
+                                            }
+                                            disabled={!hasAvaliadorProprio}
+                                            onChange={() =>
+                                              handleSkillChange(
+                                                item.skill_id,
+                                                "avaliador_proprio",
+                                                true,
+                                              )
+                                            }
+                                          />
                                           {t(
-                                            "tela_vaga_dados.item_label_avaliador"
+                                            "tela_vaga_dados.item_label_proprio",
                                           )}
                                         </label>
-                                        <TooltipIcon
-                                          message={
-                                            hasAvaliadorProprio
-                                              ? `${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo1"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo2"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo3"
-                                                )}\n\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo4"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo5"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo6"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo7"
-                                                )}`
-                                              : `${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo8"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo9"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo10"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo11"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo12"
-                                                )}\n${t(
-                                                  "tela_vaga_dados.item_tooltip_avaliador_passo13"
-                                                )}`
-                                          }
-                                          perfil={perfil}
-                                        />
+                                        <label className="flex items-center gap-1">
+                                          <input
+                                            type="radio"
+                                            checked={
+                                              hasAvaliadorProprio === false
+                                                ? true
+                                                : !item.avaliador_proprio
+                                            }
+                                            onChange={() =>
+                                              handleSkillChange(
+                                                item.skill_id,
+                                                "avaliador_proprio",
+                                                false,
+                                              )
+                                            }
+                                          />
+                                          {t(
+                                            "tela_vaga_dados.item_label_whizzat",
+                                          )}
+                                        </label>
                                       </div>
-                                      <label className="flex items-center gap-1">
-                                        <input
-                                          type="radio"
-                                          checked={
-                                            hasAvaliadorProprio === true &&
-                                            item.avaliador_proprio
-                                              ? true
-                                              : false
-                                          }
-                                          disabled={!hasAvaliadorProprio}
-                                          onChange={() =>
-                                            handleSkillChange(
-                                              item.skill_id,
-                                              "avaliador_proprio",
-                                              true
-                                            )
-                                          }
-                                        />
-                                        {t(
-                                          "tela_vaga_dados.item_label_proprio"
-                                        )}
-                                      </label>
-                                      <label className="flex items-center gap-1">
-                                        <input
-                                          type="radio"
-                                          checked={
-                                            hasAvaliadorProprio === false
-                                              ? true
-                                              : !item.avaliador_proprio
-                                          }
-                                          onChange={() =>
-                                            handleSkillChange(
-                                              item.skill_id,
-                                              "avaliador_proprio",
-                                              false
-                                            )
-                                          }
-                                        />
-                                        {t(
-                                          "tela_vaga_dados.item_label_whizzat"
-                                        )}
-                                      </label>
                                     </div>
+                                  </div>
+
+                                  <button
+                                    onClick={() =>
+                                      handleRemoveSkill(item.skill_id)
+                                    }
+                                    className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
+                                    title={t(
+                                      "tela_vaga_dados.item_botao_remover_skill",
+                                    )}
+                                  >
+                                    <X size={18} />
+                                  </button>
+                                </div>
+                              );
+                            })}
+                        </div>
+
+                        {/* Botões no rodapé */}
+                        <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                          <div className="flex">
+                            <button
+                              onClick={prevStep}
+                              type="button"
+                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                            >
+                              {t("tela_vaga_dados.item_botao_voltar")}
+                            </button>
+                          </div>
+
+                          {/* Direita: botões cadastrar e editar */}
+                          <div className="flex gap-2">
+                            <button
+                              type="button" // evita submit acidental
+                              onClick={handleCancel}
+                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                            >
+                              {t("tela_vaga_dados.item_botao_cancelar")}
+                            </button>
+                            <button
+                              type="submit"
+                              className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer`}
+                            >
+                              {t("tela_vaga_dados.item_botao_avancar")}
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
+                  {step === 4 && (
+                    <div className="w-full flex flex-col flex-1">
+                      <form
+                        onSubmit={handleSubmit}
+                        className="flex flex-col flex-1"
+                      >
+                        {/* Capa e Logo */}
+
+                        {/* Container Principal */}
+                        <div className="flex flex-col md:flex-row  w-full ">
+                          {/* Coluna Esquerda */}
+                          <div className="flex flex-col md:flex-row w-full">
+                            {/* Dados da vaga e skills lado a lado */}
+                            {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border border-yellow-500"> */}
+                            {/* Bloco - Informações da vaga */}
+                            <div className="w-[65%] space-y-4 mr-2">
+                              {/* Linha 1 - Logo + Título da vaga e empresa */}
+                              <div className="flex flex-col gap-4">
+                                {/* Logo e título + empresa ocupando toda largura */}
+                                <div className="flex flex-row w-full gap-4 items-center">
+                                  {/* Logo */}
+                                  <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
+                                    {form.logo ? (
+                                      <Image
+                                        src={form?.logo}
+                                        alt="Logo da empresa"
+                                        width={64}
+                                        height={64}
+                                        className="w-full h-full object-cover"
+                                        unoptimized
+                                      />
+                                    ) : (
+                                      <div className="text-xs text-gray-400 text-center px-2">
+                                        {t("tela_vaga_dados.item_msg_sem_foto")}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Título e empresa */}
+                                  <div className="flex-1">
+                                    <h2 className="text-xl font-semibold text-gray-800">
+                                      {form.nome_vaga}
+                                    </h2>
+                                    <p className="text-sm text-gray-500">
+                                      {empresas.find(
+                                        (e) =>
+                                          e.id.toString() ===
+                                          form.empresa_id.toString(),
+                                      )?.nome_empresa ??
+                                        t(
+                                          "tela_vaga_dados.item_msg_indefinida",
+                                        )}
+                                    </p>
                                   </div>
                                 </div>
 
-                                <button
-                                  onClick={() =>
-                                    handleRemoveSkill(item.skill_id)
-                                  }
-                                  className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
-                                  title={t(
-                                    "tela_vaga_dados.item_botao_remover_skill"
-                                  )}
-                                >
-                                  <X size={18} />
-                                </button>
+                                {/* Data de vigência abaixo */}
+                                <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
+                                  <CalendarDays className="w-4 h-4 text-purple-500" />
+                                  <span>
+                                    {t("tela_vaga_dados.item_msg_vigencia")}{" "}
+                                    <strong>{dataFormatada}</strong>
+                                  </span>
+                                </div>
                               </div>
-                            );
-                          })}
-                      </div>
 
-                      {/* Botões no rodapé */}
-                      <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                        <div className="flex">
-                          <button
-                            onClick={prevStep}
-                            type="button"
-                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                          >
-                            {t("tela_vaga_dados.item_botao_voltar")}
-                          </button>
+                              <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
+                                {/* Estado */}
+                                <div className="flex items-center gap-2 w-full sm:w-1/2">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-gray-500"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
+                                    />
+                                  </svg>
+                                  {form.estado_label}
+                                </div>
+
+                                {/* Cidade */}
+                                <div className="flex items-center gap-2 w-full sm:w-1/2">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-gray-500"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
+                                    />
+                                    <circle cx="12" cy="10" r="3" />
+                                  </svg>
+                                  {form.cidade_label}
+                                </div>
+                              </div>
+
+                              {/* Linha 1 - Local e Data de Cadastro */}
+                              <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
+                                <div className="flex items-center gap-2 w-full">
+                                  <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
+                                  {t("tela_vaga_dados.item_msg_aberta")}{" "}
+                                  {(form.data_cadastro ?? dataBase)
+                                    ? new Date(
+                                        form.data_cadastro ?? dataBase,
+                                      ).toLocaleDateString("pt-BR")
+                                    : t("tela_vaga_dados.item_msg_sem_data")}
+                                </div>
+                              </div>
+
+                              {/* Linha 2 - Período e Modalidade */}
+                              <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
+                                <div className="flex items-center gap-2 w-full sm:w-1/2">
+                                  <Clock className="w-4 h-4 text-gray-500 shrink-0" />
+                                  {periodos.find(
+                                    (p) =>
+                                      String(p.periodo_trabalho_id) ===
+                                      String(form.periodo_trabalho_id),
+                                  )?.periodo ||
+                                    t("tela_vaga_dados.item_msg_sem_periodo")}
+                                </div>
+                                <div className="flex items-center gap-2 w-full sm:w-1/2">
+                                  <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
+                                  {modalidades.find(
+                                    (m) =>
+                                      String(m.modalidade_trabalho_id) ===
+                                      String(form.modalidade_trabalho_id),
+                                  )?.modalidade ||
+                                    t(
+                                      "tela_vaga_dados.item_msg_sem_modalidade",
+                                    )}
+                                </div>
+                              </div>
+
+                              {/* Linha 3 - Aberta em e PCD */}
+                              <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
+                                <div className="w-full sm:w-1/2">
+                                  {form.pcd && (
+                                    <span role="img" aria-label="acessível">
+                                      ♿ {t("tela_vaga_dados.item_vaga_pcd")}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="w-full sm:w-1/2">
+                                  {form?.lgbtq && (
+                                    <span role="img" aria-label="acessível">
+                                      🏳️‍🌈 {t("tela_vaga_dados.item_vaga_lgbtq")}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
+                                <div className="w-full sm:w-1/2">
+                                  {form.mulheres && (
+                                    <span role="img" aria-label="acessível">
+                                      👩‍💼{" "}
+                                      {t("tela_vaga_dados.item_vaga_mulheres")}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="w-full sm:w-1/2">
+                                  {form?.cinquenta_mais && (
+                                    <span role="img" aria-label="acessível">
+                                      👴{" "}
+                                      {t("tela_vaga_dados.item_vaga_50_mais")}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Linha 4 - Descrição */}
+                              <div>
+                                <h3 className="text-md font-semibold text-gray-700 mb-1">
+                                  {t("tela_vaga_dados.item_label_descricao")}
+                                </h3>
+                                <p className="text-sm text-gray-600 whitespace-pre-line">
+                                  {form.descricao}
+                                </p>
+                              </div>
+
+                              {/* Linha 5 - Vigência */}
+                            </div>
+
+                            {/* Bloco - Lista de Skills */}
+                            <div className="w-full sm:w-[30%] flex flex-col mt-2">
+                              <h3 className="text-md font-semibold text-gray-700 mb-2">
+                                {t("tela_vaga_dados.item_label_skill_pesos")}
+                              </h3>
+
+                              <ul className="grid grid-cols-1 xs:grid-cols-2 gap-2">
+                                {form.lista_skills?.map((skill, index) => (
+                                  <li
+                                    key={index}
+                                    className="border border-purple-300 bg-purple-50 px-4 py-3 rounded-md flex flex-col justify-between"
+                                  >
+                                    {/* Linha 1: nome da skill e peso */}
+                                    <div className="flex justify-between items-center mb-1">
+                                      <span className="text-sm font-light">
+                                        {skill.nome}
+                                      </span>
+                                      <span className="text-xs text-[#808080]">
+                                        {t("tela_vaga_dados.item_label_peso")}{" "}
+                                        {skill.peso / 10}/10
+                                      </span>
+                                    </div>
+
+                                    {/* Linha 2: barra de score */}
+                                    <div className="w-full h-2 bg-gray-200 rounded-full">
+                                      <div
+                                        className="h-full bg-purple-500 rounded-full"
+                                        style={{
+                                          width: `${(skill.peso / 10) * 10}%`,
+                                        }}
+                                      />
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            {/* </div> */}
+                          </div>
+
+                          {/* Coluna Direita - Gráficos */}
+                          <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
+                            <SkillsPanel skills={skillsData} perfil={perfil} />
+                          </div>
                         </div>
 
-                        {/* Direita: botões cadastrar e editar */}
-                        <div className="flex gap-2">
-                          <button
-                            type="button" // evita submit acidental
-                            onClick={handleCancel}
-                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                          >
-                            {t("tela_vaga_dados.item_botao_cancelar")}
-                          </button>
-                          <button
-                            type="submit"
-                            className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer`}
-                          >
-                            {t("tela_vaga_dados.item_botao_avancar")}
-                          </button>
+                        {/* Botões */}
+                        <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                          <div className="flex">
+                            <button
+                              onClick={prevStep}
+                              type="button"
+                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                            >
+                              {t("tela_vaga_dados.item_botao_voltar")}
+                            </button>
+                          </div>
+
+                          {/* Direita: botões cadastrar e editar */}
+                          <div className="flex gap-2">
+                            <button
+                              type="button" // evita submit acidental
+                              onClick={handleCancel}
+                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                            >
+                              {t("tela_vaga_dados.item_botao_cancelar")}
+                            </button>
+                            <button
+                              type="submit"
+                              className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
+                                isFormValid(form)
+                                  ? "text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                                  : "bg-gray-300 cursor-not-allowed"
+                              }`}
+                            >
+                              {isSubmitting ? (
+                                <ImSpinner2 className="animate-spin" />
+                              ) : (
+                                t("tela_vaga_dados.item_botao_publicar")
+                              )}
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    </form>
-                  </div>
-                )}
+                      </form>
+                    </div>
+                  )}
 
-                {step === 4 && (
-                  <div className="w-full h-full flex flex-col">
-                    <form
-                      onSubmit={handleSubmit}
-                      className="flex flex-col flex-1"
-                    >
-                      {/* Capa e Logo */}
+                  {step === 5 && vagaPublicada === null && <LoadingOverlay />}
 
+                  {step === 5 && (
+                    <div className="w-full h-full flex flex-col">
                       {/* Container Principal */}
                       <div className="flex flex-col md:flex-row  w-full ">
                         {/* Coluna Esquerda */}
@@ -1767,9 +2050,9 @@ export default function VagaDados({
                               <div className="flex flex-row w-full gap-4 items-center">
                                 {/* Logo */}
                                 <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
-                                  {form.logo ? (
+                                  {vagaPublicada?.empresa?.logo ? (
                                     <Image
-                                      src={form?.logo}
+                                      src={vagaPublicada?.empresa?.logo}
                                       alt="Logo da empresa"
                                       width={64}
                                       height={64}
@@ -1784,17 +2067,12 @@ export default function VagaDados({
                                 </div>
 
                                 {/* Título e empresa */}
-                                <div className="flex-1">
+                                <div>
                                   <h2 className="text-xl font-semibold text-gray-800">
-                                    {form.nome_vaga}
+                                    {vagaPublicada?.nome_vaga}
                                   </h2>
                                   <p className="text-sm text-gray-500">
-                                    {empresas.find(
-                                      (e) =>
-                                        e.id.toString() ===
-                                        form.empresa_id.toString()
-                                    )?.nome_empresa ??
-                                      t("tela_vaga_dados.item_msg_indefinida")}
+                                    {vagaPublicada?.empresa?.nome_empresa}
                                   </p>
                                 </div>
                               </div>
@@ -1809,55 +2087,19 @@ export default function VagaDados({
                               </div>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
-                              {/* Estado */}
-                              <div className="flex items-center gap-2 w-full sm:w-1/2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
-                                  />
-                                </svg>
-                                {form.estado_label}
-                              </div>
-
-                              {/* Cidade */}
-                              <div className="flex items-center gap-2 w-full sm:w-1/2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
-                                  />
-                                  <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                {form.cidade_label}
-                              </div>
-                            </div>
-
                             {/* Linha 1 - Local e Data de Cadastro */}
                             <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
-                              <div className="flex items-center gap-2 w-full">
+                              <div className="flex items-center gap-2 w-full sm:w-1/2">
+                                <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
+                                {vagaPublicada?.local_vaga ||
+                                  t("tela_vaga_dados.item_msg_sem_local")}
+                              </div>
+                              <div className="flex items-center gap-2 w-full sm:w-1/2">
                                 <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
                                 {t("tela_vaga_dados.item_msg_aberta")}{" "}
-                                {form.data_cadastro ?? dataBase
+                                {vagaPublicada?.data_cadastro
                                   ? new Date(
-                                      form.data_cadastro ?? dataBase
+                                      vagaPublicada?.data_cadastro,
                                     ).toLocaleDateString("pt-BR")
                                   : t("tela_vaga_dados.item_msg_sem_data")}
                               </div>
@@ -1867,20 +2109,13 @@ export default function VagaDados({
                             <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
                               <div className="flex items-center gap-2 w-full sm:w-1/2">
                                 <Clock className="w-4 h-4 text-gray-500 shrink-0" />
-                                {periodos.find(
-                                  (p) =>
-                                    String(p.periodo_trabalho_id) ===
-                                    String(form.periodo_trabalho_id)
-                                )?.periodo ||
+                                {vagaPublicada?.periodo_trabalho?.periodo ||
                                   t("tela_vaga_dados.item_msg_sem_periodo")}
                               </div>
                               <div className="flex items-center gap-2 w-full sm:w-1/2">
                                 <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
-                                {modalidades.find(
-                                  (m) =>
-                                    String(m.modalidade_trabalho_id) ===
-                                    String(form.modalidade_trabalho_id)
-                                )?.modalidade ||
+                                {vagaPublicada?.modalidade_trabalho
+                                  ?.modalidade ||
                                   t("tela_vaga_dados.item_msg_sem_modalidade")}
                               </div>
                             </div>
@@ -1888,14 +2123,14 @@ export default function VagaDados({
                             {/* Linha 3 - Aberta em e PCD */}
                             <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
                               <div className="w-full sm:w-1/2">
-                                {form.pcd && (
+                                {vagaPublicada?.pcd && (
                                   <span role="img" aria-label="acessível">
                                     ♿ {t("tela_vaga_dados.item_vaga_pcd")}
                                   </span>
                                 )}
                               </div>
                               <div className="w-full sm:w-1/2">
-                                {form?.lgbtq && (
+                                {vagaPublicada?.lgbtq && (
                                   <span role="img" aria-label="acessível">
                                     🏳️‍🌈 {t("tela_vaga_dados.item_vaga_lgbtq")}
                                   </span>
@@ -1904,14 +2139,14 @@ export default function VagaDados({
                             </div>
                             <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
                               <div className="w-full sm:w-1/2">
-                                {form.mulheres && (
+                                {vagaPublicada?.mulheres && (
                                   <span role="img" aria-label="acessível">
                                     👩‍💼 {t("tela_vaga_dados.item_vaga_mulheres")}
                                   </span>
                                 )}
                               </div>
                               <div className="w-full sm:w-1/2">
-                                {form?.cinquenta_mais && (
+                                {vagaPublicada?.cinquenta_mais && (
                                   <span role="img" aria-label="acessível">
                                     👴 {t("tela_vaga_dados.item_vaga_50_mais")}
                                   </span>
@@ -1925,7 +2160,7 @@ export default function VagaDados({
                                 {t("tela_vaga_dados.item_label_descricao")}
                               </h3>
                               <p className="text-sm text-gray-600 whitespace-pre-line">
-                                {form.descricao}
+                                {vagaPublicada?.descricao}
                               </p>
                             </div>
 
@@ -1939,7 +2174,7 @@ export default function VagaDados({
                             </h3>
 
                             <ul className="grid grid-cols-1 xs:grid-cols-2 gap-2">
-                              {form.lista_skills?.map((skill, index) => (
+                              {vagaPublicada?.skills?.map((skill, index) => (
                                 <li
                                   key={index}
                                   className="border border-purple-300 bg-purple-50 px-4 py-3 rounded-md flex flex-col justify-between"
@@ -1974,237 +2209,17 @@ export default function VagaDados({
 
                         {/* Coluna Direita - Gráficos */}
                         <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                          <SkillsPanel skills={skillsData} perfil={perfil} />
+                          <SkillsPanel
+                            skills={vagaPublicada?.skills}
+                            perfil={perfil}
+                          />
                         </div>
-                      </div>
-
-                      {/* Botões */}
-                      <div className="flex flex-col md:flex-row justify-between gap-2 mt-6">
-                        <div className="flex">
-                          <button
-                            onClick={prevStep}
-                            type="button"
-                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
-                          >
-                            {t("tela_vaga_dados.item_botao_voltar")}
-                          </button>
-                        </div>
-
-                        {/* Direita: botões cadastrar e editar */}
-                        <div className="flex gap-2">
-                          <button
-                            type="button" // evita submit acidental
-                            onClick={handleCancel}
-                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                          >
-                            {t("tela_vaga_dados.item_botao_cancelar")}
-                          </button>
-                          <button
-                            type="submit"
-                            className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
-                              isFormValid(form)
-                                ? "text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                                : "bg-gray-300 cursor-not-allowed"
-                            }`}
-                          >
-                            {isSubmitting ? (
-                              <ImSpinner2 className="animate-spin" />
-                            ) : (
-                              t("tela_vaga_dados.item_botao_publicar")
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                )}
-
-                {step === 5 && vagaPublicada === null && <LoadingOverlay />}
-
-                {step === 5 && (
-                  <div className="w-full h-full flex flex-col">
-                    {/* Container Principal */}
-                    <div className="flex flex-col md:flex-row  w-full ">
-                      {/* Coluna Esquerda */}
-                      <div className="flex flex-col md:flex-row w-full">
-                        {/* Dados da vaga e skills lado a lado */}
-                        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border border-yellow-500"> */}
-                        {/* Bloco - Informações da vaga */}
-                        <div className="w-[65%] space-y-4 mr-2">
-                          {/* Linha 1 - Logo + Título da vaga e empresa */}
-                          <div className="flex flex-col gap-4">
-                            {/* Logo e título + empresa ocupando toda largura */}
-                            <div className="flex flex-row w-full gap-4 items-center">
-                              {/* Logo */}
-                              <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
-                                {vagaPublicada?.empresa?.logo ? (
-                                  <Image
-                                    src={vagaPublicada?.empresa?.logo}
-                                    alt="Logo da empresa"
-                                    width={64}
-                                    height={64}
-                                    className="w-full h-full object-cover"
-                                    unoptimized
-                                  />
-                                ) : (
-                                  <div className="text-xs text-gray-400 text-center px-2">
-                                    {t("tela_vaga_dados.item_msg_sem_foto")}
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Título e empresa */}
-                              <div>
-                                <h2 className="text-xl font-semibold text-gray-800">
-                                  {vagaPublicada?.nome_vaga}
-                                </h2>
-                                <p className="text-sm text-gray-500">
-                                  {vagaPublicada?.empresa?.nome_empresa}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Data de vigência abaixo */}
-                            <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
-                              <CalendarDays className="w-4 h-4 text-purple-500" />
-                              <span>
-                                {t("tela_vaga_dados.item_msg_vigencia")}{" "}
-                                <strong>{dataFormatada}</strong>
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Linha 1 - Local e Data de Cadastro */}
-                          <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
-                            <div className="flex items-center gap-2 w-full sm:w-1/2">
-                              <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
-                              {vagaPublicada?.local_vaga ||
-                                t("tela_vaga_dados.item_msg_sem_local")}
-                            </div>
-                            <div className="flex items-center gap-2 w-full sm:w-1/2">
-                              <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
-                              {t("tela_vaga_dados.item_msg_aberta")}{" "}
-                              {vagaPublicada?.data_cadastro
-                                ? new Date(
-                                    vagaPublicada?.data_cadastro
-                                  ).toLocaleDateString("pt-BR")
-                                : t("tela_vaga_dados.item_msg_sem_data")}
-                            </div>
-                          </div>
-
-                          {/* Linha 2 - Período e Modalidade */}
-                          <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
-                            <div className="flex items-center gap-2 w-full sm:w-1/2">
-                              <Clock className="w-4 h-4 text-gray-500 shrink-0" />
-                              {vagaPublicada?.periodo_trabalho?.periodo ||
-                                t("tela_vaga_dados.item_msg_sem_periodo")}
-                            </div>
-                            <div className="flex items-center gap-2 w-full sm:w-1/2">
-                              <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
-                              {vagaPublicada?.modalidade_trabalho?.modalidade ||
-                                t("tela_vaga_dados.item_msg_sem_modalidade")}
-                            </div>
-                          </div>
-
-                          {/* Linha 3 - Aberta em e PCD */}
-                          <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
-                            <div className="w-full sm:w-1/2">
-                              {vagaPublicada?.pcd && (
-                                <span role="img" aria-label="acessível">
-                                  ♿ {t("tela_vaga_dados.item_vaga_pcd")}
-                                </span>
-                              )}
-                            </div>
-                            <div className="w-full sm:w-1/2">
-                              {vagaPublicada?.lgbtq && (
-                                <span role="img" aria-label="acessível">
-                                  🏳️‍🌈 {t("tela_vaga_dados.item_vaga_lgbtq")}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
-                            <div className="w-full sm:w-1/2">
-                              {vagaPublicada?.mulheres && (
-                                <span role="img" aria-label="acessível">
-                                  👩‍💼 {t("tela_vaga_dados.item_vaga_mulheres")}
-                                </span>
-                              )}
-                            </div>
-                            <div className="w-full sm:w-1/2">
-                              {vagaPublicada?.cinquenta_mais && (
-                                <span role="img" aria-label="acessível">
-                                  👴 {t("tela_vaga_dados.item_vaga_50_mais")}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Linha 4 - Descrição */}
-                          <div>
-                            <h3 className="text-md font-semibold text-gray-700 mb-1">
-                              {t("tela_vaga_dados.item_label_descricao")}
-                            </h3>
-                            <p className="text-sm text-gray-600 whitespace-pre-line">
-                              {vagaPublicada?.descricao}
-                            </p>
-                          </div>
-
-                          {/* Linha 5 - Vigência */}
-                        </div>
-
-                        {/* Bloco - Lista de Skills */}
-                        <div className="w-full sm:w-[30%] flex flex-col mt-2">
-                          <h3 className="text-md font-semibold text-gray-700 mb-2">
-                            {t("tela_vaga_dados.item_label_skill_pesos")}
-                          </h3>
-
-                          <ul className="grid grid-cols-1 xs:grid-cols-2 gap-2">
-                            {vagaPublicada?.skills?.map((skill, index) => (
-                              <li
-                                key={index}
-                                className="border border-purple-300 bg-purple-50 px-4 py-3 rounded-md flex flex-col justify-between"
-                              >
-                                {/* Linha 1: nome da skill e peso */}
-                                <div className="flex justify-between items-center mb-1">
-                                  <span className="text-sm font-light">
-                                    {skill.nome}
-                                  </span>
-                                  <span className="text-xs text-[#808080]">
-                                    {t("tela_vaga_dados.item_label_peso")}{" "}
-                                    {skill.peso / 10}/10
-                                  </span>
-                                </div>
-
-                                {/* Linha 2: barra de score */}
-                                <div className="w-full h-2 bg-gray-200 rounded-full">
-                                  <div
-                                    className="h-full bg-purple-500 rounded-full"
-                                    style={{
-                                      width: `${(skill.peso / 10) * 10}%`,
-                                    }}
-                                  />
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-
-                        {/* </div> */}
-                      </div>
-
-                      {/* Coluna Direita - Gráficos */}
-                      <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                        <SkillsPanel
-                          skills={vagaPublicada?.skills}
-                          perfil={perfil}
-                        />
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </main>
+                  )}
+                </div>
+              </PageContainer>
+            </div>
           </>
         )}
       </div>

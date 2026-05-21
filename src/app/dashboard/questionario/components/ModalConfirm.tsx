@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { Trash2 } from "lucide-react";
 
 interface Props {
   titulo: string;
@@ -45,7 +46,9 @@ export default function ModalConfirm({
         <div className="flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50  cursor-pointer"
+            className="px-4 py-2 text-sm rounded-lg text-indigo-900 bg-blue-100 
+                      border border-transparent 
+                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
           >
             {t("questionario.btn_cancelar")}
           </button>
@@ -53,8 +56,14 @@ export default function ModalConfirm({
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 cursor-pointer"
+            className="flex items-center justify-center gap-2 
+             px-4 py-2 text-sm 
+             text-red-600 bg-blue-100 
+             border border-transparent 
+             hover:bg-blue-200 hover:border-blue-300 
+             rounded-lg cursor-pointer whitespace-nowrap"
           >
+            <Trash2 size={14} />
             {loading
               ? t("questionario.btn_excluindo")
               : t("questionario.btn_excluir")}

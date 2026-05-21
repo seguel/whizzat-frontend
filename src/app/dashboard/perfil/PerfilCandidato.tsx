@@ -16,6 +16,7 @@ import CreatableSelect from "react-select/creatable";
 import TooltipIcon from "../../components/TooltipIcon";
 import SkillsPanel from "../../components/perfil/SkillsPanel";
 import { useTranslation } from "react-i18next";
+import PageContainer from "@/app/components/PageContainer";
 
 const allowedTypes = [
   "image/",
@@ -154,7 +155,7 @@ export default function PerfilCandidato({
       estado_label: "",
       cidade_id: 0,
       cidade_label: "",
-    }
+    },
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showErrors, setShowErrors] = useState(false);
@@ -175,7 +176,7 @@ export default function PerfilCandidato({
   /***** formacao ******/
   const [formacaoInput, setFormacaoInput] = useState<string>("");
   const [novoCertificadoFile, setNovoCertificadoFile] = useState<File | null>(
-    null
+    null,
   );
   const [novoCertificadoPreview, setNovoCertificadoPreview] = useState<
     string | null
@@ -191,7 +192,7 @@ export default function PerfilCandidato({
 
   /***** certificacoes ******/
   const [novoCertificacaoFile, setNovoCertificacaoFile] = useState<File | null>(
-    null
+    null,
   );
   const [novoCertificacaoPreview, setNovoCertificacaoPreview] = useState<
     string | null
@@ -269,7 +270,7 @@ export default function PerfilCandidato({
       } catch (error) {
         console.error(
           t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingCandidato(false);
@@ -284,7 +285,7 @@ export default function PerfilCandidato({
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
 
         const userData = await userRes.json();
@@ -326,7 +327,7 @@ export default function PerfilCandidato({
       } catch (error) {
         console.error(
           t("tela_perfil_recrutador.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingCandidato(false);
@@ -350,11 +351,11 @@ export default function PerfilCandidato({
           {
             method: "GET",
             credentials: "include",
-          }
+          },
         );
         if (!res.ok)
           throw new Error(
-            t("tela_perfil_candidato.item_alerta_erro_buscar_dados")
+            t("tela_perfil_candidato.item_alerta_erro_buscar_dados"),
           );
 
         const data = await res.json();
@@ -399,7 +400,7 @@ export default function PerfilCandidato({
       } catch (error) {
         console.error(
           t("tela_perfil_candidato.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingCandidato(false);
@@ -468,7 +469,7 @@ export default function PerfilCandidato({
       } catch (error) {
         console.error(
           t("tela_perfil_candidato.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoadingCandidato(false);
@@ -488,7 +489,7 @@ export default function PerfilCandidato({
       if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
       return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(
         4,
-        8
+        8,
       )}`;
     } else {
       // en-US mm/dd/yyyy
@@ -496,7 +497,7 @@ export default function PerfilCandidato({
       if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
       return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(
         4,
-        8
+        8,
       )}`;
     }
   };
@@ -569,7 +570,7 @@ export default function PerfilCandidato({
     const selectedId = e.target.value;
     const value = Number(e.target.value ?? 0);
     const generoSelecionada = generos.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setSexo(selectedId);
@@ -585,7 +586,7 @@ export default function PerfilCandidato({
     const selectedId = e.target.value;
     const value = Number(e.target.value ?? 0);
     const estadoSelecionada = estados.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setEstado(selectedId);
@@ -605,7 +606,7 @@ export default function PerfilCandidato({
         `${process.env.NEXT_PUBLIC_API_URL}/cidades/estado-cidade/${selectedId}`,
         {
           method: "GET",
-        }
+        },
       );
 
       if (!cidadeRes.ok)
@@ -626,7 +627,7 @@ export default function PerfilCandidato({
     const selectedId = e.target.value;
     const value = Number(e.target.value ?? 0);
     const cidadeSelecionada = cidades.find(
-      (e) => e.id.toString() === selectedId
+      (e) => e.id.toString() === selectedId,
     );
 
     setCidade(selectedId);
@@ -812,15 +813,15 @@ export default function PerfilCandidato({
         formData.append(
           "skills",
           JSON.stringify(
-            serializeSkills(form.lista_skills.filter((s) => s.skill_id > 0))
-          )
+            serializeSkills(form.lista_skills.filter((s) => s.skill_id > 0)),
+          ),
         );
 
         formData.append(
           "novas_skills",
           JSON.stringify(
-            serializeSkills(form.lista_skills.filter((s) => s.skill_id < 0))
-          )
+            serializeSkills(form.lista_skills.filter((s) => s.skill_id < 0)),
+          ),
         );
 
         // ================================
@@ -843,7 +844,7 @@ export default function PerfilCandidato({
           if (f.certificado_file instanceof File) {
             formData.append(
               `formacao_certificado_${index}`,
-              f.certificado_file
+              f.certificado_file,
             );
           }
         });
@@ -863,11 +864,15 @@ export default function PerfilCandidato({
         // console.log(certificacoesData.filter((c) => c.certificacao_id > 0));
         formData.append(
           "certificacoes",
-          JSON.stringify(certificacoesData.filter((c) => c.certificacao_id > 0))
+          JSON.stringify(
+            certificacoesData.filter((c) => c.certificacao_id > 0),
+          ),
         );
         formData.append(
           "novas_certificacoes",
-          JSON.stringify(certificacoesData.filter((c) => c.certificacao_id < 0))
+          JSON.stringify(
+            certificacoesData.filter((c) => c.certificacao_id < 0),
+          ),
         );
 
         // ================================
@@ -890,8 +895,8 @@ export default function PerfilCandidato({
             typeof data.message === "string"
               ? data.message
               : Array.isArray(data.message)
-              ? data.message.join(", ")
-              : t("tela_perfil_candidato.item_alerta_erro_salvar");
+                ? data.message.join(", ")
+                : t("tela_perfil_candidato.item_alerta_erro_salvar");
           throw new Error(errorMessage);
         }
 
@@ -971,7 +976,7 @@ export default function PerfilCandidato({
   const handleSkillChange = (
     skill_id: number,
     field: "peso" | "favorito" | "tempo_favorito",
-    value: number | boolean | string
+    value: number | boolean | string,
   ) => {
     const atualizadas = form.lista_skills.map((s) => {
       if (s.skill_id !== skill_id) return s;
@@ -997,7 +1002,7 @@ export default function PerfilCandidato({
   /*** formacao ***/
 
   const handleNovoCertificadoChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1060,7 +1065,7 @@ export default function PerfilCandidato({
 
   const handleCertificadoItemChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    id: number
+    id: number,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1097,7 +1102,7 @@ export default function PerfilCandidato({
               certificado_file: file, // substitui o arquivo
               certificado_preview: previewUrl, // substitui o preview
             }
-          : f
+          : f,
       );
       return { ...prev, lista_formacao: novaLista };
     });
@@ -1108,7 +1113,7 @@ export default function PerfilCandidato({
 
     toast.success(
       t("tela_perfil_candidato.item_botao_certificado_atualizado"),
-      { duration: 2000 }
+      { duration: 2000 },
     );
   };
 
@@ -1121,7 +1126,7 @@ export default function PerfilCandidato({
 
   /*** certificacoes ***/
   const handleNovoCertificacaoChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1194,7 +1199,7 @@ export default function PerfilCandidato({
 
   const handleCertificacaoItemChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    id: number
+    id: number,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1231,7 +1236,7 @@ export default function PerfilCandidato({
               certificado_file: file, // substitui o arquivo
               certificado_preview: previewUrl, // substitui o preview
             }
-          : f
+          : f,
       );
       return { ...prev, lista_certificado: novaLista };
     });
@@ -1242,7 +1247,7 @@ export default function PerfilCandidato({
 
     toast.success(
       t("tela_perfil_candidato.item_botao_certificado_atualizado"),
-      { duration: 2000 }
+      { duration: 2000 },
     );
   };
 
@@ -1250,7 +1255,7 @@ export default function PerfilCandidato({
     setForm((prev) => ({
       ...prev,
       lista_certificado: prev.lista_certificado.filter(
-        (s) => s.certificacao_id !== id
+        (s) => s.certificacao_id !== id,
       ),
     }));
   };
@@ -1266,312 +1271,319 @@ export default function PerfilCandidato({
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-      <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
+
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        {step != 7 && (
-          <div className="pt-3 pl-6 flex items-center justify-center">
-            <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
-              {[
-                `1 ${t("tela_topo_passos.passo_dados")}`,
-                `2 ${t("tela_topo_passos.passo_formacao")}`,
-                `3 ${t("tela_topo_passos.passo_certificacao")}`,
-                `4 ${t("tela_topo_passos.passo_hardskills")}`,
-                `5 ${t("tela_topo_passos.passo_softskills")}`,
-                `6 ${t("tela_topo_passos.passo_visualizar")}`,
-                `7 ${t("tela_topo_passos.passo_publicar")}`,
-              ].map((etapa, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-1 flex-1 min-w-0 "
-                >
+        <div className="flex-1 overflow-y-auto">
+          {step != 7 && (
+            <div className="pt-3 pl-6 flex items-center justify-center">
+              <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
+                {[
+                  `1 ${t("tela_topo_passos.passo_dados")}`,
+                  `2 ${t("tela_topo_passos.passo_formacao")}`,
+                  `3 ${t("tela_topo_passos.passo_certificacao")}`,
+                  `4 ${t("tela_topo_passos.passo_hardskills")}`,
+                  `5 ${t("tela_topo_passos.passo_softskills")}`,
+                  `6 ${t("tela_topo_passos.passo_visualizar")}`,
+                  `7 ${t("tela_topo_passos.passo_publicar")}`,
+                ].map((etapa, index) => (
                   <div
-                    className={`w-6 h-6 rounded-full text-center text-white text-xs flex items-center justify-center ${
-                      step === index + 1 ? "bg-blue-600" : "bg-gray-300"
-                    }`}
+                    key={index}
+                    className="flex items-center gap-1 flex-1 min-w-0 "
                   >
-                    {index + 1}
+                    <div
+                      className={`w-6 h-6 rounded-full text-center text-white text-xs flex items-center justify-center ${
+                        step === index + 1 ? "bg-blue-600" : "bg-gray-300"
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <span
+                      className={`truncate ${
+                        step === index + 1 ? "text-black" : "text-gray-400"
+                      }`}
+                    >
+                      {etapa.split(" ")[1]}
+                    </span>
                   </div>
-                  <span
-                    className={`truncate ${
-                      step === index + 1 ? "text-black" : "text-gray-400"
-                    }`}
-                  >
-                    {etapa.split(" ")[1]}
-                  </span>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <main className="p-4 grid grid-cols-1 gap-4 w-[98%] mx-auto">
-          <div className="flex flex-col items-start p-4 bg-white rounded-lg shadow-sm w-full min-h-[500px]">
-            {step === 1 && (
-              <form
-                onSubmit={handleSubmit}
-                className="grid grid-cols-1 gap-4 w-full"
-              >
-                {candidatoId && (
-                  <div className="flex items-center justify-between w-full">
-                    {/* Esquerda: Toggle + "Ativo" */}
-                    <label className="flex items-center cursor-pointer">
-                      <div className="relative">
+          <PageContainer>
+            <div className="flex flex-col flex-1 w-full min-h-[500px] ">
+              {step === 1 && (
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex flex-col flex-1 w-full gap-4"
+                >
+                  {candidatoId && (
+                    <div className="flex items-center justify-between w-full">
+                      {/* Esquerda: Toggle + "Ativo" */}
+                      <label className="flex items-center cursor-pointer">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            name="ativo"
+                            checked={form.ativo ?? candidato?.ativo ?? true}
+                            onChange={handleChange}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
+                          <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
+                        </div>
+                        <span className="ml-3 text-sm font-normal text-gray-700">
+                          {t("tela_perfil_candidato.item_ativo")}
+                        </span>
+                      </label>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-sm font-medium mb-1">
+                      {t("tela_perfil_recrutador.item_label_nome")}
+                    </label>
+                    <div className="flex flex-row gap-3">
+                      <div className="flex items-center border border-blue-600 rounded px-3 py-2 w-1/2">
                         <input
-                          type="checkbox"
-                          name="ativo"
-                          checked={form.ativo ?? candidato?.ativo ?? true}
+                          name="primeiro_nome"
+                          placeholder={t(
+                            "tela_perfil_recrutador.item_placeholder_primeiro_nome",
+                          )}
+                          className="w-full outline-none"
+                          defaultValue={form.primeiro_nome}
                           onChange={handleChange}
-                          className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
-                        <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
                       </div>
-                      <span className="ml-3 text-sm font-normal text-gray-700">
-                        {t("tela_perfil_candidato.item_ativo")}
-                      </span>
-                    </label>
-                  </div>
-                )}
-
-                <div>
-                  <label className="text-sm font-medium mb-1">
-                    {t("tela_perfil_recrutador.item_label_nome")}
-                  </label>
-                  <div className="flex flex-row gap-3">
-                    <div className="flex items-center border border-blue-600 rounded px-3 py-2 w-1/2">
-                      <input
-                        name="primeiro_nome"
-                        placeholder={t(
-                          "tela_perfil_recrutador.item_placeholder_primeiro_nome"
-                        )}
-                        className="w-full outline-none"
-                        defaultValue={form.primeiro_nome}
-                        onChange={handleChange}
-                      />
+                      <div className="flex items-center border border-blue-600 rounded px-3 py-2 w-1/2">
+                        <input
+                          name="ultimo_nome"
+                          placeholder={t(
+                            "tela_perfil_recrutador.item_placeholder_ultimo_nome",
+                          )}
+                          className="w-full outline-none"
+                          defaultValue={form.ultimo_nome}
+                          onChange={handleChange}
+                        />
+                      </div>
                     </div>
-                    <div className="flex items-center border border-blue-600 rounded px-3 py-2 w-1/2">
-                      <input
-                        name="ultimo_nome"
-                        placeholder={t(
-                          "tela_perfil_recrutador.item_placeholder_ultimo_nome"
-                        )}
-                        className="w-full outline-none"
-                        defaultValue={form.ultimo_nome}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                  {showErrors && (!form.primeiro_nome || !form.ultimo_nome) && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {t("tela_perfil_recrutador.item_msg_campo_obt")}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                    {t("cadastro.nome_social")}
-                    <TooltipIcon
-                      message={`${t("cadastro.tooltip_msg_nome_social")}`}
-                      perfil={perfil}
-                    />
-                  </label>
-                  <div className="flex items-center border border-blue-600 rounded px-3 py-2">
-                    <input
-                      type="text"
-                      name="nome_social"
-                      placeholder={t("cadastro.placehold_nome_social")}
-                      className="w-full outline-none"
-                      defaultValue={form.nome_social}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  {/* Campo 1 - Data de nascimento */}
-                  <div className="col-span-1">
-                    <label className="text-sm font-medium mb-1">
-                      {t("cadastro.data_nascimento")}
-                    </label>
-
-                    <input
-                      type="text"
-                      value={dtNascDisplay}
-                      onChange={handleMaskedDateChange}
-                      placeholder={t("cadastro.placehold_data_nascimento")}
-                      className="flex items-center border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
-                    />
-
-                    {showErrors && !form.data_nascimento && (
-                      <p className="text-sm text-red-600 mt-1">
-                        {t("tela_perfil_recrutador.item_msg_campo_obt")}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Campo 2 - Sexo */}
-                  <div className="col-span-1">
-                    <label className="text-sm font-medium mb-1">
-                      {t("cadastro.sexo")}
-                    </label>
-                    <select
-                      className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
-                      name="genero"
-                      value={sexo}
-                      onChange={handleGeneroChange}
-                    >
-                      <option value="">{t("cadastro.placehold_sexo")}</option>
-                      {generos.map((gen) => (
-                        <option key={gen.id} value={gen.id}>
-                          {gen.genero}
-                        </option>
-                      ))}
-                    </select>
-
-                    {showErrors && !form.genero_id && (
-                      <p className="text-sm text-red-600 mt-1">
-                        {t("tela_perfil_recrutador.item_msg_campo_obt")}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Campo 3 - Estado */}
-                  <div className="col-span-1">
-                    <label className="text-sm font-medium mb-1">
-                      {t("cadastro.estado")}
-                    </label>
-
-                    <select
-                      className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
-                      name="estado"
-                      value={estado}
-                      onChange={handleEstadoChange}
-                    >
-                      <option value="">{t("cadastro.placehold_estado")}</option>
-                      {estados.map((e) => (
-                        <option key={e.id} value={e.id}>
-                          {e.sigla}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Campo 4 - Cidade (maior no desktop) */}
-                  <div className="col-span-1 md:col-span-2">
-                    <label className="text-sm font-medium mb-1">
-                      {t("cadastro.cidade")}
-                    </label>
-
-                    <select
-                      className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
-                      name="cidade"
-                      value={cidade}
-                      onChange={handleCidadeChange}
-                    >
-                      <option value="">{t("cadastro.placehold_cidade")}</option>
-                      {cidades.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.cidade}
-                        </option>
-                      ))}
-                    </select>
-
-                    {showErrors && !form.cidade_id && (
-                      <p className="text-sm text-red-600 mt-1">
-                        {t("tela_perfil_recrutador.item_msg_campo_obt")}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t("tela_perfil_candidato.item_label_telefone")}
-                  </label>
-                  <div className="flex items-center border border-blue-400 rounded px-3 py-2">
-                    <span className="mr-2">🇧🇷</span>
-                    <input
-                      type="tel"
-                      name="telefone"
-                      placeholder={t(
-                        "tela_perfil_candidato.item_placeholder_telefone"
+                    {showErrors &&
+                      (!form.primeiro_nome || !form.ultimo_nome) && (
+                        <p className="text-sm text-red-600 mt-1">
+                          {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                        </p>
                       )}
-                      className="w-full outline-none"
-                      defaultValue={candidato?.telefone ?? form.telefone}
-                      onChange={handleChange}
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                      {t("cadastro.nome_social")}
+                      <TooltipIcon
+                        message={`${t("cadastro.tooltip_msg_nome_social")}`}
+                        perfil={perfil}
+                      />
+                    </label>
+                    <div className="flex items-center border border-blue-600 rounded px-3 py-2">
+                      <input
+                        type="text"
+                        name="nome_social"
+                        placeholder={t("cadastro.placehold_nome_social")}
+                        className="w-full outline-none"
+                        defaultValue={form.nome_social}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    {/* Campo 1 - Data de nascimento */}
+                    <div className="col-span-1">
+                      <label className="text-sm font-medium mb-1">
+                        {t("cadastro.data_nascimento")}
+                      </label>
+
+                      <input
+                        type="text"
+                        value={dtNascDisplay}
+                        onChange={handleMaskedDateChange}
+                        placeholder={t("cadastro.placehold_data_nascimento")}
+                        className="flex items-center border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                      />
+
+                      {showErrors && !form.data_nascimento && (
+                        <p className="text-sm text-red-600 mt-1">
+                          {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Campo 2 - Sexo */}
+                    <div className="col-span-1">
+                      <label className="text-sm font-medium mb-1">
+                        {t("cadastro.sexo")}
+                      </label>
+                      <select
+                        className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                        name="genero"
+                        value={sexo}
+                        onChange={handleGeneroChange}
+                      >
+                        <option value="">{t("cadastro.placehold_sexo")}</option>
+                        {generos.map((gen) => (
+                          <option key={gen.id} value={gen.id}>
+                            {gen.genero}
+                          </option>
+                        ))}
+                      </select>
+
+                      {showErrors && !form.genero_id && (
+                        <p className="text-sm text-red-600 mt-1">
+                          {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Campo 3 - Estado */}
+                    <div className="col-span-1">
+                      <label className="text-sm font-medium mb-1">
+                        {t("cadastro.estado")}
+                      </label>
+
+                      <select
+                        className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                        name="estado"
+                        value={estado}
+                        onChange={handleEstadoChange}
+                      >
+                        <option value="">
+                          {t("cadastro.placehold_estado")}
+                        </option>
+                        {estados.map((e) => (
+                          <option key={e.id} value={e.id}>
+                            {e.sigla}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Campo 4 - Cidade (maior no desktop) */}
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="text-sm font-medium mb-1">
+                        {t("cadastro.cidade")}
+                      </label>
+
+                      <select
+                        className="flex border border-blue-600 rounded px-3 py-2 focus:outline-none w-full"
+                        name="cidade"
+                        value={cidade}
+                        onChange={handleCidadeChange}
+                      >
+                        <option value="">
+                          {t("cadastro.placehold_cidade")}
+                        </option>
+                        {cidades.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.cidade}
+                          </option>
+                        ))}
+                      </select>
+
+                      {showErrors && !form.cidade_id && (
+                        <p className="text-sm text-red-600 mt-1">
+                          {t("tela_perfil_recrutador.item_msg_campo_obt")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {t("tela_perfil_candidato.item_label_telefone")}
+                    </label>
+                    <div className="flex items-center border border-blue-400 rounded px-3 py-2">
+                      <span className="mr-2">🇧🇷</span>
+                      <input
+                        type="tel"
+                        name="telefone"
+                        placeholder={t(
+                          "tela_perfil_candidato.item_placeholder_telefone",
+                        )}
+                        className="w-full outline-none"
+                        defaultValue={candidato?.telefone ?? form.telefone}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    {showErrors && !form.telefone && (
+                      <p className="text-sm text-red-600 mt-1">
+                        {t("tela_perfil_candidato.item_msg_campo_obt")}
+                      </p>
+                    )}
+                  </div>
+
+                  <fieldset className="text-sm text-gray-700 mt-2">
+                    <legend className="mb-1 font-medium">
+                      {t("tela_perfil_candidato.item_label_notificacao")}
+                    </legend>
+                    <div className="flex">
+                      <label className="flex items-center gap-2 cursor-pointer mr-10">
+                        <input
+                          type="radio"
+                          name="meioNotificacao"
+                          value="WhatsApp"
+                          checked={"WhatsApp" === String(form.meioNotificacao)}
+                          onChange={handleChange}
+                          className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
+                        />
+                        <span>WhatsApp</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="meioNotificacao"
+                          value="SMS"
+                          checked={"SMS" === String(form.meioNotificacao)}
+                          onChange={handleChange}
+                          className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
+                        />
+                        <span>SMS</span>
+                      </label>
+                    </div>
+                    {showErrors && !form.meioNotificacao && (
+                      <p className="text-sm text-red-600 mt-1">
+                        {t("tela_perfil_candidato.item_msg_campo_obt")}
+                      </p>
+                    )}
+                  </fieldset>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {t("tela_perfil_candidato.item_label_descreva")}{" "}
+                    </label>
+                    <textarea
+                      name="apresentacao"
+                      placeholder={t(
+                        "tela_perfil_candidato.item_placeholder_apresentacao",
+                      )}
+                      className="w-full border border-blue-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      rows={6}
+                      value={form.apresentacao || ""}
+                      onChange={(e) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          apresentacao: e.target.value,
+                        }))
+                      }
                     />
                   </div>
-                  {showErrors && !form.telefone && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {t("tela_perfil_candidato.item_msg_campo_obt")}
-                    </p>
-                  )}
-                </div>
 
-                <fieldset className="text-sm text-gray-700 mt-2">
-                  <legend className="mb-1 font-medium">
-                    {t("tela_perfil_candidato.item_label_notificacao")}
-                  </legend>
-                  <div className="flex">
-                    <label className="flex items-center gap-2 cursor-pointer mr-10">
-                      <input
-                        type="radio"
-                        name="meioNotificacao"
-                        value="WhatsApp"
-                        checked={"WhatsApp" === String(form.meioNotificacao)}
-                        onChange={handleChange}
-                        className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
-                      />
-                      <span>WhatsApp</span>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      {t("tela_perfil_candidato.item_label_foto")}
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="meioNotificacao"
-                        value="SMS"
-                        checked={"SMS" === String(form.meioNotificacao)}
-                        onChange={handleChange}
-                        className="appearance-none w-4 h-4 rounded-full border-2 border-blue-600 checked:bg-blue-600 checked:border-blue-600 cursor-pointer transition-all duration-200"
-                      />
-                      <span>SMS</span>
-                    </label>
-                  </div>
-                  {showErrors && !form.meioNotificacao && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {t("tela_perfil_candidato.item_msg_campo_obt")}
-                    </p>
-                  )}
-                </fieldset>
-
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t("tela_perfil_candidato.item_label_descreva")}{" "}
-                  </label>
-                  <textarea
-                    name="apresentacao"
-                    placeholder={t(
-                      "tela_perfil_candidato.item_placeholder_apresentacao"
-                    )}
-                    className="w-full border border-blue-400 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    rows={6}
-                    value={form.apresentacao || ""}
-                    onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        apresentacao: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t("tela_perfil_candidato.item_label_foto")}
-                  </label>
-                  <label
-                    className={`
+                    <label
+                      className={`
                       flex flex-col items-center justify-center
                       border border-dashed border-blue-400 rounded
                       cursor-pointer hover:bg-blue-50
@@ -1579,1331 +1591,41 @@ export default function PerfilCandidato({
                       p-3
                       sm:p-6
                     `}
-                  >
-                    {form.logoPreview ? (
-                      <Image
-                        src={form.logoPreview}
-                        alt="Prévia da logo"
-                        width={80}
-                        height={50}
-                        className="object-contain mb-2"
-                        unoptimized
-                        priority={false}
-                      />
-                    ) : (
-                      <FaCloudUploadAlt className="text-2xl mb-1" />
-                    )}
-                    {!form.logoPreview && (
-                      <span className="text-sm font-medium text-center sm:text-base">
-                        {t("tela_perfil_candidato.item_msg_foto")}
-                      </span>
-                    )}
-                    <input
-                      type="file"
-                      name="logo"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleChange}
-                    />
-                  </label>
-                  {showErrors && !logoFile && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {t("tela_perfil_candidato.item_msg_logo_obt")}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="button" // evita submit acidental
-                    onClick={handleCancel}
-                    className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                  >
-                    {t("tela_perfil_candidato.item_botao_cancelar")}
-                  </button>
-                  <button
-                    type="submit"
-                    className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                  >
-                    {t("tela_perfil_candidato.item_botao_avancar")}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {step === 2 && (
-              <div className="w-full h-full flex flex-col">
-                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-                  <div>
-                    <h1 className="block text-sm mb-1 py-3 font-bold">
-                      {t("tela_perfil_candidato.item_label_informe_formacao")}
-                    </h1>
-
-                    {/* Linha de adição de formação */}
-                    <div className="flex flex-col sm:flex-row sm:items-end sm:gap-3 gap-2">
-                      {/* Graduação */}
-                      <div className="flex flex-col w-full sm:w-1/4">
-                        <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                          {t("tela_perfil_candidato.item_label_graduacao")}
-                        </label>
-                        <select
-                          className="border border-blue-400 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-300"
-                          name="graduacao_id"
-                          value={selectedGraduacao?.value || ""}
-                          onChange={handleGraduacaoChange}
-                        >
-                          <option value="">
-                            {t("tela_perfil_candidato.item_msg_graduacao")}
-                          </option>
-                          {graduacoes.map((grad) => (
-                            <option key={grad.id} value={grad.id}>
-                              {grad.graduacao}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Formação */}
-                      <div className="flex flex-col w-full sm:w-2/4">
-                        <label className="text-xs sm:text-sm font-medium mb-1 flex items-center gap-1">
-                          {t("tela_perfil_candidato.item_label_formacao")}
-                        </label>
-                        <input
-                          type="text"
-                          name="formacao"
-                          placeholder={t(
-                            "tela_perfil_candidato.item_msg_formacao"
-                          )}
-                          className="w-full border border-blue-400 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-blue-300"
-                          value={formacaoInput}
-                          onChange={(e) => setFormacaoInput(e.target.value)}
-                        />
-                      </div>
-
-                      {/* Upload certificado estilizado */}
-                      <div className="flex flex-col w-full sm:w-1/4">
-                        <label className="text-xs sm:text-sm font-medium mb-1">
-                          {t("tela_perfil_candidato.item_label_certificado")}
-                        </label>
-                        {/* Input real (oculto) */}
-                        <input
-                          type="file"
-                          accept="image/*,application/pdf"
-                          className="hidden"
-                          id="novo-certificado"
-                          onChange={handleNovoCertificadoChange} // ✅ AQUI ESTAVA FALTANDO
-                        />
-
-                        {/* Label estilizado (clique para selecionar arquivo) */}
-                        <label
-                          htmlFor="novo-certificado"
-                          className="flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-blue-400 rounded-md cursor-pointer hover:bg-blue-50 transition text-sm sm:text-base truncate"
-                        >
-                          <Upload
-                            size={18}
-                            className="text-blue-600 shrink-0"
-                          />
-                          <span className="truncate">
-                            {novoCertificadoFile
-                              ? novoCertificadoFile.name // mostra o nome real do arquivo
-                              : t("tela_perfil_candidato.item_msg_certificado")}
-                          </span>
-                        </label>
-                      </div>
-
-                      {/* Botão adicionar */}
-                      <div className="flex sm:mt-6">
-                        <button
-                          type="button"
-                          onClick={handleAddFormacao}
-                          className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
-                        >
-                          {t("tela_perfil_candidato.item_botao_adicionar")}
-                        </button>
-                      </div>
-                    </div>
-
-                    {showErrors &&
-                      (!selectedGraduacao?.value ||
-                        !formacaoInput ||
-                        !novoCertificadoFile) && (
-                        <p className="text-sm text-red-600 mt-1">
-                          {t("tela_perfil_candidato.item_msg_campo_obt")}
-                        </p>
-                      )}
-                  </div>
-
-                  {/* Lista de formações */}
-                  <div className="flex flex-1 flex-col gap-3 mt-5">
-                    {form.lista_formacao?.map((item) => {
-                      const graduacaoObj = graduacoes.find(
-                        (g) => g.id === item.graduacao_id
-                      );
-
-                      return (
-                        <div
-                          key={item.id}
-                          className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                        >
-                          <div className="flex flex-col gap-2 w-full">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap">
-                              {/* Tipo da graduação */}
-                              <div className="flex items-center gap-2 text-sm min-w-[200px] font-bold">
-                                <span>
-                                  {graduacaoObj?.graduacao ??
-                                    t(
-                                      "tela_perfil_candidato.item_msg_nenhuma_graduacao"
-                                    )}
-                                </span>
-                              </div>
-
-                              {/* Nome da formação */}
-                              <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
-                                {item.formacao}
-                              </div>
-
-                              {/* Ações */}
-                              <div className="flex items-center gap-3 text-sm min-w-[120px]">
-                                {/* Visualizar certificado */}
-                                {certificadoPreviews[item.id] && (
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      window.open(
-                                        certificadoPreviews[item.id],
-                                        "_blank"
-                                      )
-                                    }
-                                    className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
-                                    title={t(
-                                      "tela_perfil_candidato.item_botao_visualizar"
-                                    )}
-                                  >
-                                    <FileText size={20} />
-                                  </button>
-                                )}
-
-                                {/* Upload certificado */}
-                                <label
-                                  htmlFor={`certificado-${item.id}`}
-                                  className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
-                                  title={t(
-                                    "tela_perfil_candidato.item_botao_substituir"
-                                  )}
-                                >
-                                  <Upload size={20} />
-                                </label>
-                                <input
-                                  type="file"
-                                  accept="image/*,application/pdf"
-                                  id={`certificado-${item.id}`}
-                                  className="hidden"
-                                  onChange={(e) =>
-                                    handleCertificadoItemChange(e, item.id)
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Remover formação */}
-                          <button
-                            onClick={() => handleRemoveFormacao(item.id)}
-                            className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 self-end sm:self-auto cursor-pointer"
-                            title={t(
-                              "tela_perfil_candidato.item_botao_remover_formacao"
-                            )}
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Botões de navegação */}
-                  <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                    <div className="flex">
-                      <button
-                        onClick={prevStep}
-                        type="button"
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_voltar")}
-                      </button>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_cancelar")}
-                      </button>
-                      <button
-                        type="submit"
-                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
-                      >
-                        {t("tela_perfil_candidato.item_botao_avancar")}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="w-full h-full flex flex-col">
-                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-                  <div>
-                    <h1 className="block text-sm mb-1 py-3 font-bold">
-                      {t(
-                        "tela_perfil_candidato.item_label_informe_certificacao"
-                      )}
-                      {/* <p className="block text-[11x] font-light">(mínimo 1)</p> */}
-                    </h1>
-
-                    <div className="w-full">
-                      <div className="grid grid-cols-1 md:grid-cols-[3fr_1.5fr_auto] gap-4 items-end">
-                        {/* Campo de certificação - largo */}
-                        <div className="flex flex-col w-full">
-                          <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                            {t("tela_perfil_candidato.item_label_certificacao")}
-                            <TooltipIcon
-                              message={`${t(
-                                "tela_perfil_candidato.item_tooltip_certificacao_titulo"
-                              )}\n${t(
-                                "tela_perfil_candidato.item_tooltip_certificacao_passo1"
-                              )}\n${t(
-                                "tela_perfil_candidato.item_tooltip_certificacao_passo2"
-                              )}\n${t(
-                                "tela_perfil_candidato.item_tooltip_certificacao_passo3"
-                              )}`}
-                              perfil={perfil}
-                            />
-                          </label>
-                          <CreatableSelect
-                            isClearable
-                            placeholder={t(
-                              "tela_perfil_candidato.item_msg_certificacao"
-                            )}
-                            value={selectedCertificacao}
-                            onChange={(newValue) =>
-                              setSelectedCertificacao(newValue)
-                            }
-                            options={certificacao.map((cert) => ({
-                              value: String(cert.id),
-                              label: cert.certificado,
-                            }))}
-                            formatCreateLabel={(inputValue) =>
-                              `${t(
-                                "tela_perfil_candidato.item_msg_criar_certificacao"
-                              )} ${inputValue}`
-                            }
-                          />
-                        </div>
-
-                        {/* Upload - médio */}
-                        <div className="flex flex-col w-full">
-                          <label className="text-xs sm:text-sm font-medium mb-1">
-                            {t("tela_perfil_candidato.item_label_certificado")}
-                          </label>
-                          <input
-                            type="file"
-                            accept="image/*,application/pdf"
-                            className="hidden"
-                            id="novo-certificacao"
-                            onChange={handleNovoCertificacaoChange}
-                          />
-                          <label
-                            htmlFor="novo-certificacao"
-                            className="flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-blue-400 rounded-md cursor-pointer hover:bg-blue-50 transition text-sm truncate"
-                          >
-                            <Upload
-                              size={18}
-                              className="text-blue-600 shrink-0"
-                            />
-                            <span className="truncate">
-                              {novoCertificacaoFile
-                                ? novoCertificacaoFile.name
-                                : t(
-                                    "tela_perfil_candidato.item_msg_certificado"
-                                  )}
-                            </span>
-                          </label>
-                        </div>
-
-                        {/* Botão - largura automática */}
-                        <div className="flex flex-col w-full">
-                          <label className="text-xs sm:text-sm font-medium mb-1 opacity-0">
-                            &nbsp;
-                          </label>
-                          <button
-                            type="button"
-                            onClick={handleAddCertificacao}
-                            className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
-                          >
-                            {t("tela_perfil_candidato.item_botao_adicionar")}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {showErrors &&
-                      (form.lista_certificado.length <= 0 ||
-                        !novoCertificacaoFile) && (
-                        <p className="text-sm text-red-600 mt-1">
-                          {t("tela_perfil_candidato.item_msg_campo_obt")}
-                        </p>
-                      )}
-                  </div>
-
-                  <div className="flex flex-1 flex-col gap-3 mt-5">
-                    {form.lista_certificado.map((item) => {
-                      const cert = certificacao.find(
-                        (s) => s.id === item.certificacao_id
-                      );
-                      return (
-                        <div
-                          key={item.certificacao_id}
-                          className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                        >
-                          <div className="flex flex-col gap-2 w-full">
-                            {/* Linha com Skill, Peso e Candidato */}
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
-                              {/* Nome da skill */}
-                              <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
-                                {cert?.certificado ?? item.certificado}
-                              </div>
-
-                              {/* Ações */}
-                              <div className="flex items-center gap-3 text-sm min-w-[120px]">
-                                {/* Visualizar certificado */}
-                                {certificacaoPreview[item.certificacao_id] && (
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      window.open(
-                                        certificacaoPreview[
-                                          item.certificacao_id
-                                        ],
-                                        "_blank"
-                                      )
-                                    }
-                                    className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
-                                    title={t(
-                                      "tela_perfil_candidato.item_botao_visualizar"
-                                    )}
-                                  >
-                                    <FileText size={20} />
-                                  </button>
-                                )}
-
-                                {/* Upload certificado */}
-                                <label
-                                  htmlFor={`certificado-${item.certificacao_id}`}
-                                  className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
-                                  title={t(
-                                    "tela_perfil_candidato.item_botao_substituir"
-                                  )}
-                                >
-                                  <Upload size={20} />
-                                </label>
-                                <input
-                                  type="file"
-                                  accept="image/*,application/pdf"
-                                  id={`certificado-${item.certificacao_id}`}
-                                  className="hidden"
-                                  onChange={(e) =>
-                                    handleCertificacaoItemChange(
-                                      e,
-                                      item.certificacao_id
-                                    )
-                                  }
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={() =>
-                              handleRemoveCertificacao(item.certificacao_id)
-                            }
-                            className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 cursor-pointer"
-                            title={t(
-                              "tela_perfil_candidato.item_botao_remover_certificacao"
-                            )}
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Botões no rodapé */}
-                  <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                    <div className="flex">
-                      <button
-                        onClick={prevStep}
-                        type="button"
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_voltar")}
-                      </button>
-                    </div>
-
-                    {/* Direita: botões cadastrar e editar */}
-                    <div className="flex gap-2">
-                      <button
-                        type="button" // evita submit acidental
-                        onClick={handleCancel}
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_cancelar")}
-                      </button>
-                      <button
-                        type="submit"
-                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
-                      >
-                        {t("tela_perfil_candidato.item_botao_avancar")}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="w-full h-full flex flex-col">
-                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-                  <div>
-                    <h1 className="block text-sm mb-1 py-3 font-bold">
-                      {t("tela_perfil_candidato.item_label_informe_hardskills")}
-                      <p className="text-[11px] font-normal italic">
-                        {t(
-                          "tela_perfil_candidato.item_label_informe_hardskills_subitem"
-                        )}
-                      </p>
-                      <p className="block text-[11x] font-light">
-                        {t("tela_perfil_candidato.item_label_informe_qtde")}
-                      </p>
-                    </h1>
-
-                    <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                      {t("tela_perfil_candidato.item_label_skill")}
-                      <TooltipIcon
-                        message={`${t(
-                          "tela_perfil_candidato.item_tooltip_skill_titulo"
-                        )}\n${t(
-                          "tela_perfil_candidato.item_tooltip_skill_passo1"
-                        )}\n${t(
-                          "tela_perfil_candidato.item_tooltip_skill_passo2"
-                        )}\n${t(
-                          "tela_perfil_candidato.item_tooltip_skill_passo3"
-                        )}`}
-                        perfil={perfil}
-                      />
-                    </label>
-
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <CreatableSelect
-                          isClearable
-                          placeholder={t(
-                            "tela_perfil_candidato.item_msg_skill"
-                          )}
-                          value={selectedSkill}
-                          onChange={(newValue) => setSelectedSkill(newValue)}
-                          options={skills
-                            .filter((f) => f.tipo_skill_id == 1)
-                            .map((skill) => ({
-                              value: String(skill.skill_id),
-                              label: skill.skill,
-                              tipo_skill_id: skill.tipo_skill_id,
-                            }))}
-                          formatCreateLabel={(inputValue) =>
-                            `${t(
-                              "tela_perfil_candidato.item_msg_criar_skill"
-                            )} ${inputValue}`
-                          }
-                          isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
-                        />
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleAddSkill(1)}
-                        className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_adicionar")}
-                      </button>
-                    </div>
-
-                    {showErrors && form.lista_skills.length <= 0 && (
-                      <p className="text-sm text-red-600 mt-1">
-                        {t("tela_perfil_candidato.item_msg_campo_obt")}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex flex-1 flex-col gap-3 mt-5">
-                    {form.lista_skills
-                      .filter((f) => f.tipo_skill_id == 1)
-                      .map((item) => {
-                        const skill = skills.find(
-                          (s) => s.skill_id === item.skill_id
-                        );
-                        return (
-                          <div
-                            key={item.skill_id}
-                            className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                          >
-                            <div className="flex flex-col gap-2 w-full">
-                              {/* Linha com Skill, Peso e Candidato */}
-                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
-                                {/* Nome da skill */}
-                                <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
-                                  {skill?.skill ?? item.nome}
-                                </div>
-
-                                {/* Peso com slider */}
-                                <div className="flex items-center gap-2 text-sm min-w-[200px]">
-                                  <label className="font-medium whitespace-nowrap">
-                                    {t("tela_perfil_candidato.item_label_peso")}
-                                  </label>
-                                  <input
-                                    type="range"
-                                    min={1}
-                                    max={10}
-                                    step={0.5}
-                                    list="tickmarks"
-                                    value={item.peso / 10}
-                                    onChange={(e) =>
-                                      handleSkillChange(
-                                        item.skill_id,
-                                        "peso",
-                                        Number(e.target.value) * 10
-                                      )
-                                    }
-                                    className="w-full sm:w-40 accent-blue-600 cursor-pointer"
-                                  />
-                                  <datalist id="tickmarks">
-                                    {[...Array(19)].map((_, i) => {
-                                      const val = i * 0.5 + 1;
-                                      return (
-                                        <option
-                                          key={val}
-                                          value={val.toFixed(1)}
-                                        />
-                                      );
-                                    })}
-                                  </datalist>
-                                  <span className="w-8 text-right">
-                                    {(item.peso / 10).toFixed(1)}
-                                  </span>
-                                </div>
-
-                                {/* favorito */}
-                                <div className="flex items-center gap-4 text-sm min-w-[260px]">
-                                  <div className="flex items-center gap-1">
-                                    <label className="font-medium whitespace-nowrap">
-                                      {t(
-                                        "tela_perfil_candidato.item_label_favorito"
-                                      )}
-                                    </label>
-                                  </div>
-
-                                  {/* Estrela de favorito */}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const totalFavoritos =
-                                        form.lista_skills.filter(
-                                          (s) => s.favorito
-                                        ).length;
-
-                                      // Se já tem 5 favoritos e este não é favorito → não deixa clicar
-                                      if (
-                                        totalFavoritos >= 5 &&
-                                        !item.favorito
-                                      ) {
-                                        return;
-                                      }
-
-                                      handleSkillChange(
-                                        item.skill_id,
-                                        "favorito",
-                                        !item.favorito
-                                      );
-                                    }}
-                                    className={`flex items-center ${
-                                      form.lista_skills.filter(
-                                        (s) => s.favorito
-                                      ).length >= 5 && !item.favorito
-                                        ? "cursor-not-allowed opacity-50"
-                                        : "cursor-pointer"
-                                    }`}
-                                    disabled={
-                                      form.lista_skills.filter(
-                                        (s) => s.favorito
-                                      ).length >= 5 && !item.favorito
-                                    }
-                                  >
-                                    <TooltipIcon
-                                      message={`${t(
-                                        "tela_perfil_candidato.item_tooltip_favorite_passo1"
-                                      )}\n${t(
-                                        "tela_perfil_candidato.item_tooltip_favorite_passo2"
-                                      )}\n${t(
-                                        "tela_perfil_candidato.item_tooltip_favorite_passo2_1"
-                                      )}`}
-                                      perfil={perfil}
-                                    >
-                                      <Star
-                                        className={`w-4 h-4 transition-colors ${
-                                          item.favorito
-                                            ? "fill-yellow-400 text-yellow-400"
-                                            : "text-gray-400"
-                                        }`}
-                                      />
-                                    </TooltipIcon>
-                                  </button>
-
-                                  {/* Tempo da skill */}
-                                  <input
-                                    type="text"
-                                    placeholder={t(
-                                      "tela_perfil_candidato.item_placeholder_favorito"
-                                    )}
-                                    className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
-                                    value={item.tempo_favorito}
-                                    onChange={(e) =>
-                                      handleSkillChange(
-                                        item.skill_id,
-                                        "tempo_favorito",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            </div>
-
-                            <button
-                              onClick={() => handleRemoveSkill(item.skill_id)}
-                              className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
-                              title={t(
-                                "tela_perfil_candidato.item_botao_remover_skill"
-                              )}
-                            >
-                              <X size={18} />
-                            </button>
-                          </div>
-                        );
-                      })}
-                  </div>
-
-                  {/* Botões no rodapé */}
-                  <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                    <div className="flex">
-                      <button
-                        onClick={prevStep}
-                        type="button"
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_voltar")}
-                      </button>
-                    </div>
-
-                    {/* Direita: botões cadastrar e editar */}
-                    <div className="flex gap-2">
-                      <button
-                        type="button" // evita submit acidental
-                        onClick={handleCancel}
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_cancelar")}
-                      </button>
-                      <button
-                        type="submit"
-                        disabled={form.lista_skills.length < 3} // só habilita se >= 3
-                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
-                      ${
-                        form.lista_skills.length < 3
-                          ? "bg-gray-300 cursor-not-allowed"
-                          : "bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                      }`}
-                      >
-                        {t("tela_perfil_candidato.item_botao_avancar")}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {step === 5 && (
-              <div className="w-full h-full flex flex-col">
-                <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-                  <div>
-                    <h1 className="block text-sm mb-1 py-3 font-bold">
-                      {t("tela_perfil_candidato.item_label_informe_softskills")}
-                      <p className="text-[11px] font-normal italic">
-                        {t(
-                          "tela_perfil_candidato.item_label_informe_softskills_subitem"
-                        )}
-                      </p>
-                    </h1>
-
-                    <label className="text-sm font-medium mb-1 flex items-center gap-1">
-                      {t("tela_perfil_candidato.item_label_skill")}
-                      <TooltipIcon
-                        message={`${t(
-                          "tela_perfil_candidato.item_tooltip_skill_titulo"
-                        )}\n${t(
-                          "tela_perfil_candidato.item_tooltip_skill_passo1"
-                        )}\n${t(
-                          "tela_perfil_candidato.item_tooltip_skill_passo2"
-                        )}\n${t(
-                          "tela_perfil_candidato.item_tooltip_skill_passo3"
-                        )}`}
-                        perfil={perfil}
-                      />
-                    </label>
-
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <CreatableSelect
-                          isClearable
-                          placeholder={t(
-                            "tela_perfil_candidato.item_msg_skill"
-                          )}
-                          value={selectedSkill}
-                          onChange={(newValue) => setSelectedSkill(newValue)}
-                          options={skills
-                            .filter((f) => f.tipo_skill_id == 2)
-                            .map((skill) => ({
-                              value: String(skill.skill_id),
-                              label: skill.skill,
-                              tipo_skill_id: skill.tipo_skill_id,
-                            }))}
-                          formatCreateLabel={(inputValue) =>
-                            `${t(
-                              "tela_perfil_candidato.item_msg_criar_skill"
-                            )} ${inputValue}`
-                          }
-                          // isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
-                        />
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleAddSkill(2)}
-                        className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_adicionar")}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-1 flex-col gap-3 mt-5">
-                    {form.lista_skills
-                      .filter((f) => f.tipo_skill_id == 2)
-                      .map((item) => {
-                        const skill = skills.find(
-                          (s) => s.skill_id === item.skill_id
-                        );
-                        return (
-                          <div
-                            key={item.skill_id}
-                            className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                          >
-                            <div className="flex flex-col gap-2 w-full">
-                              {/* Linha com Skill, Peso e Candidato */}
-                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
-                                {/* Nome da skill */}
-                                <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
-                                  {skill?.skill ?? item.nome}
-                                </div>
-
-                                {/* Peso com slider */}
-                                <div className="flex items-center gap-2 text-sm min-w-[200px]">
-                                  <label className="font-medium whitespace-nowrap">
-                                    {t("tela_perfil_candidato.item_label_peso")}
-                                  </label>
-                                  <input
-                                    type="range"
-                                    min={1}
-                                    max={10}
-                                    step={0.5}
-                                    list="tickmarks"
-                                    value={item.peso / 10}
-                                    onChange={(e) =>
-                                      handleSkillChange(
-                                        item.skill_id,
-                                        "peso",
-                                        Number(e.target.value) * 10
-                                      )
-                                    }
-                                    className="w-full sm:w-40 accent-blue-600 cursor-pointer"
-                                  />
-                                  <datalist id="tickmarks">
-                                    {[...Array(19)].map((_, i) => {
-                                      const val = i * 0.5 + 1;
-                                      return (
-                                        <option
-                                          key={val}
-                                          value={val.toFixed(1)}
-                                        />
-                                      );
-                                    })}
-                                  </datalist>
-                                  <span className="w-8 text-right">
-                                    {(item.peso / 10).toFixed(1)}
-                                  </span>
-                                </div>
-
-                                {/* favorito */}
-                                <div className="flex items-center gap-4 text-sm min-w-[260px]">
-                                  <div className="flex items-center gap-1">
-                                    <label className="font-medium whitespace-nowrap">
-                                      {t(
-                                        "tela_perfil_candidato.item_label_favorito"
-                                      )}
-                                    </label>
-                                  </div>
-
-                                  {/* Estrela de favorito */}
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      const totalFavoritos =
-                                        form.lista_skills.filter(
-                                          (s) => s.favorito
-                                        ).length;
-
-                                      // Se já tem 5 favoritos e este não é favorito → não deixa clicar
-                                      if (
-                                        totalFavoritos >= 5 &&
-                                        !item.favorito
-                                      ) {
-                                        return;
-                                      }
-
-                                      handleSkillChange(
-                                        item.skill_id,
-                                        "favorito",
-                                        !item.favorito
-                                      );
-                                    }}
-                                    className={`flex items-center ${
-                                      form.lista_skills.filter(
-                                        (s) => s.favorito
-                                      ).length >= 5 && !item.favorito
-                                        ? "cursor-not-allowed opacity-50"
-                                        : "cursor-pointer"
-                                    }`}
-                                    disabled={
-                                      form.lista_skills.filter(
-                                        (s) => s.favorito
-                                      ).length >= 5 && !item.favorito
-                                    }
-                                  >
-                                    <TooltipIcon
-                                      message={`${t(
-                                        "tela_perfil_candidato.item_tooltip_favorite_passo1"
-                                      )}\n${t(
-                                        "tela_perfil_candidato.item_tooltip_favorite_passo2"
-                                      )}\n${t(
-                                        "tela_perfil_candidato.item_tooltip_favorite_passo2_1"
-                                      )}`}
-                                      perfil={perfil}
-                                    >
-                                      <Star
-                                        className={`w-4 h-4 transition-colors ${
-                                          item.favorito
-                                            ? "fill-yellow-400 text-yellow-400"
-                                            : "text-gray-400"
-                                        }`}
-                                      />
-                                    </TooltipIcon>
-                                  </button>
-
-                                  {/* Tempo da skill */}
-                                  <input
-                                    type="text"
-                                    placeholder={t(
-                                      "tela_perfil_candidato.item_placeholder_favorito"
-                                    )}
-                                    className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
-                                    value={item.tempo_favorito}
-                                    onChange={(e) =>
-                                      handleSkillChange(
-                                        item.skill_id,
-                                        "tempo_favorito",
-                                        e.target.value
-                                      )
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            </div>
-
-                            <button
-                              onClick={() => handleRemoveSkill(item.skill_id)}
-                              className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
-                              title={t(
-                                "tela_perfil_candidato.item_botao_remover_skill"
-                              )}
-                            >
-                              <X size={18} />
-                            </button>
-                          </div>
-                        );
-                      })}
-                  </div>
-
-                  {/* Botões no rodapé */}
-                  <div className="flex flex-col md:flex-row justify-between gap-2 mt-4">
-                    <div className="flex">
-                      <button
-                        onClick={prevStep}
-                        type="button"
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_voltar")}
-                      </button>
-                    </div>
-
-                    {/* Direita: botões cadastrar e editar */}
-                    <div className="flex gap-2">
-                      <button
-                        type="button" // evita submit acidental
-                        onClick={handleCancel}
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                      >
-                        {t("tela_perfil_candidato.item_botao_cancelar")}
-                      </button>
-                      <button
-                        type="submit"
-                        className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
-                      >
-                        {t("tela_perfil_candidato.item_botao_avancar")}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {step === 6 && (
-              <form
-                onSubmit={handleSubmit}
-                className="flex-1 flex flex-col w-full h-full"
-              >
-                {/* Container Principal */}
-                <div className="flex flex-col md:flex-row  w-full ">
-                  {/* Coluna Esquerda */}
-                  <div className="flex flex-col md:flex-row w-full">
-                    {/* Dados da vaga e skills lado a lado */}
-                    {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border border-yellow-500"> */}
-                    {/* Bloco - Informações da vaga */}
-                    <div className="w-full space-y-4 mr-2">
-                      {/* Linha 1 - Logo + Título da vaga e empresa */}
-                      <div className="flex flex-col gap-4">
-                        {/* Logo e título + empresa ocupando toda largura */}
-                        <div className="flex items-start gap-4">
-                          {/* Avatar / Logo */}
-                          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0">
-                            {form.logoPreview ? (
-                              <img
-                                src={form.logoPreview}
-                                alt="Logo da candidato"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="text-xs text-gray-400 flex items-center justify-center h-full">
-                                {t("tela_perfil_candidato.item_msg_sem_foto")}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Dados */}
-                          <div className="flex-1 space-y-3 ">
-                            {/* Status + Nome */}
-                            {form.ativo ? (
-                              <span className="flex items-center gap-1">
-                                <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-3 w-3 text-white"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </div>
-                                <span className="text-sm text-green-600">
-                                  {t("tela_perfil_candidato.item_ativo")}
-                                </span>
-                              </span>
-                            ) : (
-                              <span className="flex items-center gap-1">
-                                <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-3 w-3 text-white"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </div>
-                                <span className="text-sm text-gray-600">
-                                  {t("tela_perfil_candidato.item_inativo")}
-                                </span>
-                              </span>
-                            )}
-
-                            {form.nome_social ? (
-                              <div className="flex items-center">
-                                <div className="flex flex-col leading-tight">
-                                  <p className="font-bold">
-                                    {form.nome_social}
-                                  </p>
-                                  <p className="text-sm">
-                                    {form.primeiro_nome} {form.ultimo_nome}
-                                  </p>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center">
-                                <div className="flex flex-col leading-tight">
-                                  <p className="font-bold">
-                                    {form.primeiro_nome} {form.ultimo_nome}
-                                  </p>
-                                  <p className="text-sm">{form.nome_social}</p>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Bloco 2 colunas */}
-                            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800 w-full">
-                              {/* Dt Nasc */}
-                              <div className="flex items-center gap-2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                  />
-                                </svg>
-                                {dtNascDisplay}
-                              </div>
-
-                              {/* Sexo */}
-                              <div className="flex items-center gap-2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 11a4 4 0 100-8 4 4 0 000 8zm0 0c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z"
-                                  />
-                                </svg>
-
-                                {form.sexo_label}
-                              </div>
-
-                              {/* Estado */}
-                              <div className="flex items-center gap-2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
-                                  />
-                                </svg>
-                                {form.estado_label}
-                              </div>
-
-                              {/* Cidade */}
-                              <div className="flex items-center gap-2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
-                                  />
-                                  <circle cx="12" cy="10" r="3" />
-                                </svg>
-                                {form.cidade_label}
-                              </div>
-
-                              {/* Telefone */}
-                              <div className="flex items-center gap-2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.2 3.6a1 1 0 01-.272 1.06l-1.516 1.516a11.042 11.042 0 005.292 5.292l1.516-1.516a1 1 0 011.06-.272l3.6 1.2a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C8.477 21 3 15.523 3 9V5z"
-                                  />
-                                </svg>
-                                {form.telefone}
-                              </div>
-
-                              {/* Meio de comunicação */}
-                              <div className="flex items-center gap-2">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 text-gray-500"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  {/* Balão de chat */}
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 10h8m-8 4h5m-9 5.5V5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H7l-4 4z"
-                                  />
-                                </svg>
-                                {form.meioNotificacao}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Apresentação */}
-                        <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-5">
-                          {form.apresentacao ||
-                            t(
-                              "tela_perfil_candidato.item_msg_nenhuma_apresentacao"
-                            )}
-                        </div>
-                        <div className="flex flex-row w-[95%] mt-5">
-                          <div className="w-1/2 rounded-xl p-1 shadow-sm">
-                            <p className="ml-1">
-                              {t(
-                                "tela_perfil_candidato.item_label_lista_formacao"
-                              )}
-                            </p>
-                            {Array.isArray(form.lista_formacao) &&
-                            form.lista_formacao.length > 0 ? (
-                              form.lista_formacao.map((item) => {
-                                return (
-                                  <div
-                                    key={item.id}
-                                    className="mt-2 border border-blue-300 text-gray-500 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                                  >
-                                    {item.formacao}
-                                  </div>
-                                );
-                              })
-                            ) : (
-                              <p className="text-sm text-gray-500 font-bold mt-3 text-center">
-                                {t(
-                                  "tela_perfil_candidato.item_msg_nenhuma_formacao"
-                                )}
-                              </p>
-                            )}
-                          </div>
-                          <div className="ml-2 w-1/2 rounded-xl p-1 shadow-sm">
-                            <p className="ml-1">
-                              {t(
-                                "tela_perfil_candidato.item_label_lista_certificacao"
-                              )}
-                            </p>
-                            {Array.isArray(form.lista_certificado) &&
-                            form.lista_certificado.length > 0 ? (
-                              form.lista_certificado.map((item) => {
-                                return (
-                                  <div
-                                    key={item.certificacao_id}
-                                    className="mt-2 border border-blue-300 text-gray-500 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                                  >
-                                    {item.certificado}
-                                  </div>
-                                );
-                              })
-                            ) : (
-                              <p className="text-sm text-gray-500 font-bold mt-3 text-center">
-                                {t(
-                                  "tela_perfil_candidato.item_msg_nenhuma_certificacao"
-                                )}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Coluna Direita - Gráficos */}
-                  <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                    <SkillsPanel skills={skillsData} perfil={perfil} />
-                  </div>
-                </div>
-
-                {/* Botões */}
-                <div className="flex flex-col md:flex-row justify-between gap-2 mt-6">
-                  <div className="flex">
-                    <button
-                      onClick={prevStep}
-                      type="button"
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
                     >
-                      {t("tela_perfil_candidato.item_botao_voltar")}
-                    </button>
+                      {form.logoPreview ? (
+                        <Image
+                          src={form.logoPreview}
+                          alt="Prévia da logo"
+                          width={80}
+                          height={50}
+                          className="object-contain mb-2"
+                          unoptimized
+                          priority={false}
+                        />
+                      ) : (
+                        <FaCloudUploadAlt className="text-2xl mb-1" />
+                      )}
+                      {!form.logoPreview && (
+                        <span className="text-sm font-medium text-center sm:text-base">
+                          {t("tela_perfil_candidato.item_msg_foto")}
+                        </span>
+                      )}
+                      <input
+                        type="file"
+                        name="logo"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleChange}
+                      />
+                    </label>
+                    {showErrors && !logoFile && (
+                      <p className="text-sm text-red-600 mt-1">
+                        {t("tela_perfil_candidato.item_msg_logo_obt")}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Direita: botões cadastrar e editar */}
-                  <div className="flex gap-2">
+                  <div className="flex justify-end gap-2 mt-auto pt-4">
                     <button
                       type="button" // evita submit acidental
                       onClick={handleCancel}
@@ -2913,24 +1635,1349 @@ export default function PerfilCandidato({
                     </button>
                     <button
                       type="submit"
-                      className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
-                        isFormValid(form)
-                          ? "text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                          : "bg-gray-300 cursor-not-allowed"
-                      }`}
+                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
                     >
-                      {isSubmitting ? (
-                        <ImSpinner2 className="animate-spin" />
-                      ) : (
-                        t("tela_perfil_candidato.item_botao_publicar")
-                      )}
+                      {t("tela_perfil_candidato.item_botao_avancar")}
                     </button>
                   </div>
+                </form>
+              )}
+
+              {step === 2 && (
+                <div className="w-full flex flex-col flex-1">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col flex-1"
+                  >
+                    <div>
+                      <h1 className="block text-sm mb-1 py-3 font-bold">
+                        {t("tela_perfil_candidato.item_label_informe_formacao")}
+                      </h1>
+
+                      {/* Linha de adição de formação */}
+                      <div className="flex flex-col sm:flex-row sm:items-end sm:gap-3 gap-2">
+                        {/* Graduação */}
+                        <div className="flex flex-col w-full sm:w-1/4">
+                          <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                            {t("tela_perfil_candidato.item_label_graduacao")}
+                          </label>
+                          <select
+                            className="border border-blue-400 rounded-md px-2 py-2 w-full focus:outline-none focus:ring-1 focus:ring-blue-300"
+                            name="graduacao_id"
+                            value={selectedGraduacao?.value || ""}
+                            onChange={handleGraduacaoChange}
+                          >
+                            <option value="">
+                              {t("tela_perfil_candidato.item_msg_graduacao")}
+                            </option>
+                            {graduacoes.map((grad) => (
+                              <option key={grad.id} value={grad.id}>
+                                {grad.graduacao}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Formação */}
+                        <div className="flex flex-col w-full sm:w-2/4">
+                          <label className="text-xs sm:text-sm font-medium mb-1 flex items-center gap-1">
+                            {t("tela_perfil_candidato.item_label_formacao")}
+                          </label>
+                          <input
+                            type="text"
+                            name="formacao"
+                            placeholder={t(
+                              "tela_perfil_candidato.item_msg_formacao",
+                            )}
+                            className="w-full border border-blue-400 rounded px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-1 focus:ring-blue-300"
+                            value={formacaoInput}
+                            onChange={(e) => setFormacaoInput(e.target.value)}
+                          />
+                        </div>
+
+                        {/* Upload certificado estilizado */}
+                        <div className="flex flex-col w-full sm:w-1/4">
+                          <label className="text-xs sm:text-sm font-medium mb-1">
+                            {t("tela_perfil_candidato.item_label_certificado")}
+                          </label>
+                          {/* Input real (oculto) */}
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            className="hidden"
+                            id="novo-certificado"
+                            onChange={handleNovoCertificadoChange} // ✅ AQUI ESTAVA FALTANDO
+                          />
+
+                          {/* Label estilizado (clique para selecionar arquivo) */}
+                          <label
+                            htmlFor="novo-certificado"
+                            className="flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-blue-400 rounded-md cursor-pointer hover:bg-blue-50 transition text-sm sm:text-base truncate"
+                          >
+                            <Upload
+                              size={18}
+                              className="text-blue-600 shrink-0"
+                            />
+                            <span className="truncate">
+                              {novoCertificadoFile
+                                ? novoCertificadoFile.name // mostra o nome real do arquivo
+                                : t(
+                                    "tela_perfil_candidato.item_msg_certificado",
+                                  )}
+                            </span>
+                          </label>
+                        </div>
+
+                        {/* Botão adicionar */}
+                        <div className="flex sm:mt-6">
+                          <button
+                            type="button"
+                            onClick={handleAddFormacao}
+                            className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
+                          >
+                            {t("tela_perfil_candidato.item_botao_adicionar")}
+                          </button>
+                        </div>
+                      </div>
+
+                      {showErrors &&
+                        (!selectedGraduacao?.value ||
+                          !formacaoInput ||
+                          !novoCertificadoFile) && (
+                          <p className="text-sm text-red-600 mt-1">
+                            {t("tela_perfil_candidato.item_msg_campo_obt")}
+                          </p>
+                        )}
+                    </div>
+
+                    {/* Lista de formações */}
+                    <div className="flex flex-1 flex-col gap-3 mt-5">
+                      {form.lista_formacao?.map((item) => {
+                        const graduacaoObj = graduacoes.find(
+                          (g) => g.id === item.graduacao_id,
+                        );
+
+                        return (
+                          <div
+                            key={item.id}
+                            className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <div className="flex flex-col gap-2 w-full">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap">
+                                {/* Tipo da graduação */}
+                                <div className="flex items-center gap-2 text-sm min-w-[200px] font-bold">
+                                  <span>
+                                    {graduacaoObj?.graduacao ??
+                                      t(
+                                        "tela_perfil_candidato.item_msg_nenhuma_graduacao",
+                                      )}
+                                  </span>
+                                </div>
+
+                                {/* Nome da formação */}
+                                <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                  {item.formacao}
+                                </div>
+
+                                {/* Ações */}
+                                <div className="flex items-center gap-3 text-sm min-w-[120px]">
+                                  {/* Visualizar certificado */}
+                                  {certificadoPreviews[item.id] && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        window.open(
+                                          certificadoPreviews[item.id],
+                                          "_blank",
+                                        )
+                                      }
+                                      className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
+                                      title={t(
+                                        "tela_perfil_candidato.item_botao_visualizar",
+                                      )}
+                                    >
+                                      <FileText size={20} />
+                                    </button>
+                                  )}
+
+                                  {/* Upload certificado */}
+                                  <label
+                                    htmlFor={`certificado-${item.id}`}
+                                    className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
+                                    title={t(
+                                      "tela_perfil_candidato.item_botao_substituir",
+                                    )}
+                                  >
+                                    <Upload size={20} />
+                                  </label>
+                                  <input
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    id={`certificado-${item.id}`}
+                                    className="hidden"
+                                    onChange={(e) =>
+                                      handleCertificadoItemChange(e, item.id)
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Remover formação */}
+                            <button
+                              onClick={() => handleRemoveFormacao(item.id)}
+                              className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 self-end sm:self-auto cursor-pointer"
+                              title={t(
+                                "tela_perfil_candidato.item_botao_remover_formacao",
+                              )}
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Botões de navegação */}
+                    <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                      <div className="flex">
+                        <button
+                          onClick={prevStep}
+                          type="button"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_voltar")}
+                        </button>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={handleCancel}
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_cancelar")}
+                        </button>
+                        <button
+                          type="submit"
+                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
+                        >
+                          {t("tela_perfil_candidato.item_botao_avancar")}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
                 </div>
-              </form>
-            )}
-          </div>
-        </main>
+              )}
+
+              {step === 3 && (
+                <div className="w-full flex flex-col flex-1">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col flex-1"
+                  >
+                    <div>
+                      <h1 className="block text-sm mb-1 py-3 font-bold">
+                        {t(
+                          "tela_perfil_candidato.item_label_informe_certificacao",
+                        )}
+                        {/* <p className="block text-[11x] font-light">(mínimo 1)</p> */}
+                      </h1>
+
+                      <div className="w-full">
+                        <div className="grid grid-cols-1 md:grid-cols-[3fr_1.5fr_auto] gap-4 items-end">
+                          {/* Campo de certificação - largo */}
+                          <div className="flex flex-col w-full">
+                            <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                              {t(
+                                "tela_perfil_candidato.item_label_certificacao",
+                              )}
+                              <TooltipIcon
+                                message={`${t(
+                                  "tela_perfil_candidato.item_tooltip_certificacao_titulo",
+                                )}\n${t(
+                                  "tela_perfil_candidato.item_tooltip_certificacao_passo1",
+                                )}\n${t(
+                                  "tela_perfil_candidato.item_tooltip_certificacao_passo2",
+                                )}\n${t(
+                                  "tela_perfil_candidato.item_tooltip_certificacao_passo3",
+                                )}`}
+                                perfil={perfil}
+                              />
+                            </label>
+                            <CreatableSelect
+                              isClearable
+                              placeholder={t(
+                                "tela_perfil_candidato.item_msg_certificacao",
+                              )}
+                              value={selectedCertificacao}
+                              onChange={(newValue) =>
+                                setSelectedCertificacao(newValue)
+                              }
+                              options={certificacao.map((cert) => ({
+                                value: String(cert.id),
+                                label: cert.certificado,
+                              }))}
+                              formatCreateLabel={(inputValue) =>
+                                `${t(
+                                  "tela_perfil_candidato.item_msg_criar_certificacao",
+                                )} ${inputValue}`
+                              }
+                            />
+                          </div>
+
+                          {/* Upload - médio */}
+                          <div className="flex flex-col w-full">
+                            <label className="text-xs sm:text-sm font-medium mb-1">
+                              {t(
+                                "tela_perfil_candidato.item_label_certificado",
+                              )}
+                            </label>
+                            <input
+                              type="file"
+                              accept="image/*,application/pdf"
+                              className="hidden"
+                              id="novo-certificacao"
+                              onChange={handleNovoCertificacaoChange}
+                            />
+                            <label
+                              htmlFor="novo-certificacao"
+                              className="flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-blue-400 rounded-md cursor-pointer hover:bg-blue-50 transition text-sm truncate"
+                            >
+                              <Upload
+                                size={18}
+                                className="text-blue-600 shrink-0"
+                              />
+                              <span className="truncate">
+                                {novoCertificacaoFile
+                                  ? novoCertificacaoFile.name
+                                  : t(
+                                      "tela_perfil_candidato.item_msg_certificado",
+                                    )}
+                              </span>
+                            </label>
+                          </div>
+
+                          {/* Botão - largura automática */}
+                          <div className="flex flex-col w-full">
+                            <label className="text-xs sm:text-sm font-medium mb-1 opacity-0">
+                              &nbsp;
+                            </label>
+                            <button
+                              type="button"
+                              onClick={handleAddCertificacao}
+                              className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
+                            >
+                              {t("tela_perfil_candidato.item_botao_adicionar")}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {showErrors &&
+                        (form.lista_certificado.length <= 0 ||
+                          !novoCertificacaoFile) && (
+                          <p className="text-sm text-red-600 mt-1">
+                            {t("tela_perfil_candidato.item_msg_campo_obt")}
+                          </p>
+                        )}
+                    </div>
+
+                    <div className="flex flex-1 flex-col gap-3 mt-5">
+                      {form.lista_certificado.map((item) => {
+                        const cert = certificacao.find(
+                          (s) => s.id === item.certificacao_id,
+                        );
+                        return (
+                          <div
+                            key={item.certificacao_id}
+                            className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                          >
+                            <div className="flex flex-col gap-2 w-full">
+                              {/* Linha com Skill, Peso e Candidato */}
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
+                                {/* Nome da skill */}
+                                <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                  {cert?.certificado ?? item.certificado}
+                                </div>
+
+                                {/* Ações */}
+                                <div className="flex items-center gap-3 text-sm min-w-[120px]">
+                                  {/* Visualizar certificado */}
+                                  {certificacaoPreview[
+                                    item.certificacao_id
+                                  ] && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        window.open(
+                                          certificacaoPreview[
+                                            item.certificacao_id
+                                          ],
+                                          "_blank",
+                                        )
+                                      }
+                                      className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
+                                      title={t(
+                                        "tela_perfil_candidato.item_botao_visualizar",
+                                      )}
+                                    >
+                                      <FileText size={20} />
+                                    </button>
+                                  )}
+
+                                  {/* Upload certificado */}
+                                  <label
+                                    htmlFor={`certificado-${item.certificacao_id}`}
+                                    className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 hover:text-blue-800 transition flex items-center justify-center cursor-pointer"
+                                    title={t(
+                                      "tela_perfil_candidato.item_botao_substituir",
+                                    )}
+                                  >
+                                    <Upload size={20} />
+                                  </label>
+                                  <input
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    id={`certificado-${item.certificacao_id}`}
+                                    className="hidden"
+                                    onChange={(e) =>
+                                      handleCertificacaoItemChange(
+                                        e,
+                                        item.certificacao_id,
+                                      )
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={() =>
+                                handleRemoveCertificacao(item.certificacao_id)
+                              }
+                              className="text-red-600 hover:text-red-800 mt-2 sm:mt-0 cursor-pointer"
+                              title={t(
+                                "tela_perfil_candidato.item_botao_remover_certificacao",
+                              )}
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Botões no rodapé */}
+                    <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                      <div className="flex">
+                        <button
+                          onClick={prevStep}
+                          type="button"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_voltar")}
+                        </button>
+                      </div>
+
+                      {/* Direita: botões cadastrar e editar */}
+                      <div className="flex gap-2">
+                        <button
+                          type="button" // evita submit acidental
+                          onClick={handleCancel}
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_cancelar")}
+                        </button>
+                        <button
+                          type="submit"
+                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
+                        >
+                          {t("tela_perfil_candidato.item_botao_avancar")}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="w-full flex flex-col flex-1">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col flex-1"
+                  >
+                    <div>
+                      <h1 className="block text-sm mb-1 py-3 font-bold">
+                        {t(
+                          "tela_perfil_candidato.item_label_informe_hardskills",
+                        )}
+                        <p className="text-[11px] font-normal italic">
+                          {t(
+                            "tela_perfil_candidato.item_label_informe_hardskills_subitem",
+                          )}
+                        </p>
+                        <p className="block text-[11x] font-light">
+                          {t("tela_perfil_candidato.item_label_informe_qtde")}
+                        </p>
+                      </h1>
+
+                      <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                        {t("tela_perfil_candidato.item_label_skill")}
+                        <TooltipIcon
+                          message={`${t(
+                            "tela_perfil_candidato.item_tooltip_skill_titulo",
+                          )}\n${t(
+                            "tela_perfil_candidato.item_tooltip_skill_passo1",
+                          )}\n${t(
+                            "tela_perfil_candidato.item_tooltip_skill_passo2",
+                          )}\n${t(
+                            "tela_perfil_candidato.item_tooltip_skill_passo3",
+                          )}`}
+                          perfil={perfil}
+                        />
+                      </label>
+
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <CreatableSelect
+                            isClearable
+                            placeholder={t(
+                              "tela_perfil_candidato.item_msg_skill",
+                            )}
+                            value={selectedSkill}
+                            onChange={(newValue) => setSelectedSkill(newValue)}
+                            options={skills
+                              .filter((f) => f.tipo_skill_id == 1)
+                              .map((skill) => ({
+                                value: String(skill.skill_id),
+                                label: skill.skill,
+                                tipo_skill_id: skill.tipo_skill_id,
+                              }))}
+                            formatCreateLabel={(inputValue) =>
+                              `${t(
+                                "tela_perfil_candidato.item_msg_criar_skill",
+                              )} ${inputValue}`
+                            }
+                            isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleAddSkill(1)}
+                          className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_adicionar")}
+                        </button>
+                      </div>
+
+                      {showErrors && form.lista_skills.length <= 0 && (
+                        <p className="text-sm text-red-600 mt-1">
+                          {t("tela_perfil_candidato.item_msg_campo_obt")}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-1 flex-col gap-3 mt-5">
+                      {form.lista_skills
+                        .filter((f) => f.tipo_skill_id == 1)
+                        .map((item) => {
+                          const skill = skills.find(
+                            (s) => s.skill_id === item.skill_id,
+                          );
+                          return (
+                            <div
+                              key={item.skill_id}
+                              className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                            >
+                              <div className="flex flex-col gap-2 w-full">
+                                {/* Linha com Skill, Peso e Candidato */}
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
+                                  {/* Nome da skill */}
+                                  <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                    {skill?.skill ?? item.nome}
+                                  </div>
+
+                                  {/* Peso com slider */}
+                                  <div className="flex items-center gap-2 text-sm min-w-[200px]">
+                                    <label className="font-medium whitespace-nowrap">
+                                      {t(
+                                        "tela_perfil_candidato.item_label_peso",
+                                      )}
+                                    </label>
+                                    <input
+                                      type="range"
+                                      min={1}
+                                      max={10}
+                                      step={0.5}
+                                      list="tickmarks"
+                                      value={item.peso / 10}
+                                      onChange={(e) =>
+                                        handleSkillChange(
+                                          item.skill_id,
+                                          "peso",
+                                          Number(e.target.value) * 10,
+                                        )
+                                      }
+                                      className="w-full sm:w-40 accent-blue-600 cursor-pointer"
+                                    />
+                                    <datalist id="tickmarks">
+                                      {[...Array(19)].map((_, i) => {
+                                        const val = i * 0.5 + 1;
+                                        return (
+                                          <option
+                                            key={val}
+                                            value={val.toFixed(1)}
+                                          />
+                                        );
+                                      })}
+                                    </datalist>
+                                    <span className="w-8 text-right">
+                                      {(item.peso / 10).toFixed(1)}
+                                    </span>
+                                  </div>
+
+                                  {/* favorito */}
+                                  <div className="flex items-center gap-4 text-sm min-w-[260px]">
+                                    <div className="flex items-center gap-1">
+                                      <label className="font-medium whitespace-nowrap">
+                                        {t(
+                                          "tela_perfil_candidato.item_label_favorito",
+                                        )}
+                                      </label>
+                                    </div>
+
+                                    {/* Estrela de favorito */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const totalFavoritos =
+                                          form.lista_skills.filter(
+                                            (s) => s.favorito,
+                                          ).length;
+
+                                        // Se já tem 5 favoritos e este não é favorito → não deixa clicar
+                                        if (
+                                          totalFavoritos >= 5 &&
+                                          !item.favorito
+                                        ) {
+                                          return;
+                                        }
+
+                                        handleSkillChange(
+                                          item.skill_id,
+                                          "favorito",
+                                          !item.favorito,
+                                        );
+                                      }}
+                                      className={`flex items-center ${
+                                        form.lista_skills.filter(
+                                          (s) => s.favorito,
+                                        ).length >= 5 && !item.favorito
+                                          ? "cursor-not-allowed opacity-50"
+                                          : "cursor-pointer"
+                                      }`}
+                                      disabled={
+                                        form.lista_skills.filter(
+                                          (s) => s.favorito,
+                                        ).length >= 5 && !item.favorito
+                                      }
+                                    >
+                                      <TooltipIcon
+                                        message={`${t(
+                                          "tela_perfil_candidato.item_tooltip_favorite_passo1",
+                                        )}\n${t(
+                                          "tela_perfil_candidato.item_tooltip_favorite_passo2",
+                                        )}\n${t(
+                                          "tela_perfil_candidato.item_tooltip_favorite_passo2_1",
+                                        )}`}
+                                        perfil={perfil}
+                                      >
+                                        <Star
+                                          className={`w-4 h-4 transition-colors ${
+                                            item.favorito
+                                              ? "fill-yellow-400 text-yellow-400"
+                                              : "text-gray-400"
+                                          }`}
+                                        />
+                                      </TooltipIcon>
+                                    </button>
+
+                                    {/* Tempo da skill */}
+                                    <input
+                                      type="text"
+                                      placeholder={t(
+                                        "tela_perfil_candidato.item_placeholder_favorito",
+                                      )}
+                                      className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
+                                      value={item.tempo_favorito}
+                                      onChange={(e) =>
+                                        handleSkillChange(
+                                          item.skill_id,
+                                          "tempo_favorito",
+                                          e.target.value,
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => handleRemoveSkill(item.skill_id)}
+                                className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
+                                title={t(
+                                  "tela_perfil_candidato.item_botao_remover_skill",
+                                )}
+                              >
+                                <X size={18} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                    </div>
+
+                    {/* Botões no rodapé */}
+                    <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                      <div className="flex">
+                        <button
+                          onClick={prevStep}
+                          type="button"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_voltar")}
+                        </button>
+                      </div>
+
+                      {/* Direita: botões cadastrar e editar */}
+                      <div className="flex gap-2">
+                        <button
+                          type="button" // evita submit acidental
+                          onClick={handleCancel}
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_cancelar")}
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={form.lista_skills.length < 3} // só habilita se >= 3
+                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
+                      ${
+                        form.lista_skills.length < 3
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                      }`}
+                        >
+                          {t("tela_perfil_candidato.item_botao_avancar")}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {step === 5 && (
+                <div className="w-full flex flex-col flex-1">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col flex-1"
+                  >
+                    <div>
+                      <h1 className="block text-sm mb-1 py-3 font-bold">
+                        {t(
+                          "tela_perfil_candidato.item_label_informe_softskills",
+                        )}
+                        <p className="text-[11px] font-normal italic">
+                          {t(
+                            "tela_perfil_candidato.item_label_informe_softskills_subitem",
+                          )}
+                        </p>
+                      </h1>
+
+                      <label className="text-sm font-medium mb-1 flex items-center gap-1">
+                        {t("tela_perfil_candidato.item_label_skill")}
+                        <TooltipIcon
+                          message={`${t(
+                            "tela_perfil_candidato.item_tooltip_skill_titulo",
+                          )}\n${t(
+                            "tela_perfil_candidato.item_tooltip_skill_passo1",
+                          )}\n${t(
+                            "tela_perfil_candidato.item_tooltip_skill_passo2",
+                          )}\n${t(
+                            "tela_perfil_candidato.item_tooltip_skill_passo3",
+                          )}`}
+                          perfil={perfil}
+                        />
+                      </label>
+
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <CreatableSelect
+                            isClearable
+                            placeholder={t(
+                              "tela_perfil_candidato.item_msg_skill",
+                            )}
+                            value={selectedSkill}
+                            onChange={(newValue) => setSelectedSkill(newValue)}
+                            options={skills
+                              .filter((f) => f.tipo_skill_id == 2)
+                              .map((skill) => ({
+                                value: String(skill.skill_id),
+                                label: skill.skill,
+                                tipo_skill_id: skill.tipo_skill_id,
+                              }))}
+                            formatCreateLabel={(inputValue) =>
+                              `${t(
+                                "tela_perfil_candidato.item_msg_criar_skill",
+                              )} ${inputValue}`
+                            }
+                            // isDisabled={form.lista_skills.length >= 12} // 🚀 trava após 12
+                          />
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleAddSkill(2)}
+                          className="bg-blue-600 text-white px-4 py-1 rounded-full hover:bg-blue-700 transition whitespace-nowrap cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_adicionar")}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-1 flex-col gap-3 mt-5">
+                      {form.lista_skills
+                        .filter((f) => f.tipo_skill_id == 2)
+                        .map((item) => {
+                          const skill = skills.find(
+                            (s) => s.skill_id === item.skill_id,
+                          );
+                          return (
+                            <div
+                              key={item.skill_id}
+                              className="border border-blue-300 bg-blue-50 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                            >
+                              <div className="flex flex-col gap-2 w-full">
+                                {/* Linha com Skill, Peso e Candidato */}
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between flex-wrap gap-4 sm:gap-8">
+                                  {/* Nome da skill */}
+                                  <div className="bg-blue-600 text-white text-sm font-medium text-center px-3 py-1 rounded-full w-fit min-w-[150px]">
+                                    {skill?.skill ?? item.nome}
+                                  </div>
+
+                                  {/* Peso com slider */}
+                                  <div className="flex items-center gap-2 text-sm min-w-[200px]">
+                                    <label className="font-medium whitespace-nowrap">
+                                      {t(
+                                        "tela_perfil_candidato.item_label_peso",
+                                      )}
+                                    </label>
+                                    <input
+                                      type="range"
+                                      min={1}
+                                      max={10}
+                                      step={0.5}
+                                      list="tickmarks"
+                                      value={item.peso / 10}
+                                      onChange={(e) =>
+                                        handleSkillChange(
+                                          item.skill_id,
+                                          "peso",
+                                          Number(e.target.value) * 10,
+                                        )
+                                      }
+                                      className="w-full sm:w-40 accent-blue-600 cursor-pointer"
+                                    />
+                                    <datalist id="tickmarks">
+                                      {[...Array(19)].map((_, i) => {
+                                        const val = i * 0.5 + 1;
+                                        return (
+                                          <option
+                                            key={val}
+                                            value={val.toFixed(1)}
+                                          />
+                                        );
+                                      })}
+                                    </datalist>
+                                    <span className="w-8 text-right">
+                                      {(item.peso / 10).toFixed(1)}
+                                    </span>
+                                  </div>
+
+                                  {/* favorito */}
+                                  <div className="flex items-center gap-4 text-sm min-w-[260px]">
+                                    <div className="flex items-center gap-1">
+                                      <label className="font-medium whitespace-nowrap">
+                                        {t(
+                                          "tela_perfil_candidato.item_label_favorito",
+                                        )}
+                                      </label>
+                                    </div>
+
+                                    {/* Estrela de favorito */}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const totalFavoritos =
+                                          form.lista_skills.filter(
+                                            (s) => s.favorito,
+                                          ).length;
+
+                                        // Se já tem 5 favoritos e este não é favorito → não deixa clicar
+                                        if (
+                                          totalFavoritos >= 5 &&
+                                          !item.favorito
+                                        ) {
+                                          return;
+                                        }
+
+                                        handleSkillChange(
+                                          item.skill_id,
+                                          "favorito",
+                                          !item.favorito,
+                                        );
+                                      }}
+                                      className={`flex items-center ${
+                                        form.lista_skills.filter(
+                                          (s) => s.favorito,
+                                        ).length >= 5 && !item.favorito
+                                          ? "cursor-not-allowed opacity-50"
+                                          : "cursor-pointer"
+                                      }`}
+                                      disabled={
+                                        form.lista_skills.filter(
+                                          (s) => s.favorito,
+                                        ).length >= 5 && !item.favorito
+                                      }
+                                    >
+                                      <TooltipIcon
+                                        message={`${t(
+                                          "tela_perfil_candidato.item_tooltip_favorite_passo1",
+                                        )}\n${t(
+                                          "tela_perfil_candidato.item_tooltip_favorite_passo2",
+                                        )}\n${t(
+                                          "tela_perfil_candidato.item_tooltip_favorite_passo2_1",
+                                        )}`}
+                                        perfil={perfil}
+                                      >
+                                        <Star
+                                          className={`w-4 h-4 transition-colors ${
+                                            item.favorito
+                                              ? "fill-yellow-400 text-yellow-400"
+                                              : "text-gray-400"
+                                          }`}
+                                        />
+                                      </TooltipIcon>
+                                    </button>
+
+                                    {/* Tempo da skill */}
+                                    <input
+                                      type="text"
+                                      placeholder={t(
+                                        "tela_perfil_candidato.item_placeholder_favorito",
+                                      )}
+                                      className="border rounded px-2 py-1 w-30 disabled:bg-gray-100"
+                                      value={item.tempo_favorito}
+                                      onChange={(e) =>
+                                        handleSkillChange(
+                                          item.skill_id,
+                                          "tempo_favorito",
+                                          e.target.value,
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => handleRemoveSkill(item.skill_id)}
+                                className="text-red-600 hover:text-red-800 mt-2 sm:mt-0"
+                                title={t(
+                                  "tela_perfil_candidato.item_botao_remover_skill",
+                                )}
+                              >
+                                <X size={18} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                    </div>
+
+                    {/* Botões no rodapé */}
+                    <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                      <div className="flex">
+                        <button
+                          onClick={prevStep}
+                          type="button"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_voltar")}
+                        </button>
+                      </div>
+
+                      {/* Direita: botões cadastrar e editar */}
+                      <div className="flex gap-2">
+                        <button
+                          type="button" // evita submit acidental
+                          onClick={handleCancel}
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_cancelar")}
+                        </button>
+                        <button
+                          type="submit"
+                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
+                        >
+                          {t("tela_perfil_candidato.item_botao_avancar")}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {step === 6 && (
+                <div className="w-full flex flex-col flex-1">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="flex flex-col flex-1"
+                  >
+                    {/* Container Principal */}
+                    <div className="flex flex-col md:flex-row  w-full ">
+                      {/* Coluna Esquerda */}
+                      <div className="flex flex-col md:flex-row w-full">
+                        {/* Dados da vaga e skills lado a lado */}
+                        {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border border-yellow-500"> */}
+                        {/* Bloco - Informações da vaga */}
+                        <div className="w-full space-y-4 mr-2">
+                          {/* Linha 1 - Logo + Título da vaga e empresa */}
+                          <div className="flex flex-col gap-4">
+                            {/* Logo e título + empresa ocupando toda largura */}
+                            <div className="flex items-start gap-4">
+                              {/* Avatar / Logo */}
+                              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0">
+                                {form.logoPreview ? (
+                                  <img
+                                    src={form.logoPreview}
+                                    alt="Logo da candidato"
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="text-xs text-gray-400 flex items-center justify-center h-full">
+                                    {t(
+                                      "tela_perfil_candidato.item_msg_sem_foto",
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Dados */}
+                              <div className="flex-1 space-y-3 ">
+                                {/* Status + Nome */}
+                                {form.ativo ? (
+                                  <span className="flex items-center gap-1">
+                                    <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-3 w-3 text-white"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="text-sm text-green-600">
+                                      {t("tela_perfil_candidato.item_ativo")}
+                                    </span>
+                                  </span>
+                                ) : (
+                                  <span className="flex items-center gap-1">
+                                    <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-3 w-3 text-white"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </div>
+                                    <span className="text-sm text-gray-600">
+                                      {t("tela_perfil_candidato.item_inativo")}
+                                    </span>
+                                  </span>
+                                )}
+
+                                {form.nome_social ? (
+                                  <div className="flex items-center">
+                                    <div className="flex flex-col leading-tight">
+                                      <p className="font-bold">
+                                        {form.nome_social}
+                                      </p>
+                                      <p className="text-sm">
+                                        {form.primeiro_nome} {form.ultimo_nome}
+                                      </p>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center">
+                                    <div className="flex flex-col leading-tight">
+                                      <p className="font-bold">
+                                        {form.primeiro_nome} {form.ultimo_nome}
+                                      </p>
+                                      <p className="text-sm">
+                                        {form.nome_social}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Bloco 2 colunas */}
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-800 w-full">
+                                  {/* Dt Nasc */}
+                                  <div className="flex items-center gap-2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                      />
+                                    </svg>
+                                    {dtNascDisplay}
+                                  </div>
+
+                                  {/* Sexo */}
+                                  <div className="flex items-center gap-2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 11a4 4 0 100-8 4 4 0 000 8zm0 0c-4.418 0-8 2.239-8 5v3h16v-3c0-2.761-3.582-5-8-5z"
+                                      />
+                                    </svg>
+
+                                    {form.sexo_label}
+                                  </div>
+
+                                  {/* Estado */}
+                                  <div className="flex items-center gap-2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M9 3l6 2 6-2v13l-6 2-6-2-6 2V5l6-2z"
+                                      />
+                                    </svg>
+                                    {form.estado_label}
+                                  </div>
+
+                                  {/* Cidade */}
+                                  <div className="flex items-center gap-2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"
+                                      />
+                                      <circle cx="12" cy="10" r="3" />
+                                    </svg>
+                                    {form.cidade_label}
+                                  </div>
+
+                                  {/* Telefone */}
+                                  <div className="flex items-center gap-2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M3 5a2 2 0 012-2h2.28a1 1 0 01.948.684l1.2 3.6a1 1 0 01-.272 1.06l-1.516 1.516a11.042 11.042 0 005.292 5.292l1.516-1.516a1 1 0 011.06-.272l3.6 1.2a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C8.477 21 3 15.523 3 9V5z"
+                                      />
+                                    </svg>
+                                    {form.telefone}
+                                  </div>
+
+                                  {/* Meio de comunicação */}
+                                  <div className="flex items-center gap-2">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 text-gray-500"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      {/* Balão de chat */}
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M8 10h8m-8 4h5m-9 5.5V5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H7l-4 4z"
+                                      />
+                                    </svg>
+                                    {form.meioNotificacao}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Apresentação */}
+                            <div className="w-[85%] text-sm text-gray-700 whitespace-pre-line mt-5">
+                              {form.apresentacao ||
+                                t(
+                                  "tela_perfil_candidato.item_msg_nenhuma_apresentacao",
+                                )}
+                            </div>
+                            <div className="flex flex-row w-[95%] mt-5">
+                              <div className="w-1/2 rounded-xl p-1 shadow-sm">
+                                <p className="ml-1">
+                                  {t(
+                                    "tela_perfil_candidato.item_label_lista_formacao",
+                                  )}
+                                </p>
+                                {Array.isArray(form.lista_formacao) &&
+                                form.lista_formacao.length > 0 ? (
+                                  form.lista_formacao.map((item) => {
+                                    return (
+                                      <div
+                                        key={item.id}
+                                        className="mt-2 border border-blue-300 text-gray-500 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                                      >
+                                        {item.formacao}
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  <p className="text-sm text-gray-500 font-bold mt-3 text-center">
+                                    {t(
+                                      "tela_perfil_candidato.item_msg_nenhuma_formacao",
+                                    )}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="ml-2 w-1/2 rounded-xl p-1 shadow-sm">
+                                <p className="ml-1">
+                                  {t(
+                                    "tela_perfil_candidato.item_label_lista_certificacao",
+                                  )}
+                                </p>
+                                {Array.isArray(form.lista_certificado) &&
+                                form.lista_certificado.length > 0 ? (
+                                  form.lista_certificado.map((item) => {
+                                    return (
+                                      <div
+                                        key={item.certificacao_id}
+                                        className="mt-2 border border-blue-300 text-gray-500 px-4 py-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
+                                      >
+                                        {item.certificado}
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  <p className="text-sm text-gray-500 font-bold mt-3 text-center">
+                                    {t(
+                                      "tela_perfil_candidato.item_msg_nenhuma_certificacao",
+                                    )}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Coluna Direita - Gráficos */}
+                      <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
+                        <SkillsPanel skills={skillsData} perfil={perfil} />
+                      </div>
+                    </div>
+
+                    {/* Botões */}
+                    <div className="flex flex-col md:flex-row justify-between gap-2 mt-auto pt-4">
+                      <div className="flex">
+                        <button
+                          onClick={prevStep}
+                          type="button"
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_voltar")}
+                        </button>
+                      </div>
+
+                      {/* Direita: botões cadastrar e editar */}
+                      <div className="flex gap-2">
+                        <button
+                          type="button" // evita submit acidental
+                          onClick={handleCancel}
+                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                        >
+                          {t("tela_perfil_candidato.item_botao_cancelar")}
+                        </button>
+                        <button
+                          type="submit"
+                          className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
+                            isFormValid(form)
+                              ? "text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                              : "bg-gray-300 cursor-not-allowed"
+                          }`}
+                        >
+                          {isSubmitting ? (
+                            <ImSpinner2 className="animate-spin" />
+                          ) : (
+                            t("tela_perfil_candidato.item_botao_publicar")
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          </PageContainer>
+        </div>
       </div>
     </div>
   );
