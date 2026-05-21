@@ -90,7 +90,7 @@ export default function Sidebar({
         <Link href={item.route} key={idx}>
           <div
             onClick={() => isMobile && setIsDrawerOpen?.(false)}
-            className={`relative flex items-center p-2 rounded cursor-pointer transition-all
+            className={`relative flex items-center p-2 rounded cursor-pointer transition-all 
               ${actualCollapsed ? "justify-center" : "gap-3"}
               ${isActive ? profileColorMap[profile] : "hover:bg-gray-100"}`}
           >

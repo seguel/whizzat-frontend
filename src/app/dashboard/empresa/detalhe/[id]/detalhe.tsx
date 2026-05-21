@@ -5,7 +5,7 @@ import Image from "next/image";
 import Sidebar from "../../../../components/perfil/Sidebar";
 import TopBar from "../../../../components/perfil/TopBar";
 import { ProfileType } from "../../../../components/perfil/ProfileContext";
-/* import { useAuthGuard } from "../../lib/hooks/useAuthGuard";*/
+import PageContainer from "@/app/components/PageContainer";
 import LoadingOverlay from "../../../../components/LoadingOverlay";
 // import { FaCloudUploadAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
@@ -93,14 +93,14 @@ export default function EmpresaDetalhe({
             {
               method: "GET",
               credentials: "include",
-            }
+            },
           ),
           fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/empresas/lista-vagas-empresa/${empresaId}`,
             {
               method: "GET",
               credentials: "include",
-            }
+            },
           ),
         ]);
 
@@ -115,7 +115,7 @@ export default function EmpresaDetalhe({
       } catch (error) {
         console.error(
           t("tela_empresa_dados.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setIsLoading(false);
@@ -134,12 +134,14 @@ export default function EmpresaDetalhe({
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-      <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
+
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        <main className="p-4 grid grid-cols-1 gap-4 w-[98%] mx-auto">
-          <div className="flex flex-col items-start p-4 bg-white rounded-lg shadow-sm w-full min-h-[500px] space-y-6">
-            <div className="pt-1 px-1 flex justify-between w-full">
+        <div className="flex-1 overflow-y-auto">
+          <PageContainer>
+            {/* <div className="flex flex-col items-start p-4 bg-white rounded-lg shadow-sm w-full min-h-[500px] space-y-6"> */}
+            <div className="pt-1 px-1 flex justify-between w-full mb-4">
               {/* Esquerda: botão voltar */}
               <div className="flex">
                 <button
@@ -157,7 +159,7 @@ export default function EmpresaDetalhe({
                 <button
                   onClick={() =>
                     router.push(
-                      `/dashboard/empresa/criar?perfil=${perfil}&op=N`
+                      `/dashboard/empresa/criar?perfil=${perfil}&op=N`,
                     )
                   }
                   className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
@@ -169,7 +171,7 @@ export default function EmpresaDetalhe({
                   <button
                     onClick={() =>
                       router.push(
-                        `/dashboard/empresa/editar/${empresas?.id}?perfil=${perfil}&op=E`
+                        `/dashboard/empresa/editar/${empresas?.id}?perfil=${perfil}&op=E`,
                       )
                     }
                     className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
@@ -403,7 +405,7 @@ export default function EmpresaDetalhe({
                     <button
                       onClick={() =>
                         router.push(
-                          `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresas?.id}`
+                          `/dashboard/vagas?perfil=${perfil}&op=N&id=${empresas?.id}`,
                         )
                       }
                       className="px-4 py-2 rounded-full text-sm font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
@@ -492,8 +494,9 @@ export default function EmpresaDetalhe({
                 </div>
               </div>
             </div>
-          </div>
-        </main>
+            {/* </div> */}
+          </PageContainer>
+        </div>
       </div>
     </div>
   );

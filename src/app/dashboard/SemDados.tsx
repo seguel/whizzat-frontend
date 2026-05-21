@@ -1,6 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import PageContainer from "../components/PageContainer";
 
 interface SemDadosProps {
   tipo: "empresa" | "vaga" | "perfil";
@@ -164,11 +165,5 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
     }
   };
 
-  return (
-    <main className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div className="md:col-span-3 flex flex-col items-center justify-center p-6 bg-white rounded-lg shadow-sm w-full min-h-[550px] text-center">
-        {renderBloco()}
-      </div>
-    </main>
-  );
+  return <PageContainer>{renderBloco()}</PageContainer>;
 }

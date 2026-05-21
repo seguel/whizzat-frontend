@@ -13,6 +13,9 @@ import { ProfileType } from "../../../../components/perfil/ProfileContext";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
+import PageContainer from "@/app/components/PageContainer";
+import { useAvaliador } from "../../../../lib/hooks/useAvaliador";
+import SemDados from "../../../SemDados";
 
 interface Props {
   perfil: ProfileType;
@@ -20,6 +23,7 @@ interface Props {
 }
 
 export default function EditarPage({ perfil, id }: Props) {
+  const { hasPerfilAvaliador, loading } = useAvaliador(perfil);
   const { t } = useTranslation("common");
   const router = useRouter();
 
@@ -143,7 +147,7 @@ export default function EditarPage({ perfil, id }: Props) {
     }
   };
 
-  if (isLoading) return <LoadingOverlay />;
+  if (isLoading || loading) return <LoadingOverlay />;
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -153,105 +157,116 @@ export default function EditarPage({ perfil, id }: Props) {
         profile={perfil}
       />
 
-      <div className="flex flex-col flex-1 overflow-y-auto bg-[#F5F6F6]">
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
-
-        <main className="p-6 w-[98%] mx-auto">
-          <div className="bg-white rounded-xl border p-6 flex flex-col gap-4">
-            {/* HEADER */}
-            <div className="flex items-center justify-between">
-              <h1 className="text-lg font-semibold">
-                {t("questionario.titulo_editar")}
-              </h1>
-
-              <button
-                onClick={() =>
-                  router.push(`/dashboard/questionario?perfil=${perfil}`)
-                }
-                className="flex items-center gap-2 px-3 py-2 text-sm border rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                <ArrowLeft size={16} />
-                {t("questionario.btn_voltar")}
-              </button>
-            </div>
-
-            {/* titulo */}
-            {/* ativo */}
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={ativo}
-                onChange={(e) => setAtivo(e.target.checked)}
-              />
-              {t("questionario.ativo")}
-            </label>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">
-                {t("questionario.titulo")}
-              </label>
-
-              <input
-                value={titulo}
-                onChange={(e) => setTitulo(e.target.value)}
-                className="border rounded-lg px-3 py-2 text-sm"
-              />
-            </div>
-
-            {/* comentario */}
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium">
-                {t("questionario.comentario")}
-              </label>
-
-              <textarea
-                value={comentario}
-                onChange={(e) => setComentario(e.target.value)}
-                rows={4}
-                className="border rounded-lg px-3 py-2 text-sm w-full overflow-y-auto"
-              />
-            </div>
-
-            {/* perguntas */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
+        {!hasPerfilAvaliador ? (
+          <SemDados tipo="perfil" perfil={perfil} />
+        ) : (
+          <div className="flex-1 overflow-y-auto">
+            <PageContainer>
+              <div className="bg-white rounded-xl border p-4 flex flex-col gap-4 ">
+                {/* HEADER */}
                 <div className="flex items-center justify-between">
+                  <h1 className="text-lg font-semibold">
+                    {t("questionario.titulo_editar")}
+                  </h1>
+
+                  <button
+                    onClick={() =>
+                      router.push(`/dashboard/questionario?perfil=${perfil}`)
+                    }
+                    className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg text-indigo-900 bg-blue-100 
+                      border border-transparent 
+                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
+                  >
+                    <ArrowLeft size={16} />
+                    {t("questionario.btn_voltar")}
+                  </button>
+                </div>
+
+                {/* titulo */}
+                {/* ativo */}
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={ativo}
+                    onChange={(e) => setAtivo(e.target.checked)}
+                  />
+                  {t("questionario.ativo")}
+                </label>
+
+                <div className="flex flex-col gap-1">
                   <label className="text-sm font-medium">
-                    {t("questionario.pergunta")} ({perguntas.length})
+                    {t("questionario.titulo")}
                   </label>
+
+                  <input
+                    value={titulo}
+                    onChange={(e) => setTitulo(e.target.value)}
+                    className="border rounded-lg px-3 py-2 text-sm"
+                  />
+                </div>
+
+                {/* comentario */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium">
+                    {t("questionario.comentario")}
+                  </label>
+
+                  <textarea
+                    value={comentario}
+                    onChange={(e) => setComentario(e.target.value)}
+                    rows={4}
+                    className="border rounded-lg px-3 py-2 text-sm w-full overflow-y-auto"
+                  />
+                </div>
+
+                {/* perguntas */}
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium">
+                        {t("questionario.pergunta")} ({perguntas.length})
+                      </label>
+                    </div>
+                  </div>
+
+                  <ListaPerguntasSortable
+                    perguntas={perguntas}
+                    setPerguntas={setPerguntas}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={adicionarPergunta}
+                    className="self-start px-3 py-2 text-sm rounded-md font-semibold
+               text-indigo-900 bg-blue-100 
+                      border border-transparent 
+                      hover:bg-blue-200 hover:border-blue-300 transition cursor-pointer"
+                  >
+                    + {t("questionario.btn_add_pergunta")}
+                  </button>
+                </div>
+
+                {/* salvar */}
+                <div className="flex justify-end gap-3 pt-4 border-t">
+                  <button
+                    onClick={salvar}
+                    disabled={salvando}
+                    className="px-5 py-2 rounded-md text-sm font-semibold
+                text-indigo-900 bg-blue-100 
+                      border border-transparent 
+                      hover:bg-blue-200 hover:border-blue-300 transition cursor-pointer"
+                  >
+                    {salvando
+                      ? t("questionario.btn_salvando")
+                      : t("questionario.btn_salvar")}
+                  </button>
                 </div>
               </div>
-
-              <ListaPerguntasSortable
-                perguntas={perguntas}
-                setPerguntas={setPerguntas}
-              />
-
-              <button
-                type="button"
-                onClick={adicionarPergunta}
-                className="self-start px-3 py-2 text-sm rounded-md
-               bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer"
-              >
-                + {t("questionario.btn_add_pergunta")}
-              </button>
-            </div>
-
-            {/* salvar */}
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <button
-                onClick={salvar}
-                disabled={salvando}
-                className="px-5 py-2 rounded-md text-sm font-semibold
-                bg-green-600 text-white hover:bg-green-700 transition cursor-pointer"
-              >
-                {salvando
-                  ? t("questionario.btn_salvando")
-                  : t("questionario.btn_salvar")}
-              </button>
-            </div>
+            </PageContainer>
           </div>
-        </main>
+        )}
       </div>
     </div>
   );

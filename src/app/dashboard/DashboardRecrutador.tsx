@@ -40,7 +40,8 @@ export default function DashboardRecrutador({ perfil }: Props) {
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-      <div className="flex flex-col flex-1 overflow-y-auto transition-all bg-[#F5F6F6]">
+
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
         {!hasPerfilRecrutador ? (

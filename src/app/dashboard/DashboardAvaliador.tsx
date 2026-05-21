@@ -19,17 +19,7 @@ export default function DashboardAvaliador({ perfil }: Props) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { hasPerfilAvaliador, loading } = useAvaliador(perfil);
 
-  //Ativar somente quando avaliador tiver plano
-  /* useEffect(() => {
-    if (hasRedirectPlano) {
-      router.push(hasRedirectPlano);
-    }
-  }, [hasRedirectPlano, router]); */
-
   if (loading) return <LoadingOverlay />;
-
-  // 🔹 Se estiver redirecionando, não renderiza nada
-  // if (hasRedirectPlano) return null;
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -38,16 +28,14 @@ export default function DashboardAvaliador({ perfil }: Props) {
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-      <div className="flex flex-col flex-1 overflow-y-auto transition-all">
+
+      <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
+
         {!hasPerfilAvaliador ? (
           <SemDados tipo="perfil" perfil={perfil} />
         ) : (
-          <>
-            <main className="p-4">
-              <EvaluationList />
-            </main>
-          </>
+          <EvaluationList />
         )}
       </div>
     </div>
