@@ -45,7 +45,7 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
 
   const { avaliacao, loading: loadingAvaliacao } = useAvaliacaoDetalhe(id);
 
-  console.log(avaliacao);
+  // console.log(avaliacao);
 
   if (loading || loadingAvaliacao) return <LoadingOverlay />;
 

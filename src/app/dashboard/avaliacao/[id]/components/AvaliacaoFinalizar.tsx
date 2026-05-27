@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   habilitado: boolean;
@@ -21,6 +22,7 @@ export default function CardFinalizarAvaliacao({
   peso_av,
   comentario_av,
 }: Props) {
+  const { t } = useTranslation("common");
   const router = useRouter();
   const [peso, setPeso] = useState(peso_av);
   const [comentario, setComentario] = useState(comentario_av);
@@ -57,14 +59,14 @@ export default function CardFinalizarAvaliacao({
         return;
       }
 
-      toast.success("Avaliação Finalizada!", {
+      toast.success(t("minha_avaliacao.avaliacao_finalizada"), {
         duration: 5000,
       });
       router.push(`/dashboard/avaliacao?perfil=avaliador`);
     } catch (error) {
       console.error(error);
 
-      toast.error("Problemas ao finalizar. Tente mais tarde.", {
+      toast.error(t("minha_avaliacao.erro_problema"), {
         duration: 5000,
       });
     } finally {
@@ -73,9 +75,9 @@ export default function CardFinalizarAvaliacao({
   };
 
   function getPesoLabel() {
-    if (peso <= 3) return "Básico";
-    if (peso <= 6) return "Intermediário";
-    if (peso <= 8) return "Avançado";
+    if (peso <= 3) return t("minha_avaliacao.basico");
+    if (peso <= 6) return t("minha_avaliacao.intermediario");
+    if (peso <= 8) return t("minha_avaliacao.avancado");
 
     return "Especialista";
   }
@@ -102,18 +104,18 @@ export default function CardFinalizarAvaliacao({
         <div>
           <h2 className="font-semibold">
             {status != "FINALIZADO"
-              ? "Finalizar Avaliação"
-              : "Avaliação Finalizada"}
+              ? t("minha_avaliacao.finalizar_avaliacao")
+              : t("minha_avaliacao.finalizada_avaliacao")}
           </h2>
 
           <p className="text-sm text-gray-500 mt-1">
-            Informe a nota final e comentário da entrevista.
+            {t("minha_avaliacao.informe_nota")}.
           </p>
         </div>
 
         {!habilitado && (
           <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-500">
-            Aguardando entrevista
+            {t("minha_avaliacao.aguardando_entrevista")}
           </span>
         )}
       </div>
@@ -122,7 +124,7 @@ export default function CardFinalizarAvaliacao({
         {/* PESO */}
         <div className="flex items-center gap-3">
           <label className="text-sm font-medium whitespace-nowrap">
-            Nota Final
+            {t("minha_avaliacao.nota_final")}
           </label>
 
           <input
@@ -149,7 +151,7 @@ export default function CardFinalizarAvaliacao({
         {/* COMENTÁRIO */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">
-            Comentário
+            {t("minha_avaliacao.comentario")}
           </label>
 
           <textarea
@@ -175,7 +177,9 @@ export default function CardFinalizarAvaliacao({
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
             }`}
             >
-              {loading ? "Finalizando..." : "Finalizar Avaliação"}
+              {loading
+                ? t("minha_avaliacao.finalizando")
+                : t("minha_avaliacao.finalizar_avaliacao")}
             </button>
           </div>
         )}
