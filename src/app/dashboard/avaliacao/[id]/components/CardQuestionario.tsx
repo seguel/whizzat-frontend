@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuestionarios } from "../../../../lib/hooks/useQuestionarios";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   naoEnviar: boolean;
@@ -27,6 +28,8 @@ export default function CardQuestionario({
   questionarioEnviadoTitulo,
   dataEnvioFormulario,
 }: Props) {
+  const { t, i18n } = useTranslation("common");
+
   const [selecionado, setSelecionado] = useState<number | "">("");
   const [loadingEnviar, setLoadingEnviar] = useState(false);
 
@@ -38,6 +41,21 @@ export default function CardQuestionario({
   } | null>(null);
 
   const { questionarios, loading } = useQuestionarios(avaliadorId);
+
+  // 👇 idioma atual
+  const currentLocale =
+    i18n.language === "en"
+      ? "en-US"
+      : i18n.language === "es"
+        ? "es-ES"
+        : "pt-BR";
+
+  // 👇 formatador internacionalizado
+  const formatarData = (data: string) => {
+    return new Intl.DateTimeFormat(currentLocale, {
+      dateStyle: "short",
+    }).format(new Date(data));
+  };
 
   // 👇 quando abrir tela e já existir questionário enviado
   useEffect(() => {
@@ -83,9 +101,9 @@ export default function CardQuestionario({
         throw new Error("Erro ao enviar questionário");
       }
 
-      const data = await res.json();
+      // const data = await res.json();
 
-      console.log("Enviado:", data);
+      // console.log("Enviado:", data);
 
       // 👇 pega título selecionado
       const questionarioSelecionado = questionarios.find(
@@ -95,7 +113,8 @@ export default function CardQuestionario({
       // 👇 salva estado local
       setQuestionarioEnviado({
         id: Number(selecionado),
-        titulo: questionarioSelecionado?.titulo ?? "Questionário",
+        titulo:
+          questionarioSelecionado?.titulo ?? t("minha_avaliacao.questionario"),
         dataEnvio: new Date().toISOString(),
       });
     } catch (err) {
@@ -107,7 +126,9 @@ export default function CardQuestionario({
 
   return (
     <div className="bg-white p-4 border rounded-xl shadow-sm flex flex-col gap-4 h-[525px]">
-      <h2 className="font-semibold mb-2">Selecionar Questionário</h2>
+      <h2 className="font-semibold mb-2">
+        {t("minha_avaliacao.titulo_questionario")}
+      </h2>
 
       <select
         disabled={naoEnviar || loadingEnviar || loading || bloqueado}
@@ -119,8 +140,8 @@ export default function CardQuestionario({
       >
         <option value="">
           {loading
-            ? "Carregando questionários..."
-            : "Selecione um questionário"}
+            ? t("minha_avaliacao.carregando_questionario")
+            : t("minha_avaliacao.selecione_questionario")}
         </option>
 
         {questionarios.map((q: Questionario) => (
@@ -141,7 +162,7 @@ export default function CardQuestionario({
           disabled={bloqueado}
           onChange={(e) => setNaoEnviar(e.target.checked)}
         />
-        Não enviar questionário
+        {t("minha_avaliacao.nao_questionario")}
       </label>
 
       <button
@@ -156,27 +177,28 @@ export default function CardQuestionario({
             : "text-indigo-900 bg-blue-100 hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
         }`}
       >
-        {loadingEnviar ? "Enviando..." : "Enviar Questionário"}
+        {loadingEnviar
+          ? t("minha_avaliacao.enviando")
+          : t("minha_avaliacao.enviar_questionario")}
       </button>
 
       {/* 👇 status enviado */}
       {questionarioEnviado && (
         <div className="mt-10 rounded-lg border border-green-200 bg-green-50 p-3 text-sm">
           <p className="font-medium text-green-800">
-            Questionário enviado com sucesso
+            {t("minha_avaliacao.enviado_questionario")}
           </p>
 
           <div className="mt-2 flex flex-col gap-1 text-green-700">
             <span>
-              <strong>Questionário:</strong> {questionarioEnviado.titulo}
+              <strong>{t("minha_avaliacao.questionario")}:</strong>{" "}
+              {questionarioEnviado.titulo}
             </span>
 
             <span>
-              <strong>Data envio:</strong>{" "}
+              <strong>{t("minha_avaliacao.data_envio")}:</strong>{" "}
               <span className="font-semibold text-green-700 whitespace-nowrap">
-                {new Date(questionarioEnviado.dataEnvio).toLocaleDateString(
-                  "pt-BR",
-                )}
+                {formatarData(questionarioEnviado.dataEnvio)}
               </span>
             </span>
           </div>
