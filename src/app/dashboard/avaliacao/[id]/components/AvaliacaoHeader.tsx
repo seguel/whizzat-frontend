@@ -52,9 +52,9 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoProps) {
   function getPesoLabel() {
     const peso = avaliacao.peso;
 
-    if (peso <= 3) return "Básico";
-    if (peso <= 6) return "Intermediário";
-    if (peso <= 8) return "Avançado";
+    if (peso <= 3) return t("minha_avaliacao.basico");
+    if (peso <= 6) return t("minha_avaliacao.intermediario");
+    if (peso <= 8) return t("minha_avaliacao.avancado");
 
     return "Especialista";
   }
@@ -140,11 +140,14 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoProps) {
 
       <div className="flex gap-6 flex-wrap">
         {/* Autoavaliação */}
-        <MetricCard label="Autoavaliação" value={avaliacao.peso} />
+        <MetricCard
+          label={t("minha_avaliacao.autoavaliacao")}
+          value={avaliacao.peso}
+        />
 
         {/* Última avaliação */}
         <MetricCard
-          label="Última avaliação"
+          label={t("minha_avaliacao.ultima_avaliacao")}
           value={
             avaliacao.ultimo_peso_avaliador
               ? avaliacao.ultimo_peso_avaliador
@@ -154,7 +157,7 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoProps) {
 
         {/* Data */}
         <MetricCard
-          label="Dt. Últ. Avaliação"
+          label={t("minha_avaliacao.dt_ultima_avaliacao")}
           value={
             avaliacao.ultima_avaliacao
               ? new Date(avaliacao.ultima_avaliacao).toLocaleDateString("pt-BR")

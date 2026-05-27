@@ -3,7 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { ptBR } from "date-fns/locale";
+
+import { ptBR, enUS, es } from "date-fns/locale";
+
+import { useTranslation } from "react-i18next";
 
 type Agenda = {
   id: number;
@@ -29,12 +32,35 @@ export default function CardAgenda({
   entrevistaRealizada,
   setEntrevistaRealizada,
 }: Props) {
+  const { t, i18n } = useTranslation("common");
+
   const [dataSelecionada, setDataSelecionada] = useState<Date | undefined>();
 
   const [horarioSelecionado, setHorarioSelecionado] = useState<string>("");
 
   const [loadingEnviar, setLoadingEnviar] = useState(false);
+
   const horarioSelecionadoRef = useRef<HTMLButtonElement | null>(null);
+
+  // 👇 locale calendário
+  const currentLocale =
+    i18n.language === "en" ? enUS : i18n.language === "es" ? es : ptBR;
+
+  // 👇 locale formatação data
+  const currentLocaleCode =
+    i18n.language === "en"
+      ? "en-US"
+      : i18n.language === "es"
+        ? "es-ES"
+        : "pt-BR";
+
+  // 👇 helper formatador
+  const formatarDataHora = (data: string | Date) => {
+    return new Intl.DateTimeFormat(currentLocaleCode, {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(new Date(data));
+  };
 
   const hoje = new Date();
 
@@ -45,8 +71,6 @@ export default function CardAgenda({
   const agendaPendente = agenda?.status === "PENDENTE";
   const agendaAceita = agenda?.status === "ACEITO";
   const agendaRecusada = agenda?.status === "RECUSADO";
-
-  // const entrevistaRealizada = status === "ENTREVISTA_REALIZADA";
 
   // 👇 bloqueia somente quando existe agenda válida
   const bloqueado = agendaPendente || agendaAceita;
@@ -62,13 +86,13 @@ export default function CardAgenda({
       setDataSelecionada(data);
 
       setHorarioSelecionado(
-        data.toLocaleTimeString("pt-BR", {
+        data.toLocaleTimeString(currentLocaleCode, {
           hour: "2-digit",
           minute: "2-digit",
         }),
       );
     }
-  }, [agenda]);
+  }, [agenda, currentLocaleCode]);
 
   useEffect(() => {
     if (horarioSelecionadoRef.current) {
@@ -104,7 +128,7 @@ export default function CardAgenda({
 
     try {
       setLoadingEnviar(true);
-      console.log(dataHoraCompleta.toISOString());
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/avaliador/avaliacoes/agendar`,
         {
@@ -124,10 +148,6 @@ export default function CardAgenda({
         throw new Error("Erro ao enviar agenda");
       }
 
-      const data = await res.json();
-
-      console.log("Agenda enviada:", data);
-
       window.location.reload();
     } catch (err) {
       console.error(err);
@@ -136,15 +156,16 @@ export default function CardAgenda({
     }
   };
 
+  // 👇 status traduzido
   const statusAgendaLabel = {
-    PENDENTE: "Aguardando aceite",
-    ACEITO: "Aceita",
-    RECUSADO: "Recusada",
+    PENDENTE: t("minha_avaliacao.status_agenda.pendente"),
+    ACEITO: t("minha_avaliacao.status_agenda.aceito"),
+    RECUSADO: t("minha_avaliacao.status_agenda.recusado"),
   }[agenda?.status ?? ""];
 
   return (
     <div className="bg-white p-1 border rounded-xl shadow-sm flex flex-col gap-2 h-[525px] overflow-hidden">
-      <h2 className="font-semibold">Data Entrevista</h2>
+      <h2 className="font-semibold">{t("minha_avaliacao.data_entrevista")}</h2>
 
       {/* 👇 agenda enviada */}
       {agenda && (
@@ -159,7 +180,9 @@ export default function CardAgenda({
           }`}
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="text-gray-700">Sugestão enviada:</span>
+            <span className="text-gray-700">
+              {t("minha_avaliacao.data_sugestao")}:
+            </span>
 
             <span
               className={`text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap
@@ -185,11 +208,7 @@ export default function CardAgenda({
                       : "text-yellow-700"
                 }`}
           >
-            {new Date(agenda.data_hora_agenda).toLocaleDateString("pt-BR")} -{" "}
-            {new Date(agenda.data_hora_agenda).toLocaleTimeString("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {formatarDataHora(agenda.data_hora_agenda)}
           </div>
         </div>
       )}
@@ -205,7 +224,7 @@ export default function CardAgenda({
           }
         >
           <DayPicker
-            locale={ptBR}
+            locale={currentLocale}
             mode="single"
             selected={dataSelecionada}
             onSelect={setDataSelecionada}
@@ -236,7 +255,7 @@ export default function CardAgenda({
         {/* 👇 horários */}
         <div className="w-24 border-l overflow-y-auto max-h-[290px] bg-gray-50">
           <div className="sticky top-0 bg-white px-2 py-2 text-xs font-medium text-gray-500">
-            Horários
+            {t("minha_avaliacao.horarios")}
           </div>
 
           <div className="p-2 flex flex-col gap-1">
@@ -249,13 +268,13 @@ export default function CardAgenda({
                 disabled={!habilitado || bloqueado}
                 onClick={() => setHorarioSelecionado(horario)}
                 className={`text-sm rounded-md py-1 transition
-                      ${
-                        horarioSelecionado === horario
-                          ? "bg-blue-600 text-white"
-                          : habilitado && !bloqueado
-                            ? "hover:bg-blue-100 text-gray-700"
-                            : "text-gray-300 cursor-not-allowed"
-                      }`}
+                ${
+                  horarioSelecionado === horario
+                    ? "bg-blue-600 text-white"
+                    : habilitado && !bloqueado
+                      ? "hover:bg-blue-100 text-gray-700"
+                      : "text-gray-300 cursor-not-allowed"
+                }`}
               >
                 {horario}
               </button>
@@ -267,13 +286,11 @@ export default function CardAgenda({
       {/* 👇 preview */}
       {dataHoraCompleta && !bloqueado && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm shadow-sm">
-          <span className="text-gray-700">Sugestão selecionada:</span>{" "}
+          <span className="text-gray-700">
+            {t("minha_avaliacao.sugestao_selecionada")}:
+          </span>{" "}
           <span className="font-bold text-indigo-700 whitespace-nowrap">
-            {dataHoraCompleta.toLocaleDateString("pt-BR")} -{" "}
-            {dataHoraCompleta.toLocaleTimeString("pt-BR", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {formatarDataHora(dataHoraCompleta)}
           </span>
         </div>
       )}
@@ -299,18 +316,17 @@ export default function CardAgenda({
         }`}
       >
         {loadingEnviar
-          ? "Enviando..."
+          ? t("minha_avaliacao.enviando")
           : podeReagendar
-            ? "Enviar Nova Sugestão"
+            ? t("minha_avaliacao.nova_sugestao")
             : agendaPendente
-              ? "Sugestão enviada"
-              : "Enviar Sugestão"}
+              ? t("minha_avaliacao.enviada_sugestao")
+              : t("minha_avaliacao.enviar_sugestao")}
       </button>
 
       {!habilitado && !agenda && (
         <p className="text-xs text-gray-400">
-          Disponível após envio do questionário ou caso o avaliador opte por não
-          enviar.
+          {t("minha_avaliacao.msg_agenda")}.
         </p>
       )}
 
@@ -325,13 +341,9 @@ export default function CardAgenda({
             />
 
             <span className="font-medium text-gray-700">
-              Confirmar entrevista realizada
+              {t("minha_avaliacao.confirmar_entrevista")}
             </span>
           </label>
-
-          {/* <p className="text-xs text-gray-500 mt-1">
-            Após confirmar, será possível finalizar a avaliação.
-          </p> */}
         </div>
       )}
     </div>
