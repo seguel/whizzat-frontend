@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import AvaliacaoConvite from "./AvaliacaoConvites";
-import { ProfileType } from "../../components/perfil/ProfileContext";
+import { ProfileType } from "../../../components/perfil/ProfileContext";
 
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
 type PerfilKey = (typeof validPerfis)[number];
