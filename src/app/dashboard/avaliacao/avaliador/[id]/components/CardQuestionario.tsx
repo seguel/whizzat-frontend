@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuestionarios } from "../../../../lib/hooks/useQuestionarios";
+import { useQuestionarios } from "../../../../../lib/hooks/useQuestionarios";
 import { useTranslation } from "react-i18next";
 
 type Props = {
