@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { notFound } from "next/navigation";
 import AvaliacaoPage from "./AvaliacaoPage";
-import { ProfileType } from "../../../components/perfil/ProfileContext";
+import { ProfileType } from "../../../../components/perfil/ProfileContext";
 
 const validPerfis = ["candidato", "recrutador", "avaliador"] as const;
 type PerfilKey = (typeof validPerfis)[number];

@@ -3,8 +3,8 @@
 import {
   ProfileProvider,
   ProfileType,
-} from "../../components/perfil/ProfileContext";
-import { NotificationProvider } from "../../components/perfil/NotificationContext";
+} from "../../../components/perfil/ProfileContext";
+import { NotificationProvider } from "../../../components/perfil/NotificationContext";
 import AvaliacaoConvites from "./AvaliacaoConvites";
 
 interface Props {

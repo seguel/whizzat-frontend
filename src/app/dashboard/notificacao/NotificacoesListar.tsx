@@ -9,7 +9,7 @@ import { Star, CheckCircle, Trash2 } from "lucide-react";
 import { useNotifications } from "../../components/perfil/NotificationContext";
 import { useTranslation } from "react-i18next";
 import PageContainer from "@/app/components/PageContainer";
-import { useAvaliador } from "../../lib/hooks/useAvaliador";
+import { usePerfil } from "../../lib/hooks/usePerfil";
 import SemDados from "../SemDados";
 
 interface Props {
@@ -71,7 +71,7 @@ function renderNotificacaoConteudo(notificacao: Notificacao, t: any) {
 }
 
 export default function NotificacoesListar({ perfil }: Props) {
-  const { hasPerfilAvaliador, loading } = useAvaliador(perfil);
+  // const { hasPerfilAvaliador, loading } = useAvaliador(perfil);
 
   const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -95,6 +95,8 @@ export default function NotificacoesListar({ perfil }: Props) {
   const [filtro, setFiltro] = useState<"todas" | "naoLidas">("todas");
 
   const temNaoLidas = notificacoes.some((n) => !n.lida);
+
+  const { hasPerfil, loading } = usePerfil(perfil);
 
   const marcarComoLida = async (id: number) => {
     try {
@@ -255,7 +257,7 @@ export default function NotificacoesListar({ perfil }: Props) {
       <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
-        {!hasPerfilAvaliador ? (
+        {!hasPerfil ? (
           <SemDados tipo="perfil" perfil={perfil} />
         ) : (
           <div className="flex-1 overflow-y-auto">
