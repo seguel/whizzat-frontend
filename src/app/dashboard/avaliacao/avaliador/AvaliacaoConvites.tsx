@@ -10,7 +10,7 @@ import { ProfileType } from "../../../components/perfil/ProfileContext";
 import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import PageContainer from "@/app/components/PageContainer";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Props {
   perfil: ProfileType;
@@ -53,6 +53,8 @@ function ConviteCard({
   t: TFunction;
   perfil: ProfileType;
 }) {
+  const router = useRouter();
+
   const pesoNota = convite.peso_avaliador
     ? convite.peso_avaliador / 10
     : convite.peso
@@ -66,6 +68,12 @@ function ConviteCard({
     if (convite.peso > 60) return "bg-green-500";
 
     return "bg-red-500";
+  };
+
+  const abrirDetalhe = () => {
+    router.push(
+      `/dashboard/avaliacao/avaliador/${convite.id}?perfil=${perfil}`,
+    );
   };
 
   const getStatusColor = () => {
@@ -126,12 +134,14 @@ function ConviteCard({
 
   return (
     <div
+      onClick={abrirDetalhe}
       className="relative bg-white rounded-xl border shadow-sm mt-1
                  w-full max-w-[260px] min-h-[250px]
                  flex flex-col
                  hover:shadow-md hover:-translate-y-0.5
                  transition-all duration-300
-                 overflow-hidden"
+                 overflow-hidden
+                 cursor-pointer"
     >
       {/* Barra lateral fixa */}
       <div
@@ -141,67 +151,64 @@ function ConviteCard({
       {/* Conteúdo */}
       <div className="p-4 pl-5 flex flex-col h-full">
         {/* BLOCO QUE CRESCE */}
-        <Link
-          className="cursor-pointer"
-          href={`/dashboard/avaliacao/avaliador/${convite.id}?perfil=${perfil}`}
-        >
-          <div className="flex-1">
-            {/* TOPO */}
-            <div className="flex items-start gap-3">
-              <img
-                src={convite.logo || "/avatar-placeholder.png"}
-                alt={convite.candidato_nome}
-                className="w-12 h-12 rounded-full object-cover border"
-              />
 
-              <div className="flex flex-col">
-                <h3 className="font-semibold text-gray-800 text-sm">
-                  {convite.candidato_nome}
-                </h3>
-                <span className="font-normal text-gray-800 text-xs">
-                  {convite.localizacao}
-                </span>
+        <div className="flex-1">
+          {/* TOPO */}
+          <div className="flex items-start gap-3">
+            <img
+              src={convite.logo || "/avatar-placeholder.png"}
+              alt={convite.candidato_nome}
+              className="w-12 h-12 rounded-full object-cover border"
+            />
 
-                <div className="mt-1 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium w-fit">
-                  {convite.skill}
-                </div>
+            <div className="flex flex-col">
+              <h3 className="font-semibold text-gray-800 text-sm">
+                {convite.candidato_nome}
+              </h3>
+              <span className="font-normal text-gray-800 text-xs">
+                {convite.localizacao}
+              </span>
+
+              <div className="mt-1 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium w-fit">
+                {convite.skill}
               </div>
             </div>
-
-            {/* PESO */}
-            {convite.peso && (tipo === "PENDENTE" || tipo === "FINALIZADO") && (
-              <div className="mt-4">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs text-gray-500">
-                    {t("minha_avaliacao.peso")}
-                  </span>
-                  <span className="text-xs text-gray-400">{pesoNota}/10</span>
-                </div>
-
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${getPesoColor()}`}
-                    style={{
-                      width: `${tipo === "FINALIZADO" ? convite.peso_avaliador : convite.peso}%`,
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {convite.data_agenda && (
-              <div className="mt-3 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
-                <p className="text-[11px] text-blue-700 font-medium">
-                  📅 {t("minha_avaliacao.candidato.entrevista_em")}
-                </p>
-
-                <p className="text-xs font-semibold text-blue-800 mt-1">
-                  {formatarDataHora(convite.data_agenda)}
-                </p>
-              </div>
-            )}
           </div>
-        </Link>
+
+          {/* PESO */}
+          {convite.peso && (tipo === "PENDENTE" || tipo === "FINALIZADO") && (
+            <div className="mt-4">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs text-gray-500">
+                  {t("minha_avaliacao.peso")}
+                </span>
+                <span className="text-xs text-gray-400">{pesoNota}/10</span>
+              </div>
+
+              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${getPesoColor()}`}
+                  style={{
+                    width: `${tipo === "FINALIZADO" ? convite.peso_avaliador : convite.peso}%`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {convite.data_agenda && (
+            <div className="mt-3 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
+              <p className="text-[11px] text-blue-700 font-medium">
+                📅 {t("minha_avaliacao.candidato.entrevista_em")}
+              </p>
+
+              <p className="text-xs font-semibold text-blue-800 mt-1">
+                {formatarDataHora(convite.data_agenda)}
+              </p>
+            </div>
+          )}
+        </div>
+
         <div className="absolute bottom-1 left-4 w-[90%]">
           {/* AÇÕES (sempre no rodapé) */}
           {tipo === "PENDENTE" && (
