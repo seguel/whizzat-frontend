@@ -46,7 +46,7 @@ export default function CardFinalizarAvaliacao({
           body: JSON.stringify({
             avaliacao_id: Number(avaliacaoId),
             avaliadorId: Number(avaliadorId),
-            peso: peso,
+            peso: peso * 10,
             comentario: comentario,
           }),
         },
@@ -62,7 +62,7 @@ export default function CardFinalizarAvaliacao({
       toast.success(t("minha_avaliacao.avaliacao_finalizada"), {
         duration: 5000,
       });
-      router.push(`/dashboard/avaliacao?perfil=avaliador`);
+      router.push(`/dashboard/avaliacao/avaliador?perfil=avaliador`);
     } catch (error) {
       console.error(error);
 

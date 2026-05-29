@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Sidebar from "../../../components/perfil/Sidebar";
-import TopBar from "../../../components/perfil/TopBar";
-import LoadingOverlay from "../../../components/LoadingOverlay";
+import Sidebar from "../../../../components/perfil/Sidebar";
+import TopBar from "../../../../components/perfil/TopBar";
+import LoadingOverlay from "../../../../components/LoadingOverlay";
 // import { useTranslation } from "react-i18next";
-import { ProfileType } from "../../../components/perfil/ProfileContext";
+import { ProfileType } from "../../../../components/perfil/ProfileContext";
 import PageContainer from "@/app/components/PageContainer";
 
 import AvaliacaoHeader from "./components/AvaliacaoHeader";
@@ -14,9 +14,9 @@ import CardFinalizarAvaliacao from "./components/AvaliacaoFinalizar";
 import CardQuestionario from "./components/CardQuestionario";
 import CardAgenda from "./components/CardAgenda";
 
-import { useAvaliador } from "../../../lib/hooks/useAvaliador";
-import { useAvaliacaoDetalhe } from "../../../lib/hooks/useAvaliacaoDetalhe";
-import SemDados from "../../SemDados";
+import { useAvaliador } from "../../../../lib/hooks/useAvaliador";
+import { useAvaliacaoDetalhe } from "../../../../lib/hooks/useAvaliacaoDetalhe";
+import SemDados from "../../../SemDados";
 
 interface Props {
   perfil: ProfileType;

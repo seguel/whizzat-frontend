@@ -58,7 +58,7 @@ export function useNavItems(
           icon: <Star size={20} />,
           label: t("sidebar.menu_minhas_vagas"),
           route: "/vagas",
-          activeRoutes: ["/dashboard/notificacao"],
+          activeRoutes: ["/dashboard/vagas"],
         },
         {
           icon: <Search size={20} />,
@@ -75,8 +75,8 @@ export function useNavItems(
         {
           icon: <CheckSquare size={20} />,
           label: t("sidebar.menu_avaliacoes"),
-          route: "/avaliacoes",
-          activeRoutes: ["/dashboard/notificacao"],
+          route: `/dashboard/avaliacao/candidato?perfil=${profile}`,
+          activeRoutes: ["/dashboard/avaliacao"],
         },
         {
           icon: <Calendar size={20} />,
@@ -161,7 +161,7 @@ export function useNavItems(
         {
           icon: <CheckSquare size={20} />,
           label: t("sidebar.menu_avaliacoes"),
-          route: `/dashboard/avaliacao?perfil=${profile}`,
+          route: `/dashboard/avaliacao/avaliador?perfil=${profile}`,
           activeRoutes: ["/dashboard/avaliacao"],
         },
         {
