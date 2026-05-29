@@ -110,9 +110,11 @@ function AvaliacaoCard({
   };
 
   const abrirDetalhe = () => {
-    router.push(
-      `/dashboard/avaliacao/candidato/${avaliacao.id}?perfil=${perfil}`,
-    );
+    const url =
+      tipo === "QUESTIONARIO_ENVIADO"
+        ? `/dashboard/candidato/questionario/${avaliacao.id}?perfil=${perfil}`
+        : `/dashboard/candidato/detalhe/${avaliacao.id}?perfil=${perfil}`;
+    router.push(url);
   };
 
   return (
@@ -165,7 +167,7 @@ function AvaliacaoCard({
             )}
           </div>
 
-          {tipo === "QUESTIONARIO" && (
+          {tipo === "QUESTIONARIO_ENVIADO" && (
             <div className="mt-3 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
               <p className="text-[11px] text-blue-700 font-medium">
                 📅 {t("minha_avaliacao.candidato.formulario_enviado")}
@@ -195,7 +197,7 @@ function AvaliacaoCard({
         {/* RODAPÉ */}
         <div className="mt-auto">
           {/* QUESTIONÁRIO */}
-          {tipo === "QUESTIONARIO" && (
+          {tipo === "QUESTIONARIO_ENVIADO" && (
             <div className="mt-4 pt-3 border-t">
               <div
                 className="
@@ -294,7 +296,7 @@ function AvaliacaoCard({
 
           <p className="text-[10px] text-gray-400 mt-2 text-center">
             {t("minha_avaliacao.candidato.atualizado_em")}{" "}
-            {tipo === "QUESTIONARIO"
+            {tipo === "QUESTIONARIO_ENVIADO"
               ? formatarData(avaliacao.data_envio_formulario)
               : tipo === "AGENDA_ENVIADA"
                 ? formatarData(avaliacao.data_agenda_criacao)
