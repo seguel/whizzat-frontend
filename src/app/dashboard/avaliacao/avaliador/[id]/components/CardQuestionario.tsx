@@ -12,6 +12,9 @@ type Props = {
   questionarioEnviadoId?: number | null;
   questionarioEnviadoTitulo?: string | null;
   dataEnvioFormulario?: string | null;
+  dataResposta?: string | null;
+  mostrarRespostas: boolean;
+  setMostrarRespostas: (value: boolean) => void;
 };
 
 type Questionario = {
@@ -27,6 +30,9 @@ export default function CardQuestionario({
   questionarioEnviadoId,
   questionarioEnviadoTitulo,
   dataEnvioFormulario,
+  dataResposta,
+  mostrarRespostas,
+  setMostrarRespostas,
 }: Props) {
   const { t, i18n } = useTranslation("common");
 
@@ -201,6 +207,35 @@ export default function CardQuestionario({
                 {formatarData(questionarioEnviado.dataEnvio)}
               </span>
             </span>
+          </div>
+        </div>
+      )}
+
+      {dataResposta && (
+        <div className="mt-4 rounded-lg border border-green-200 bg-blue-50 p-3 text-sm">
+          <p className="font-medium text-green-800">
+            {t("minha_avaliacao.questionario_respondido")}
+          </p>
+
+          <div className="mt-2 flex flex-col gap-1 text-green-700">
+            <span>
+              <strong>{t("minha_avaliacao.data_resposta")}:</strong>{" "}
+              <span className="font-semibold text-green-700 whitespace-nowrap">
+                {formatarData(dataResposta)}
+              </span>
+            </span>
+            <button
+              onClick={() => setMostrarRespostas(!mostrarRespostas)}
+              className="
+                  flex-1 py-2 rounded-lg text-xs font-semibold cursor-pointer
+                  bg-green-600 text-white
+                  hover:bg-green-700 transition
+                "
+            >
+              {mostrarRespostas
+                ? t("minha_avaliacao.btn_ocultar_resposta")
+                : t("minha_avaliacao.btn_ver_resposta")}
+            </button>
           </div>
         </div>
       )}
