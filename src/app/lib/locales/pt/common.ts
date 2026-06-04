@@ -675,7 +675,8 @@ const pt = {
     enviando: "Enviando...",
     enviado_questionario: "Questionário enviado com sucesso",
     questionario: "Questionário",
-    data_envio: "Data envio",
+    data_envio: "Data Envio",
+    data_resposta: "Data Resposta",
     data_entrevista: "Data Entrevista",
     data_sugestao: "Sugestão enviada",
     horarios: "Horários",
@@ -694,6 +695,8 @@ const pt = {
     nota_final: "Nota Final",
     comentario: "Comentário",
     finalizando: "Finalizando...",
+    btn_ver_resposta: "Visualizar Repostas",
+    btn_ocultar_resposta: "Ocultar Respostas",
     steps: {
       convite_aceito: "CONVITE ACEITO",
       questionario_enviado: "QUESTIONÁRIO ENVIADO",

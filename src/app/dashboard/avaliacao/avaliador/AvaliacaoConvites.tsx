@@ -270,8 +270,10 @@ function ConviteCard({
             {t("minha_avaliacao.enviado_em")}{" "}
             {tipo === "PENDENTE"
               ? formatarData(convite.criado_em)
-              : tipo === "QUESTIONARIO"
-                ? formatarData(convite.data_envio_formulario)
+              : tipo === "QUESTIONARIO_ENVIADO"
+                ? convite.data_resposta_questionario
+                  ? formatarData(convite.data_resposta_questionario)
+                  : formatarData(convite.data_envio_formulario)
                 : tipo === "AGENDA_ENVIADA"
                   ? formatarData(convite.data_agenda_criacao)
                   : tipo === "AGENDADO"

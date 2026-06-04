@@ -31,3 +31,20 @@ export interface AvaliacaoDetalhe {
 
   status: AvaliacaoStatus;
 }
+
+export interface PerguntaDTO {
+  id: number;
+  ordem: number;
+  pergunta: string;
+  tipo: string;
+  resposta?: string;
+}
+
+export interface QuestionarioDTO {
+  avaliacaoId: number;
+  skill: string;
+  questionarioId: number;
+  titulo: string;
+  comentario?: string;
+  perguntas: PerguntaDTO[];
+}

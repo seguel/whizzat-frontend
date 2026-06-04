@@ -13,6 +13,7 @@ import AvaliacaoTimeline from "./components/AvaliacaoTimeline";
 import CardFinalizarAvaliacao from "./components/AvaliacaoFinalizar";
 import CardQuestionario from "./components/CardQuestionario";
 import CardAgenda from "./components/CardAgenda";
+import CardQuestionarioRespostas from "./components/CardQuestionarioRespostas";
 
 import { useAvaliador } from "../../../../lib/hooks/useAvaliador";
 import { useAvaliacaoDetalhe } from "../../../../lib/hooks/useAvaliacaoDetalhe";
@@ -44,6 +45,7 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
   const [entrevistaRealizada, setEntrevistaRealizada] = useState(false);
 
   const { avaliacao, loading: loadingAvaliacao } = useAvaliacaoDetalhe(id);
+  const [mostrarRespostas, setMostrarRespostas] = useState(false);
 
   // console.log(avaliacao);
 
@@ -84,6 +86,9 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
                     questionarioEnviadoId={avaliacao.questionario_id}
                     questionarioEnviadoTitulo={avaliacao.questionario_titulo}
                     dataEnvioFormulario={avaliacao.data_envio_formulario}
+                    dataResposta={avaliacao.questionario_respondido}
+                    mostrarRespostas={mostrarRespostas}
+                    setMostrarRespostas={setMostrarRespostas}
                   />
 
                   <CardAgenda
@@ -99,12 +104,19 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
                 {/* <AvaliacaoActions avaliacao={avaliacao} /> */}
               </div>
 
+              {mostrarRespostas && (
+                <CardQuestionarioRespostas
+                  avaliacaoId={id}
+                  avaliadorId={avaliadorId ?? 0}
+                />
+              )}
+
               <CardFinalizarAvaliacao
                 habilitado={entrevistaRealizada}
                 avaliacaoId={id}
                 avaliadorId={avaliadorId ?? 0}
                 status={avaliacao.status}
-                peso_av={avaliacao.peso_avaliador ?? 50}
+                peso_av={avaliacao.peso_avaliador ?? 1}
                 comentario_av={avaliacao.comentario}
               />
             </PageContainer>
