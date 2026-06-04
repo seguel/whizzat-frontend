@@ -52,6 +52,7 @@ function AvaliacaoCard({
   t: TFunction;
   perfil: ProfileType;
 }) {
+  console.log(perfil);
   const { i18n } = useTranslation("common");
   const router = useRouter();
 
@@ -109,17 +110,20 @@ function AvaliacaoCard({
     }
   };
 
-  const abrirDetalhe = () => {
-    const url =
-      tipo === "QUESTIONARIO_ENVIADO"
-        ? `/dashboard/candidato/questionario/${avaliacao.id}?perfil=${perfil}`
-        : `/dashboard/candidato/detalhe/${avaliacao.id}?perfil=${perfil}`;
-    router.push(url);
-  };
-
   return (
     <div
-      onClick={abrirDetalhe}
+      onClick={() => {
+        if (avaliacao.status === "QUESTIONARIO_ENVIADO") {
+          router.push(
+            `/dashboard/avaliacao/candidato/${avaliacao.id}/questionario?perfil=candidato`,
+          );
+          return;
+        }
+
+        router.push(
+          `/dashboard/avaliacao/candidato/${avaliacao.id}?perfil=candidato`,
+        );
+      }}
       className="
       relative bg-white rounded-xl border shadow-sm mt-1
       w-full max-w-[260px] min-h-[130px]
