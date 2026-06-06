@@ -24,6 +24,7 @@ export interface Pergunta {
   resposta_base: string;
   tipo: "CAIXA_TEXTO";
   ativo: boolean;
+  obrigatorio: boolean;
 }
 
 interface Props {
@@ -103,6 +104,7 @@ export default function ListaPerguntasSortable({
               value={p.pergunta}
               respostaBase={p.resposta_base}
               ativo={p.ativo}
+              obrigatorio={p.obrigatorio}
               onChange={(value) =>
                 atualizarPergunta(index, { ...p, pergunta: value })
               }
@@ -114,6 +116,9 @@ export default function ListaPerguntasSortable({
               }
               onRemove={() => removerPergunta(p.id)}
               onDuplicate={() => duplicarPergunta(index)}
+              onToggleObrigatorio={(value) =>
+                atualizarPergunta(index, { ...p, obrigatorio: value })
+              }
             />
           ))}
         </div>

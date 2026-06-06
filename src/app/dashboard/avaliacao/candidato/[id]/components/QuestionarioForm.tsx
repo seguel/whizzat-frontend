@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 interface PerguntaDTO {
   id: number;
@@ -10,6 +11,7 @@ interface PerguntaDTO {
   pergunta: string;
   tipo: string;
   resposta?: string;
+  obrigatorio: boolean;
 }
 
 interface QuestionarioDTO {
@@ -27,6 +29,7 @@ interface Props {
 
 export default function QuestionarioForm({ avaliacaoId }: Props) {
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -107,10 +110,10 @@ export default function QuestionarioForm({ avaliacaoId }: Props) {
       if (!res.ok) {
         const erro = await res.json().catch(() => null);
 
-        throw new Error(erro?.message || "Erro ao salvar questionário");
+        throw new Error(erro?.message || t("questionario.resposta.msg_erro"));
       }
 
-      toast.success("Questionário enviado com sucesso", {
+      toast.success(t("questionario.resposta.msg_sucesso"), {
         duration: 3000,
       });
 
@@ -118,7 +121,9 @@ export default function QuestionarioForm({ avaliacaoId }: Props) {
     } catch (error) {
       console.error(error);
       toast.error(
-        error instanceof Error ? error.message : "Erro ao salvar respostas",
+        error instanceof Error
+          ? error.message
+          : t("questionario.resposta.msg_erro"),
         {
           duration: 3000,
         },
@@ -135,7 +140,7 @@ export default function QuestionarioForm({ avaliacaoId }: Props) {
   if (loading) {
     return (
       <div className="w-full flex justify-center py-10">
-        Carregando questionário...
+        {t("questionario.resposta.msg_carregando")}
       </div>
     );
   }
@@ -143,14 +148,15 @@ export default function QuestionarioForm({ avaliacaoId }: Props) {
   if (!questionario) {
     return (
       <div className="w-full flex justify-center py-10">
-        Questionário não encontrado.
+        {t("questionario.resposta.msg_sem_questionario")}
       </div>
     );
   }
 
-  const possuiResposta = Object.values(respostas).some(
-    (resposta) => resposta.trim().length > 0,
-  );
+  const obrigatoriasRespondidas =
+    questionario?.perguntas
+      .filter((p) => p.obrigatorio)
+      .every((p) => (respostas[p.id] || "").trim().length > 0) ?? false;
 
   const respondidas = Object.values(respostas).filter(
     (resposta) => resposta.trim().length > 0,
@@ -160,11 +166,11 @@ export default function QuestionarioForm({ avaliacaoId }: Props) {
     <div className="max-w-5xl mx-auto px-4">
       <div className="mb-3">
         <h1 className="text-3xl font-bold text-gray-900">
-          Questionário de Avaliação
+          {t("questionario.resposta.titulo")}
         </h1>
 
         <p className="mt-2 text-gray-600">
-          Skill avaliada:{" "}
+          {t("questionario.resposta.titulo_skill")}{" "}
           <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
             {questionario.skill}
           </span>
@@ -184,8 +190,12 @@ export default function QuestionarioForm({ avaliacaoId }: Props) {
             <div key={pergunta.id} className="border rounded-lg p-4">
               <label className="block font-medium mb-3">
                 {index + 1}. {pergunta.pergunta}
+                {pergunta.obrigatorio && (
+                  <span className="ml-2 text-red-600 font-semibold text-sm">
+                    ({t("questionario.obrigatorio")})
+                  </span>
+                )}
               </label>
-
               <textarea
                 rows={5}
                 className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -197,21 +207,27 @@ export default function QuestionarioForm({ avaliacaoId }: Props) {
         </div>
 
         <div className="mt-6 text-sm text-gray-500">
-          Respondidas: {respondidas} de {questionario.perguntas.length}
+          {t("questionario.resposta.titulo_respondida")} {respondidas}{" "}
+          {t("questionario.resposta.titulo_de")} {questionario.perguntas.length}
         </div>
+        {!obrigatoriasRespondidas && (
+          <p className="mt-4 text-sm text-red-600">
+            {t("questionario.resposta.msg_preencher_campo")}
+          </p>
+        )}
         <div className="flex justify-end gap-3 mt-8">
           <button
             type="button"
             onClick={cancelar}
             className="px-5 py-2 border rounded-lg cursor-pointer"
           >
-            Cancelar
+            {t("questionario.resposta.btn_cancelar")}
           </button>
 
           <button
             type="button"
             onClick={salvar}
-            disabled={saving || !possuiResposta}
+            disabled={saving || !obrigatoriasRespondidas}
             className="
                     px-5 py-2
                     bg-blue-600
@@ -222,7 +238,9 @@ export default function QuestionarioForm({ avaliacaoId }: Props) {
                     cursor-pointer
                   "
           >
-            {saving ? "Salvando..." : "Enviar Respostas"}
+            {saving
+              ? t("questionario.resposta.salvando")
+              : t("questionario.resposta.btn_salvar")}
           </button>
         </div>
       </div>

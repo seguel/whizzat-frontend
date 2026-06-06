@@ -16,10 +16,12 @@ interface Props {
   onChangeRespostaBase: (value: string) => void;
 
   ativo: boolean;
+  obrigatorio: boolean;
   onToggleAtivo: (value: boolean) => void;
 
   onRemove: () => void;
   onDuplicate?: () => void;
+  onToggleObrigatorio: (value: boolean) => void;
 }
 
 export default function PerguntaItem({
@@ -30,9 +32,11 @@ export default function PerguntaItem({
   respostaBase,
   onChangeRespostaBase,
   ativo,
+  obrigatorio,
   onToggleAtivo,
   onRemove,
   onDuplicate,
+  onToggleObrigatorio,
 }: Props) {
   const { t } = useTranslation("common");
 
@@ -63,7 +67,15 @@ export default function PerguntaItem({
               checked={ativo}
               onChange={(e) => onToggleAtivo(e.target.checked)}
             />
-            Ativa
+            {t("questionario.ativo")}
+          </label>
+          <label className="flex items-center gap-1 text-xs text-gray-500 ">
+            <input
+              type="checkbox"
+              checked={obrigatorio}
+              onChange={(e) => onToggleObrigatorio(e.target.checked)}
+            />
+            {t("questionario.obrigatorio")}
           </label>
 
           {onDuplicate && (
