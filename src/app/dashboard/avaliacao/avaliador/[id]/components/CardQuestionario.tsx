@@ -150,11 +150,15 @@ export default function CardQuestionario({
             : t("minha_avaliacao.selecione_questionario")}
         </option>
 
-        {questionarios.map((q: Questionario) => (
-          <option key={q.id} value={q.id}>
-            {q.titulo}
-          </option>
-        ))}
+        {questionarios ? (
+          questionarios.map((q: Questionario) => (
+            <option key={q.id} value={q.id}>
+              {q.titulo}
+            </option>
+          ))
+        ) : (
+          <option value="">{t("minha_avaliacao.sem_questionario")}</option>
+        )}
       </select>
 
       <label
