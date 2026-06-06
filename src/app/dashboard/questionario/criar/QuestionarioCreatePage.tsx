@@ -31,6 +31,7 @@ export default function CriarQuestionarioPage({ perfil }: Props) {
   const [titulo, setTitulo] = useState("");
   const [comentario, setComentario] = useState("");
   const [ativo, setAtivo] = useState(true);
+  // const [obrigatorio, setObrigatorio] = useState(false);
 
   const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
   const [salvando, setSalvando] = useState(false);
@@ -44,6 +45,7 @@ export default function CriarQuestionarioPage({ perfil }: Props) {
         resposta_base: "",
         tipo: "CAIXA_TEXTO",
         ativo: true,
+        obrigatorio: false,
       },
     ]);
   };
@@ -84,6 +86,7 @@ export default function CriarQuestionarioPage({ perfil }: Props) {
         tipo_pergunta: "CAIXA_TEXTO",
         ativo: p.ativo,
         ordem: index + 1,
+        obrigatorio: p.obrigatorio,
       })),
     };
 
@@ -220,7 +223,7 @@ export default function CriarQuestionarioPage({ perfil }: Props) {
                     type="button"
                     onClick={adicionarPergunta}
                     className="self-start px-3 py-2 text-sm rounded-md font-semibold
-               text-indigo-900 bg-blue-100 
+                     text-indigo-900 bg-blue-100 
                       border border-transparent 
                       hover:bg-blue-200 hover:border-blue-300 transition cursor-pointer"
                   >
@@ -242,7 +245,7 @@ export default function CriarQuestionarioPage({ perfil }: Props) {
                     }
                     disabled={salvando}
                     className="px-5 py-2 rounded-md text-sm font-semibold
-                text-indigo-900 bg-blue-100 
+                    text-indigo-900 bg-blue-100 
                       border border-transparent 
                       hover:bg-blue-200 hover:border-blue-300 transition cursor-pointer"
                   >
@@ -253,7 +256,7 @@ export default function CriarQuestionarioPage({ perfil }: Props) {
                     onClick={salvar}
                     disabled={salvando}
                     className="px-5 py-2 rounded-md text-sm font-semibold
-                text-indigo-900 bg-blue-100 
+                     text-indigo-900 bg-blue-100 
                       border border-transparent 
                       hover:bg-blue-200 hover:border-blue-300 transition cursor-pointer"
                   >

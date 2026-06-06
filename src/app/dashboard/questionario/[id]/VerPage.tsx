@@ -22,6 +22,7 @@ interface Pergunta {
   pergunta: string;
   resposta_base?: string;
   ativo: boolean;
+  obrigatorio: boolean;
 }
 
 interface Questionario {
@@ -146,10 +147,10 @@ export default function VerPage({ perfil, id }: Props) {
                       )
                     }
                     className="flex items-center gap-2 px-4 py-2 text-sm font-semibold
-                  text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 rounded-lg
-                  transition-all duration-200 cursor-pointer"
+                      text-indigo-900 bg-blue-100 
+                          border border-transparent 
+                          hover:bg-blue-200 hover:border-blue-300 rounded-lg
+                      transition-all duration-200 cursor-pointer"
                   >
                     <Pencil size={16} />
                     {t("questionario.btn_editar")}
@@ -173,34 +174,38 @@ export default function VerPage({ perfil, id }: Props) {
               </div>
 
               {/* PERGUNTAS */}
-              <div className="grid grid-cols-[40px_80px_1fr_1fr] gap-4 text-xs font-semibold text-gray-500 border-b pb-2">
+              <div className="grid grid-cols-[40px_80px_110px_1.5fr_1fr] gap-4 text-xs font-semibold text-gray-500 border-b pb-2">
                 <div>#</div>
                 <div>{t("questionario.ativo")}</div>
+                <div>{t("questionario.obrigatorio")}</div>
                 <div>{t("questionario.pergunta")}</div>
                 <div>{t("questionario.resposta_base")}</div>
               </div>
+
               <div className="flex flex-col divide-y">
                 {questionario.pergunta.map((p, index) => (
                   <div
                     key={p.id}
-                    className="grid grid-cols-[40px_80px_1fr_1fr] gap-4 py-3 text-sm"
+                    className="grid grid-cols-[40px_80px_110px_1.5fr_1fr] gap-4 py-3 text-sm"
                   >
-                    {/* ordem */}
                     <div className="text-gray-400 font-semibold">
                       {index + 1}
                     </div>
 
-                    {/* ativo */}
                     <div className="text-gray-800">
                       {p.ativo
                         ? t("questionario.ativo_sim")
                         : t("questionario.ativo_nao")}
                     </div>
 
-                    {/* pergunta */}
+                    <div className="text-gray-800">
+                      {p.obrigatorio
+                        ? t("questionario.ativo_sim")
+                        : t("questionario.ativo_nao")}
+                    </div>
+
                     <div className="text-gray-800">{p.pergunta}</div>
 
-                    {/* resposta base */}
                     <div className="text-gray-500">
                       {p.resposta_base || "-"}
                     </div>

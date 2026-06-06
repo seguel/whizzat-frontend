@@ -24,18 +24,6 @@ interface Props {
   id: string;
 }
 
-/* function podeAgendar(status: string, naoEnviar: boolean) {
-  if (status === "convite_aceito" && naoEnviar) return true;
-
-  return [
-    "questionario_enviado",
-    "questionario_respondido",
-    "agenda_marcada",
-    "entrevista_realizada",
-    "avaliacao_finalizada",
-  ].includes(status);
-} */
-
 export default function AvaliacaoPage({ perfil, id }: Props) {
   const { hasPerfilAvaliador, avaliadorId, loading } = useAvaliador(perfil);
 
@@ -43,6 +31,7 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [naoEnviarQuestionario, setNaoEnviarQuestionario] = useState(false);
   const [entrevistaRealizada, setEntrevistaRealizada] = useState(false);
+  const [finalizarSemEntrevista, setFinalizarSemEntrevista] = useState(false);
 
   const { avaliacao, loading: loadingAvaliacao } = useAvaliacaoDetalhe(id);
   const [mostrarRespostas, setMostrarRespostas] = useState(false);
@@ -108,6 +97,9 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
                 <CardQuestionarioRespostas
                   avaliacaoId={id}
                   avaliadorId={avaliadorId ?? 0}
+                  status={avaliacao.status}
+                  finalizarSemEntrevista={finalizarSemEntrevista}
+                  setFinalizarSemEntrevista={setFinalizarSemEntrevista}
                 />
               )}
 
@@ -118,6 +110,7 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
                 status={avaliacao.status}
                 peso_av={avaliacao.peso_avaliador ?? 1}
                 comentario_av={avaliacao.comentario}
+                finalizarSemEntrevista={finalizarSemEntrevista}
               />
             </PageContainer>
           </div>

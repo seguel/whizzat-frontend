@@ -268,7 +268,7 @@ function ConviteCard({
           )}
           <p className="text-[10px] text-gray-400 mt-2 text-center">
             {t("minha_avaliacao.enviado_em")}{" "}
-            {tipo === "PENDENTE"
+            {tipo === "PENDENTE" || tipo === "CONVITE_ACEITO"
               ? formatarData(convite.criado_em)
               : tipo === "QUESTIONARIO_ENVIADO"
                 ? convite.data_resposta_questionario
