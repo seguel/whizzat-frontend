@@ -34,6 +34,7 @@ export default function EditarPage({ perfil, id }: Props) {
   const [titulo, setTitulo] = useState("");
   const [comentario, setComentario] = useState("");
   const [ativo, setAtivo] = useState(true);
+  // const [obrigatorio, setObrigatorio] = useState(false);
   const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
 
   const adicionarPergunta = () => {
@@ -45,6 +46,7 @@ export default function EditarPage({ perfil, id }: Props) {
         resposta_base: "",
         tipo: "CAIXA_TEXTO",
         ativo: true,
+        obrigatorio: false,
       },
     ]);
   };
@@ -65,6 +67,7 @@ export default function EditarPage({ perfil, id }: Props) {
         setTitulo(data.titulo);
         setComentario(data.comentario || "");
         setAtivo(data.ativo);
+        // setObrigatorio(data.obrigatorio);
 
         setPerguntas(
           data.pergunta.map((p: any) => ({
@@ -73,6 +76,7 @@ export default function EditarPage({ perfil, id }: Props) {
             resposta_base: p.resposta_base || "",
             tipo: "CAIXA_TEXTO",
             ativo: p.ativo,
+            obrigatorio: p.obrigatorio,
           })),
         );
       } catch (error) {
@@ -115,6 +119,7 @@ export default function EditarPage({ perfil, id }: Props) {
         tipo_pergunta: "CAIXA_TEXTO",
         ativo: p.ativo,
         ordem: index,
+        obrigatorio: p.obrigatorio,
       })),
     };
 
@@ -240,7 +245,7 @@ export default function EditarPage({ perfil, id }: Props) {
                     type="button"
                     onClick={adicionarPergunta}
                     className="self-start px-3 py-2 text-sm rounded-md font-semibold
-               text-indigo-900 bg-blue-100 
+                    text-indigo-900 bg-blue-100 
                       border border-transparent 
                       hover:bg-blue-200 hover:border-blue-300 transition cursor-pointer"
                   >
@@ -254,7 +259,7 @@ export default function EditarPage({ perfil, id }: Props) {
                     onClick={salvar}
                     disabled={salvando}
                     className="px-5 py-2 rounded-md text-sm font-semibold
-                text-indigo-900 bg-blue-100 
+                    stext-indigo-900 bg-blue-100 
                       border border-transparent 
                       hover:bg-blue-200 hover:border-blue-300 transition cursor-pointer"
                   >

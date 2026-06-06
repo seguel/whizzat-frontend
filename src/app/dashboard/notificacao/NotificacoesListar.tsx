@@ -73,7 +73,7 @@ function renderNotificacaoConteudo(notificacao: Notificacao, t: any) {
 export default function NotificacoesListar({ perfil }: Props) {
   // const { hasPerfilAvaliador, loading } = useAvaliador(perfil);
 
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [notificacoes, setNotificacoes] = useState<Notificacao[]>([]);
@@ -97,6 +97,23 @@ export default function NotificacoesListar({ perfil }: Props) {
   const temNaoLidas = notificacoes.some((n) => !n.lida);
 
   const { hasPerfil, loading } = usePerfil(perfil);
+
+  const currentLocale =
+    i18n.language === "en"
+      ? "en-US"
+      : i18n.language === "es"
+        ? "es-ES"
+        : "pt-BR";
+
+  const formatarData = (data?: string | null) => {
+    if (!data) return "-";
+
+    return new Intl.DateTimeFormat(currentLocale, {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(new Date(data));
+  };
 
   const marcarComoLida = async (id: number) => {
     try {
@@ -349,7 +366,7 @@ export default function NotificacoesListar({ perfil }: Props) {
 
                         <p className="text-[11px] text-gray-400 mt-3">
                           {t("notificacao.enviado")}{" "}
-                          {new Date(notificacao.criado_em).toLocaleString()}
+                          {formatarData(notificacao.criado_em)}
                         </p>
                       </div>
 

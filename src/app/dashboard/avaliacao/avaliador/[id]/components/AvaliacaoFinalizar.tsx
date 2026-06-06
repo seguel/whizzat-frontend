@@ -12,6 +12,7 @@ type Props = {
   status: string;
   peso_av: number;
   comentario_av?: string;
+  finalizarSemEntrevista: boolean;
 };
 
 export default function CardFinalizarAvaliacao({
@@ -21,6 +22,7 @@ export default function CardFinalizarAvaliacao({
   status,
   peso_av,
   comentario_av,
+  finalizarSemEntrevista,
 }: Props) {
   const { t } = useTranslation("common");
   const router = useRouter();
@@ -29,7 +31,7 @@ export default function CardFinalizarAvaliacao({
 
   const [loading, setLoading] = useState(false);
 
-  if (status == "FINALIZADO") habilitado = true;
+  if (status == "FINALIZADO" || finalizarSemEntrevista) habilitado = true;
 
   const handleFinalizar = async () => {
     try {
@@ -48,6 +50,7 @@ export default function CardFinalizarAvaliacao({
             avaliadorId: Number(avaliadorId),
             peso: peso * 10,
             comentario: comentario,
+            finalizarSemEntrevista: finalizarSemEntrevista,
           }),
         },
       );
