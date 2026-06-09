@@ -118,11 +118,11 @@ function AvaliacaoCard({
             `/dashboard/avaliacao/candidato/${avaliacao.id}/questionario?perfil=candidato`,
           );
           return;
+        } else if (avaliacao.status === "FINALIZADO") {
+          router.push(
+            `/dashboard/avaliacao/candidato/${avaliacao.id}?perfil=candidato`,
+          );
         }
-
-        router.push(
-          `/dashboard/avaliacao/candidato/${avaliacao.id}?perfil=candidato`,
-        );
       }}
       className="
       relative bg-white rounded-xl border shadow-sm mt-1
