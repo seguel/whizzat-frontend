@@ -735,6 +735,12 @@ const pt = {
       questionario_pendente: "Aguardando Resposta",
       formulario_enviado: "Questionário Recebido:",
       entrevista_recusada: "Data Recusada, aguardar nova data.",
+      resultado_avaliacao: "Resultado da Avaliação",
+      resultado_descricao:
+        "Confira abaixo sua autoavaliação, a nota atribuída pelo avaliador e o nível identificado durante o processo.",
+      basico: "Básico",
+      itermediario: "Intermediário",
+      avancado: "Avançado",
     },
   },
   questionario: {
