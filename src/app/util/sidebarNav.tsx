@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Home,
   Star,
-  Search,
+  // Search,
   User,
   CheckSquare,
   Calendar,
@@ -54,18 +54,18 @@ export function useNavItems(
           route: `/dashboard?perfil=${profile}`,
           activeRoutes: ["/dashboard"],
         },
-        {
-          icon: <Star size={20} />,
-          label: t("sidebar.menu_minhas_vagas"),
-          route: "/vagas",
-          activeRoutes: ["/dashboard/vagas"],
-        },
-        {
-          icon: <Search size={20} />,
-          label: t("sidebar.menu_buscar_vagas"),
-          route: `/dashboard/candidato/vagas?perfil=${profile}`,
-          activeRoutes: ["/dashboard/candidato"],
-        },
+        // {
+        //   icon: <Star size={20} />,
+        //   label: t("sidebar.menu_minhas_vagas"),
+        //   route: "/vagas",
+        //   activeRoutes: ["/dashboard/vagas"],
+        // },
+        // {
+        //   icon: <Search size={20} />,
+        //   label: t("sidebar.menu_buscar_vagas"),
+        //   route: `/dashboard/candidato/vagas?perfil=${profile}`,
+        //   activeRoutes: ["/dashboard/candidato"],
+        // },
         {
           icon: <User size={20} />,
           label: t("sidebar.menu_meu_perfil"),
@@ -81,7 +81,7 @@ export function useNavItems(
         {
           icon: <Calendar size={20} />,
           label: t("sidebar.menu_agenda"),
-          route: "/agenda",
+          route: `/dashboard/agenda?perfil=${profile}`,
           activeRoutes: ["/dashboard/agenda"],
         },
         {
@@ -179,7 +179,7 @@ export function useNavItems(
         {
           icon: <Calendar size={20} />,
           label: t("sidebar.menu_agenda"),
-          route: "/agenda",
+          route: `/dashboard/agenda?perfil=${profile}`,
           activeRoutes: ["/dashboard/agenda"],
         },
         {
