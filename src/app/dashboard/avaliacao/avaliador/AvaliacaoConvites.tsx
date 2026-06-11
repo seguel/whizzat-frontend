@@ -118,24 +118,24 @@ function ConviteCard({
     }).format(new Date(data));
   };
 
-  const formatarDataHora = (data?: string | null) => {
-    if (!data) return "-";
+  // const formatarDataHora = (data?: string | null) => {
+  //   if (!data) return "-";
 
-    const dt = new Date(data);
+  //   const dt = new Date(data);
 
-    const dataFormatada = new Intl.DateTimeFormat(currentLocale, {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(dt);
+  //   const dataFormatada = new Intl.DateTimeFormat(currentLocale, {
+  //     day: "2-digit",
+  //     month: "2-digit",
+  //     year: "numeric",
+  //   }).format(dt);
 
-    const horaFormatada = new Intl.DateTimeFormat(currentLocale, {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(dt);
+  //   const horaFormatada = new Intl.DateTimeFormat(currentLocale, {
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //   }).format(dt);
 
-    return `${dataFormatada} • ${horaFormatada}`;
-  };
+  //   return `${dataFormatada} • ${horaFormatada}`;
+  // };
 
   return (
     <div
