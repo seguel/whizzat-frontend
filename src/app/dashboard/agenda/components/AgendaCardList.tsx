@@ -5,26 +5,21 @@ import { format, isToday, isTomorrow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import AgendaCard from "./AgendaCard";
 import { AgendaItemDTO } from "../dto/AgendaItemDTO";
+import { useTranslation } from "react-i18next";
 
-function getTituloGrupo(data: Date) {
+function getTituloGrupo(data: Date, t: (key: string) => string) {
   if (isToday(data)) {
-    return "Hoje";
+    return t("agenda.hoje");
   }
 
   if (isTomorrow(data)) {
-    return "Amanhã";
+    return t("agenda.amanha");
   }
 
   return format(data, "dd 'de' MMMM 'de' yyyy", {
     locale: ptBR,
   });
 }
-
-// export interface AgendaItem {
-//   id: number;
-//   skill: string;
-//   data_hora: string;
-// }
 
 interface Props {
   agenda: AgendaItemDTO[];
@@ -38,10 +33,11 @@ export default function AgendaCardList({
   perfil,
 }: Props) {
   const refs = useRef<Record<number, HTMLDivElement | null>>({});
+  const { t } = useTranslation("common");
 
   const grupos = agenda.reduce(
     (acc, item) => {
-      const titulo = getTituloGrupo(new Date(item.data_hora));
+      const titulo = getTituloGrupo(new Date(item.data_hora), t);
 
       if (!acc[titulo]) {
         acc[titulo] = [];
@@ -73,11 +69,11 @@ export default function AgendaCardList({
         <div className="text-5xl mb-3">📅</div>
 
         <h2 className="text-lg font-semibold text-gray-800">
-          Nenhuma entrevista agendada
+          {t("agenda.sem_entrevista")}
         </h2>
 
         <p className="mt-2 text-sm text-gray-500">
-          Quando existir uma entrevista aceita ela aparecerá aqui.
+          {t("agenda.msg_sem_entrevista")}
         </p>
       </div>
     );
@@ -88,7 +84,7 @@ export default function AgendaCardList({
       <div className="border-b px-6 py-4">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold text-gray-900">
-            Próximas entrevistas
+            {t("agenda.proxima_entrevista")}
           </h2>
 
           <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-bold">

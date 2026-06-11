@@ -815,6 +815,29 @@ const pt = {
       finalizar_sem_entrevista: "Permitir Finalizar Sem Entrevista.",
     },
   },
+  agenda: {
+    titulo_um: "Agenda de Entrevistas",
+    titulo_dois: "Consulte abaixo suas próximas entrevistas agendadas.",
+    status_aguardando: "Aguardando aceite",
+    status_agendada_atrasada: "Agendada / Em atraso",
+    status_agendada: "Agendada",
+    status_atrasada: "Em atraso",
+    sem_entrevista: "Nenhuma entrevista agendada",
+    msg_sem_entrevista:
+      "Quando existir uma entrevista aceita ela aparecerá aqui.",
+    proxima_entrevista: "Próximas entrevistas",
+    hoje: "Hoje",
+    amanha: "Amanhã",
+    entrevista_agendada: "Entrevistas agendadas",
+    entrevista_pendente: "Entrevistas pendentes/atraso",
+    domingo: "Dom",
+    segunda: "Seg",
+    terca: "Ter",
+    quarta: "Qua",
+    quinta: "Qui",
+    sexta: "Sex",
+    sabado: "Sáb",
+  },
 };
 
 export default pt;
