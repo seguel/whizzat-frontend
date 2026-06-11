@@ -176,7 +176,7 @@ function ConviteCard({
           </div>
 
           {/* PESO */}
-          {convite.peso && (tipo === "PENDENTE" || tipo === "FINALIZADO") && (
+          {convite.peso && (
             <div className="mt-4">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-xs text-gray-500">
