@@ -837,6 +837,7 @@ const pt = {
     quinta: "Qui",
     sexta: "Sex",
     sabado: "Sáb",
+    sem: "sem",
   },
 };
 
