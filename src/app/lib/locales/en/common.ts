@@ -823,6 +823,28 @@ const en = {
       finalizar_sem_entrevista: "Allow Completion Without Interview",
     },
   },
+  agenda: {
+    titulo_um: "Interview Schedule",
+    titulo_dois: "View your upcoming scheduled interviews below.",
+    status_aguardando: "Awaiting Acceptance",
+    status_agendada_atrasada: "Scheduled / Overdue",
+    status_agendada: "Scheduled",
+    status_atrasada: "Overdue",
+    sem_entrevista: "No interviews scheduled",
+    msg_sem_entrevista: "Accepted interviews will appear here.",
+    proxima_entrevista: "Upcoming Interviews",
+    hoje: "Today",
+    amanha: "Tomorrow",
+    entrevista_agendada: "Scheduled Interviews",
+    entrevista_pendente: "Pending / Overdue Interviews",
+    domingo: "Sun",
+    segunda: "Mon",
+    terca: "Tue",
+    quarta: "Wed",
+    quinta: "Thu",
+    sexta: "Fri",
+    sabado: "Sat",
+  },
 };
 
 export default en;

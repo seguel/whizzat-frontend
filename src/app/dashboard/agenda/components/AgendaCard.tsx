@@ -1,14 +1,7 @@
 "use client";
 
-// import { format } from "date-fns";
-// import { ptBR } from "date-fns/locale";
+import { useTranslation } from "react-i18next";
 import { AgendaItemDTO } from "../dto/AgendaItemDTO";
-
-// export interface AgendaItem {
-//   id: number;
-//   skill: string;
-//   data_hora: string;
-// }
 
 interface Props {
   agenda: AgendaItemDTO;
@@ -17,6 +10,7 @@ interface Props {
 }
 
 export default function AgendaCard({ agenda, selected, perfil }: Props) {
+  const { t } = useTranslation("common");
   const dataCompara = new Date(agenda.data_hora);
   const [data] = agenda.data_hora.split("T");
   const hora = agenda.data_hora.substring(11, 16);
@@ -100,13 +94,13 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
         >
           {perfil === "avaliador"
             ? agenda.status === "PENDENTE"
-              ? "Aguardando aceite"
+              ? t("agenda.status_aguardando")
               : atrasada
-                ? "Agendada / Em atraso"
-                : "Agendada"
+                ? t("agenda.status_agendada_atrasada")
+                : t("agenda.status_agendada")
             : atrasada
-              ? "Em atraso"
-              : "Agendada"}
+              ? t("agenda.status_atrasada")
+              : t("agenda.status_agendada")}
         </span>
       </div>
     </div>

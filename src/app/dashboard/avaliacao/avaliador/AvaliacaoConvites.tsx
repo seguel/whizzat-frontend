@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import PageContainer from "@/app/components/PageContainer";
 import { useRouter } from "next/navigation";
+import { Calendar } from "lucide-react";
 
 interface Props {
   perfil: ProfileType;
@@ -71,6 +72,10 @@ function ConviteCard({
   };
 
   const abrirDetalhe = () => {
+    if (tipo === "PENDENTE") {
+      return;
+    }
+
     router.push(
       `/dashboard/avaliacao/avaliador/${convite.id}?perfil=${perfil}`,
     );
@@ -149,29 +154,32 @@ function ConviteCard({
       />
 
       {/* Conteúdo */}
-      <div className="p-4 pl-5 flex flex-col h-full">
+      <div className="p-4 pl-5 flex flex-col flex-1">
         {/* BLOCO QUE CRESCE */}
 
         <div className="flex-1">
           {/* TOPO */}
-          <div className="flex items-start gap-3">
-            <img
-              src={convite.logo || "/avatar-placeholder.png"}
-              alt={convite.candidato_nome}
-              className="w-12 h-12 rounded-full object-cover border"
-            />
+          <div className="flex flex-col gap-2">
+            <div className="flex items-start gap-3">
+              <img
+                src={convite.logo || "/avatar-placeholder.png"}
+                alt={convite.candidato_nome}
+                className="w-12 h-12 rounded-full object-cover border"
+              />
 
-            <div className="flex flex-col">
-              <h3 className="font-semibold text-gray-800 text-sm">
-                {convite.candidato_nome}
-              </h3>
-              <span className="font-normal text-gray-800 text-xs">
-                {convite.localizacao}
-              </span>
+              <div className="flex flex-col flex-1 min-w-0">
+                <h3 className="font-semibold text-gray-800 text-sm leading-tight">
+                  {convite.candidato_nome}
+                </h3>
 
-              <div className="mt-1 inline-flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium w-fit">
-                {convite.skill}
+                <span className="text-xs text-gray-500">
+                  {convite.localizacao}
+                </span>
               </div>
+            </div>
+
+            <div className="w-full rounded-md bg-indigo-100 text-indigo-700 text-xs font-medium px-3 py-2 break-words text-center">
+              {convite.skill}
             </div>
           </div>
 
@@ -197,19 +205,16 @@ function ConviteCard({
           )}
 
           {convite.data_agenda && (
-            <div className="mt-3 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
-              <p className="text-[11px] text-blue-700 font-medium">
-                📅 {t("minha_avaliacao.candidato.entrevista_em")}
-              </p>
-
-              <p className="text-xs font-semibold text-blue-800 mt-1">
-                {formatarDataHora(convite.data_agenda)}
-              </p>
+            <div className="mt-3 rounded-lg bg-blue-50 border border-blue-100 p-2">
+              <div className="flex items-center gap-2 text-blue-700 text-xs font-medium">
+                <Calendar size={14} />
+                <span>13/06/2026 • 09:45</span>
+              </div>
             </div>
           )}
         </div>
 
-        <div className="absolute bottom-1 left-4 w-[90%]">
+        <div className="mt-auto pt-3">
           {/* AÇÕES (sempre no rodapé) */}
           {tipo === "PENDENTE" && (
             <div className="flex gap-2 mt-4 pt-3 border-t">
@@ -316,6 +321,7 @@ export default function AvaliacaoConvites({ perfil }: Props) {
         { credentials: "include" },
       );
       const dataConvites = await resConvites.json();
+      // console.log(dataConvites);
 
       setConvitesPendentes(dataConvites.pendentes || []);
 
@@ -387,14 +393,24 @@ export default function AvaliacaoConvites({ perfil }: Props) {
           <SemDados tipo="perfil" perfil={perfil} />
         ) : (
           <PageContainer>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 items-start">
               {/* RECEBIDO */}
-              <div className="flex flex-col bg-white shadow-SM rounded-xl border p-4 h-[80vh]">
+              <div
+                className="
+                  flex flex-col
+                  bg-white
+                  rounded-2xl
+                  border border-gray-200
+                  shadow-sm
+                  p-4
+                  min-h-[80vh]
+                "
+              >
                 <h2 className="text-sm font-semibold text-gray-800 mb-4 text-center border-b pb-2">
                   {t("minha_avaliacao.recebido")} ({convitesPendentes.length})
                 </h2>
 
-                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 pr-1">
                   {convitesPendentes.length === 0 && (
                     <p className="text-sm text-gray-400 text-center">
                       {t("minha_avaliacao.sem_convite")}
@@ -416,12 +432,22 @@ export default function AvaliacaoConvites({ perfil }: Props) {
               </div>
 
               {/* ACEITO */}
-              <div className="flex flex-col bg-white shadow-SM rounded-xl border p-4 h-[80vh]">
+              <div
+                className="
+                  flex flex-col
+                  bg-white
+                  rounded-2xl
+                  border border-gray-200
+                  shadow-sm
+                  p-4
+                  min-h-[80vh]
+                "
+              >
                 <h2 className="text-sm font-semibold text-gray-800 mb-4 text-center border-b pb-2">
                   {t("minha_avaliacao.aceito")} ({convitesAceitos.length})
                 </h2>
 
-                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 pr-1">
                   {convitesAceitos.length === 0 && (
                     <p className="text-sm text-gray-400 text-center">
                       {t("minha_avaliacao.sem_aceito")}
@@ -441,12 +467,22 @@ export default function AvaliacaoConvites({ perfil }: Props) {
               </div>
 
               {/* AGENDADO */}
-              <div className="flex flex-col bg-white shadow-SM rounded-xl border p-4 h-[80vh]">
+              <div
+                className="
+                  flex flex-col
+                  bg-white
+                  rounded-2xl
+                  border border-gray-200
+                  shadow-sm
+                  p-4
+                  min-h-[80vh]
+                "
+              >
                 <h2 className="text-sm font-semibold text-gray-800 mb-4 text-center border-b pb-2">
                   {t("minha_avaliacao.agendado")} ({convitesAgendados.length})
                 </h2>
 
-                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 pr-1">
                   {convitesAgendados.length === 0 && (
                     <p className="text-sm text-gray-400 text-center">
                       {t("minha_avaliacao.sem_agenda")}
@@ -466,13 +502,23 @@ export default function AvaliacaoConvites({ perfil }: Props) {
               </div>
 
               {/* FINALIZADOS */}
-              <div className="flex flex-col bg-white shadow-SM rounded-xl border p-4 h-[80vh]">
+              <div
+                className="
+                  flex flex-col
+                  bg-white
+                  rounded-2xl
+                  border border-gray-200
+                  shadow-sm
+                  p-4
+                  min-h-[80vh]
+                "
+              >
                 <h2 className="text-sm font-semibold text-gray-800 mb-4 text-center border-b pb-2">
                   {t("minha_avaliacao.finalizado")} (
                   {convitesFinalizados.length})
                 </h2>
 
-                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 pr-1">
                   {convitesFinalizados.length === 0 && (
                     <p className="text-sm text-gray-400 text-center">
                       {t("minha_avaliacao.sem_finalizacao")}

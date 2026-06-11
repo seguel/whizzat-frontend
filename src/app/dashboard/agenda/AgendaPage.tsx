@@ -6,6 +6,7 @@ import TopBar from "../../components/perfil/TopBar";
 import PageContainer from "../../components/PageContainer";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { ProfileType } from "../../components/perfil/ProfileContext";
+import { useTranslation } from "react-i18next";
 
 import AgendaCalendar from "./components/AgendaCalendar";
 import AgendaCardList from "./components/AgendaCardList";
@@ -22,6 +23,7 @@ interface Props {
 // }
 
 export default function AgendaPage({ perfil }: Props) {
+  const { t } = useTranslation("common");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export default function AgendaPage({ perfil }: Props) {
       }
 
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
 
       setAgenda(data);
 
@@ -82,12 +84,10 @@ export default function AgendaPage({ perfil }: Props) {
             <div className="space-y-6">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Agenda de Entrevistas
+                  {t("agenda.titulo_um")}
                 </h1>
 
-                <p className="mt-2 text-gray-500">
-                  Consulte abaixo suas próximas entrevistas agendadas.
-                </p>
+                <p className="mt-2 text-gray-500">{t("agenda.titulo_dois")}</p>
               </div>
 
               <div
