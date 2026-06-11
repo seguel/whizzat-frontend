@@ -423,8 +423,15 @@ export default function AvaliacaoLista({ perfil }: Props) {
             >
               {/* QUESTIONÁRIO */}
               <div
-                className="flex flex-col bg-white shadow-sm
-                rounded-xl border p-4 h-[80vh]"
+                className="
+                  flex flex-col
+                  bg-white
+                  rounded-2xl
+                  border border-gray-200
+                  shadow-sm
+                  p-4
+                  min-h-[80vh]
+                "
               >
                 <h2
                   className="font-semibold text-gray-800 mb-4
@@ -434,7 +441,7 @@ export default function AvaliacaoLista({ perfil }: Props) {
                   {avaliacoesQuestionario.length})
                 </h2>
 
-                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 pr-1">
                   {avaliacoesQuestionario.length === 0 && (
                     <p className="text-sm text-gray-400 text-center">
                       {t("minha_avaliacao.candidato.sem_questionario")}
@@ -455,8 +462,15 @@ export default function AvaliacaoLista({ perfil }: Props) {
 
               {/* AGENDADAS */}
               <div
-                className="flex flex-col bg-white shadow-sm
-                rounded-xl border p-4 h-[80vh]"
+                className="
+                  flex flex-col
+                  bg-white
+                  rounded-2xl
+                  border border-gray-200
+                  shadow-sm
+                  p-4
+                  min-h-[80vh]
+                "
               >
                 <h2
                   className="font-semibold text-gray-800 mb-4
@@ -466,7 +480,7 @@ export default function AvaliacaoLista({ perfil }: Props) {
                   {avaliacoesAgendadas.length})
                 </h2>
 
-                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 pr-1">
                   {avaliacoesAgendadas.length === 0 && (
                     <p className="text-sm text-gray-400 text-center">
                       {t("minha_avaliacao.candidato.sem_entrevista")}
@@ -489,8 +503,15 @@ export default function AvaliacaoLista({ perfil }: Props) {
 
               {/* FINALIZADAS */}
               <div
-                className="flex flex-col bg-white shadow-sm
-                rounded-xl border p-4 h-[80vh]"
+                className="
+                  flex flex-col
+                  bg-white
+                  rounded-2xl
+                  border border-gray-200
+                  shadow-sm
+                  p-4
+                  min-h-[80vh]
+                "
               >
                 <h2
                   className="font-semibold text-gray-800 mb-4
@@ -500,7 +521,7 @@ export default function AvaliacaoLista({ perfil }: Props) {
                   {avaliacoesFinalizadas.length})
                 </h2>
 
-                <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 pr-1">
                   {avaliacoesFinalizadas.length === 0 && (
                     <p className="text-sm text-gray-400 text-center">
                       {t("minha_avaliacao.candidato.sem_finalizacao")}

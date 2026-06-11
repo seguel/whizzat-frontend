@@ -14,6 +14,7 @@ import {
 
 import { ptBR } from "date-fns/locale";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface AgendaItem {
   id: number;
@@ -32,6 +33,7 @@ export default function AgendaCalendar({
   selectedDate,
   onSelectDate,
 }: Props) {
+  const { t } = useTranslation("common");
   const [currentMonth, setCurrentMonth] = useState(() => {
     if (agenda.length > 0) {
       return new Date(agenda[0].data_hora);
@@ -170,13 +172,13 @@ export default function AgendaCalendar({
       </div>
 
       <div className="grid grid-cols-7 gap-1 mb-2 text-xs text-center text-gray-400 font-medium">
-        <span>Dom</span>
-        <span>Seg</span>
-        <span>Ter</span>
-        <span>Qua</span>
-        <span>Qui</span>
-        <span>Sex</span>
-        <span>Sáb</span>
+        <span>{t("agenda.domingo")}</span>
+        <span>{t("agenda.segunda")}</span>
+        <span>{t("agenda.terca")}</span>
+        <span>{t("agenda.quarta")}</span>
+        <span>{t("agenda.quinta")}</span>
+        <span>{t("agenda.sexta")}</span>
+        <span>{t("agenda.sabado")}</span>
       </div>
 
       <div className="space-y-1">{rows}</div>
@@ -184,12 +186,12 @@ export default function AgendaCalendar({
       <div className="mt-5 space-y-2 text-xs text-gray-500">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-blue-600" />
-          Entrevistas agendadas
+          {t("agenda.entrevista_agendada")}
         </div>
 
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-orange-500" />
-          Entrevistas pendentes em atraso
+          {t("agenda.entrevista_pendente")}
         </div>
       </div>
     </div>
