@@ -22,6 +22,7 @@ type Props = {
 
   entrevistaRealizada: boolean;
   setEntrevistaRealizada: (value: boolean) => void;
+  finalizarSemEntrevista: boolean;
 };
 
 export default function CardAgenda({
@@ -31,6 +32,7 @@ export default function CardAgenda({
   status,
   entrevistaRealizada,
   setEntrevistaRealizada,
+  finalizarSemEntrevista,
 }: Props) {
   const { t, i18n } = useTranslation("common");
 
@@ -73,7 +75,7 @@ export default function CardAgenda({
   const agendaRecusada = agenda?.status === "RECUSADO";
 
   // 👇 bloqueia somente quando existe agenda válida
-  const bloqueado = agendaPendente || agendaAceita;
+  const bloqueado = agendaPendente || agendaAceita || finalizarSemEntrevista;
 
   // 👇 permite reagendar quando recusada
   const podeReagendar = agendaRecusada;

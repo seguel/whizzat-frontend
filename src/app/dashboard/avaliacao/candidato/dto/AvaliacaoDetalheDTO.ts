@@ -10,6 +10,7 @@ export interface AvaliacaoDetalheDTO {
   peso_avaliador: number | null;
   data_avaliacao: string | null;
   questionario_titulo: string;
+  comentario: string;
 
   // Questionário
   data_resposta_questionario: string | null;

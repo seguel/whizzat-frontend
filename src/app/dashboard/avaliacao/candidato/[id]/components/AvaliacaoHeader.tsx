@@ -61,9 +61,7 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoHeaderProps) {
 
     if (peso <= 3) return t("minha_avaliacao.candidato.basico");
     if (peso <= 6) return t("minha_avaliacao.candidato.intermediario");
-    if (peso <= 8) return t("minha_avaliacao.candidato.avancado");
-
-    return t("minha_avaliacao.especialista");
+    if (peso > 6) return t("minha_avaliacao.candidato.avancado");
   }
 
   function getPesoBadgeColor() {
@@ -143,6 +141,22 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoHeaderProps) {
               style={{
                 width: `${(avaliacao.peso_avaliador ?? 0) * 10}%`,
               }}
+            />
+          </div>
+
+          <div className="space-y-2 mt-5">
+            <label className="text-sm font-semibold text-gray-700">
+              {t("minha_avaliacao.candidato.comentario")}
+            </label>
+            <p className="text-[12px] font-medium text-gray-700">
+              {t("minha_avaliacao.candidato.comentario_msg")}
+            </p>
+
+            <textarea
+              rows={4}
+              value={avaliacao.comentario}
+              disabled={true}
+              className="w-full rounded-lg border bg-white border-gray-300 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-gray-100"
             />
           </div>
         </div>
