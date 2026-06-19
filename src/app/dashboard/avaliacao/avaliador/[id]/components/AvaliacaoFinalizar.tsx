@@ -154,7 +154,7 @@ export default function CardFinalizarAvaliacao({
         {/* COMENTÁRIO */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">
-            {t("minha_avaliacao.comentario")}
+            {t("minha_avaliacao.comentario_finalizacao")}
           </label>
 
           <textarea
@@ -172,7 +172,7 @@ export default function CardFinalizarAvaliacao({
           <div className="flex justify-end">
             <button
               onClick={handleFinalizar}
-              disabled={!habilitado || loading}
+              disabled={!habilitado || loading || !comentario?.trim()}
               className={`rounded-lg px-5 py-2 text-sm font-semibold transition
             ${
               habilitado && !loading
