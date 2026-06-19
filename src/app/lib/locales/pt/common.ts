@@ -693,7 +693,8 @@ const pt = {
     finalizada_avaliacao: "Avaliação Finalizada",
     informe_nota: "Informe a nota final e comentário da entrevista",
     nota_final: "Nota Final",
-    comentario: "Comentário",
+    comentario:
+      "Comentário (visível apenas para você, este conteúdo não será exibido ao candidato)",
     comentario_resposta: "Comentário sobre respostas",
     finalizando: "Finalizando...",
     btn_ver_resposta: "Visualizar Repostas",
@@ -704,6 +705,8 @@ const pt = {
     respostas_questionario: "Respostas do Questionário",
     salvando: "Salvando...",
     salvar_comentario: "Salvar Comentário",
+    comentario_finalizacao:
+      "Comentário (este conteúdo será exibido ao candidato como feedback. Utilize uma linguagem clara, objetiva e construtiva.)",
     steps: {
       convite_aceito: "CONVITE ACEITO",
       questionario_enviado: "QUESTIONÁRIO ENVIADO",
@@ -741,6 +744,9 @@ const pt = {
       basico: "Básico",
       itermediario: "Intermediário",
       avancado: "Avançado",
+      comentario: "Feedback da avaliação",
+      comentario_msg:
+        "Abaixo estão os comentários compartilhados pelo avaliador sobre sua entrevista.",
     },
   },
   questionario: {
