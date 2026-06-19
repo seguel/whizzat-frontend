@@ -78,6 +78,7 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
                     dataResposta={avaliacao.questionario_respondido}
                     mostrarRespostas={mostrarRespostas}
                     setMostrarRespostas={setMostrarRespostas}
+                    status={avaliacao.status}
                   />
 
                   <CardAgenda
@@ -87,6 +88,7 @@ export default function AvaliacaoPage({ perfil, id }: Props) {
                     status={avaliacao.status}
                     entrevistaRealizada={entrevistaRealizada}
                     setEntrevistaRealizada={setEntrevistaRealizada}
+                    finalizarSemEntrevista={finalizarSemEntrevista}
                   />
                 </div>
 

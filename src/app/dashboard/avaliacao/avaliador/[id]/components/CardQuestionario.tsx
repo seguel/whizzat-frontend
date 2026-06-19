@@ -15,6 +15,7 @@ type Props = {
   dataResposta?: string | null;
   mostrarRespostas: boolean;
   setMostrarRespostas: (value: boolean) => void;
+  status: string;
 };
 
 type Questionario = {
@@ -33,6 +34,7 @@ export default function CardQuestionario({
   dataResposta,
   mostrarRespostas,
   setMostrarRespostas,
+  status,
 }: Props) {
   const { t, i18n } = useTranslation("common");
 
@@ -130,6 +132,15 @@ export default function CardQuestionario({
     }
   };
 
+  const desabilitar =
+    naoEnviar ||
+    loadingEnviar ||
+    loading ||
+    bloqueado ||
+    status === "AGENDADO" ||
+    status === "AGENDA_ENVIADA" ||
+    status === "FINALIZADO";
+
   return (
     <div className="bg-white p-4 border rounded-xl shadow-sm flex flex-col gap-4 h-[525px]">
       <h2 className="font-semibold mb-2">
@@ -137,7 +148,7 @@ export default function CardQuestionario({
       </h2>
 
       <select
-        disabled={naoEnviar || loadingEnviar || loading || bloqueado}
+        disabled={desabilitar}
         value={selecionado}
         onChange={(e) =>
           setSelecionado(e.target.value ? Number(e.target.value) : "")
@@ -177,12 +188,10 @@ export default function CardQuestionario({
 
       <button
         onClick={handleEnviar}
-        disabled={
-          naoEnviar || !selecionado || loading || loadingEnviar || bloqueado
-        }
+        disabled={desabilitar || !selecionado}
         className={`rounded-lg py-2 text-sm font-semibold transition border border-transparent
         ${
-          naoEnviar || !selecionado || loading || loadingEnviar || bloqueado
+          desabilitar || !selecionado
             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
             : "text-indigo-900 bg-blue-100 hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
         }`}
