@@ -51,7 +51,7 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoHeaderProps) {
 
     if (peso <= 3) return "bg-red-400";
     if (peso <= 6) return "bg-yellow-400";
-    if (peso <= 8) return "bg-blue-400";
+    if (peso > 6) return "bg-blue-400";
 
     return "bg-green-500";
   }
@@ -69,7 +69,7 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoHeaderProps) {
 
     if (peso <= 3) return "bg-red-100 text-red-600";
     if (peso <= 6) return "bg-yellow-100 text-yellow-700";
-    if (peso <= 8) return "bg-blue-100 text-blue-700";
+    if (peso > 6) return "bg-blue-100 text-blue-700";
 
     return "bg-green-100 text-green-700";
   }
