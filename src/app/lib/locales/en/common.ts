@@ -434,10 +434,10 @@ const en = {
     item_tooltip_skill_passo2: "2. Select 'Create new skill';",
     item_tooltip_skill_passo3: "3. Click the Add button.",
 
-    item_tooltip_favorite_passo1: "- You may select up to 5 favorites.",
+    item_tooltip_favorite_passo1: "- You may select up to 6 favorites.",
     item_tooltip_favorite_passo2: "- Favorite skills will be used ",
-    item_tooltip_favorite_passo2_1:
-      " as preferred criteria for candidate evaluations.",
+    item_tooltip_favorite_passo2_1: " for candidate evaluations.",
+    item_sugerido_avaliador: "Recommended by the evaluator:",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Evaluators Awaiting Confirmation",
@@ -617,6 +617,8 @@ const en = {
     item_label_panel_score: "Average Score  (Hard+Soft):",
     item_label_panel_hardskill: "Hard Skill Distribution",
     item_label_panel_softskill: "Soft Skill Distribution",
+    tipo_grafico_perfil: "Profile",
+    tipo_grafico_avaliador: "Evaluator Recommendation",
   },
   planos: {
     titulo: "You don’t have a plan yet. Please select one below.",
@@ -750,7 +752,7 @@ const en = {
       resultado_descricao:
         "Below you can review your self-assessment, the evaluator's score, and the level identified during the evaluation process.",
       basico: "Basic",
-      itermediario: "Intermediate",
+      intermediario: "Intermediate",
       avancado: "Advanced",
       comentario: "Evaluation Feedback",
       comentario_msg:

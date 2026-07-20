@@ -304,8 +304,7 @@ const pt = {
     item_tooltip_favorite_passo1:
       "- Pode ser selecionado até 6 skills para ser um avaliador.",
     item_tooltip_favorite_passo2: "- Os Skills marcados serão assumidos ",
-    item_tooltip_favorite_passo2_1:
-      " como preferenciais para avaliações de candidatos.",
+    item_tooltip_favorite_passo2_1: " para avaliações de candidatos.",
   },
   tela_perfil_recrutador: {
     item_ativo: "Ativo",
@@ -429,6 +428,7 @@ const pt = {
     item_tooltip_favorite_passo2: "- Os Skills favoritos serão assumidos ",
     item_tooltip_favorite_passo2_1:
       " como preferenciais para avaliações de candidatos.",
+    item_sugerido_avaliador: "Sugerido pelo avaliador:",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Avaliadores Aguardando Confirmação",
@@ -609,6 +609,8 @@ const pt = {
     item_label_panel_score: "Score Médio (Hard+Soft):",
     item_label_panel_hardskill: "Distribuição de Hard Skills",
     item_label_panel_softskill: "Distribuição de Soft Skills",
+    tipo_grafico_perfil: "Perfil",
+    tipo_grafico_avaliador: "Sugestão do avaliador",
   },
   planos: {
     titulo: "Você ainda não possui um plano, selecione abaixo.",
@@ -742,7 +744,7 @@ const pt = {
       resultado_descricao:
         "Confira abaixo sua autoavaliação, a nota atribuída pelo avaliador e o nível identificado durante o processo.",
       basico: "Básico",
-      itermediario: "Intermediário",
+      intermediario: "Intermediário",
       avancado: "Avançado",
       comentario: "Feedback da avaliação",
       comentario_msg:
