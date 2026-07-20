@@ -54,6 +54,7 @@ interface SkillAvaliacao {
   favorito: boolean;
   tempo_favorito?: string;
   tipo_skill_id?: number;
+  peso_avaliador?: number;
 }
 
 // Tipos de dados do formulário
@@ -932,6 +933,7 @@ export default function PerfilCandidato({
       favorito: Boolean(s.favorito), // boolean
       tempo_favorito: s.tempo_favorito ?? "",
       tipo_skill_id: s.tipo_skill_id ?? 1,
+      peso_avaliador: s.peso_avaliador ?? "",
     }));
   }
 
@@ -2200,42 +2202,60 @@ export default function PerfilCandidato({
                                   </div>
 
                                   {/* Peso com slider */}
-                                  <div className="flex items-center gap-2 text-sm min-w-[200px]">
-                                    <label className="font-medium whitespace-nowrap">
-                                      {t(
-                                        "tela_perfil_candidato.item_label_peso",
-                                      )}
-                                    </label>
-                                    <input
-                                      type="range"
-                                      min={1}
-                                      max={10}
-                                      step={0.5}
-                                      list="tickmarks"
-                                      value={item.peso / 10}
-                                      onChange={(e) =>
-                                        handleSkillChange(
-                                          item.skill_id,
-                                          "peso",
-                                          Number(e.target.value) * 10,
-                                        )
-                                      }
-                                      className="w-full sm:w-40 accent-blue-600 cursor-pointer"
-                                    />
-                                    <datalist id="tickmarks">
-                                      {[...Array(19)].map((_, i) => {
-                                        const val = i * 0.5 + 1;
-                                        return (
-                                          <option
-                                            key={val}
-                                            value={val.toFixed(1)}
-                                          />
-                                        );
-                                      })}
-                                    </datalist>
-                                    <span className="w-8 text-right">
-                                      {(item.peso / 10).toFixed(1)}
-                                    </span>
+                                  <div className="flex flex-col min-w-[200px]">
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <label className="font-medium whitespace-nowrap">
+                                        {t(
+                                          "tela_perfil_candidato.item_label_peso",
+                                        )}
+                                      </label>
+
+                                      <input
+                                        type="range"
+                                        min={1}
+                                        max={10}
+                                        step={0.5}
+                                        list="tickmarks"
+                                        value={item.peso / 10}
+                                        onChange={(e) =>
+                                          handleSkillChange(
+                                            item.skill_id,
+                                            "peso",
+                                            Number(e.target.value) * 10,
+                                          )
+                                        }
+                                        className="w-full sm:w-40 accent-blue-600 cursor-pointer"
+                                      />
+
+                                      <datalist id="tickmarks">
+                                        {[...Array(19)].map((_, i) => {
+                                          const val = i * 0.5 + 1;
+                                          return (
+                                            <option
+                                              key={val}
+                                              value={val.toFixed(1)}
+                                            />
+                                          );
+                                        })}
+                                      </datalist>
+
+                                      <span className="w-5 text-right">
+                                        {(item.peso / 10).toFixed(1)}
+                                      </span>
+                                    </div>
+
+                                    {item.peso_avaliador && (
+                                      <div className="flex justify-center mt-2">
+                                        <span className="rounded-full bg-blue-200 px-3 py-1 text-xs text-gray-600 font-semibold">
+                                          {t(
+                                            "tela_perfil_candidato.item_sugerido_avaliador",
+                                          )}{" "}
+                                          {(item.peso_avaliador / 10).toFixed(
+                                            1,
+                                          )}
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
 
                                   {/* favorito */}
@@ -2467,42 +2487,58 @@ export default function PerfilCandidato({
                                   </div>
 
                                   {/* Peso com slider */}
-                                  <div className="flex items-center gap-2 text-sm min-w-[200px]">
-                                    <label className="font-medium whitespace-nowrap">
-                                      {t(
-                                        "tela_perfil_candidato.item_label_peso",
-                                      )}
-                                    </label>
-                                    <input
-                                      type="range"
-                                      min={1}
-                                      max={10}
-                                      step={0.5}
-                                      list="tickmarks"
-                                      value={item.peso / 10}
-                                      onChange={(e) =>
-                                        handleSkillChange(
-                                          item.skill_id,
-                                          "peso",
-                                          Number(e.target.value) * 10,
-                                        )
-                                      }
-                                      className="w-full sm:w-40 accent-blue-600 cursor-pointer"
-                                    />
-                                    <datalist id="tickmarks">
-                                      {[...Array(19)].map((_, i) => {
-                                        const val = i * 0.5 + 1;
-                                        return (
-                                          <option
-                                            key={val}
-                                            value={val.toFixed(1)}
-                                          />
-                                        );
-                                      })}
-                                    </datalist>
-                                    <span className="w-8 text-right">
-                                      {(item.peso / 10).toFixed(1)}
-                                    </span>
+                                  <div className="flex flex-col min-w-[200px]">
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <label className="font-medium whitespace-nowrap">
+                                        {t(
+                                          "tela_perfil_candidato.item_label_peso",
+                                        )}
+                                      </label>
+
+                                      <input
+                                        type="range"
+                                        min={1}
+                                        max={10}
+                                        step={0.5}
+                                        list="tickmarks"
+                                        value={item.peso / 10}
+                                        onChange={(e) =>
+                                          handleSkillChange(
+                                            item.skill_id,
+                                            "peso",
+                                            Number(e.target.value) * 10,
+                                          )
+                                        }
+                                        className="w-full sm:w-40 accent-blue-600 cursor-pointer"
+                                      />
+
+                                      <datalist id="tickmarks">
+                                        {[...Array(19)].map((_, i) => {
+                                          const val = i * 0.5 + 1;
+                                          return (
+                                            <option
+                                              key={val}
+                                              value={val.toFixed(1)}
+                                            />
+                                          );
+                                        })}
+                                      </datalist>
+
+                                      <span className="w-5 text-right">
+                                        {(item.peso / 10).toFixed(1)}
+                                      </span>
+                                    </div>
+
+                                    {item.peso_avaliador && (
+                                      <div className="flex justify-center mt-2">
+                                        <span className="rounded-full bg-blue-200 px-3 py-1 text-xs text-gray-600 font-semibold">
+                                          Sugerido pelo avaliador:{" "}
+                                          {(item.peso_avaliador / 10).toFixed(
+                                            1,
+                                          )}
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
 
                                   {/* favorito */}

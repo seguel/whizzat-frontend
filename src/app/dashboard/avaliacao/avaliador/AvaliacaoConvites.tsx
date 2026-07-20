@@ -63,10 +63,10 @@ function ConviteCard({
       : 0;
 
   const getPesoColor = () => {
-    if (!convite.peso) return "bg-gray-300";
-    if (convite.peso < 30) return "bg-red-400";
-    if (convite.peso < 60) return "bg-yellow-400";
-    if (convite.peso > 60) return "bg-green-500";
+    if (!pesoNota) return "bg-gray-300";
+    if (pesoNota < 3) return "bg-red-400";
+    if (pesoNota <= 6) return "bg-yellow-400";
+    if (pesoNota > 6) return "bg-green-500";
 
     return "bg-red-500";
   };
