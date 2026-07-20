@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 type Skill = {
   nome?: string;
   peso: number; // escala de 1 a 10
+  peso_avaliador?: number;
   tipo_skill_id?: number;
 };
 
@@ -43,6 +44,7 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
   const radarData = (skills ?? []).map((skill) => ({
     skill: skill.nome,
     value: skill.peso / 10,
+    valueAvaliador: (skill.peso_avaliador ?? 0) / 10,
     tipo_skill_id: skill.tipo_skill_id,
   }));
 
@@ -86,7 +88,7 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
       ? Math.round(
           (skills.reduce((sum, skill) => sum + skill.peso / 10, 0) /
             skills.length) *
-            10
+            10,
         )
       : 0;
 
@@ -114,10 +116,22 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
             <Radar
               name="skills"
               dataKey="value"
-              stroke="#9333EA"
+              stroke={corGrafico}
+              strokeWidth={2}
               fill={corGrafico}
-              fillOpacity={0.6}
+              fillOpacity={0.3}
             />
+
+            {perfil != "avaliador" && (
+              <Radar
+                name="Sugestão"
+                dataKey="valueAvaliador"
+                stroke="#2563EB"
+                strokeWidth={1.5}
+                fill="#2563EB"
+                fillOpacity={0.08}
+              />
+            )}
           </RadarChart>
         </ResponsiveContainer>
       </div>
@@ -141,10 +155,22 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
               <Radar
                 name="skills"
                 dataKey="value"
-                stroke="#9333EA"
+                stroke={corGrafico}
+                strokeWidth={2}
                 fill={corGrafico}
-                fillOpacity={0.6}
+                fillOpacity={0.3}
               />
+
+              {perfil != "avaliador" && (
+                <Radar
+                  name="Sugestão"
+                  dataKey="valueAvaliador"
+                  stroke="#2563EB"
+                  strokeWidth={1.5}
+                  fill="#2563EB"
+                  fillOpacity={0.08}
+                />
+              )}
             </RadarChart>
           </ResponsiveContainer>
         </div>
@@ -181,6 +207,25 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
             {media}
           </text>
         </svg>
+      </div>
+      <div className="flex justify-center gap-4 text-xs mt-1">
+        <div className="flex items-center gap-1">
+          <span>Gráfico:</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div
+            className="w-3 h-3 rounded-full"
+            style={{ background: corGrafico }}
+          />
+          <span>{t("tela_vaga_dados.tipo_grafico_perfil")}</span>
+        </div>
+
+        {perfil != "avaliador" && (
+          <div className="flex items-center gap-1">
+            <div className="w-3 h-3 rounded-full bg-blue-500" />
+            <span>{t("tela_vaga_dados.tipo_grafico_avaliador")}</span>
+          </div>
+        )}
       </div>
     </aside>
   );

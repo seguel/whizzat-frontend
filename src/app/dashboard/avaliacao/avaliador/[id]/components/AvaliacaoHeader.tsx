@@ -40,31 +40,31 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoProps) {
   // const pesoNota = avaliacao.peso ? avaliacao.peso / 10 : 0;
 
   function getPesoColor() {
-    const peso = avaliacao.peso;
+    const peso = avaliacao.peso_avaliador ?? avaliacao.peso;
 
     if (peso <= 3) return "bg-red-400";
     if (peso <= 6) return "bg-yellow-400";
-    if (peso <= 8) return "bg-green-400";
+    if (peso > 6) return "bg-green-400";
 
     return "bg-green-500";
   }
 
   function getPesoLabel() {
-    const peso = avaliacao.peso;
+    const peso = avaliacao.peso_avaliador ?? avaliacao.peso;
 
     if (peso <= 3) return t("minha_avaliacao.basico");
     if (peso <= 6) return t("minha_avaliacao.intermediario");
-    if (peso <= 8) return t("minha_avaliacao.avancado");
+    if (peso > 6) return t("minha_avaliacao.avancado");
 
     return "Especialista";
   }
 
   function getPesoBadgeColor() {
-    const peso = avaliacao.peso;
+    const peso = avaliacao.peso_avaliador ?? avaliacao.peso;
 
-    if (peso <= 3) return "bg-red-100 text-red-600";
-    if (peso <= 6) return "bg-yellow-100 text-yellow-700";
-    if (peso <= 8) return "bg-blue-100 text-blue-700";
+    if (peso <= 3) return "bg-red-100 text-red-500";
+    if (peso <= 6) return "bg-yellow-100 text-yellow-500";
+    if (peso > 6) return "bg-green-100 text-green-500";
 
     return "bg-green-100 text-green-700";
   }
@@ -123,14 +123,16 @@ export default function AvaliacaoHeader({ avaliacao }: AvaliacaoProps) {
               <div className="flex justify-between text-xs text-gray-500 mb-1">
                 <span>{t("minha_avaliacao.peso")}</span>
                 <span className="font-medium text-gray-700">
-                  {avaliacao.peso}/10
+                  {avaliacao.peso_avaliador ?? avaliacao.peso}/10
                 </span>
               </div>
 
               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${getPesoColor()}`}
-                  style={{ width: `${avaliacao.peso * 10}%` }}
+                  style={{
+                    width: `${(avaliacao.peso_avaliador ?? avaliacao.peso) * 10}%`,
+                  }}
                 />
               </div>
             </div>
