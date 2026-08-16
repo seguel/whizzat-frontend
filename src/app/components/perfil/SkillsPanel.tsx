@@ -12,17 +12,22 @@ import { useEffect, useState } from "react";
 
 type Skill = {
   nome?: string;
-  peso: number; // escala de 1 a 10
-  peso_avaliador?: number;
+  peso: number;
+  peso_avaliador?: number | null;
   tipo_skill_id?: number;
 };
 
 type SkillsPanelProps = {
   skills?: Skill[];
   perfil: "candidato" | "avaliador" | "recrutador";
+  className?: string;
 };
 
-export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
+export default function SkillsPanel({
+  skills,
+  perfil,
+  className = "",
+}: SkillsPanelProps) {
   const { t, i18n } = useTranslation("common");
   const [ready, setReady] = useState(false);
 
@@ -92,12 +97,18 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
         )
       : 0;
 
+  const hasAvaliacaoAvaliador = (skills ?? []).some(
+    (skill) => skill.peso_avaliador != null,
+  );
+
   // Para o círculo: cálculo do dashoffset
   const dashArray = 314; // circunferência de r=50 => 2πr ≈ 314
   const dashOffset = dashArray - (media / 100) * dashArray;
 
   return (
-    <aside className="bg-white rounded-xl p-3 shadow-sm w-full md:max-w-[280px] ">
+    <aside
+      className={`bg-white rounded-xl p-3 w-full md:max-w-[280px] ${className}`}
+    >
       {/* Radar Chart */}
       <div>
         <h3 className="text-sm font-semibold text-center">
@@ -122,7 +133,7 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
               fillOpacity={0.3}
             />
 
-            {perfil != "avaliador" && (
+            {perfil !== "avaliador" && hasAvaliacaoAvaliador && (
               <Radar
                 name="Sugestão"
                 dataKey="valueAvaliador"
@@ -161,7 +172,7 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
                 fillOpacity={0.3}
               />
 
-              {perfil != "avaliador" && (
+              {perfil !== "avaliador" && hasAvaliacaoAvaliador && (
                 <Radar
                   name="Sugestão"
                   dataKey="valueAvaliador"
@@ -220,7 +231,7 @@ export default function SkillsPanel({ skills, perfil }: SkillsPanelProps) {
           <span>{t("tela_vaga_dados.tipo_grafico_perfil")}</span>
         </div>
 
-        {perfil != "avaliador" && (
+        {perfil !== "avaliador" && hasAvaliacaoAvaliador && (
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 rounded-full bg-blue-500" />
             <span>{t("tela_vaga_dados.tipo_grafico_avaliador")}</span>
