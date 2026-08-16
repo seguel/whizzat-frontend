@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // App Router
 import Sidebar from "../components/perfil/Sidebar";
 import TopBar from "../components/perfil/TopBar";
-import EvaluationList from "../components/perfil/EvaluationList";
+import CandidateDashboard from "./candidato/components/CandidateDashboard";
 import { ProfileType } from "../components/perfil/ProfileContext";
 import { useCandidato } from "../lib/hooks/useCandidato";
 import LoadingOverlay from "../components/LoadingOverlay";
@@ -42,14 +42,13 @@ export default function DashboardCandidato({ perfil }: Props) {
 
       <div className="flex flex-col flex-1 bg-[#F5F6F6] overflow-hidden">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
+
         {!hasPerfilCandidato ? (
           <SemDados tipo="perfil" perfil={perfil} />
         ) : (
-          <>
-            <main className="p-4">
-              <EvaluationList />
-            </main>
-          </>
+          <main className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-6">
+            <CandidateDashboard />
+          </main>
         )}
       </div>
     </div>
