@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from "react-i18next";
 
 type TimelineItem = {
   id: number;
@@ -40,15 +41,17 @@ const timeline: TimelineItem[] = [
 ];
 
 export default function ProcessTimeline() {
+  const { t } = useTranslation("common");
+
   return (
     <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
       <div className="mb-5">
         <h2 className="text-lg font-semibold text-gray-900">
-          Atividades recentes
+          Movimentações recentes
         </h2>
 
         <p className="text-sm text-gray-500 mt-1">
-          Acompanhe as últimas movimentações dos seus processos.
+          Acompanhe as últimas movimentações dos seus processos seletivos.
         </p>
       </div>
 
