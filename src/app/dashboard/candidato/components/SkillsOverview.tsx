@@ -1,6 +1,7 @@
 "use client";
 
 import SkillsPanel from "../../../components/perfil/SkillsPanel";
+import { useTranslation } from "react-i18next";
 
 type Skill = {
   skill_id?: number;
@@ -15,16 +16,20 @@ interface Props {
 }
 
 export default function SkillsOverview({ skills }: Props) {
+  const { t } = useTranslation("common");
+
   const hardSkills = skills.filter((skill) => skill.tipo_skill_id === 1);
   const softSkills = skills.filter((skill) => skill.tipo_skill_id === 2);
 
   return (
     <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5">
       <div className="mb-5">
-        <h2 className="text-lg font-semibold text-gray-900">Meu perfil</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          {t("dash_candidato.skill_header")}{" "}
+        </h2>
 
         <p className="text-sm text-gray-500 mt-1">
-          Compare seu nível informado com a avaliação recebida.
+          {t("dash_candidato.skill_titulo")}
         </p>
       </div>
 
@@ -41,12 +46,20 @@ export default function SkillsOverview({ skills }: Props) {
         {/* Barras */}
         <div className="min-w-0">
           {hardSkills.length > 0 && (
-            <SkillGroup title="Hard Skills" skills={hardSkills} />
+            <SkillGroup
+              type="hard"
+              title={t("dash_candidato.skill_hard")}
+              skills={hardSkills}
+            />
           )}
 
           {softSkills.length > 0 && (
             <div className={hardSkills.length > 0 ? "mt-10" : ""}>
-              <SkillGroup title="Soft Skills" skills={softSkills} />
+              <SkillGroup
+                type="soft"
+                title={t("dash_candidato.skill_soft")}
+                skills={softSkills}
+              />
             </div>
           )}
         </div>
@@ -55,8 +68,19 @@ export default function SkillsOverview({ skills }: Props) {
   );
 }
 
-function SkillGroup({ title, skills }: { title: string; skills: Skill[] }) {
-  const isHardSkill = title === "Hard Skills";
+function SkillGroup({
+  type,
+  title,
+  skills,
+}: {
+  type: "hard" | "soft";
+  title: string;
+  skills: Skill[];
+}) {
+  const { t } = useTranslation("common");
+
+  const isHardSkill = type === "hard";
+
   return (
     <div>
       <div
@@ -68,16 +92,16 @@ function SkillGroup({ title, skills }: { title: string; skills: Skill[] }) {
       >
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm text-lg">
-            {title === "Hard Skills" ? "⚙️" : "🤝"}
+            {isHardSkill ? "⚙️" : "🤝"}
           </div>
 
           <div>
             <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
 
             <p className="text-xs text-gray-500 mt-0.5">
-              {title === "Hard Skills"
-                ? "Competências técnicas"
-                : "Competências comportamentais"}
+              {isHardSkill
+                ? t("dash_candidato.skill_hard_descricao")
+                : t("dash_candidato.skill_soft_descricao")}
             </p>
           </div>
         </div>
@@ -96,6 +120,7 @@ function SkillGroup({ title, skills }: { title: string; skills: Skill[] }) {
 }
 
 function SkillBars({ skill }: { skill: Skill }) {
+  const { t } = useTranslation("common");
   const perfil = skill.peso / 10;
 
   const avaliador =
@@ -117,7 +142,9 @@ function SkillBars({ skill }: { skill: Skill }) {
       {/* Perfil */}
       <div className="mb-2">
         <div className="flex items-center justify-between text-xs mb-1">
-          <span className="text-gray-500">Perfil</span>
+          <span className="text-gray-500">
+            {t("dash_candidato.skill_perfil")}
+          </span>
 
           <span className="font-semibold text-green-600">
             {perfil.toFixed(1)}
@@ -136,7 +163,9 @@ function SkillBars({ skill }: { skill: Skill }) {
       {avaliador != null ? (
         <div>
           <div className="flex items-center justify-between text-xs mb-1">
-            <span className="text-gray-500">Avaliador</span>
+            <span className="text-gray-500">
+              {t("dash_candidato.skill_avaliador")}
+            </span>
 
             <span className="font-semibold text-blue-600">
               {avaliador.toFixed(1)}
@@ -152,7 +181,7 @@ function SkillBars({ skill }: { skill: Skill }) {
         </div>
       ) : (
         <div className="text-xs text-gray-400 mt-2">
-          Avaliação ainda não disponível
+          {t("dash_candidato.sem_avaliacao")}
         </div>
       )}
     </div>
