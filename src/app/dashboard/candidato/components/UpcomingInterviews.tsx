@@ -1,22 +1,25 @@
 "use client";
 
 import { DashboardEntrevista } from "../../../lib/types/candidato-dashboard";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   entrevistas: DashboardEntrevista[];
 }
 
 export default function UpcomingInterviews({ entrevistas }: Props) {
+  const { t } = useTranslation("common");
+
   return (
     <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5 h-fit">
       <div className="flex items-center justify-between gap-3 mb-5">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">
-            Entrevistas agendadas
+            {t("dash_candidato.stats_agendada")}
           </h2>
 
           <p className="text-sm text-gray-500 mt-1">
-            Avaliações confirmadas com seus avaliadores.
+            {t("dash_candidato.avaliacao_confirmada")}
           </p>
         </div>
 
@@ -24,7 +27,7 @@ export default function UpcomingInterviews({ entrevistas }: Props) {
       </div>
 
       {entrevistas.length > 0 ? (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
           {entrevistas.map((entrevista) => (
             <InterviewCard key={entrevista.id} entrevista={entrevista} />
           ))}
@@ -32,24 +35,16 @@ export default function UpcomingInterviews({ entrevistas }: Props) {
       ) : (
         <div className="py-8 text-center">
           <p className="text-sm text-gray-500">
-            Você não possui entrevistas agendadas.
+            {t("dash_candidato.sem_agenda")}
           </p>
         </div>
-      )}
-
-      {entrevistas.length > 0 && (
-        <button
-          type="button"
-          className="w-full mt-5 text-sm font-medium text-green-600 hover:text-green-700 transition-colors"
-        >
-          Ver agenda completa
-        </button>
       )}
     </section>
   );
 }
 
 function InterviewCard({ entrevista }: { entrevista: DashboardEntrevista }) {
+  const { t } = useTranslation("common");
   const data = new Date(entrevista.data_hora);
 
   const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
@@ -95,16 +90,18 @@ function InterviewCard({ entrevista }: { entrevista: DashboardEntrevista }) {
             {entrevista.skill}
           </p>
 
-          <p className="text-xs text-gray-500 mt-1">Avaliação de Skill</p>
+          <p className="text-xs text-gray-500 mt-1">
+            {t("dash_candidato.agenda_skill")}
+          </p>
 
           <div className="mt-2">
             {entrevista.atrasada ? (
               <span className="inline-flex rounded-full bg-red-100 px-2.5 py-1 text-[11px] font-medium text-red-700">
-                Atrasada
+                {t("dash_candidato.agenda_atrasada")}
               </span>
             ) : (
               <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
-                Confirmada
+                {t("dash_candidato.agenda_confirmada")}
               </span>
             )}
           </div>
