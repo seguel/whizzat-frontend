@@ -7,8 +7,10 @@ import UpcomingInterviews from "./UpcomingInterviews";
 import CandidateOpportunities from "./CandidateOpportunities";
 import ProcessTimeline from "./ProcessTimeline";
 import { useCandidatoDashboard } from "../../../lib/hooks/useCandidatoDashboard";
+import { useTranslation } from "react-i18next";
 
 export default function CandidateDashboard() {
+  const { t } = useTranslation("common");
   const { data, loading, error } = useCandidatoDashboard();
 
   if (loading) {
@@ -18,9 +20,7 @@ export default function CandidateDashboard() {
   if (error || !data) {
     return (
       <div className="bg-white border border-red-100 rounded-2xl p-6">
-        <p className="text-sm text-red-600">
-          Não foi possível carregar o dashboard.
-        </p>
+        <p className="text-sm text-red-600">{t("dash_candidato.erro")}</p>
       </div>
     );
   }
@@ -28,11 +28,12 @@ export default function CandidateDashboard() {
   return (
     <div className="max-w-[1600px] mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Meu Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {t("dash_candidato.header")}
+        </h1>
 
         <p className="text-sm text-gray-500 mt-1">
-          Acompanhe seus processos seletivos, entrevistas e evolução do seu
-          perfil.
+          {t("dash_candidato.sub_header")}
         </p>
       </div>
 

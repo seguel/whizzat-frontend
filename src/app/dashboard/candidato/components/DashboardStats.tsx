@@ -1,35 +1,38 @@
 "use client";
 
 import { DashboardResumo } from "../../../lib/types/candidato-dashboard";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   resumo: DashboardResumo;
 }
 
 export default function DashboardStats({ resumo }: Props) {
+  const { t } = useTranslation("common");
+
   const stats = [
     {
-      label: "Processos seletivos",
+      label: t("dash_candidato.stats_seletivo"),
       value: resumo.processos_seletivos,
-      description: "Em andamento",
+      description: t("dash_candidato.stats_seletivo_msg"),
       icon: "💼",
     },
     {
-      label: "Entrevistas agendadas",
+      label: t("dash_candidato.stats_agendada"),
       value: resumo.entrevistas_agendadas,
-      description: "Confirmadas",
+      description: t("dash_candidato.stats_agendada_msg"),
       icon: "📅",
     },
     {
-      label: "Entrevistas realizadas",
+      label: t("dash_candidato.stats_realizada"),
       value: resumo.entrevistas_realizadas,
-      description: "Concluídas",
+      description: t("dash_candidato.stats_realizada_msg"),
       icon: "🎤",
     },
     {
-      label: "Skills avaliadas",
+      label: t("dash_candidato.stats_skill"),
       value: resumo.skills_avaliadas,
-      description: "Com avaliação",
+      description: t("dash_candidato.stats_skill_msg"),
       icon: "⭐",
     },
   ];
