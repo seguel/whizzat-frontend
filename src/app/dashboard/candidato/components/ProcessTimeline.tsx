@@ -1,5 +1,5 @@
 "use client";
-import { useTranslation } from "react-i18next";
+// import { useTranslation } from "react-i18next";
 
 type TimelineItem = {
   id: number;
@@ -41,7 +41,7 @@ const timeline: TimelineItem[] = [
 ];
 
 export default function ProcessTimeline() {
-  const { t } = useTranslation("common");
+  // const { t } = useTranslation("common");
 
   return (
     <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
