@@ -4,7 +4,7 @@ import { useState } from "react";
 // import { useRouter } from "next/navigation"; // App Router
 import Sidebar from "../components/perfil/Sidebar";
 import TopBar from "../components/perfil/TopBar";
-import EvaluationList from "../components/perfil/EvaluationList";
+import EvaluatorDashboard from "./avaliador/components/EvaluatorDashboard";
 import { ProfileType } from "../components/perfil/ProfileContext";
 import { useAvaliador } from "../lib/hooks/useAvaliador";
 import LoadingOverlay from "../components/LoadingOverlay";
@@ -35,7 +35,9 @@ export default function DashboardAvaliador({ perfil }: Props) {
         {!hasPerfilAvaliador ? (
           <SemDados tipo="perfil" perfil={perfil} />
         ) : (
-          <EvaluationList />
+          <main className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-6">
+            <EvaluatorDashboard />
+          </main>
         )}
       </div>
     </div>
