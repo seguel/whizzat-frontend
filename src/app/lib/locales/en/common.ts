@@ -881,6 +881,48 @@ const en = {
     agenda_atrasada: "Overdue",
     agenda_confirmada: "Confirmed",
   },
+  dash_avaliador: {
+    stats_pendente: "Pending Evaluations",
+    stats_pendente_msg: "Awaiting Completion",
+    stats_agendada: "Scheduled Interviews",
+    stats_agendada_msg: "Confirmed",
+    stats_skill: "Evaluated Skills",
+    stats_skill_msg: "Total Completed",
+    stats_pontuacao: "Score",
+    stats_pontuacao_msg: "Current Score",
+
+    header: "My Dashboard",
+    sub_header:
+      "Track your evaluations, interviews, and performance as an evaluator.",
+    erro: "Unable to load the dashboard.",
+
+    agenda_titulo: "Scheduled Interviews",
+    agenda_descricao: "Confirmed evaluations with candidates.",
+    agenda_atrasada: "Overdue",
+    agenda_confirmada: "Confirmed",
+    sem_agenda: "You have no scheduled interviews.",
+
+    pendencias_titulo: "Evaluations Requiring Action",
+    pendencias_descricao: "Evaluations that require action from you.",
+    acao_questionario: "Send Questionnaire",
+    acao_agenda: "Send Schedule",
+    acao_reagendar: "Reschedule Interview",
+    acao_finalizar: "Complete Evaluation",
+    btn_ver_avaliacao: "View Evaluation",
+    sem_pendencias: "No evaluations require your attention at this time.",
+
+    top_skills_titulo: "Most Evaluated Skills",
+    top_skills_descricao: "Skills you have evaluated most frequently.",
+    sem_top_skills: "You don't have any completed evaluations yet.",
+
+    ranking_titulo: "Score and Ranking",
+    ranking_descricao:
+      "Your score influences your priority for receiving evaluations.",
+    ranking_pontuacao: "Current Score",
+    ranking_pontos: "points",
+    ranking_posicao: "Ranking Position",
+    ranking_avaliadores: "evaluators",
+  },
 };
 
 export default en;
