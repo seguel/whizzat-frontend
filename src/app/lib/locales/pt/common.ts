@@ -429,6 +429,40 @@ const pt = {
     item_tooltip_favorite_passo2_1:
       " como preferenciais para avaliações de candidatos.",
     item_sugerido_avaliador: "Sugerido pelo avaliador:",
+    aberto_oportunidades: "Aberto a oportunidades",
+    disponivel_oportunidades: "Disponível para novas oportunidades",
+    indisponivel_oportunidades: "Não disponível no momento",
+    inclusao_titulo: "Oportunidades inclusivas e afirmativas",
+    inclusao_descricao:
+      "Estas opções são voluntárias e ajudam a identificar oportunidades inclusivas ou ações afirmativas compatíveis com você.",
+    inclusao_pcd: "Oportunidades para pessoas com deficiência (PCD)",
+    inclusao_pcd_msg:
+      "Desejo participar de oportunidades destinadas a pessoas com deficiência.",
+    inclusao_racial: "Ações afirmativas étnico-raciais",
+    inclusao_racial_msg:
+      "Desejo participar de oportunidades com políticas afirmativas étnico-raciais.",
+    inclusao_lgbtqia: "Diversidade LGBTQIA+",
+    inclusao_lgbtqia_msg:
+      "Desejo participar de oportunidades voltadas à diversidade LGBTQIA+.",
+    inclusao_50mais: "Profissionais 50+",
+    inclusao_50mais_msg:
+      "Desejo participar de oportunidades voltadas a profissionais com 50 anos ou mais.",
+    inclusao_diversidade: "Outras iniciativas de diversidade e inclusão",
+    inclusao_diversidade_msg:
+      "Desejo ser considerado em outras oportunidades inclusivas compatíveis com meu perfil.",
+    inclusao_privacidade:
+      "O preenchimento é opcional. Estas preferências serão utilizadas somente para identificar oportunidades inclusivas ou afirmativas e não interferem na participação em vagas de ampla concorrência.",
+    inclusao_visualizacao_msg:
+      "Preferências informadas para participação em oportunidades inclusivas ou afirmativas.",
+    inclusao_pcd_curto: "PCD",
+    inclusao_racial_curto: "Ações afirmativas étnico-raciais",
+    inclusao_lgbtqia_curto: "Diversidade LGBTQIA+",
+    inclusao_50mais_curto: "Profissionais 50+",
+    inclusao_diversidade_curto: "Diversidade e inclusão",
+    inclusao_nenhuma_selecionada:
+      "Nenhuma preferência de oportunidade inclusiva foi selecionada.",
+    inclusao_privacidade_resumo:
+      "Estas informações são opcionais e serão utilizadas somente para identificar oportunidades compatíveis.",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Avaliadores Aguardando Confirmação",
