@@ -78,6 +78,14 @@ interface CandidatoForm {
   estado_label: string;
   cidade_id: number;
   cidade_label: string;
+  aberto_oportunidades: boolean;
+
+  // Oportunidades inclusivas / afirmativas
+  oportunidade_pcd: boolean;
+  oportunidade_afirmativa_racial: boolean;
+  oportunidade_lgbtqia: boolean;
+  oportunidade_50mais: boolean;
+  oportunidade_diversidade: boolean;
 }
 
 interface CandidatoData {
@@ -101,6 +109,70 @@ interface CandidatoData {
   estado_label: string;
   cidade_id: number;
   cidade_label: string;
+  aberto_oportunidades: boolean;
+
+  oportunidade_pcd?: boolean;
+  oportunidade_afirmativa_racial?: boolean;
+  oportunidade_lgbtqia?: boolean;
+  oportunidade_50mais?: boolean;
+  oportunidade_diversidade?: boolean;
+}
+
+interface InclusiveOptionProps {
+  name: string;
+  checked: boolean;
+  title: string;
+  description: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function InclusiveOption({
+  name,
+  checked,
+  title,
+  description,
+  onChange,
+}: InclusiveOptionProps) {
+  return (
+    <label
+      className={`
+        flex items-start gap-3 rounded-xl border p-3 sm:p-4 cursor-pointer
+        transition-all
+        ${
+          checked
+            ? "border-blue-300 bg-white shadow-sm"
+            : "border-gray-200 bg-white/60 hover:bg-white"
+        }
+      `}
+    >
+      <div className="pt-0.5">
+        <input
+          type="checkbox"
+          name={name}
+          checked={checked}
+          onChange={onChange}
+          className="h-4 w-4 rounded border-gray-300 accent-blue-600 cursor-pointer"
+        />
+      </div>
+
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-gray-800">{title}</p>
+
+        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+          {description}
+        </p>
+      </div>
+    </label>
+  );
+}
+
+function OpportunityBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm">
+      <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+      {children}
+    </span>
+  );
 }
 
 // LocalStorage hook
@@ -156,6 +228,12 @@ export default function PerfilCandidato({
       estado_label: "",
       cidade_id: 0,
       cidade_label: "",
+      aberto_oportunidades: true,
+      oportunidade_pcd: false,
+      oportunidade_afirmativa_racial: false,
+      oportunidade_lgbtqia: false,
+      oportunidade_50mais: false,
+      oportunidade_diversidade: false,
     },
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -311,6 +389,12 @@ export default function PerfilCandidato({
           estado_label: userData.estado,
           cidade_id: userData.cidade_id,
           cidade_label: userData.cidade,
+          aberto_oportunidades: true,
+          oportunidade_pcd: false,
+          oportunidade_afirmativa_racial: false,
+          oportunidade_lgbtqia: false,
+          oportunidade_50mais: false,
+          oportunidade_diversidade: false,
         };
 
         // console.log("passei aqui sem idrecrutador");
@@ -383,6 +467,13 @@ export default function PerfilCandidato({
           estado_label: data.usuario.estado,
           cidade_id: data.usuario.cidade_id,
           cidade_label: data.usuario.cidade,
+          aberto_oportunidades: data.aberto_oportunidades ?? true,
+          oportunidade_pcd: data.oportunidade_pcd ?? false,
+          oportunidade_afirmativa_racial:
+            data.oportunidade_afirmativa_racial ?? false,
+          oportunidade_lgbtqia: data.oportunidade_lgbtqia ?? false,
+          oportunidade_50mais: data.oportunidade_50mais ?? false,
+          oportunidade_diversidade: data.oportunidade_diversidade ?? false,
         };
 
         setDtNascDisplay(data.usuario.data_nascimento);
@@ -802,6 +893,36 @@ export default function PerfilCandidato({
         formData.append("cidade_id", String(form.cidade_id));
 
         if (logoFile) formData.append("logo", logoFile);
+
+        formData.append(
+          "aberto_oportunidades",
+          form.aberto_oportunidades ? "true" : "false",
+        );
+
+        formData.append(
+          "oportunidade_pcd",
+          form.oportunidade_pcd ? "true" : "false",
+        );
+
+        formData.append(
+          "oportunidade_afirmativa_racial",
+          form.oportunidade_afirmativa_racial ? "true" : "false",
+        );
+
+        formData.append(
+          "oportunidade_lgbtqia",
+          form.oportunidade_lgbtqia ? "true" : "false",
+        );
+
+        formData.append(
+          "oportunidade_50mais",
+          form.oportunidade_50mais ? "true" : "false",
+        );
+
+        formData.append(
+          "oportunidade_diversidade",
+          form.oportunidade_diversidade ? "true" : "false",
+        );
 
         if (candidatoId) {
           formData.append("candidatoId", String(candidatoId));
@@ -1323,22 +1444,36 @@ export default function PerfilCandidato({
                 >
                   {candidatoId && (
                     <div className="flex items-center justify-between w-full">
-                      {/* Esquerda: Toggle + "Ativo" */}
                       <label className="flex items-center cursor-pointer">
                         <div className="relative">
                           <input
                             type="checkbox"
-                            name="ativo"
-                            checked={form.ativo ?? candidato?.ativo ?? true}
+                            name="aberto_oportunidades"
+                            checked={form.aberto_oportunidades ?? true}
                             onChange={handleChange}
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors"></div>
-                          <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5"></div>
+
+                          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors" />
+
+                          <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5" />
                         </div>
-                        <span className="ml-3 text-sm font-normal text-gray-700">
-                          {t("tela_perfil_candidato.item_ativo")}
-                        </span>
+
+                        <div className="ml-3">
+                          <span className="block text-sm font-medium text-gray-700">
+                            {t("tela_perfil_candidato.aberto_oportunidades")}
+                          </span>
+
+                          <span className="block text-xs text-gray-500 mt-0.5">
+                            {(form.aberto_oportunidades ?? true)
+                              ? t(
+                                  "tela_perfil_candidato.disponivel_oportunidades",
+                                )
+                              : t(
+                                  "tela_perfil_candidato.indisponivel_oportunidades",
+                                )}
+                          </span>
+                        </div>
                       </label>
                     </div>
                   )}
@@ -1558,6 +1693,83 @@ export default function PerfilCandidato({
                       </p>
                     )}
                   </fieldset>
+
+                  {/* Oportunidades inclusivas e afirmativas */}
+                  <div className="rounded-2xl border border-blue-100 bg-green-100 p-4 sm:p-5">
+                    <div className="flex items-start gap-3 mb-5">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm text-xl">
+                        ♡
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900">
+                          {t("tela_perfil_candidato.inclusao_titulo")}
+                        </h3>
+
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1 max-w-3xl">
+                          {t("tela_perfil_candidato.inclusao_descricao")}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                      <InclusiveOption
+                        name="oportunidade_pcd"
+                        checked={form.oportunidade_pcd}
+                        onChange={handleChange}
+                        title={t("tela_perfil_candidato.inclusao_pcd")}
+                        description={t(
+                          "tela_perfil_candidato.inclusao_pcd_msg",
+                        )}
+                      />
+
+                      <InclusiveOption
+                        name="oportunidade_afirmativa_racial"
+                        checked={form.oportunidade_afirmativa_racial}
+                        onChange={handleChange}
+                        title={t("tela_perfil_candidato.inclusao_racial")}
+                        description={t(
+                          "tela_perfil_candidato.inclusao_racial_msg",
+                        )}
+                      />
+
+                      <InclusiveOption
+                        name="oportunidade_lgbtqia"
+                        checked={form.oportunidade_lgbtqia}
+                        onChange={handleChange}
+                        title={t("tela_perfil_candidato.inclusao_lgbtqia")}
+                        description={t(
+                          "tela_perfil_candidato.inclusao_lgbtqia_msg",
+                        )}
+                      />
+
+                      <InclusiveOption
+                        name="oportunidade_50mais"
+                        checked={form.oportunidade_50mais}
+                        onChange={handleChange}
+                        title={t("tela_perfil_candidato.inclusao_50mais")}
+                        description={t(
+                          "tela_perfil_candidato.inclusao_50mais_msg",
+                        )}
+                      />
+
+                      <InclusiveOption
+                        name="oportunidade_diversidade"
+                        checked={form.oportunidade_diversidade}
+                        onChange={handleChange}
+                        title={t("tela_perfil_candidato.inclusao_diversidade")}
+                        description={t(
+                          "tela_perfil_candidato.inclusao_diversidade_msg",
+                        )}
+                      />
+                    </div>
+
+                    <div className="mt-5 pt-4 border-t border-blue-100">
+                      <p className="text-[11px] sm:text-xs text-gray-500 leading-relaxed">
+                        🔒 {t("tela_perfil_candidato.inclusao_privacidade")}
+                      </p>
+                    </div>
+                  </div>
 
                   <div>
                     <label className="block text-sm font-medium mb-1">
@@ -2712,7 +2924,7 @@ export default function PerfilCandidato({
                               {/* Dados */}
                               <div className="flex-1 space-y-3 ">
                                 {/* Status + Nome */}
-                                {form.ativo ? (
+                                {form.aberto_oportunidades ? (
                                   <span className="flex items-center gap-1">
                                     <div className="w-4 h-4 flex items-center justify-center rounded-full bg-green-500">
                                       <svg
@@ -2728,28 +2940,23 @@ export default function PerfilCandidato({
                                         />
                                       </svg>
                                     </div>
+
                                     <span className="text-sm text-green-600">
-                                      {t("tela_perfil_candidato.item_ativo")}
+                                      {t(
+                                        "tela_perfil_candidato.disponivel_oportunidades",
+                                      )}
                                     </span>
                                   </span>
                                 ) : (
                                   <span className="flex items-center gap-1">
                                     <div className="w-4 h-4 flex items-center justify-center rounded-full bg-gray-400">
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-3 w-3 text-white"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M4 10a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
+                                      <div className="w-2 h-[2px] bg-white rounded" />
                                     </div>
+
                                     <span className="text-sm text-gray-600">
-                                      {t("tela_perfil_candidato.item_inativo")}
+                                      {t(
+                                        "tela_perfil_candidato.indisponivel_oportunidades",
+                                      )}
                                     </span>
                                   </span>
                                 )}
@@ -2907,6 +3114,94 @@ export default function PerfilCandidato({
                                   "tela_perfil_candidato.item_msg_nenhuma_apresentacao",
                                 )}
                             </div>
+
+                            {/* ===================================================== */}
+                            {/* OPORTUNIDADES / DIVERSIDADE */}
+                            {/* ===================================================== */}
+
+                            <div className="w-[95%] mt-5 rounded-2xl border border-blue-100 bg-blue-50/40 p-4">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div>
+                                  <h3 className="text-sm font-semibold text-gray-900">
+                                    {t("tela_perfil_candidato.inclusao_titulo")}
+                                  </h3>
+
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {t(
+                                      "tela_perfil_candidato.inclusao_visualizacao_msg",
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="mt-4 pt-4 border-t border-blue-100">
+                                {form.oportunidade_pcd ||
+                                form.oportunidade_afirmativa_racial ||
+                                form.oportunidade_lgbtqia ||
+                                form.oportunidade_50mais ||
+                                form.oportunidade_diversidade ? (
+                                  <div className="flex flex-wrap gap-2">
+                                    {form.oportunidade_pcd && (
+                                      <OpportunityBadge>
+                                        {t(
+                                          "tela_perfil_candidato.inclusao_pcd_curto",
+                                        )}
+                                      </OpportunityBadge>
+                                    )}
+
+                                    {form.oportunidade_afirmativa_racial && (
+                                      <OpportunityBadge>
+                                        {t(
+                                          "tela_perfil_candidato.inclusao_racial_curto",
+                                        )}
+                                      </OpportunityBadge>
+                                    )}
+
+                                    {form.oportunidade_lgbtqia && (
+                                      <OpportunityBadge>
+                                        {t(
+                                          "tela_perfil_candidato.inclusao_lgbtqia_curto",
+                                        )}
+                                      </OpportunityBadge>
+                                    )}
+
+                                    {form.oportunidade_50mais && (
+                                      <OpportunityBadge>
+                                        {t(
+                                          "tela_perfil_candidato.inclusao_50mais_curto",
+                                        )}
+                                      </OpportunityBadge>
+                                    )}
+
+                                    {form.oportunidade_diversidade && (
+                                      <OpportunityBadge>
+                                        {t(
+                                          "tela_perfil_candidato.inclusao_diversidade_curto",
+                                        )}
+                                      </OpportunityBadge>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-gray-500">
+                                    {t(
+                                      "tela_perfil_candidato.inclusao_nenhuma_selecionada",
+                                    )}
+                                  </p>
+                                )}
+                              </div>
+
+                              <div className="mt-4 flex items-start gap-2">
+                                <span className="text-sm">🔒</span>
+
+                                <p className="text-[11px] text-gray-500 leading-relaxed">
+                                  {t(
+                                    "tela_perfil_candidato.inclusao_privacidade_resumo",
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Formações / Certificações */}
                             <div className="flex flex-row w-[95%] mt-5">
                               <div className="w-1/2 rounded-xl p-1 shadow-sm">
                                 <p className="ml-1">
