@@ -18,6 +18,16 @@ interface Props {
   candidatoId: number | null;
 }
 
+type TipoOportunidade = "AMPLA_CONCORRENCIA" | "AFIRMATIVA" | "EXCLUSIVA";
+
+type PublicoAfirmativo =
+  | "PCD"
+  | "AFIRMATIVA_RACIAL"
+  | "LGBTQIA"
+  | "MULHERES"
+  | "CINQUENTA_MAIS"
+  | "DIVERSIDADE";
+
 interface Job {
   empresa_id: number;
   vaga_id: number;
@@ -28,10 +38,8 @@ interface Job {
   data_cadastro: string;
   qtde_dias_aberta: number;
   prazo: string;
-  pcd?: boolean;
-  lgbtq?: boolean;
-  mulheres?: boolean;
-  cinquenta_mais?: boolean;
+  tipo_oportunidade: TipoOportunidade;
+  publicos_afirmativos: PublicoAfirmativo[];
   cidade_label: string;
   estado_sigla: string;
 }
@@ -55,7 +63,7 @@ export default function ListaVagas({
     { modalidade_trabalho_id: number; modalidade: string }[]
   >([]);
   const [skills, setSkills] = useState<{ skill_id: number; skill: string }[]>(
-    []
+    [],
   );
 
   const [filtroModalidade, setFiltroModalidade] = useState("");
@@ -78,7 +86,7 @@ export default function ListaVagas({
         {
           method: "GET",
           credentials: "include",
-        }
+        },
       );
 
       const data = await res.json();
@@ -132,7 +140,7 @@ export default function ListaVagas({
       } catch (error) {
         console.error(
           t("tela_lista_vagas.item_alerta_erro_buscar_dados"),
-          error
+          error,
         );
       } finally {
         setLoading(false);
@@ -177,19 +185,19 @@ export default function ListaVagas({
                                   modalidades.find(
                                     (e) =>
                                       String(e.modalidade_trabalho_id) ===
-                                      filtroModalidade
+                                      filtroModalidade,
                                   )?.modalidade || "",
                               }
                             : {
                                 value: "",
                                 label: t(
-                                  "tela_lista_vagas.item_msg_modalidades"
+                                  "tela_lista_vagas.item_msg_modalidades",
                                 ),
                               }
                         }
                         onChange={(option) =>
                           setFiltroModalidade(
-                            option ? String(option.value) : ""
+                            option ? String(option.value) : "",
                           )
                         }
                         options={[
