@@ -463,6 +463,16 @@ const pt = {
       "Nenhuma preferência de oportunidade inclusiva foi selecionada.",
     inclusao_privacidade_resumo:
       "Estas informações são opcionais e serão utilizadas somente para identificar oportunidades compatíveis.",
+    modalidade_titulo: "Modalidade de trabalho",
+    modalidade_descricao:
+      "Selecione as modalidades em que você aceita receber oportunidades.",
+    modalidade_presencial: "Presencial",
+    modalidade_hibrido: "Híbrido",
+    modalidade_remoto: "Remoto",
+    modalidade_visualizacao_msg:
+      "Modalidades de trabalho que você aceita para novas oportunidades.",
+    modalidade_nenhuma_selecionada:
+      "Nenhuma modalidade de trabalho foi selecionada.",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Avaliadores Aguardando Confirmação",
@@ -645,6 +655,38 @@ const pt = {
     item_label_panel_softskill: "Distribuição de Soft Skills",
     tipo_grafico_perfil: "Meu Score",
     tipo_grafico_avaliador: "Sugestão do avaliador",
+    tipo_oportunidade_titulo: "Tipo de oportunidade",
+    tipo_oportunidade_descricao:
+      "Defina se a vaga é de ampla concorrência ou possui uma política afirmativa específica.",
+    tipo_ampla: "Ampla concorrência",
+    tipo_ampla_msg: "Oportunidade aberta a todos os candidatos compatíveis.",
+    tipo_afirmativa: "Afirmativa",
+    tipo_afirmativa_msg:
+      "Oportunidade com foco ou priorização para públicos específicos.",
+    tipo_exclusiva: "Exclusiva",
+    tipo_exclusiva_msg:
+      "Oportunidade destinada exclusivamente aos públicos selecionados.",
+    publico_afirmativo_titulo: "Público da oportunidade",
+    publico_afirmativo_msg:
+      "Selecione os públicos contemplados pela ação afirmativa.",
+    publico_exclusivo_msg:
+      "Selecione os públicos aos quais esta oportunidade é destinada.",
+    publico_pcd: "Pessoas com deficiência (PCD)",
+    publico_racial: "Ações afirmativas étnico-raciais",
+    publico_lgbtqia: "Diversidade LGBTQIA+",
+    publico_mulheres: "Mulheres",
+    publico_50mais: "Profissionais 50+",
+    publico_diversidade: "Outras iniciativas de diversidade",
+    publico_obrigatorio:
+      "Selecione pelo menos um público para esta oportunidade.",
+    tipo_oportunidade_detalhe_msg:
+      "Classificação e público desta oportunidade.",
+    publico_pcd_curto: "PCD",
+    publico_racial_curto: "Étnico-racial",
+    publico_lgbtqia_curto: "LGBTQIA+",
+    publico_mulheres_curto: "Mulheres",
+    publico_50mais_curto: "50+",
+    publico_diversidade_curto: "Diversidade",
   },
   planos: {
     titulo: "Você ainda não possui um plano, selecione abaixo.",

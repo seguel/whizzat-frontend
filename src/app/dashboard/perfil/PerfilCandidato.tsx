@@ -86,6 +86,10 @@ interface CandidatoForm {
   oportunidade_lgbtqia: boolean;
   oportunidade_50mais: boolean;
   oportunidade_diversidade: boolean;
+
+  aceita_presencial: boolean;
+  aceita_hibrido: boolean;
+  aceita_remoto: boolean;
 }
 
 interface CandidatoData {
@@ -116,6 +120,16 @@ interface CandidatoData {
   oportunidade_lgbtqia?: boolean;
   oportunidade_50mais?: boolean;
   oportunidade_diversidade?: boolean;
+
+  candidatoModalidadeTrabalhos?: {
+    modalidade_id: number;
+    modalidade: {
+      modalidade_trabalho_id: number;
+      codigo: string;
+      modalidade: string;
+      linguagem: string;
+    };
+  }[];
 }
 
 interface InclusiveOptionProps {
@@ -197,6 +211,71 @@ function useLocalStorage<T>(key: string, initialValue: T) {
   return [storedValue, setStoredValue] as const;
 }
 
+type ModalidadeTrabalho = {
+  modalidade_trabalho_id: number;
+  modalidade: string;
+  codigo: "PRESENCIAL" | "HIBRIDO" | "REMOTO";
+  ativo: boolean;
+  linguagem: string;
+};
+
+interface WorkModeOptionProps {
+  name: string;
+  checked: boolean;
+  title: string;
+  icon: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function WorkModeOption({
+  name,
+  checked,
+  title,
+  icon,
+  onChange,
+}: WorkModeOptionProps) {
+  return (
+    <label
+      className={`
+        flex items-center gap-3 rounded-xl border p-3 cursor-pointer
+        transition-all
+        ${
+          checked
+            ? "border-green-300 bg-white shadow-sm"
+            : "border-gray-200 bg-white/60 hover:border-green-200"
+        }
+      `}
+    >
+      <input
+        type="checkbox"
+        name={name}
+        checked={checked}
+        onChange={onChange}
+        className="h-4 w-4 accent-green-600 cursor-pointer"
+      />
+
+      <span className="text-lg">{icon}</span>
+
+      <span className="text-sm font-medium text-gray-800">{title}</span>
+    </label>
+  );
+}
+
+function WorkModeBadge({
+  children,
+  icon,
+}: {
+  children: React.ReactNode;
+  icon: string;
+}) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-green-200 bg-white px-3 py-1.5 text-xs font-medium text-green-700 shadow-sm">
+      <span>{icon}</span>
+      {children}
+    </span>
+  );
+}
+
 export default function PerfilCandidato({
   perfil,
   candidatoId,
@@ -234,6 +313,9 @@ export default function PerfilCandidato({
       oportunidade_lgbtqia: false,
       oportunidade_50mais: false,
       oportunidade_diversidade: false,
+      aceita_presencial: true,
+      aceita_hibrido: true,
+      aceita_remoto: true,
     },
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -317,6 +399,8 @@ export default function PerfilCandidato({
     tipo_skill_id: number;
   } | null>(null);
 
+  const [modalidades, setModalidades] = useState<ModalidadeTrabalho[]>([]);
+
   useEffect(() => {
     const fetchSelectData = async () => {
       setLoadingCandidato(true);
@@ -395,6 +479,9 @@ export default function PerfilCandidato({
           oportunidade_lgbtqia: false,
           oportunidade_50mais: false,
           oportunidade_diversidade: false,
+          aceita_presencial: true,
+          aceita_hibrido: true,
+          aceita_remoto: true,
         };
 
         // console.log("passei aqui sem idrecrutador");
@@ -444,7 +531,7 @@ export default function PerfilCandidato({
           );
 
         const data = await res.json();
-        // console.log(data);
+        console.log(data);
 
         // mapeia os campos da API para o form
         const candidatoFormData: CandidatoForm = {
@@ -474,6 +561,24 @@ export default function PerfilCandidato({
           oportunidade_lgbtqia: data.oportunidade_lgbtqia ?? false,
           oportunidade_50mais: data.oportunidade_50mais ?? false,
           oportunidade_diversidade: data.oportunidade_diversidade ?? false,
+
+          aceita_presencial:
+            data.candidatoModalidadeTrabalhos?.some(
+              (m: { modalidade: { codigo: string } }) =>
+                m.modalidade.codigo === "PRESENCIAL",
+            ) ?? false,
+
+          aceita_hibrido:
+            data.candidatoModalidadeTrabalhos?.some(
+              (m: { modalidade: { codigo: string } }) =>
+                m.modalidade.codigo === "HIBRIDO",
+            ) ?? false,
+
+          aceita_remoto:
+            data.candidatoModalidadeTrabalhos?.some(
+              (m: { modalidade: { codigo: string } }) =>
+                m.modalidade.codigo === "REMOTO",
+            ) ?? false,
         };
 
         setDtNascDisplay(data.usuario.data_nascimento);
@@ -532,32 +637,38 @@ export default function PerfilCandidato({
 
     const fetchSelectData = async () => {
       try {
-        const [skillsRes, graduacoesRes, certificacaoRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/`, {
-            method: "GET",
-            credentials: "include",
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/graduacao/`, {
-            method: "GET",
-            credentials: "include",
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/certificacoes/`, {
-            method: "GET",
-            credentials: "include",
-          }),
-        ]);
+        const [skillsRes, graduacoesRes, certificacaoRes, modalidadesRes] =
+          await Promise.all([
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/skills/`, {
+              method: "GET",
+              credentials: "include",
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/graduacao/`, {
+              method: "GET",
+              credentials: "include",
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/certificacoes/`, {
+              method: "GET",
+              credentials: "include",
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/modalidades`, {
+              method: "GET",
+              credentials: "include",
+            }),
+          ]);
 
-        const [skillsData, graduacoesData, certificacaoData] =
+        const [skillsData, graduacoesData, certificacaoData, modalidadesData] =
           await Promise.all([
             skillsRes.json(),
             graduacoesRes.json(),
             certificacaoRes.json(),
+            modalidadesRes.json(),
           ]);
 
-        //console.log(skillsData);
         setSkills(skillsData);
         setGraduacoes(graduacoesData);
         setCertificacao(certificacaoData);
+        setModalidades(modalidadesData);
       } catch (error) {
         console.error(
           t("tela_perfil_candidato.item_alerta_erro_buscar_dados"),
@@ -922,6 +1033,28 @@ export default function PerfilCandidato({
         formData.append(
           "oportunidade_diversidade",
           form.oportunidade_diversidade ? "true" : "false",
+        );
+
+        const modalidadesSelecionadas: number[] = [];
+        const presencial = modalidades.find((m) => m.codigo === "PRESENCIAL");
+        const hibrido = modalidades.find((m) => m.codigo === "HIBRIDO");
+        const remoto = modalidades.find((m) => m.codigo === "REMOTO");
+
+        if (form.aceita_presencial && presencial) {
+          modalidadesSelecionadas.push(presencial.modalidade_trabalho_id);
+        }
+
+        if (form.aceita_hibrido && hibrido) {
+          modalidadesSelecionadas.push(hibrido.modalidade_trabalho_id);
+        }
+
+        if (form.aceita_remoto && remoto) {
+          modalidadesSelecionadas.push(remoto.modalidade_trabalho_id);
+        }
+
+        formData.append(
+          "modalidades_trabalho",
+          JSON.stringify(modalidadesSelecionadas),
         );
 
         if (candidatoId) {
@@ -1693,6 +1826,44 @@ export default function PerfilCandidato({
                       </p>
                     )}
                   </fieldset>
+
+                  <div className="rounded-2xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+                    <div className="mb-4">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-900">
+                        {t("tela_perfil_candidato.modalidade_titulo")}
+                      </h3>
+
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                        {t("tela_perfil_candidato.modalidade_descricao")}
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <WorkModeOption
+                        name="aceita_presencial"
+                        checked={form.aceita_presencial}
+                        onChange={handleChange}
+                        icon="🏢"
+                        title={t("tela_perfil_candidato.modalidade_presencial")}
+                      />
+
+                      <WorkModeOption
+                        name="aceita_hibrido"
+                        checked={form.aceita_hibrido}
+                        onChange={handleChange}
+                        icon="🔄"
+                        title={t("tela_perfil_candidato.modalidade_hibrido")}
+                      />
+
+                      <WorkModeOption
+                        name="aceita_remoto"
+                        checked={form.aceita_remoto}
+                        onChange={handleChange}
+                        icon="🏠"
+                        title={t("tela_perfil_candidato.modalidade_remoto")}
+                      />
+                    </div>
+                  </div>
 
                   {/* Oportunidades inclusivas e afirmativas */}
                   <div className="rounded-2xl border border-blue-100 bg-green-100 p-4 sm:p-5">
@@ -3113,6 +3284,63 @@ export default function PerfilCandidato({
                                 t(
                                   "tela_perfil_candidato.item_msg_nenhuma_apresentacao",
                                 )}
+                            </div>
+
+                            {/* Modalidades de trabalho */}
+                            <div className="w-[95%] mt-5 rounded-2xl border border-green-100 bg-green-50/40 p-4">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div>
+                                  <h3 className="text-sm font-semibold text-gray-900">
+                                    {t(
+                                      "tela_perfil_candidato.modalidade_titulo",
+                                    )}
+                                  </h3>
+
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    {t(
+                                      "tela_perfil_candidato.modalidade_visualizacao_msg",
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div className="mt-4 pt-4 border-t border-green-100">
+                                {form.aceita_presencial ||
+                                form.aceita_hibrido ||
+                                form.aceita_remoto ? (
+                                  <div className="flex flex-wrap gap-2">
+                                    {form.aceita_presencial && (
+                                      <WorkModeBadge icon="🏢">
+                                        {t(
+                                          "tela_perfil_candidato.modalidade_presencial",
+                                        )}
+                                      </WorkModeBadge>
+                                    )}
+
+                                    {form.aceita_hibrido && (
+                                      <WorkModeBadge icon="🔄">
+                                        {t(
+                                          "tela_perfil_candidato.modalidade_hibrido",
+                                        )}
+                                      </WorkModeBadge>
+                                    )}
+
+                                    {form.aceita_remoto && (
+                                      <WorkModeBadge icon="🏠">
+                                        {t(
+                                          "tela_perfil_candidato.modalidade_remoto",
+                                        )}
+                                      </WorkModeBadge>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <p className="text-xs text-gray-500">
+                                    {t(
+                                      "tela_perfil_candidato.modalidade_nenhuma_selecionada",
+                                    )}
+                                  </p>
+                                )}
+                              </div>
                             </div>
 
                             {/* ===================================================== */}

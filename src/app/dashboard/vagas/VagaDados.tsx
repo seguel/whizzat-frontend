@@ -7,7 +7,7 @@ import TopBar from "../../components/perfil/TopBar";
 import SemDados from "../SemDados";
 import { ImSpinner2 } from "react-icons/im";
 import LoadingOverlay from "../../components/LoadingOverlay";
-import { X, Clock, Building2, MapPin, CalendarDays } from "lucide-react";
+import { X, Clock, Building2, CalendarDays } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import TooltipIcon from "../../components/TooltipIcon";
 import SkillsPanel from "../../components/perfil/SkillsPanel";
@@ -28,6 +28,17 @@ interface Props {
   userId?: number;
   recrutadorId: number | null;
 }
+
+type TipoOportunidade = "AMPLA_CONCORRENCIA" | "AFIRMATIVA" | "EXCLUSIVA";
+
+type PublicoAfirmativo =
+  | "PCD"
+  | "AFIRMATIVA_RACIAL"
+  | "LGBTQIA"
+  | "MULHERES"
+  | "CINQUENTA_MAIS"
+  | "DIVERSIDADE";
+
 interface SkillAvaliacao {
   skill_id: number;
   nome?: string;
@@ -58,10 +69,8 @@ interface VagasForm {
   local_vaga: string;
   modalidade_trabalho_id: string;
   periodo_trabalho_id: string;
-  pcd: boolean;
-  lgbtq: boolean;
-  mulheres: boolean;
-  cinquenta_mais: boolean;
+  tipo_oportunidade: TipoOportunidade;
+  publicos_afirmativos: PublicoAfirmativo[];
   qtde_dias_aberta: string;
   qtde_posicao: string;
   lista_skills: SkillAvaliacao[];
@@ -85,10 +94,8 @@ interface VagaData {
   periodo_trabalho_id: string;
   modalidade_trabalho: ModalidadeVaga;
   periodo_trabalho: PeriodoVaga;
-  pcd: boolean;
-  lgbtq: boolean;
-  mulheres: boolean;
-  cinquenta_mais: boolean;
+  tipo_oportunidade: TipoOportunidade;
+  publicos_afirmativos: PublicoAfirmativo[];
   qtde_dias_aberta: number;
   qtde_posicao: number;
   skills: SkillAvaliacao[];
@@ -141,10 +148,8 @@ export default function VagaDados({
     local_vaga: "",
     modalidade_trabalho_id: "",
     periodo_trabalho_id: "",
-    pcd: false,
-    lgbtq: false,
-    mulheres: false,
-    cinquenta_mais: false,
+    tipo_oportunidade: "AMPLA_CONCORRENCIA",
+    publicos_afirmativos: [],
     qtde_dias_aberta: "",
     qtde_posicao: "",
     lista_skills: [],
@@ -216,6 +221,7 @@ export default function VagaDados({
 
   useEffect(() => {
     setLoadingVagaEmpresa(true);
+    console.log(vagaPublicada);
 
     const fetchSelectData = async () => {
       try {
@@ -275,10 +281,8 @@ export default function VagaDados({
           local_vaga: data.local_vaga || "",
           modalidade_trabalho_id: data.modalidade_trabalho_id || "",
           periodo_trabalho_id: data.periodo_trabalho_id || "",
-          pcd: data.pcd || false,
-          lgbtq: data.lgbtq || false,
-          mulheres: data.mulheres || false,
-          cinquenta_mais: data.cinquenta_mais || false,
+          tipo_oportunidade: data.tipo_oportunidade ?? "AMPLA_CONCORRENCIA",
+          publicos_afirmativos: data.publicos_afirmativos ?? [],
           qtde_dias_aberta: data.qtde_dias_aberta || "",
           qtde_posicao: data.qtde_posicao || "",
           lista_skills: data.skills || [],
@@ -494,9 +498,10 @@ export default function VagaDados({
         !form.modalidade_trabalho_id ||
         !form.periodo_trabalho_id ||
         form.qtde_dias_aberta === "0" ||
-        form.qtde_dias_aberta === "0"
+        Number(form.qtde_posicao) <= 0 ||
+        (form.tipo_oportunidade !== "AMPLA_CONCORRENCIA" &&
+          form.publicos_afirmativos.length === 0)
       ) {
-        // console.log(form);
         return;
       }
 
@@ -536,10 +541,12 @@ export default function VagaDados({
           local_vaga: form.local_vaga,
           modalidade_trabalho_id: Number(form.modalidade_trabalho_id),
           periodo_trabalho_id: Number(form.periodo_trabalho_id),
-          pcd: form.pcd,
-          lgbtq: form.lgbtq,
-          mulheres: form.mulheres,
-          cinquenta_mais: form.cinquenta_mais,
+          tipo_oportunidade: form.tipo_oportunidade,
+
+          publicos_afirmativos:
+            form.tipo_oportunidade === "AMPLA_CONCORRENCIA"
+              ? []
+              : form.publicos_afirmativos,
           qtde_dias_aberta: Number(form.qtde_dias_aberta),
           qtde_posicao: Number(form.qtde_posicao),
           skills: form.lista_skills.filter((s) => s.skill_id > 0), // ← SkillAvaliacao[]
@@ -661,6 +668,151 @@ export default function VagaDados({
       logo: empresaSelecionada?.logo ?? "",
     }));
   };
+
+  const handlePublicoAfirmativoChange = (
+    publico: PublicoAfirmativo,
+    checked: boolean,
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+
+      publicos_afirmativos: checked
+        ? [...new Set([...prev.publicos_afirmativos, publico])]
+        : prev.publicos_afirmativos.filter((item) => item !== publico),
+    }));
+  };
+
+  const handleTipoOportunidadeChange = (tipo: TipoOportunidade) => {
+    setForm((prev) => ({
+      ...prev,
+      tipo_oportunidade: tipo,
+
+      // Se voltar para ampla, limpa os públicos
+      publicos_afirmativos:
+        tipo === "AMPLA_CONCORRENCIA" ? [] : prev.publicos_afirmativos,
+    }));
+  };
+
+  interface OpportunityTypeOptionProps {
+    value: TipoOportunidade;
+    checked: boolean;
+    title: string;
+    description: string;
+    icon: string;
+    onChange: (value: TipoOportunidade) => void;
+  }
+
+  function OpportunityTypeOption({
+    value,
+    checked,
+    title,
+    description,
+    icon,
+    onChange,
+  }: OpportunityTypeOptionProps) {
+    return (
+      <label
+        className={`
+        flex flex-col
+        rounded-xl border
+        p-3 sm:p-4
+        cursor-pointer
+        transition-all
+        h-full
+        ${
+          checked
+            ? "border-purple-400 bg-white shadow-sm"
+            : "border-gray-200 bg-white/60 hover:border-purple-200 hover:bg-white"
+        }
+      `}
+      >
+        {/* Radio + ícone + título */}
+        <div className="flex items-start gap-2">
+          <input
+            type="radio"
+            name="tipo_oportunidade"
+            value={value}
+            checked={checked}
+            onChange={() => onChange(value)}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-purple-600 cursor-pointer"
+          />
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-lg shrink-0">{icon}</span>
+
+              <span className="text-sm font-semibold text-gray-800">
+                {title}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Descrição abaixo */}
+        <p className="mt-2 pl-6 text-xs text-gray-500 leading-relaxed">
+          {description}
+        </p>
+      </label>
+    );
+  }
+
+  interface PublicOptionProps {
+    codigo: PublicoAfirmativo;
+    checked: boolean;
+    title: string;
+    onChange: (publico: PublicoAfirmativo, checked: boolean) => void;
+  }
+
+  function PublicOption({
+    codigo,
+    checked,
+    title,
+    onChange,
+  }: PublicOptionProps) {
+    return (
+      <label
+        className={`flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition-all ${
+          checked
+            ? "border-purple-300 bg-white shadow-sm"
+            : "border-gray-200 bg-white/60 hover:border-purple-200"
+        }`}
+      >
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(codigo, e.target.checked)}
+          className="h-4 w-4 accent-purple-600 cursor-pointer"
+        />
+
+        <span className="text-sm font-medium text-gray-800">{title}</span>
+      </label>
+    );
+  }
+
+  function getPublicoLabel(
+    publico: PublicoAfirmativo,
+    t: (key: string) => string,
+  ) {
+    switch (publico) {
+      case "PCD":
+        return t("tela_vaga_dados.publico_pcd");
+
+      case "AFIRMATIVA_RACIAL":
+        return t("tela_vaga_dados.publico_racial");
+
+      case "LGBTQIA":
+        return t("tela_vaga_dados.publico_lgbtqia");
+
+      case "MULHERES":
+        return t("tela_vaga_dados.publico_mulheres");
+
+      case "CINQUENTA_MAIS":
+        return t("tela_vaga_dados.publico_50mais");
+
+      case "DIVERSIDADE":
+        return t("tela_vaga_dados.publico_diversidade");
+    }
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -911,105 +1063,6 @@ export default function VagaDados({
                             ))}
                           </div>
                         </fieldset>
-
-                        {/* Inclusiva */}
-                        <div className="mt-4 w-full">
-                          {/* Título */}
-                          <p className="text-sm sm:text-base font-normal mb-3 text-[#14342A]">
-                            {t("tela_vaga_dados.item_label_vaga_afirmativa")}
-                          </p>
-
-                          {/* Grid responsivo */}
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:gap-x-6">
-                            {/* Coluna esquerda */}
-                            <div className="flex flex-col space-y-2">
-                              {/* Checkbox PCD */}
-                              <label className="flex items-center space-x-2 cursor-pointer">
-                                <div className="relative w-4 h-4 sm:w-5 sm:h-5">
-                                  <input
-                                    type="checkbox"
-                                    name="pcd"
-                                    checked={form.pcd ?? vaga?.pcd ?? false}
-                                    onChange={handleChange_dinamicos}
-                                    className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
-                                  />
-                                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
-                                    ✔
-                                  </span>
-                                </div>
-                                <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                  PCD
-                                </span>
-                              </label>
-
-                              {/* Checkbox Mulheres */}
-                              <label className="flex items-center space-x-2 cursor-pointer">
-                                <div className="relative w-4 h-4 sm:w-5 sm:h-5">
-                                  <input
-                                    type="checkbox"
-                                    name="mulheres"
-                                    checked={
-                                      form.mulheres ?? vaga?.mulheres ?? false
-                                    }
-                                    onChange={handleChange_dinamicos}
-                                    className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
-                                  />
-                                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
-                                    ✔
-                                  </span>
-                                </div>
-                                <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                  {t("tela_vaga_dados.item_msg_item_mulher")}
-                                </span>
-                              </label>
-                            </div>
-
-                            {/* Coluna direita */}
-                            <div className="flex flex-col space-y-2">
-                              {/* Checkbox LGBTQ+ */}
-                              <label className="flex items-center space-x-2 cursor-pointer">
-                                <div className="relative w-4 h-4 sm:w-5 sm:h-5">
-                                  <input
-                                    type="checkbox"
-                                    name="lgbtq"
-                                    checked={form.lgbtq ?? vaga?.lgbtq ?? false}
-                                    onChange={handleChange_dinamicos}
-                                    className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
-                                  />
-                                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
-                                    ✔
-                                  </span>
-                                </div>
-                                <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                  LGBTQ+
-                                </span>
-                              </label>
-
-                              {/* Checkbox 50+ */}
-                              <label className="flex items-center space-x-2 cursor-pointer">
-                                <div className="relative w-4 h-4 sm:w-5 sm:h-5">
-                                  <input
-                                    type="checkbox"
-                                    name="cinquenta_mais"
-                                    checked={
-                                      form.cinquenta_mais ??
-                                      vaga?.cinquenta_mais ??
-                                      false
-                                    }
-                                    onChange={handleChange_dinamicos}
-                                    className="appearance-none w-full h-full border-2 border-purple-600 rounded-sm checked:bg-purple-600 checked:border-purple-600 cursor-pointer peer transition-all"
-                                  />
-                                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-[10px] sm:text-xs pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity">
-                                    ✔
-                                  </span>
-                                </div>
-                                <span className="text-[12px] sm:text-sm font-normal text-[#14342A]">
-                                  50+
-                                </span>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
                       </div>
 
                       {/* Coluna Direita */}
@@ -1190,6 +1243,135 @@ export default function VagaDados({
                               </p>
                             )}
                         </label>
+                      </div>
+
+                      {/* Tipo de oportunidade - largura total */}
+                      <div className="col-span-1 md:col-span-2 w-full">
+                        <div className="rounded-2xl border border-purple-100 bg-purple-50/40 p-4 sm:p-5">
+                          <div className="mb-4">
+                            <h3 className="text-sm sm:text-base font-semibold text-gray-900">
+                              {t("tela_vaga_dados.tipo_oportunidade_titulo")}
+                            </h3>
+
+                            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                              {t("tela_vaga_dados.tipo_oportunidade_descricao")}
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <OpportunityTypeOption
+                              value="AMPLA_CONCORRENCIA"
+                              checked={
+                                form.tipo_oportunidade === "AMPLA_CONCORRENCIA"
+                              }
+                              onChange={handleTipoOportunidadeChange}
+                              title={t("tela_vaga_dados.tipo_ampla")}
+                              description={t("tela_vaga_dados.tipo_ampla_msg")}
+                              icon="🌐"
+                            />
+
+                            <OpportunityTypeOption
+                              value="AFIRMATIVA"
+                              checked={form.tipo_oportunidade === "AFIRMATIVA"}
+                              onChange={handleTipoOportunidadeChange}
+                              title={t("tela_vaga_dados.tipo_afirmativa")}
+                              description={t(
+                                "tela_vaga_dados.tipo_afirmativa_msg",
+                              )}
+                              icon="🤝"
+                            />
+
+                            <OpportunityTypeOption
+                              value="EXCLUSIVA"
+                              checked={form.tipo_oportunidade === "EXCLUSIVA"}
+                              onChange={handleTipoOportunidadeChange}
+                              title={t("tela_vaga_dados.tipo_exclusiva")}
+                              description={t(
+                                "tela_vaga_dados.tipo_exclusiva_msg",
+                              )}
+                              icon="🎯"
+                            />
+                          </div>
+
+                          {form.tipo_oportunidade !== "AMPLA_CONCORRENCIA" && (
+                            <div className="mt-5 pt-4 border-t border-purple-100">
+                              <p className="text-sm font-medium text-gray-800 mb-1">
+                                {t("tela_vaga_dados.publico_afirmativo_titulo")}
+                              </p>
+
+                              <p className="text-xs text-gray-500 mb-4">
+                                {form.tipo_oportunidade === "EXCLUSIVA"
+                                  ? t("tela_vaga_dados.publico_exclusivo_msg")
+                                  : t("tela_vaga_dados.publico_afirmativo_msg")}
+                              </p>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                <PublicOption
+                                  codigo="PCD"
+                                  checked={form.publicos_afirmativos.includes(
+                                    "PCD",
+                                  )}
+                                  onChange={handlePublicoAfirmativoChange}
+                                  title={t("tela_vaga_dados.publico_pcd")}
+                                />
+
+                                <PublicOption
+                                  codigo="AFIRMATIVA_RACIAL"
+                                  checked={form.publicos_afirmativos.includes(
+                                    "AFIRMATIVA_RACIAL",
+                                  )}
+                                  onChange={handlePublicoAfirmativoChange}
+                                  title={t("tela_vaga_dados.publico_racial")}
+                                />
+
+                                <PublicOption
+                                  codigo="LGBTQIA"
+                                  checked={form.publicos_afirmativos.includes(
+                                    "LGBTQIA",
+                                  )}
+                                  onChange={handlePublicoAfirmativoChange}
+                                  title={t("tela_vaga_dados.publico_lgbtqia")}
+                                />
+
+                                <PublicOption
+                                  codigo="MULHERES"
+                                  checked={form.publicos_afirmativos.includes(
+                                    "MULHERES",
+                                  )}
+                                  onChange={handlePublicoAfirmativoChange}
+                                  title={t("tela_vaga_dados.publico_mulheres")}
+                                />
+
+                                <PublicOption
+                                  codigo="CINQUENTA_MAIS"
+                                  checked={form.publicos_afirmativos.includes(
+                                    "CINQUENTA_MAIS",
+                                  )}
+                                  onChange={handlePublicoAfirmativoChange}
+                                  title={t("tela_vaga_dados.publico_50mais")}
+                                />
+
+                                <PublicOption
+                                  codigo="DIVERSIDADE"
+                                  checked={form.publicos_afirmativos.includes(
+                                    "DIVERSIDADE",
+                                  )}
+                                  onChange={handlePublicoAfirmativoChange}
+                                  title={t(
+                                    "tela_vaga_dados.publico_diversidade",
+                                  )}
+                                />
+                              </div>
+
+                              {showErrors &&
+                                form.publicos_afirmativos.length === 0 && (
+                                  <p className="text-sm text-red-600 mt-3">
+                                    {t("tela_vaga_dados.publico_obrigatorio")}
+                                  </p>
+                                )}
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <div className="col-span-1 mt-4 md:col-span-2 flex justify-center md:justify-end">
@@ -1896,40 +2078,50 @@ export default function VagaDados({
                                 </div>
                               </div>
 
-                              {/* Linha 3 - Aberta em e PCD */}
-                              <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
-                                <div className="w-full sm:w-1/2">
-                                  {form.pcd && (
-                                    <span role="img" aria-label="acessível">
-                                      ♿ {t("tela_vaga_dados.item_vaga_pcd")}
-                                    </span>
-                                  )}
+                              <div className="mt-4 rounded-xl border border-purple-100 bg-purple-50/40 p-3">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="text-xs font-medium text-gray-500">
+                                    {t(
+                                      "tela_vaga_dados.tipo_oportunidade_titulo",
+                                    )}
+                                    :
+                                  </span>
+
+                                  <span
+                                    className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                                      form.tipo_oportunidade ===
+                                      "AMPLA_CONCORRENCIA"
+                                        ? "bg-gray-100 text-gray-700"
+                                        : form.tipo_oportunidade ===
+                                            "AFIRMATIVA"
+                                          ? "bg-purple-100 text-purple-700"
+                                          : "bg-amber-100 text-amber-700"
+                                    }`}
+                                  >
+                                    {form.tipo_oportunidade ===
+                                    "AMPLA_CONCORRENCIA"
+                                      ? t("tela_vaga_dados.tipo_ampla")
+                                      : form.tipo_oportunidade === "AFIRMATIVA"
+                                        ? t("tela_vaga_dados.tipo_afirmativa")
+                                        : t("tela_vaga_dados.tipo_exclusiva")}
+                                  </span>
                                 </div>
-                                <div className="w-full sm:w-1/2">
-                                  {form?.lgbtq && (
-                                    <span role="img" aria-label="acessível">
-                                      🏳️‍🌈 {t("tela_vaga_dados.item_vaga_lgbtq")}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
-                                <div className="w-full sm:w-1/2">
-                                  {form.mulheres && (
-                                    <span role="img" aria-label="acessível">
-                                      👩‍💼{" "}
-                                      {t("tela_vaga_dados.item_vaga_mulheres")}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="w-full sm:w-1/2">
-                                  {form?.cinquenta_mais && (
-                                    <span role="img" aria-label="acessível">
-                                      👴{" "}
-                                      {t("tela_vaga_dados.item_vaga_50_mais")}
-                                    </span>
-                                  )}
-                                </div>
+
+                                {form.tipo_oportunidade !==
+                                  "AMPLA_CONCORRENCIA" && (
+                                  <div className="flex flex-wrap gap-2 mt-3">
+                                    {form.publicos_afirmativos.map(
+                                      (publico) => (
+                                        <span
+                                          key={publico}
+                                          className="inline-flex rounded-full border border-purple-200 bg-white px-2.5 py-1 text-[11px] font-medium text-purple-700"
+                                        >
+                                          {getPublicoLabel(publico, t)}
+                                        </span>
+                                      ),
+                                    )}
+                                  </div>
+                                )}
                               </div>
 
                               {/* Linha 4 - Descrição */}
@@ -2029,192 +2221,6 @@ export default function VagaDados({
                           </div>
                         </div>
                       </form>
-                    </div>
-                  )}
-
-                  {step === 5 && vagaPublicada === null && <LoadingOverlay />}
-
-                  {step === 5 && (
-                    <div className="w-full h-full flex flex-col">
-                      {/* Container Principal */}
-                      <div className="flex flex-col md:flex-row  w-full ">
-                        {/* Coluna Esquerda */}
-                        <div className="flex flex-col md:flex-row w-full">
-                          {/* Dados da vaga e skills lado a lado */}
-                          {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 border border-yellow-500"> */}
-                          {/* Bloco - Informações da vaga */}
-                          <div className="w-[65%] space-y-4 mr-2">
-                            {/* Linha 1 - Logo + Título da vaga e empresa */}
-                            <div className="flex flex-col gap-4">
-                              {/* Logo e título + empresa ocupando toda largura */}
-                              <div className="flex flex-row w-full gap-4 items-center">
-                                {/* Logo */}
-                                <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white shrink-0">
-                                  {vagaPublicada?.empresa?.logo ? (
-                                    <Image
-                                      src={vagaPublicada?.empresa?.logo}
-                                      alt="Logo da empresa"
-                                      width={64}
-                                      height={64}
-                                      className="w-full h-full object-cover"
-                                      unoptimized
-                                    />
-                                  ) : (
-                                    <div className="text-xs text-gray-400 text-center px-2">
-                                      {t("tela_vaga_dados.item_msg_sem_foto")}
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Título e empresa */}
-                                <div>
-                                  <h2 className="text-xl font-semibold text-gray-800">
-                                    {vagaPublicada?.nome_vaga}
-                                  </h2>
-                                  <p className="text-sm text-gray-500">
-                                    {vagaPublicada?.empresa?.nome_empresa}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Data de vigência abaixo */}
-                              <div className="flex items-center gap-2 bg-purple-100 text-purple-800 rounded-md px-1 py-1 text-sm w-fit">
-                                <CalendarDays className="w-4 h-4 text-purple-500" />
-                                <span>
-                                  {t("tela_vaga_dados.item_msg_vigencia")}{" "}
-                                  <strong>{dataFormatada}</strong>
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Linha 1 - Local e Data de Cadastro */}
-                            <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2">
-                              <div className="flex items-center gap-2 w-full sm:w-1/2">
-                                <MapPin className="w-4 h-4 text-gray-500 shrink-0" />
-                                {vagaPublicada?.local_vaga ||
-                                  t("tela_vaga_dados.item_msg_sem_local")}
-                              </div>
-                              <div className="flex items-center gap-2 w-full sm:w-1/2">
-                                <CalendarDays className="w-4 h-4 text-gray-500 shrink-0" />
-                                {t("tela_vaga_dados.item_msg_aberta")}{" "}
-                                {vagaPublicada?.data_cadastro
-                                  ? new Date(
-                                      vagaPublicada?.data_cadastro,
-                                    ).toLocaleDateString("pt-BR")
-                                  : t("tela_vaga_dados.item_msg_sem_data")}
-                              </div>
-                            </div>
-
-                            {/* Linha 2 - Período e Modalidade */}
-                            <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
-                              <div className="flex items-center gap-2 w-full sm:w-1/2">
-                                <Clock className="w-4 h-4 text-gray-500 shrink-0" />
-                                {vagaPublicada?.periodo_trabalho?.periodo ||
-                                  t("tela_vaga_dados.item_msg_sem_periodo")}
-                              </div>
-                              <div className="flex items-center gap-2 w-full sm:w-1/2">
-                                <Building2 className="w-4 h-4 text-gray-500 shrink-0" />
-                                {vagaPublicada?.modalidade_trabalho
-                                  ?.modalidade ||
-                                  t("tela_vaga_dados.item_msg_sem_modalidade")}
-                              </div>
-                            </div>
-
-                            {/* Linha 3 - Aberta em e PCD */}
-                            <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
-                              <div className="w-full sm:w-1/2">
-                                {vagaPublicada?.pcd && (
-                                  <span role="img" aria-label="acessível">
-                                    ♿ {t("tela_vaga_dados.item_vaga_pcd")}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="w-full sm:w-1/2">
-                                {vagaPublicada?.lgbtq && (
-                                  <span role="img" aria-label="acessível">
-                                    🏳️‍🌈 {t("tela_vaga_dados.item_vaga_lgbtq")}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex flex-col sm:flex-row text-sm text-gray-600 gap-1 sm:gap-2 mt-2">
-                              <div className="w-full sm:w-1/2">
-                                {vagaPublicada?.mulheres && (
-                                  <span role="img" aria-label="acessível">
-                                    👩‍💼 {t("tela_vaga_dados.item_vaga_mulheres")}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="w-full sm:w-1/2">
-                                {vagaPublicada?.cinquenta_mais && (
-                                  <span role="img" aria-label="acessível">
-                                    👴 {t("tela_vaga_dados.item_vaga_50_mais")}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Linha 4 - Descrição */}
-                            <div>
-                              <h3 className="text-md font-semibold text-gray-700 mb-1">
-                                {t("tela_vaga_dados.item_label_descricao")}
-                              </h3>
-                              <p className="text-sm text-gray-600 whitespace-pre-line">
-                                {vagaPublicada?.descricao}
-                              </p>
-                            </div>
-
-                            {/* Linha 5 - Vigência */}
-                          </div>
-
-                          {/* Bloco - Lista de Skills */}
-                          <div className="w-full sm:w-[30%] flex flex-col mt-2">
-                            <h3 className="text-md font-semibold text-gray-700 mb-2">
-                              {t("tela_vaga_dados.item_label_skill_pesos")}
-                            </h3>
-
-                            <ul className="grid grid-cols-1 xs:grid-cols-2 gap-2">
-                              {vagaPublicada?.skills?.map((skill, index) => (
-                                <li
-                                  key={index}
-                                  className="border border-purple-300 bg-purple-50 px-4 py-3 rounded-md flex flex-col justify-between"
-                                >
-                                  {/* Linha 1: nome da skill e peso */}
-                                  <div className="flex justify-between items-center mb-1">
-                                    <span className="text-sm font-light">
-                                      {skill.nome}
-                                    </span>
-                                    <span className="text-xs text-[#808080]">
-                                      {t("tela_vaga_dados.item_label_peso")}{" "}
-                                      {skill.peso / 10}/10
-                                    </span>
-                                  </div>
-
-                                  {/* Linha 2: barra de score */}
-                                  <div className="w-full h-2 bg-gray-200 rounded-full">
-                                    <div
-                                      className="h-full bg-purple-500 rounded-full"
-                                      style={{
-                                        width: `${(skill.peso / 10) * 10}%`,
-                                      }}
-                                    />
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {/* </div> */}
-                        </div>
-
-                        {/* Coluna Direita - Gráficos */}
-                        <div className="w-full md:w-100 flex flex-col gap-4 md:items-end">
-                          <SkillsPanel
-                            skills={vagaPublicada?.skills}
-                            perfil={perfil}
-                          />
-                        </div>
-                      </div>
                     </div>
                   )}
                 </div>
