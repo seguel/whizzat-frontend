@@ -1,5 +1,15 @@
 import JobCard from "./JobCard";
 
+type TipoOportunidade = "AMPLA_CONCORRENCIA" | "AFIRMATIVA" | "EXCLUSIVA";
+
+type PublicoAfirmativo =
+  | "PCD"
+  | "AFIRMATIVA_RACIAL"
+  | "LGBTQIA"
+  | "MULHERES"
+  | "CINQUENTA_MAIS"
+  | "DIVERSIDADE";
+
 interface Job {
   empresa_id: number;
   vaga_id: number;
@@ -10,10 +20,10 @@ interface Job {
   data_cadastro: string;
   qtde_dias_aberta: number;
   prazo: string;
-  pcd?: boolean;
-  lgbtq?: boolean;
-  mulheres?: boolean;
-  cinquenta_mais?: boolean;
+
+  tipo_oportunidade: TipoOportunidade;
+  publicos_afirmativos: PublicoAfirmativo[];
+
   cidade_label: string;
   estado_sigla: string;
 }

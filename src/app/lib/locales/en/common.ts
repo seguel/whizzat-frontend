@@ -438,6 +438,65 @@ const en = {
     item_tooltip_favorite_passo2: "- Favorite skills will be used ",
     item_tooltip_favorite_passo2_1: " for candidate evaluations.",
     item_sugerido_avaliador: "Recommended by the evaluator:",
+    aberto_oportunidades: "Open to Opportunities",
+
+    disponivel_oportunidades: "Available for New Opportunities",
+
+    indisponivel_oportunidades: "Not Available at the Moment",
+
+    inclusao_titulo: "Inclusive and Affirmative Action Opportunities",
+
+    inclusao_descricao:
+      "These options are voluntary and help identify inclusive or affirmative action opportunities that match your profile.",
+
+    inclusao_pcd: "Opportunities for People with Disabilities (PWD)",
+
+    inclusao_pcd_msg:
+      "I would like to participate in opportunities intended for people with disabilities.",
+
+    inclusao_racial: "Ethnic and Racial Affirmative Action",
+
+    inclusao_racial_msg:
+      "I would like to participate in opportunities with ethnic and racial affirmative action policies.",
+
+    inclusao_lgbtqia: "LGBTQIA+ Diversity",
+
+    inclusao_lgbtqia_msg:
+      "I would like to participate in opportunities focused on LGBTQIA+ diversity.",
+
+    inclusao_50mais: "Professionals 50+",
+
+    inclusao_50mais_msg:
+      "I would like to participate in opportunities for professionals aged 50 and over.",
+
+    inclusao_diversidade: "Other Diversity and Inclusion Initiatives",
+
+    inclusao_diversidade_msg:
+      "I would like to be considered for other inclusive opportunities that match my profile.",
+
+    inclusao_privacidade:
+      "Providing this information is optional. These preferences will only be used to identify inclusive or affirmative action opportunities and will not affect your participation in opportunities open to all candidates.",
+
+    inclusao_visualizacao_msg:
+      "Preferences provided for participation in inclusive or affirmative action opportunities.",
+    inclusao_pcd_curto: "PWD",
+    inclusao_racial_curto: "Ethnic and Racial Affirmative Action",
+    inclusao_lgbtqia_curto: "LGBTQIA+ Diversity",
+    inclusao_50mais_curto: "Professionals 50+",
+    inclusao_diversidade_curto: "Diversity and Inclusion",
+    inclusao_nenhuma_selecionada:
+      "No inclusive opportunity preferences have been selected.",
+    inclusao_privacidade_resumo:
+      "This information is optional and will only be used to identify opportunities that match your preferences.",
+    modalidade_titulo: "Work Arrangement",
+    modalidade_descricao:
+      "Select the work arrangements you are willing to consider for new opportunities.",
+    modalidade_presencial: "On-site",
+    modalidade_hibrido: "Hybrid",
+    modalidade_remoto: "Remote",
+    modalidade_visualizacao_msg:
+      "Work arrangements you are willing to consider for new opportunities.",
+    modalidade_nenhuma_selecionada: "No work arrangement has been selected.",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Evaluators Awaiting Confirmation",
@@ -619,6 +678,32 @@ const en = {
     item_label_panel_softskill: "Soft Skill Distribution",
     tipo_grafico_perfil: "Profile",
     tipo_grafico_avaliador: "Evaluator Recommendation",
+    tipo_oportunidade_titulo: "Opportunity Type",
+    tipo_oportunidade_descricao:
+      "Define whether the position is open to all candidates or has a specific affirmative action policy.",
+    tipo_ampla: "Open Competition",
+    tipo_ampla_msg: "Opportunity open to all qualified candidates.",
+    tipo_afirmativa: "Affirmative Action",
+    tipo_afirmativa_msg:
+      "Opportunity focused on or prioritizing specific groups.",
+    tipo_exclusiva: "Exclusive",
+    tipo_exclusiva_msg:
+      "Opportunity exclusively intended for the selected groups.",
+    publico_afirmativo_titulo: "Target Audience",
+    publico_afirmativo_msg:
+      "Select the groups covered by this affirmative action policy.",
+    publico_exclusivo_msg:
+      "Select the groups this opportunity is intended for.",
+    publico_pcd: "People with Disabilities (PWD)",
+    publico_racial: "Ethnic and Racial Affirmative Action",
+    publico_lgbtqia: "LGBTQIA+ Diversity",
+    publico_mulheres: "Women",
+    publico_50mais: "Professionals 50+",
+    publico_diversidade: "Other Diversity Initiatives",
+    publico_obrigatorio:
+      "Select at least one target group for this opportunity.",
+    tipo_oportunidade_detalhe_msg:
+      "Classification and target audience for this opportunity.",
   },
   planos: {
     titulo: "You don’t have a plan yet. Please select one below.",
