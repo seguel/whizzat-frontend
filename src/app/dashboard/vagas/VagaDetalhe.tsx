@@ -5,7 +5,7 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 import Sidebar from "../../components/perfil/Sidebar";
 import TopBar from "../../components/perfil/TopBar";
 import LoadingOverlay from "../../components/LoadingOverlay";
-import { Clock, Building2, CalendarDays } from "lucide-react";
+import { Clock, Building2, CalendarDays, Search } from "lucide-react";
 import SkillsPanel from "../../components/perfil/SkillsPanel";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import PageContainer from "@/app/components/PageContainer";
+import VagaMatchCandidates from "../../components/vagas/VagaMatchCandidates";
 
 interface Props {
   perfil: ProfileType;
@@ -172,21 +173,39 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
         <div className="flex-1 overflow-y-auto">
           <PageContainer>
             <div className="flex flex-col flex-1 w-full min-h-[500px] ">
-              <div className="pt-1 px-1 flex justify-between w-full mb-4">
-                {/* Esquerda: botão voltar */}
-                <div className="flex mb-1">
+              <div className="pt-1 px-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full mb-4">
+                {/* Esquerda */}
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => {
-                      router.replace(`/dashboard/vagas?perfil=${perfil}`); // limpa query id
+                      router.replace(`/dashboard/vagas?perfil=${perfil}`);
                     }}
-                    className="px-4 py-2 text-sm rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                    className="px-4 py-2 text-sm rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer whitespace-nowrap"
                   >
                     {t("tela_vaga_dados.item_botao_lista_vagas")}
                   </button>
+
+                  {perfil === "recrutador" && vaga?.ativo && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        document
+                          .getElementById("buscar-candidatos")
+                          ?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                      }}
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer whitespace-nowrap"
+                    >
+                      <Search className="w-4 h-4 shrink-0" />
+                      {t("vaga_match.ir_para_busca")}
+                    </button>
+                  )}
                 </div>
 
-                {/* Direita: botões cadastrar e editar */}
-                <div className="flex gap-2">
+                {/* Direita */}
+                <div className="flex items-center gap-2">
                   {perfil === "recrutador" && (
                     <button
                       onClick={() =>
@@ -194,7 +213,7 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                           `/dashboard/vagas?perfil=${perfil}&op=E&vagaid=${vagaId}&id=${empresaId}`,
                         )
                       }
-                      className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                      className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer whitespace-nowrap"
                     >
                       {t("tela_vaga_dados.item_botao_editar")}
                     </button>
@@ -499,6 +518,11 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
                     <SkillsPanel skills={vaga?.skills} perfil={perfil} />
                   </div>
                 </div>
+
+                {/* Match de candidatos - somente recrutador */}
+                {perfil === "recrutador" && vaga?.ativo && (
+                  <VagaMatchCandidates />
+                )}
               </div>
             </div>
           </PageContainer>
