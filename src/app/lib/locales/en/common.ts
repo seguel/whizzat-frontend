@@ -756,6 +756,8 @@ const en = {
     compatibilidade_compativel_descricao: "60% or higher",
     compatibilidade_todos_descricao: "No minimum percentage",
     ir_para_busca: "Find candidates",
+    erro_buscar: "Unable to find candidates for this job.",
+    publico_prioritario: "Priority audience",
   },
   planos: {
     titulo: "You don’t have a plan yet. Please select one below.",

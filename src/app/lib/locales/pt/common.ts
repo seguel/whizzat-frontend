@@ -740,6 +740,8 @@ const pt = {
     compatibilidade_compativel_descricao: "Match mínimo: 60%",
     compatibilidade_todos_descricao: "Sem match mínimo",
     ir_para_busca: "Encontrar candidatos",
+    erro_buscar: "Não foi possível buscar candidatos para esta vaga.",
+    publico_prioritario: "Público prioritário",
   },
   planos: {
     titulo: "Você ainda não possui um plano, selecione abaixo.",
