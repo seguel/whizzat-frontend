@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Home,
   Star,
-  // Search,
+  UserX,
   User,
   CheckSquare,
   Calendar,
@@ -111,6 +111,12 @@ export function useNavItems(
           label: t("sidebar.menu_vagas_abertas"),
           route: `/dashboard/vagas?perfil=${profile}`,
           activeRoutes: ["/dashboard/vagas"],
+        },
+        {
+          icon: <UserX size={20} />,
+          label: t("sidebar.menu_candidatos_ignorados"),
+          route: `/dashboard/candidatos-ignorados?perfil=${profile}`,
+          activeRoutes: ["/dashboard/candidatos-ignorados"],
         },
         {
           icon: <Store size={20} />,
