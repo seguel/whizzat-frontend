@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import PageContainer from "../components/PageContainer";
 
 interface SemDadosProps {
-  tipo: "empresa" | "vaga" | "perfil";
+  tipo: "empresa" | "vaga" | "perfil" | "candidato_ignorado";
   perfil: "candidato" | "avaliador" | "recrutador";
 }
-
 export default function SemDados({ tipo, perfil }: SemDadosProps) {
   const router = useRouter();
   const { t, i18n } = useTranslation("common");
@@ -160,6 +159,33 @@ export default function SemDados({ tipo, perfil }: SemDadosProps) {
           </div>
         );
 
+      case "candidato_ignorado":
+        return (
+          <div className="flex flex-col items-center justify-center h-full text-center w-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-12 w-12 text-gray-400 mb-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M18 6L6 18M6 6l12 12"
+              />
+            </svg>
+
+            <h2 className="text-lg sm:text-xl font-medium text-gray-700">
+              {t("semdados.candidato_ignorado_linha_primeiro")}
+            </h2>
+
+            <p className="text-sm text-gray-500 mt-2 max-w-md">
+              {t("semdados.candidato_ignorado_linha_segundo")}
+            </p>
+          </div>
+        );
       default:
         return null;
     }

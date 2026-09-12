@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
+import PerfilCandidatoModal from "./PerfilCandidatoModal";
 
 type FaixaMatch = "ALTA" | "BOA" | "COMPATIVEL" | "TODOS";
 
@@ -63,6 +64,22 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
     useState<MatchCandidato | null>(null);
 
   const [motivoIgnorar, setMotivoIgnorar] = useState("");
+  const [ignorando, setIgnorando] = useState(false);
+  const [perfilCandidatoId, setPerfilCandidatoId] = useState<number | null>(
+    null,
+  );
+
+  const [perfilAberto, setPerfilAberto] = useState(false);
+
+  const abrirPerfil = (candidatoId: number) => {
+    setPerfilCandidatoId(candidatoId);
+    setPerfilAberto(true);
+  };
+
+  const fecharPerfil = () => {
+    setPerfilAberto(false);
+    setPerfilCandidatoId(null);
+  };
 
   const handleBuscar = async () => {
     setBuscando(true);
@@ -156,27 +173,55 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
     setMotivoIgnorar("");
   };
 
-  const handleConfirmarIgnorar = () => {
-    if (!candidatoIgnorar) return;
+  const handleConfirmarIgnorar = async () => {
+    if (!candidatoIgnorar || ignorando) return;
 
-    // MOCK:
-    // futuramente aqui será POST para a tabela de candidatos ignorados.
-    console.log("Ignorar candidato:", {
-      candidato_id: candidatoIgnorar.candidato_id,
-      motivo: motivoIgnorar || null,
-    });
+    setIgnorando(true);
 
-    setResultados((prev) =>
-      prev.filter(
-        (item) => item.candidato_id !== candidatoIgnorar.candidato_id,
-      ),
-    );
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/ignorar`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            candidato_id: candidatoIgnorar.candidato_id,
+            motivo: motivoIgnorar || undefined,
+          }),
+        },
+      );
 
-    setSelecionados((prev) =>
-      prev.filter((id) => id !== candidatoIgnorar.candidato_id),
-    );
+      if (!res.ok) {
+        const erro = await res.json().catch(() => null);
 
-    handleFecharIgnorar();
+        throw new Error(erro?.message || t("vaga_match.erro_ignorar"));
+      }
+
+      setResultados((prev) =>
+        prev.filter(
+          (item) => item.candidato_id !== candidatoIgnorar.candidato_id,
+        ),
+      );
+
+      setSelecionados((prev) =>
+        prev.filter((id) => id !== candidatoIgnorar.candidato_id),
+      );
+
+      toast.success(t("vaga_match.ignorar_sucesso"));
+
+      handleFecharIgnorar();
+    } catch (error) {
+      console.error("Erro ao ignorar candidato:", error);
+
+      toast.error(
+        error instanceof Error ? error.message : t("vaga_match.erro_ignorar"),
+      );
+    } finally {
+      setIgnorando(false);
+    }
   };
 
   const handleConvidarSelecionados = () => {
@@ -387,6 +432,7 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
                   }
                   onSelecionar={() => toggleSelecionado(candidato.candidato_id)}
                   onIgnorar={() => handleAbrirIgnorar(candidato)}
+                  onVerPerfil={() => abrirPerfil(candidato.candidato_id)}
                 />
               ))}
             </div>
@@ -409,11 +455,22 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
         <IgnoreCandidateModal
           candidato={candidatoIgnorar}
           motivo={motivoIgnorar}
+          ignorando={ignorando}
           onMotivoChange={setMotivoIgnorar}
           onCancelar={handleFecharIgnorar}
           onConfirmar={handleConfirmarIgnorar}
         />
       )}
+
+      <PerfilCandidatoModal
+        candidatoId={perfilCandidatoId}
+        aberto={perfilAberto}
+        onFechar={fecharPerfil}
+        selecionado={
+          perfilCandidatoId != null && selecionados.includes(perfilCandidatoId)
+        }
+        onSelecionar={(candidatoId) => toggleSelecionado(candidatoId)}
+      />
     </>
   );
 }
@@ -433,6 +490,7 @@ interface CandidateMatchCardProps {
   disabled: boolean;
   onSelecionar: () => void;
   onIgnorar: () => void;
+  onVerPerfil: () => void;
 }
 
 function CandidateMatchCard({
@@ -441,6 +499,7 @@ function CandidateMatchCard({
   disabled,
   onSelecionar,
   onIgnorar,
+  onVerPerfil,
 }: CandidateMatchCardProps) {
   const { t } = useTranslation("common");
 
@@ -564,9 +623,10 @@ function CandidateMatchCard({
         <div className="flex items-center gap-2 lg:justify-end">
           <button
             type="button"
-            className="flex-1 lg:flex-none rounded-lg border border-purple-200 px-4 py-2 text-xs font-semibold text-purple-700 hover:bg-purple-50 transition cursor-pointer"
+            onClick={onVerPerfil}
+            className="rounded-lg border border-purple-200 bg-white px-3 py-2 text-sm font-semibold text-purple-700 transition hover:bg-purple-50 cursor-pointer"
           >
-            {t("vaga_match.ver_perfil")}
+            {t("perfil_candidato.ver_perfil")}
           </button>
 
           <div className="relative hidden lg:block">
@@ -615,6 +675,7 @@ function CandidateMenu({ onIgnorar }: { onIgnorar: () => void }) {
 interface IgnoreCandidateModalProps {
   candidato: MatchCandidato;
   motivo: string;
+  ignorando: boolean;
   onMotivoChange: (value: string) => void;
   onCancelar: () => void;
   onConfirmar: () => void;
@@ -623,6 +684,7 @@ interface IgnoreCandidateModalProps {
 function IgnoreCandidateModal({
   candidato,
   motivo,
+  ignorando,
   onMotivoChange,
   onCancelar,
   onConfirmar,
@@ -662,8 +724,9 @@ function IgnoreCandidateModal({
 
             <select
               value={motivo}
+              disabled={ignorando}
               onChange={(e) => onMotivoChange(e.target.value)}
-              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
+              className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400 disabled:bg-gray-50 disabled:opacity-60"
             >
               <option value="">
                 {t("vaga_match.ignorar_motivo_opcional")}
@@ -690,7 +753,8 @@ function IgnoreCandidateModal({
           <button
             type="button"
             onClick={onCancelar}
-            className="w-full sm:w-auto rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition cursor-pointer"
+            disabled={ignorando}
+            className="w-full sm:w-auto rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-60 disabled:cursor-not-allowed transition cursor-pointer"
           >
             {t("vaga_match.cancelar")}
           </button>
@@ -698,11 +762,14 @@ function IgnoreCandidateModal({
           <button
             type="button"
             onClick={onConfirmar}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 transition cursor-pointer"
+            disabled={ignorando}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed transition cursor-pointer"
           >
             <UserX className="w-4 h-4" />
 
-            {t("vaga_match.confirmar_ignorar")}
+            {ignorando
+              ? t("vaga_match.ignorando")
+              : t("vaga_match.confirmar_ignorar")}
           </button>
         </div>
       </div>
