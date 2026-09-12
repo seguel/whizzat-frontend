@@ -128,6 +128,7 @@ const pt = {
       "Desejo avaliar candidatos para receber benefícios",
     btn_sair: "Sair",
     selecionado_ola: "Olá, ",
+    selecionado_candidato_titulo: "Olá, Candidato(a)",
     selecionado_candidato_descricao_curta: "Sou um(a) Candidato(a)",
     selecionado_candidato_cor: "verde",
     selecionado_candidato_cor_css: "green",
@@ -136,6 +137,7 @@ const pt = {
 
     selecionado_recrutador_cor: "roxo",
     selecionado_recrutador_cor_css: "purple",
+    selecionado_avaliador_titulo: "Olá, Avaliador(a)",
     selecionado_avaliador_descricao_curta: "Sou um(a) Avaliador(a)",
     selecionado_avaliador_cor: "azul",
     selecionado_avaliador_cor_css: "blue",
@@ -1072,7 +1074,7 @@ const pt = {
     ranking_avaliadores: "avaliadores",
   },
   perfil_candidato: {
-    sobre: "Sobre (feedback especialista)",
+    sobre: "Sobre",
     modalidades: "Modalidades de trabalho",
     hard_skills: "Hard Skills",
     soft_skills: "Soft Skills",
