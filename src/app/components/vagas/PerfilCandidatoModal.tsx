@@ -450,7 +450,7 @@ export default function PerfilCandidatoModal({
           <button
             type="button"
             onClick={onFechar}
-            className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 sm:w-auto"
+            className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 sm:w-auto cursor-pointer"
           >
             {t("perfil_candidato.fechar")}
           </button>
@@ -461,7 +461,7 @@ export default function PerfilCandidatoModal({
               onClick={() => {
                 onSelecionar(perfil.candidato_id);
               }}
-              className={`inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition sm:w-auto ${
+              className={`inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition sm:w-auto cursor-pointer ${
                 selecionado
                   ? "bg-gray-500 hover:bg-gray-600"
                   : "bg-purple-600 hover:bg-purple-700"
