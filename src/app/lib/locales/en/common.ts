@@ -190,6 +190,7 @@ const en = {
     menu_sair: "Logout",
     menu_questionario: "Questionnaires",
     menu_candidatos_ignorados: "Ignored candidates",
+    menu_buscar_candidatos: "Search candidates",
   },
   tela_topo_passos: {
     passo_dados: "Information",
@@ -1110,6 +1111,59 @@ const en = {
     remover_selecao: "Remove selection",
     ver_perfil: "View profile",
     erro_carregar: "Unable to load the candidate profile.",
+  },
+  buscar_candidatos: {
+    convite_titulo: "Invite candidates",
+    convite_descricao:
+      "Send a professional invitation to the selected candidates.",
+
+    convite_candidato_selecionado: "candidate selected",
+    convite_candidatos_selecionados: "candidates selected",
+    convite_mesma_mensagem: "They will all receive the same invitation.",
+
+    convite_motivo: "Invitation purpose",
+    convite_motivo_descricao: "Select the context of the invitation.",
+
+    convite_tipo_oportunidade: "Professional opportunity",
+    convite_tipo_oportunidade_descricao:
+      "Invitation regarding a professional opportunity.",
+
+    convite_tipo_palestra: "Talk / event",
+    convite_tipo_palestra_descricao:
+      "Participation in a talk, event, or professional gathering.",
+
+    convite_tipo_mentoria: "Mentoring",
+    convite_tipo_mentoria_descricao:
+      "Invitation related to mentoring or professional guidance.",
+
+    convite_tipo_projeto: "Project / consulting",
+    convite_tipo_projeto_descricao:
+      "Participation in a project or consulting engagement.",
+
+    convite_tipo_networking: "Networking / conversation",
+    convite_tipo_networking_descricao:
+      "Professional networking or an initial conversation.",
+
+    convite_tipo_outro: "Other",
+    convite_tipo_outro_descricao: "Another type of professional invitation.",
+
+    convite_campo_titulo: "Title",
+    convite_titulo_placeholder:
+      "E.g.: Invitation to speak about project management",
+
+    convite_campo_mensagem: "Message",
+    convite_mensagem_placeholder:
+      "Share some details about the invitation, its context, and why you would like to get in touch.",
+    convite_mensagem_alerta:
+      "Avoid including sensitive or confidential information.",
+
+    convite_btn_cancelar: "Cancel",
+    convite_btn_enviar: "Send invitation",
+
+    convite_mock_sucesso_um: "Invitation prepared for 1 candidate.",
+    convite_mock_sucesso_varios:
+      "Invitation prepared for {{total}} candidates.",
+    convite_btn_fechar: "Close",
   },
 };
 
