@@ -192,6 +192,7 @@ const pt = {
     menu_sair: "Sair",
     menu_questionario: "Questionarios",
     menu_candidatos_ignorados: "Candidatos ignorados",
+    menu_buscar_candidatos: "Buscar candidatos",
   },
   tela_topo_passos: {
     passo_dados: "Dados",
@@ -1092,6 +1093,58 @@ const pt = {
     remover_selecao: "Remover seleção",
     ver_perfil: "Ver perfil",
     erro_carregar: "Não foi possível carregar o perfil do candidato.",
+  },
+  buscar_candidatos: {
+    convite_titulo: "Convidar candidatos",
+    convite_descricao:
+      "Envie um convite profissional aos candidatos selecionados.",
+
+    convite_candidato_selecionado: "candidato selecionado",
+    convite_candidatos_selecionados: "candidatos selecionados",
+    convite_mesma_mensagem: "Todos receberão este mesmo convite.",
+
+    convite_motivo: "Motivo do convite",
+    convite_motivo_descricao: "Selecione o contexto do contato.",
+
+    convite_tipo_oportunidade: "Oportunidade profissional",
+    convite_tipo_oportunidade_descricao:
+      "Convite para uma oportunidade profissional.",
+
+    convite_tipo_palestra: "Palestra / evento",
+    convite_tipo_palestra_descricao:
+      "Participação em palestra, evento ou encontro.",
+
+    convite_tipo_mentoria: "Mentoria",
+    convite_tipo_mentoria_descricao:
+      "Convite relacionado a mentoria ou orientação.",
+
+    convite_tipo_projeto: "Projeto / consultoria",
+    convite_tipo_projeto_descricao:
+      "Participação em projeto ou trabalho de consultoria.",
+
+    convite_tipo_networking: "Networking / conversa",
+    convite_tipo_networking_descricao:
+      "Contato profissional ou conversa inicial.",
+
+    convite_tipo_outro: "Outro",
+    convite_tipo_outro_descricao: "Outro motivo de contato profissional.",
+
+    convite_campo_titulo: "Título",
+    convite_titulo_placeholder:
+      "Ex.: Convite para palestra sobre gestão de projetos",
+
+    convite_campo_mensagem: "Mensagem",
+    convite_mensagem_placeholder:
+      "Conte um pouco sobre o convite, contexto e por que gostaria de entrar em contato.",
+    convite_mensagem_alerta:
+      "Evite incluir informações sensíveis ou confidenciais.",
+
+    convite_btn_cancelar: "Cancelar",
+    convite_btn_enviar: "Enviar convite",
+
+    convite_mock_sucesso_um: "Convite preparado para 1 candidato.",
+    convite_mock_sucesso_varios: "Convite preparado para {{total}} candidatos.",
+    convite_btn_fechar: "Fechar",
   },
 };
 

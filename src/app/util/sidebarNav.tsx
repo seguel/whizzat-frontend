@@ -12,6 +12,7 @@ import {
   Store,
   LogOut,
   ClipboardCheck,
+  Search,
 } from "lucide-react";
 
 export type ProfileType = "candidato" | "recrutador" | "avaliador";
@@ -111,6 +112,12 @@ export function useNavItems(
           label: t("sidebar.menu_vagas_abertas"),
           route: `/dashboard/vagas?perfil=${profile}`,
           activeRoutes: ["/dashboard/vagas"],
+        },
+        {
+          icon: <Search size={20} />,
+          label: t("sidebar.menu_buscar_candidatos"),
+          route: `/dashboard/buscar-candidatos?perfil=${profile}`,
+          activeRoutes: ["/dashboard/buscar-candidatos"],
         },
         {
           icon: <UserX size={20} />,
