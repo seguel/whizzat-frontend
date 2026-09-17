@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   Search,
   Sparkles,
@@ -16,6 +16,7 @@ import CandidateMatchCard, {
   MatchCandidato,
 } from "../candidate-match/CandidateMatchCard";
 import IgnoreCandidateModal from "../candidate-match/IgnoreCandidateModal";
+import ConfirmInviteCandidatesModal from "../candidate-match/ConfirmInviteCandidatesModal";
 
 type FaixaMatch = "ALTA" | "BOA" | "COMPATIVEL" | "TODOS";
 
@@ -41,7 +42,6 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
   const [buscando, setBuscando] = useState(false);
 
   const [resultados, setResultados] = useState<MatchCandidato[]>([]);
-
   const [selecionados, setSelecionados] = useState<number[]>([]);
 
   const [candidatoIgnorar, setCandidatoIgnorar] =
@@ -54,6 +54,24 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
   );
 
   const [perfilAberto, setPerfilAberto] = useState(false);
+  const resultadosRef = useRef<HTMLDivElement | null>(null);
+  const [enviandoConvites, setEnviandoConvites] = useState(false);
+  const [confirmarConviteAberto, setConfirmarConviteAberto] = useState(false);
+
+  useEffect(() => {
+    if (!pesquisou) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      resultadosRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+
+    return () => window.clearTimeout(timer);
+  }, [pesquisou]);
 
   const abrirPerfil = (candidatoId: number) => {
     setPerfilCandidatoId(candidatoId);
@@ -112,7 +130,11 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
   const LIMITE_CONVITES = 10;
 
   const idsSelecionaveis = useMemo(
-    () => resultados.slice(0, LIMITE_CONVITES).map((item) => item.candidato_id),
+    () =>
+      resultados
+        .filter((item) => !item.ja_convidado)
+        .slice(0, LIMITE_CONVITES)
+        .map((item) => item.candidato_id),
     [resultados],
   );
 
@@ -121,6 +143,14 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
     idsSelecionaveis.every((id) => selecionados.includes(id));
 
   const toggleSelecionado = (candidatoId: number) => {
+    const candidato = resultados.find(
+      (item) => item.candidato_id === candidatoId,
+    );
+
+    if (!candidato || candidato.ja_convidado) {
+      return;
+    }
+
     const jaSelecionado = selecionados.includes(candidatoId);
 
     if (jaSelecionado) {
@@ -208,9 +238,91 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
     }
   };
 
-  const handleConvidarSelecionados = () => {
-    // Mock por enquanto.
-    console.log("Candidatos selecionados:", selecionados);
+  const handleConvidarSelecionados = async () => {
+    if (selecionados.length === 0 || enviandoConvites) {
+      return;
+    }
+
+    setEnviandoConvites(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/convite/vaga`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            empresa_id: Number(empresaId),
+            vaga_id: Number(vagaId),
+            candidato_ids: selecionados,
+          }),
+        },
+      );
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.message || t("vaga_match.erro_enviar_convite"));
+      }
+
+      if (data.total === 0 && data.ja_convidados > 0) {
+        toast.error(t("vaga_match.todos_ja_convidados"));
+      } else if (data.ja_convidados > 0) {
+        toast.success(
+          t("vaga_match.convites_enviados_parcial", {
+            total: data.total,
+            jaConvidados: data.ja_convidados,
+          }),
+        );
+      } else {
+        toast.success(
+          t("vaga_match.convites_enviados_sucesso", {
+            total: data.total,
+          }),
+        );
+      }
+
+      const idsConvidados = new Set<number>(
+        (data.convites ?? []).map(
+          (convite: { candidato_id: number }) => convite.candidato_id,
+        ),
+      );
+
+      setResultados((prev) =>
+        prev.map((candidato) =>
+          idsConvidados.has(candidato.candidato_id)
+            ? {
+                ...candidato,
+                ja_convidado: true,
+              }
+            : candidato,
+        ),
+      );
+
+      setSelecionados([]);
+      setConfirmarConviteAberto(false);
+    } catch (error) {
+      console.error("Erro ao enviar convites:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t("vaga_match.erro_enviar_convite"),
+      );
+    } finally {
+      setEnviandoConvites(false);
+    }
+  };
+
+  const handleAbrirConfirmacaoConvite = () => {
+    if (selecionados.length === 0 || enviandoConvites) {
+      return;
+    }
+
+    setConfirmarConviteAberto(true);
   };
 
   return (
@@ -327,11 +439,8 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
 
             <div className="flex flex-wrap gap-2">
               <CriterioBadge label={t("vaga_match.criterio_skills")} />
-
               <CriterioBadge label={t("vaga_match.criterio_modalidade")} />
-
               <CriterioBadge label={t("vaga_match.criterio_localizacao")} />
-
               <CriterioBadge label={t("vaga_match.criterio_oportunidade")} />
             </div>
           </div>
@@ -339,7 +448,10 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
 
         {/* Resultados */}
         {pesquisou && (
-          <div className="mt-6 pt-5 border-t border-purple-200">
+          <div
+            ref={resultadosRef}
+            className="mt-6 pt-5 border-t border-purple-200"
+          >
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-4">
               <div>
                 <h3 className="text-base font-semibold text-gray-900">
@@ -377,11 +489,15 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
 
                     <button
                       type="button"
-                      onClick={handleConvidarSelecionados}
+                      onClick={handleAbrirConfirmacaoConvite}
+                      disabled={selecionados.length === 0 || enviandoConvites}
                       className="inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-xs font-semibold text-white hover:bg-purple-700 transition cursor-pointer"
                     >
-                      <Send className="w-3.5 h-3.5" />
-                      {t("vaga_match.convidar_selecionados")}
+                      <Send className="h-4 w-4" />
+
+                      {enviandoConvites
+                        ? t("vaga_match.enviando_convites")
+                        : t("vaga_match.convidar_selecionados")}
                     </button>
                   </div>
                 )}
@@ -410,6 +526,7 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
                   key={candidato.candidato_id}
                   candidato={candidato}
                   selecionado={selecionados.includes(candidato.candidato_id)}
+                  jaConvidado={candidato.ja_convidado}
                   disabled={
                     !selecionados.includes(candidato.candidato_id) &&
                     selecionados.length >= LIMITE_CONVITES
@@ -454,6 +571,14 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
           perfilCandidatoId != null && selecionados.includes(perfilCandidatoId)
         }
         onSelecionar={(candidatoId) => toggleSelecionado(candidatoId)}
+      />
+
+      <ConfirmInviteCandidatesModal
+        aberto={confirmarConviteAberto}
+        total={selecionados.length}
+        enviando={enviandoConvites}
+        onFechar={() => setConfirmarConviteAberto(false)}
+        onConfirmar={handleConvidarSelecionados}
       />
     </>
   );

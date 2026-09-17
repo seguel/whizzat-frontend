@@ -193,6 +193,7 @@ const pt = {
     menu_questionario: "Questionarios",
     menu_candidatos_ignorados: "Candidatos ignorados",
     menu_buscar_candidatos: "Buscar candidatos",
+    minhas_oportunidades: "Minhas oportunidades",
   },
   tela_topo_passos: {
     passo_dados: "Dados",
@@ -754,6 +755,25 @@ const pt = {
     erro_ignorar:
       "Não foi possível remover este candidato das próximas buscas.",
     menu_candidatos_ignorados: "Candidatos ignorados",
+    enviando_convites: "Enviando convites...",
+    convites_enviados_sucesso: "{{total}} convite(s) enviado(s) com sucesso.",
+    erro_enviar_convite: "Não foi possível enviar os convites.",
+    todos_ja_convidados:
+      "Os candidatos selecionados já foram convidados para esta vaga.",
+    convites_enviados_parcial:
+      "{{total}} convite(s) enviado(s). {{jaConvidados}} candidato(s) já havia(m) sido convidado(s).",
+    confirmar_convite_titulo: "Enviar convite?",
+    confirmar_convite_descricao: "Confirme o envio antes de continuar.",
+    confirmar_convite_um:
+      "Você está prestes a convidar 1 candidato para esta vaga.",
+    confirmar_convite_varios:
+      "Você está prestes a convidar {{total}} candidatos para esta vaga.",
+    confirmar_convite_aviso:
+      "Após o envio, os candidatos serão notificados e poderão aceitar ou recusar o convite.",
+    confirmar_convite_cancelar: "Cancelar",
+    confirmar_convite_enviar: "Enviar convite",
+    confirmar_convite_fechar: "Fechar",
+    ja_convidado: "Já convidado",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
@@ -1145,6 +1165,53 @@ const pt = {
     convite_mock_sucesso_um: "Convite preparado para 1 candidato.",
     convite_mock_sucesso_varios: "Convite preparado para {{total}} candidatos.",
     convite_btn_fechar: "Fechar",
+  },
+  oportunidades_candidato: {
+    titulo: "Minhas oportunidades",
+    descricao: "Acompanhe seus convites, entrevistas e processos finalizados.",
+    convites: "Convites",
+    entrevistas: "Entrevistas",
+    finalizados: "Finalizados",
+    recebido_em: "Recebido em",
+    finalizado_em: "Finalizado em",
+    btn_aceitar: "Aceitar convite",
+    btn_recusar: "Recusar",
+    btn_aceitar_horario: "Aceitar horário",
+    btn_recusar_horario: "Recusar horário",
+    aguardando_resposta_agenda: "Aguardando sua confirmação",
+    aprovado: "Aprovado",
+    nao_aprovado: "Não aprovado",
+    parecer: "Feedback do recrutador",
+    tipo_vaga: "Vaga",
+    tipo_oportunidade: "Oportunidade",
+    tipo_evento: "Palestra / Evento",
+    tipo_mentoria: "Mentoria",
+    tipo_projeto: "Projeto / Consultoria",
+    tipo_networking: "Networking",
+    tipo_outro: "Outro",
+    carregando_convites: "Carregando seus convites...",
+    erro_convites: "Não foi possível carregar seus convites.",
+    sem_convites: "Nenhum convite pendente",
+    sem_convites_msg:
+      "Quando você receber um novo convite, ele aparecerá aqui.",
+    horario_recusado: "Horário recusado",
+    aguardando_nova_agenda:
+      "Aguardando uma nova sugestão de horário do recrutador.",
+    aguardando_agenda: "Aguardando o recrutador sugerir um horário.",
+    entrevista_confirmada: "Entrevista confirmada",
+    entrevista_realizada: "Entrevista realizada",
+    aguardando_finalizacao:
+      "Entrevista concluída. Aguardando a finalização do processo pelo recrutador.",
+    carregando_finalizados: "Carregando processos finalizados...",
+    erro_finalizados: "Não foi possível carregar os processos finalizados.",
+    sem_finalizados: "Nenhum processo finalizado",
+    sem_finalizados_msg: "Seus processos concluídos aparecerão aqui.",
+    processo_finalizado: "Processo finalizado",
+    carregando_entrevistas: "Carregando suas entrevistas...",
+    erro_entrevistas: "Não foi possível carregar suas entrevistas.",
+    sem_entrevistas: "Nenhuma entrevista em andamento",
+    sem_entrevistas_msg:
+      "Quando você aceitar um convite, o andamento do processo aparecerá aqui.",
   },
 };
 

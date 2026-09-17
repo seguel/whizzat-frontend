@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import Select from "react-select";
 import { CheckCircle2, Search, Send, Trash2, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -92,7 +92,6 @@ export default function BuscarCandidatosPage() {
    */
 
   const [faixa, setFaixa] = useState<FaixaMatch>("ALTA");
-
   const [limite, setLimite] = useState(15);
 
   /*
@@ -102,9 +101,7 @@ export default function BuscarCandidatosPage() {
    */
 
   const [pesquisou, setPesquisou] = useState(false);
-
   const [buscando, setBuscando] = useState(false);
-
   const [resultados, setResultados] = useState<MatchCandidato[]>([]);
 
   /*
@@ -125,7 +122,6 @@ export default function BuscarCandidatosPage() {
     useState<MatchCandidato | null>(null);
 
   const [motivoIgnorar, setMotivoIgnorar] = useState("");
-
   const [ignorando, setIgnorando] = useState(false);
 
   /*
@@ -140,6 +136,7 @@ export default function BuscarCandidatosPage() {
 
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [conviteAberto, setConviteAberto] = useState(false);
+  const resultadosRef = useRef<HTMLDivElement | null>(null);
 
   /*
    * =======================================================
@@ -179,6 +176,21 @@ export default function BuscarCandidatosPage() {
     carregarDados();
   }, [t]);
 
+  useEffect(() => {
+    if (!pesquisou) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      resultadosRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+
+    return () => window.clearTimeout(timer);
+  }, [pesquisou]);
+
   /*
    * =======================================================
    * Separação Hard / Soft
@@ -186,9 +198,7 @@ export default function BuscarCandidatosPage() {
    */
 
   const hardSkills = skills.filter((skill) => skill.tipo_skill_id === 1);
-
   const softSkills = skills.filter((skill) => skill.tipo_skill_id === 2);
-
   const hardSkillsSelecionadas = skillsSelecionadas.filter(
     (skill) => skill.tipo_skill_id === 1,
   );
@@ -355,7 +365,11 @@ export default function BuscarCandidatosPage() {
    */
 
   const idsSelecionaveis = useMemo(
-    () => resultados.slice(0, LIMITE_CONVITES).map((item) => item.candidato_id),
+    () =>
+      resultados
+        .filter((item) => !item.ja_convidado)
+        .slice(0, LIMITE_CONVITES)
+        .map((item) => item.candidato_id),
     [resultados],
   );
 
@@ -364,6 +378,14 @@ export default function BuscarCandidatosPage() {
     idsSelecionaveis.every((id) => selecionados.includes(id));
 
   const toggleSelecionado = (candidatoId: number) => {
+    const candidato = resultados.find(
+      (item) => item.candidato_id === candidatoId,
+    );
+
+    if (!candidato || candidato.ja_convidado) {
+      return;
+    }
+
     const jaSelecionado = selecionados.includes(candidatoId);
 
     if (jaSelecionado) {
@@ -441,16 +463,12 @@ export default function BuscarCandidatosPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/ignorar`,
         {
           method: "POST",
-
           credentials: "include",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify({
             candidato_id: candidatoIgnorar.candidato_id,
-
             motivo: motivoIgnorar || undefined,
           }),
         },
@@ -496,14 +514,6 @@ export default function BuscarCandidatosPage() {
     }
   };
 
-  /*
-   * =======================================================
-   * Convite
-   *
-   * Mock por enquanto.
-   * =======================================================
-   */
-
   const handleConvidarSelecionados = () => {
     if (selecionados.length === 0) {
       return;
@@ -512,23 +522,79 @@ export default function BuscarCandidatosPage() {
     setConviteAberto(true);
   };
 
-  const handleEnviarConvite = (payload: ConviteCandidatosPayload) => {
-    /*
-     * Mock por enquanto.
-     *
-     * Este será exatamente o objeto que depois
-     * enviaremos para o backend.
-     */
+  const [enviandoConvite, setEnviandoConvite] = useState(false);
 
-    console.log("CONVITE:", payload);
+  const handleEnviarConvite = async (payload: ConviteCandidatosPayload) => {
+    if (enviandoConvite) {
+      return;
+    }
 
-    toast.success(
-      payload.candidato_ids.length === 1
-        ? "Convite preparado para 1 candidato."
-        : `Convite preparado para ${payload.candidato_ids.length} candidatos.`,
-    );
+    setEnviandoConvite(true);
 
-    setConviteAberto(false);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/convites`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      if (!response.ok) {
+        const erro = await response.json().catch(() => null);
+
+        throw new Error(
+          erro?.message || "Não foi possível enviar os convites.",
+        );
+      }
+
+      const data = await response.json();
+
+      toast.success(
+        data.quantidade === 1
+          ? "Convite enviado com sucesso."
+          : `${data.quantidade} convites enviados com sucesso.`,
+      );
+
+      const idsConvidados = new Set<number>(
+        (data.convites ?? []).map(
+          (convite: { candidato_id: number }) => convite.candidato_id,
+        ),
+      );
+
+      setResultados((prev) =>
+        prev.map((candidato) =>
+          idsConvidados.has(candidato.candidato_id)
+            ? {
+                ...candidato,
+                ja_convidado: true,
+              }
+            : candidato,
+        ),
+      );
+
+      /*
+       * Limpa os candidatos selecionados
+       * somente depois do sucesso.
+       */
+
+      setSelecionados([]);
+      setConviteAberto(false);
+    } catch (error) {
+      console.error("Erro ao enviar convites:", error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível enviar os convites.",
+      );
+    } finally {
+      setEnviandoConvite(false);
+    }
   };
 
   /*
@@ -726,7 +792,10 @@ export default function BuscarCandidatosPage() {
                    ===================================================== */}
 
                 {pesquisou && (
-                  <section className="mt-7 border-t border-gray-200 pt-6">
+                  <section
+                    ref={resultadosRef}
+                    className="mt-7 scroll-mt-6 border-t border-gray-200 pt-6"
+                  >
                     {/* Cabeçalho resultado */}
 
                     <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -775,7 +844,7 @@ export default function BuscarCandidatosPage() {
 
                     {/* Selecionar todos */}
 
-                    {resultados.length > 0 && (
+                    {idsSelecionaveis.length > 0 && (
                       <div className="mb-3 flex items-center gap-2 px-1">
                         <input
                           type="checkbox"
@@ -817,6 +886,7 @@ export default function BuscarCandidatosPage() {
                           onVerPerfil={() =>
                             abrirPerfil(candidato.candidato_id)
                           }
+                          jaConvidado={candidato.ja_convidado}
                         />
                       ))}
                     </div>
@@ -877,7 +947,12 @@ export default function BuscarCandidatosPage() {
       <InviteCandidatesModal
         aberto={conviteAberto}
         candidatoIds={selecionados}
-        onFechar={() => setConviteAberto(false)}
+        enviando={enviandoConvite}
+        onFechar={() => {
+          if (!enviandoConvite) {
+            setConviteAberto(false);
+          }
+        }}
         onEnviar={handleEnviarConvite}
       />
     </>

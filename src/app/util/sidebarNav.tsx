@@ -13,6 +13,7 @@ import {
   LogOut,
   ClipboardCheck,
   Search,
+  BriefcaseBusiness,
 } from "lucide-react";
 
 export type ProfileType = "candidato" | "recrutador" | "avaliador";
@@ -55,12 +56,12 @@ export function useNavItems(
           route: `/dashboard?perfil=${profile}`,
           activeRoutes: ["/dashboard"],
         },
-        // {
-        //   icon: <Star size={20} />,
-        //   label: t("sidebar.menu_minhas_vagas"),
-        //   route: "/vagas",
-        //   activeRoutes: ["/dashboard/vagas"],
-        // },
+        {
+          icon: <BriefcaseBusiness size={20} />,
+          label: t("sidebar.minhas_oportunidades"),
+          route: `/dashboard/candidato/oportunidades?perfil=${profile}`,
+          activeRoutes: ["/dashboard/candidato/oportunidades"],
+        },
         // {
         //   icon: <Search size={20} />,
         //   label: t("sidebar.menu_buscar_vagas"),
