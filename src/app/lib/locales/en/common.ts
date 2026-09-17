@@ -191,6 +191,7 @@ const en = {
     menu_questionario: "Questionnaires",
     menu_candidatos_ignorados: "Ignored candidates",
     menu_buscar_candidatos: "Search candidates",
+    minhas_oportunidades: "My opportunities",
   },
   tela_topo_passos: {
     passo_dados: "Information",
@@ -769,6 +770,25 @@ const en = {
     ignorar_sucesso: "Candidate removed from future searches.",
     erro_ignorar: "Unable to remove this candidate from future searches.",
     menu_candidatos_ignorados: "Ignored candidates",
+    enviando_convites: "Sending invitations...",
+    convites_enviados_sucesso: "{{total}} invitation(s) sent successfully.",
+    erro_enviar_convite: "Unable to send the invitations.",
+    todos_ja_convidados:
+      "The selected candidates have already been invited to this position.",
+    convites_enviados_parcial:
+      "{{total}} invitation(s) sent. {{jaConvidados}} candidate(s) had already been invited.",
+    confirmar_convite_titulo: "Send invitation?",
+    confirmar_convite_descricao: "Confirm the invitation before continuing.",
+    confirmar_convite_um:
+      "You are about to invite 1 candidate to this position.",
+    confirmar_convite_varios:
+      "You are about to invite {{total}} candidates to this position.",
+    confirmar_convite_aviso:
+      "Once sent, candidates will be notified and will be able to accept or decline the invitation.",
+    confirmar_convite_cancelar: "Cancel",
+    confirmar_convite_enviar: "Send invitation",
+    confirmar_convite_fechar: "Close",
+    ja_convidado: "Already invited",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
@@ -1164,6 +1184,57 @@ const en = {
     convite_mock_sucesso_varios:
       "Invitation prepared for {{total}} candidates.",
     convite_btn_fechar: "Close",
+  },
+  oportunidades_candidato: {
+    titulo: "My opportunities",
+    descricao: "Track your invitations, interviews, and completed processes.",
+    convites: "Invitations",
+    entrevistas: "Interviews",
+    finalizados: "Completed",
+
+    recebido_em: "Received on",
+    finalizado_em: "Completed on",
+
+    btn_aceitar: "Accept invitation",
+    btn_recusar: "Decline",
+    btn_aceitar_horario: "Accept time",
+    btn_recusar_horario: "Decline time",
+
+    aguardando_resposta_agenda: "Awaiting your confirmation",
+
+    aprovado: "Approved",
+    nao_aprovado: "Not approved",
+    parecer: "Recruiter feedback",
+
+    tipo_vaga: "Job",
+    tipo_oportunidade: "Opportunity",
+    tipo_evento: "Talk / Event",
+    tipo_mentoria: "Mentorship",
+    tipo_projeto: "Project / Consulting",
+    tipo_networking: "Networking",
+    tipo_outro: "Other",
+    carregando_convites: "Loading your invitations...",
+    erro_convites: "We couldn't load your invitations.",
+    sem_convites: "No pending invitations",
+    sem_convites_msg: "When you receive a new invitation, it will appear here.",
+    horario_recusado: "Time declined",
+    aguardando_nova_agenda:
+      "Waiting for a new time suggestion from the recruiter.",
+    aguardando_agenda: "Waiting for the recruiter to suggest a time.",
+    entrevista_confirmada: "Interview confirmed",
+    entrevista_realizada: "Interview completed",
+    aguardando_finalizacao:
+      "Interview completed. Waiting for the recruiter to finalize the process.",
+    carregando_finalizados: "Loading completed processes...",
+    erro_finalizados: "We couldn't load the completed processes.",
+    sem_finalizados: "No completed processes",
+    sem_finalizados_msg: "Your completed processes will appear here.",
+    processo_finalizado: "Process completed",
+    carregando_entrevistas: "Loading your interviews...",
+    erro_entrevistas: "We couldn't load your interviews.",
+    sem_entrevistas: "No interviews in progress",
+    sem_entrevistas_msg:
+      "When you accept an invitation, the process progress will appear here.",
   },
 };
 
