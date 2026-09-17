@@ -31,6 +31,7 @@ export interface ConviteCandidatosPayload {
 interface InviteCandidatesModalProps {
   aberto: boolean;
   candidatoIds: number[];
+  enviando: boolean;
   onFechar: () => void;
   onEnviar: (payload: ConviteCandidatosPayload) => void;
 }
@@ -82,6 +83,7 @@ const TIPOS: {
 export default function InviteCandidatesModal({
   aberto,
   candidatoIds,
+  enviando,
   onFechar,
   onEnviar,
 }: InviteCandidatesModalProps) {
@@ -108,7 +110,8 @@ export default function InviteCandidatesModal({
   const podeEnviar =
     candidatoIds.length > 0 &&
     titulo.trim().length > 0 &&
-    mensagem.trim().length > 0;
+    mensagem.trim().length > 0 &&
+    !enviando;
 
   const handleEnviar = () => {
     if (!podeEnviar) {
@@ -141,7 +144,12 @@ export default function InviteCandidatesModal({
 
           <button
             type="button"
-            onClick={onFechar}
+            onClick={() => {
+              if (!enviando) {
+                onFechar();
+              }
+            }}
+            disabled={enviando}
             className="shrink-0 cursor-pointer rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
             aria-label={t("buscar_candidatos.convite_btn_fechar")}
           >
@@ -284,8 +292,9 @@ export default function InviteCandidatesModal({
         <div className="flex flex-col-reverse gap-2 border-t border-gray-100 px-5 py-4 sm:flex-row sm:justify-end sm:px-6">
           <button
             type="button"
+            disabled={enviando}
             onClick={onFechar}
-            className="cursor-pointer rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+            className="cursor-pointer rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {t("buscar_candidatos.convite_btn_cancelar")}
           </button>
@@ -298,7 +307,9 @@ export default function InviteCandidatesModal({
           >
             <Send className="h-4 w-4" />
 
-            {t("buscar_candidatos.convite_btn_enviar")}
+            {enviando
+              ? "Enviando..."
+              : t("buscar_candidatos.convite_btn_enviar")}
           </button>
         </div>
       </div>
