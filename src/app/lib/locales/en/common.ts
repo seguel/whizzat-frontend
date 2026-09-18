@@ -192,6 +192,7 @@ const en = {
     menu_candidatos_ignorados: "Ignored candidates",
     menu_buscar_candidatos: "Search candidates",
     minhas_oportunidades: "My opportunities",
+    menu_processos: "Processes",
   },
   tela_topo_passos: {
     passo_dados: "Information",
@@ -789,6 +790,7 @@ const en = {
     confirmar_convite_enviar: "Send invitation",
     confirmar_convite_fechar: "Close",
     ja_convidado: "Already invited",
+    ja_convidado_anteriormente: "Previously invited by you",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
@@ -1184,6 +1186,13 @@ const en = {
     convite_mock_sucesso_varios:
       "Invitation prepared for {{total}} candidates.",
     convite_btn_fechar: "Close",
+    convite_conflito_titulo:
+      "{{quantidade}} candidate(s) already have an active invitation of this type",
+    convite_conflito_descricao:
+      "These candidates will not receive another invitation while their current process is still in progress.",
+    convite_ativo: "Active invitation",
+    convite_btn_enviar_quantidade: "Send to {{quantidade}} candidate(s)",
+    convite_enviando: "Sending...",
   },
   oportunidades_candidato: {
     titulo: "My opportunities",
@@ -1235,6 +1244,85 @@ const en = {
     sem_entrevistas: "No interviews in progress",
     sem_entrevistas_msg:
       "When you accept an invitation, the process progress will appear here.",
+  },
+  processos_recrutador: {
+    titulo: "Processes",
+    descricao: "Manage invitations, interviews, and candidate processes.",
+
+    em_andamento: "In progress",
+    finalizados: "Completed",
+    recusados: "Declined",
+
+    tipo_vaga: "Job",
+    tipo_oportunidade: "Opportunity",
+    tipo_evento: "Talk / Event",
+    tipo_mentoria: "Mentorship",
+    tipo_projeto: "Project / Consulting",
+    tipo_networking: "Networking",
+    tipo_outro: "Other",
+
+    convite_aceito: "Invitation accepted",
+    convite_recusado: "Invitation declined",
+
+    sugerir_entrevista_msg:
+      "The candidate accepted the invitation. Suggest an interview date and time.",
+    horario_recusado: "Time declined",
+    sugerir_novo_horario_msg:
+      "The candidate declined the suggested time. Send a new option.",
+
+    aguardando_confirmacao_candidato: "Awaiting candidate confirmation",
+    entrevista_confirmada: "Interview confirmed",
+    entrevista_realizada: "Interview completed",
+    finalizar_processo_msg:
+      "The interview has been completed. The process can now be finalized.",
+
+    btn_sugerir_entrevista: "Suggest interview",
+    btn_novo_horario: "Suggest new time",
+    btn_realizada: "Mark as completed",
+    btn_finalizar: "Finalize process",
+
+    aprovado: "Approved",
+    nao_aprovado: "Not approved",
+    parecer: "Feedback for the candidate",
+
+    finalizado_em: "Completed on",
+    recusado_em: "Declined on",
+    modal_agenda: {
+      titulo: "Suggest interview",
+      titulo_novo: "Suggest a new time",
+      descricao: "Choose a date and time for the interview with the candidate.",
+      data: "Interview date",
+      hora: "Time",
+      aviso:
+        "The candidate will receive the suggestion and can accept or decline the proposed time.",
+      horario_anterior_recusado: "Previous time declined by the candidate",
+      btn_cancelar: "Cancel",
+      btn_enviar: "Send suggestion",
+      btn_novo: "Send new time",
+      data_invalida: "Select a future date and time.",
+      btn_enviando: "Sending...",
+      erro: "Unable to send the interview suggestion.",
+    },
+    sucesso_marcar_realizada: "Interview marked as completed successfully.",
+    erro_marcar_realizada: "Unable to mark the interview as completed.",
+    btn_marcando_realizada: "Updating...",
+    modal_finalizacao: {
+      titulo: "Finalize process",
+      descricao:
+        "Enter the interview outcome and share feedback with the candidate.",
+      resultado: "Process outcome",
+      aprovado: "Approved",
+      nao_aprovado: "Not approved",
+      feedback: "Feedback for the candidate",
+      feedback_placeholder:
+        "Write feedback about the candidate's participation in the process...",
+      feedback_aviso: "This feedback will be visible to the candidate.",
+      btn_cancelar: "Cancel",
+      btn_finalizar: "Finalize process",
+      btn_finalizando: "Finalizing...",
+      sucesso: "Process finalized successfully.",
+      erro: "Unable to finalize the process.",
+    },
   },
 };
 
