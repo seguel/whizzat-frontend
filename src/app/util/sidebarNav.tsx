@@ -127,6 +127,12 @@ export function useNavItems(
           activeRoutes: ["/dashboard/candidatos-ignorados"],
         },
         {
+          icon: <BriefcaseBusiness size={20} />,
+          label: t("sidebar.menu_processos"),
+          route: `/dashboard/recrutador/processos?perfil=${profile}`,
+          activeRoutes: ["/dashboard/recrutador/processos"],
+        },
+        {
           icon: <Store size={20} />,
           label: t("sidebar.menu_empresas"),
           route: `/dashboard/empresa?perfil=${profile}`,
