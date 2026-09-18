@@ -28,9 +28,18 @@ export interface ConviteCandidatosPayload {
   candidato_ids: number[];
 }
 
+export interface CandidatoConviteManual {
+  candidato_id: number;
+  nome: string;
+  tipos_convite_ativos?: TipoConvite[];
+}
+
 interface InviteCandidatesModalProps {
   aberto: boolean;
   candidatoIds: number[];
+
+  candidatos: CandidatoConviteManual[];
+
   enviando: boolean;
   onFechar: () => void;
   onEnviar: (payload: ConviteCandidatosPayload) => void;
@@ -83,6 +92,7 @@ const TIPOS: {
 export default function InviteCandidatesModal({
   aberto,
   candidatoIds,
+  candidatos,
   enviando,
   onFechar,
   onEnviar,
@@ -107,8 +117,21 @@ export default function InviteCandidatesModal({
     return null;
   }
 
+  const candidatosSelecionados = candidatos.filter((candidato) =>
+    candidatoIds.includes(candidato.candidato_id),
+  );
+
+  const candidatosComConflito = candidatosSelecionados.filter((candidato) =>
+    candidato.tipos_convite_ativos?.includes(tipo),
+  );
+
+  const quantidadeConflitos = candidatosComConflito.length;
+
+  const quantidadeEnvios = candidatoIds.length - quantidadeConflitos;
+
   const podeEnviar =
     candidatoIds.length > 0 &&
+    quantidadeEnvios > 0 &&
     titulo.trim().length > 0 &&
     mensagem.trim().length > 0 &&
     !enviando;
@@ -234,6 +257,37 @@ export default function InviteCandidatesModal({
             </div>
           </div>
 
+          {quantidadeConflitos > 0 && (
+            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-xs font-semibold text-amber-800">
+                {t("buscar_candidatos.convite_conflito_titulo", {
+                  quantidade: quantidadeConflitos,
+                })}
+              </p>
+
+              <p className="mt-1 text-xs leading-relaxed text-amber-700">
+                {t("buscar_candidatos.convite_conflito_descricao")}
+              </p>
+
+              <div className="mt-2 space-y-1">
+                {candidatosComConflito.map((candidato) => (
+                  <div
+                    key={candidato.candidato_id}
+                    className="flex items-center justify-between gap-3 text-xs"
+                  >
+                    <span className="truncate text-amber-900">
+                      {candidato.nome}
+                    </span>
+
+                    <span className="shrink-0 font-medium text-amber-700">
+                      {t("buscar_candidatos.convite_ativo")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Título */}
 
           <div className="mt-5">
@@ -308,7 +362,7 @@ export default function InviteCandidatesModal({
             <Send className="h-4 w-4" />
 
             {enviando
-              ? "Enviando..."
+              ? t("buscar_candidatos.convite_enviando")
               : t("buscar_candidatos.convite_btn_enviar")}
           </button>
         </div>

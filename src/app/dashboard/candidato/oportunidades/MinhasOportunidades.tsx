@@ -139,39 +139,59 @@ export default function MinhasOportunidadesPage() {
     [convites, processos, finalizados],
   );
 
-  useEffect(() => {
-    async function carregarConvites() {
-      try {
-        setLoadingConvites(true);
-        setErroConvites(false);
+  async function carregarConvites() {
+    try {
+      setLoadingConvites(true);
+      setErroConvites(false);
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/candidato/convites`,
-          {
-            method: "GET",
-            credentials: "include",
-          },
-        );
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/candidato/convites`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
 
-        if (!response.ok) {
-          throw new Error("Erro ao carregar convites.");
-        }
-
-        const data = await response.json();
-
-        setConvites(data);
-      } catch (error) {
-        console.error("Erro ao carregar convites:", error);
-
-        setErroConvites(true);
-        setConvites([]);
-      } finally {
-        setLoadingConvites(false);
+      if (!response.ok) {
+        throw new Error("Erro ao carregar convites.");
       }
+
+      const data = await response.json();
+
+      setConvites(data);
+    } catch (error) {
+      console.error("Erro ao carregar convites:", error);
+
+      setErroConvites(true);
+      setConvites([]);
+    } finally {
+      setLoadingConvites(false);
+    }
+  }
+
+  useEffect(() => {
+    carregarConvites();
+    carregarProcessos();
+    carregarFinalizados();
+  }, []);
+
+  async function trocarAba(novaAba: Aba) {
+    setAba(novaAba);
+
+    if (novaAba === "convites") {
+      await carregarConvites();
+      return;
     }
 
-    carregarConvites();
-  }, []);
+    if (novaAba === "entrevistas") {
+      await carregarProcessos();
+      return;
+    }
+
+    if (novaAba === "finalizados") {
+      await carregarFinalizados();
+    }
+  }
 
   async function responderConvite(
     conviteId: number,
@@ -208,74 +228,65 @@ export default function MinhasOportunidadesPage() {
     }
   }
 
-  useEffect(() => {
-    async function carregarProcessos() {
-      try {
-        setLoadingProcessos(true);
-        setErroProcessos(false);
+  async function carregarProcessos() {
+    try {
+      setLoadingProcessos(true);
+      setErroProcessos(false);
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/candidato/processos`,
-          {
-            method: "GET",
-            credentials: "include",
-          },
-        );
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/candidato/processos`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
 
-        if (!response.ok) {
-          throw new Error("Erro ao carregar processos.");
-        }
-
-        const data = await response.json();
-
-        setProcessos(data);
-      } catch (error) {
-        console.error("Erro ao carregar processos:", error);
-
-        setErroProcessos(true);
-        setProcessos([]);
-      } finally {
-        setLoadingProcessos(false);
+      if (!response.ok) {
+        throw new Error("Erro ao carregar processos.");
       }
+
+      const data = await response.json();
+
+      setProcessos(data);
+    } catch (error) {
+      console.error("Erro ao carregar processos:", error);
+
+      setErroProcessos(true);
+      setProcessos([]);
+    } finally {
+      setLoadingProcessos(false);
     }
+  }
 
-    carregarProcessos();
-  }, []);
+  async function carregarFinalizados() {
+    try {
+      setLoadingFinalizados(true);
+      setErroFinalizados(false);
 
-  useEffect(() => {
-    async function carregarFinalizados() {
-      try {
-        setLoadingFinalizados(true);
-        setErroFinalizados(false);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/candidato/finalizados`,
+        {
+          method: "GET",
+          credentials: "include",
+        },
+      );
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/candidato/finalizados`,
-          {
-            method: "GET",
-            credentials: "include",
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Erro ao carregar processos finalizados.");
-        }
-
-        const data = await response.json();
-
-        setFinalizados(data);
-      } catch (error) {
-        console.error("Erro ao carregar processos finalizados:", error);
-
-        setErroFinalizados(true);
-        setFinalizados([]);
-      } finally {
-        setLoadingFinalizados(false);
+      if (!response.ok) {
+        throw new Error("Erro ao carregar processos finalizados.");
       }
+
+      const data = await response.json();
+
+      setFinalizados(data);
+    } catch (error) {
+      console.error("Erro ao carregar processos finalizados:", error);
+
+      setErroFinalizados(true);
+      setFinalizados([]);
+    } finally {
+      setLoadingFinalizados(false);
     }
-
-    carregarFinalizados();
-  }, []);
-
+  }
   //   const formatarData = (data?: string | null) => {
   //     if (!data) return "-";
 
@@ -358,7 +369,7 @@ export default function MinhasOportunidadesPage() {
         <div className="flex gap-1 overflow-x-auto">
           <TabButton
             ativo={aba === "convites"}
-            onClick={() => setAba("convites")}
+            onClick={() => trocarAba("convites")}
             icon={<BriefcaseBusiness className="h-4 w-4" />}
             label={t("oportunidades_candidato.convites")}
             quantidade={quantidade.convites}
@@ -367,7 +378,7 @@ export default function MinhasOportunidadesPage() {
 
           <TabButton
             ativo={aba === "entrevistas"}
-            onClick={() => setAba("entrevistas")}
+            onClick={() => trocarAba("entrevistas")}
             icon={<CalendarDays className="h-4 w-4" />}
             label={t("oportunidades_candidato.entrevistas")}
             quantidade={quantidade.entrevistas}
@@ -376,7 +387,7 @@ export default function MinhasOportunidadesPage() {
 
           <TabButton
             ativo={aba === "finalizados"}
-            onClick={() => setAba("finalizados")}
+            onClick={() => trocarAba("finalizados")}
             icon={<CheckCircle2 className="h-4 w-4" />}
             label={t("oportunidades_candidato.finalizados")}
             quantidade={quantidade.finalizados}
@@ -744,7 +755,7 @@ function TabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition ${
+      className={`flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition cursor-pointer ${
         ativo
           ? "border-purple-600 text-purple-700"
           : "border-transparent text-gray-500 hover:text-gray-700"
