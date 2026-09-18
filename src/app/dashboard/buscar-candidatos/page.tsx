@@ -18,6 +18,7 @@ import CandidateMatchCard, {
 import IgnoreCandidateModal from "@/app/components/candidate-match/IgnoreCandidateModal";
 import InviteCandidatesModal, {
   ConviteCandidatosPayload,
+  TipoConvite,
 } from "@/app/components/candidate-match/InviteCandidatesModal";
 
 /*
@@ -27,6 +28,10 @@ import InviteCandidatesModal, {
  */
 
 type FaixaMatch = "ALTA" | "BOA" | "COMPATIVEL" | "TODOS";
+
+type MatchCandidatoManual = MatchCandidato & {
+  tipos_convite_ativos?: TipoConvite[];
+};
 
 interface Skill {
   skill_id: number;
@@ -102,7 +107,7 @@ export default function BuscarCandidatosPage() {
 
   const [pesquisou, setPesquisou] = useState(false);
   const [buscando, setBuscando] = useState(false);
-  const [resultados, setResultados] = useState<MatchCandidato[]>([]);
+  const [resultados, setResultados] = useState<MatchCandidatoManual[]>([]);
 
   /*
    * -------------------------------------------------------
@@ -382,7 +387,7 @@ export default function BuscarCandidatosPage() {
       (item) => item.candidato_id === candidatoId,
     );
 
-    if (!candidato || candidato.ja_convidado) {
+    if (!candidato) {
       return;
     }
 
@@ -875,10 +880,7 @@ export default function BuscarCandidatosPage() {
                           selecionado={selecionados.includes(
                             candidato.candidato_id,
                           )}
-                          disabled={
-                            !selecionados.includes(candidato.candidato_id) &&
-                            selecionados.length >= LIMITE_CONVITES
-                          }
+                          disabled={selecionados.length >= LIMITE_CONVITES}
                           onSelecionar={() =>
                             toggleSelecionado(candidato.candidato_id)
                           }
@@ -887,6 +889,7 @@ export default function BuscarCandidatosPage() {
                             abrirPerfil(candidato.candidato_id)
                           }
                           jaConvidado={candidato.ja_convidado}
+                          bloquearJaConvidado={false}
                         />
                       ))}
                     </div>
@@ -954,6 +957,11 @@ export default function BuscarCandidatosPage() {
           }
         }}
         onEnviar={handleEnviarConvite}
+        candidatos={resultados.map((candidato) => ({
+          candidato_id: candidato.candidato_id,
+          nome: candidato.nome,
+          tipos_convite_ativos: candidato.tipos_convite_ativos ?? [],
+        }))}
       />
     </>
   );

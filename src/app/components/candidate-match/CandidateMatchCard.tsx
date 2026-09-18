@@ -31,6 +31,9 @@ interface CandidateMatchCardProps {
   selecionado: boolean;
   disabled: boolean;
   jaConvidado?: boolean;
+
+  bloquearJaConvidado?: boolean;
+
   onSelecionar: () => void;
   onIgnorar: () => void;
   onVerPerfil: () => void;
@@ -41,6 +44,7 @@ export default function CandidateMatchCard({
   selecionado,
   disabled,
   jaConvidado = false,
+  bloquearJaConvidado = true,
   onSelecionar,
   onIgnorar,
   onVerPerfil,
@@ -60,7 +64,7 @@ export default function CandidateMatchCard({
       <div className="flex flex-col lg:flex-row lg:items-center gap-4">
         {/* Candidato */}
         <div className="flex items-start sm:items-center gap-3 min-w-0 lg:w-[30%]">
-          {jaConvidado ? (
+          {jaConvidado && bloquearJaConvidado ? (
             <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
               {t("vaga_match.ja_convidado")}
             </span>
@@ -68,7 +72,7 @@ export default function CandidateMatchCard({
             <input
               type="checkbox"
               checked={selecionado}
-              disabled={disabled}
+              disabled={disabled && !selecionado}
               onChange={onSelecionar}
             />
           )}
@@ -81,6 +85,11 @@ export default function CandidateMatchCard({
             <p className="font-semibold text-sm text-gray-800 truncate">
               {candidato.nome}
             </p>
+            {jaConvidado && !bloquearJaConvidado && (
+              <p className="mt-0.5 text-[11px] font-medium text-gray-400">
+                {t("vaga_match.ja_convidado_anteriormente")}
+              </p>
+            )}
 
             {candidato.publico_prioritario && (
               <span className="mt-1 inline-flex w-fit items-center rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-700">

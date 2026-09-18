@@ -194,6 +194,7 @@ const pt = {
     menu_candidatos_ignorados: "Candidatos ignorados",
     menu_buscar_candidatos: "Buscar candidatos",
     minhas_oportunidades: "Minhas oportunidades",
+    menu_processos: "Processos",
   },
   tela_topo_passos: {
     passo_dados: "Dados",
@@ -774,6 +775,7 @@ const pt = {
     confirmar_convite_enviar: "Enviar convite",
     confirmar_convite_fechar: "Fechar",
     ja_convidado: "Já convidado",
+    ja_convidado_anteriormente: "Já recebeu convite seu",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
@@ -1165,6 +1167,13 @@ const pt = {
     convite_mock_sucesso_um: "Convite preparado para 1 candidato.",
     convite_mock_sucesso_varios: "Convite preparado para {{total}} candidatos.",
     convite_btn_fechar: "Fechar",
+    convite_conflito_titulo:
+      "{{quantidade}} candidato(s) já possui(em) um convite ativo deste tipo",
+    convite_conflito_descricao:
+      "Esses candidatos não receberão um novo convite enquanto o processo atual estiver em andamento.",
+    convite_ativo: "Convite ativo",
+    convite_btn_enviar_quantidade: "Enviar para {{quantidade}} candidato(s)",
+    convite_enviando: "Enviando...",
   },
   oportunidades_candidato: {
     titulo: "Minhas oportunidades",
@@ -1212,6 +1221,88 @@ const pt = {
     sem_entrevistas: "Nenhuma entrevista em andamento",
     sem_entrevistas_msg:
       "Quando você aceitar um convite, o andamento do processo aparecerá aqui.",
+  },
+  processos_recrutador: {
+    titulo: "Processos",
+    descricao:
+      "Gerencie convites, entrevistas e processos dos seus candidatos.",
+
+    em_andamento: "Em andamento",
+    finalizados: "Finalizados",
+    recusados: "Recusados",
+
+    tipo_vaga: "Vaga",
+    tipo_oportunidade: "Oportunidade",
+    tipo_evento: "Palestra / Evento",
+    tipo_mentoria: "Mentoria",
+    tipo_projeto: "Projeto / Consultoria",
+    tipo_networking: "Networking",
+    tipo_outro: "Outro",
+
+    convite_aceito: "Convite aceito",
+    convite_recusado: "Convite recusado",
+
+    sugerir_entrevista_msg:
+      "O candidato aceitou o convite. Sugira uma data e horário para a entrevista.",
+    horario_recusado: "Horário recusado",
+    sugerir_novo_horario_msg:
+      "O candidato recusou o horário sugerido. Envie uma nova opção.",
+
+    aguardando_confirmacao_candidato: "Aguardando confirmação do candidato",
+    entrevista_confirmada: "Entrevista confirmada",
+    entrevista_realizada: "Entrevista realizada",
+    finalizar_processo_msg:
+      "A entrevista foi realizada. O processo já pode ser finalizado.",
+
+    btn_sugerir_entrevista: "Sugerir entrevista",
+    btn_novo_horario: "Sugerir novo horário",
+    btn_realizada: "Marcar como realizada",
+    btn_finalizar: "Finalizar processo",
+
+    aprovado: "Aprovado",
+    nao_aprovado: "Não aprovado",
+    parecer: "Feedback para o candidato",
+
+    finalizado_em: "Finalizado em",
+    recusado_em: "Recusado em",
+    modal_agenda: {
+      titulo: "Sugerir entrevista",
+      titulo_novo: "Sugerir novo horário",
+      descricao:
+        "Escolha uma data e horário para a entrevista com o candidato.",
+      data: "Data da entrevista",
+      hora: "Horário",
+      aviso:
+        "O candidato receberá a sugestão e poderá aceitar ou recusar o horário.",
+      horario_anterior_recusado: "Horário anterior recusado pelo candidato",
+      btn_cancelar: "Cancelar",
+      btn_enviar: "Enviar sugestão",
+      btn_novo: "Enviar novo horário",
+      data_invalida: "Selecione uma data e horário futuros.",
+      btn_enviando: "Enviando...",
+      erro: "Não foi possível enviar a sugestão de entrevista.",
+    },
+    sucesso_marcar_realizada: "Entrevista marcada como realizada com sucesso.",
+    erro_marcar_realizada:
+      "Não foi possível marcar a entrevista como realizada.",
+    btn_marcando_realizada: "Marcando...",
+    modal_finalizacao: {
+      titulo: "Finalizar processo",
+      descricao:
+        "Informe o resultado da entrevista e compartilhe um feedback com o candidato.",
+      resultado: "Resultado do processo",
+      aprovado: "Aprovado",
+      nao_aprovado: "Não aprovado",
+      feedback: "Feedback para o candidato",
+      feedback_placeholder:
+        "Escreva um feedback sobre a participação do candidato no processo...",
+      feedback_aviso: "Este feedback será exibido ao candidato.",
+      btn_cancelar: "Cancelar",
+      btn_finalizar: "Finalizar processo",
+      btn_finalizando: "Finalizando...",
+      sucesso: "Processo finalizado com sucesso.",
+      erro: "Não foi possível finalizar o processo.",
+    },
   },
 };
 
