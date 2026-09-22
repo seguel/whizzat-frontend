@@ -3,6 +3,7 @@ import DashboardProcessos from "./DashboardProcessos";
 interface PageProps {
   searchParams: Promise<{
     perfil?: string;
+    processo?: string;
   }>;
 }
 
@@ -11,5 +12,5 @@ export default async function Page({ searchParams }: PageProps) {
 
   const perfil = params.perfil === "recrutador" ? params.perfil : "recrutador";
 
-  return <DashboardProcessos perfil={perfil} />;
+  return <DashboardProcessos perfil={perfil} processoId={params.processo} />;
 }

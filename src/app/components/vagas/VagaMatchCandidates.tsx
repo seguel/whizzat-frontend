@@ -258,6 +258,14 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
             empresa_id: Number(empresaId),
             vaga_id: Number(vagaId),
             candidato_ids: selecionados,
+            compatibilidades: resultados
+              .filter((candidato) =>
+                selecionados.includes(candidato.candidato_id),
+              )
+              .map((candidato) => ({
+                candidato_id: candidato.candidato_id,
+                score: candidato.score,
+              })),
           }),
         },
       );

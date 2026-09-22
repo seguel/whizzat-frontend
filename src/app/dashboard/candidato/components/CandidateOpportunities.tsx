@@ -1,238 +1,233 @@
 "use client";
 
-type OpportunityStatus =
-  | "convite"
-  | "questionario"
-  | "entrevista"
-  | "avaliacao"
-  | "finalizado";
+import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
+import { DashboardOportunidade } from "../../../lib/types/candidato-dashboard";
 
-type Opportunity = {
-  id: number;
-  vaga: string;
-  empresa: string;
-  etapa: string;
-  status: OpportunityStatus;
-  atualizadoEm: string;
-  match?: number;
-};
+interface Props {
+  oportunidades: DashboardOportunidade[];
+}
 
-const opportunities: Opportunity[] = [
-  {
-    id: 1,
-    vaga: "Frontend Developer",
-    empresa: "Empresa Exemplo",
-    etapa: "Entrevista",
-    status: "entrevista",
-    atualizadoEm: "14 Ago",
-    match: 92,
-  },
-  {
-    id: 2,
-    vaga: "Full Stack Developer",
-    empresa: "Tech Solutions",
-    etapa: "Avaliação",
-    status: "avaliacao",
-    atualizadoEm: "13 Ago",
-    match: 84,
-  },
-];
+export default function CandidateOpportunities({ oportunidades }: Props) {
+  const { t } = useTranslation("common");
+  const router = useRouter();
 
-const statusConfig: Record<
-  OpportunityStatus,
-  {
-    label: string;
-    className: string;
-  }
-> = {
-  convite: {
-    label: "Convite recebido",
-    className: "bg-purple-50 text-purple-700",
-  },
+  const handleVerOportunidade = (oportunidade: DashboardOportunidade) => {
+    router.push(
+      `/dashboard/candidato/oportunidades?perfil=candidato&tab=entrevistas&processo=${oportunidade.id}`,
+    );
+  };
 
-  questionario: {
-    label: "Questionário",
-    className: "bg-yellow-50 text-yellow-700",
-  },
-
-  entrevista: {
-    label: "Entrevista",
-    className: "bg-green-50 text-green-700",
-  },
-
-  avaliacao: {
-    label: "Em avaliação",
-    className: "bg-blue-50 text-blue-700",
-  },
-
-  finalizado: {
-    label: "Finalizado",
-    className: "bg-gray-100 text-gray-600",
-  },
-};
-
-export default function CandidateOpportunities() {
   return (
     <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3 mb-5">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">
-            Minhas oportunidades
+            {t("dash_candidato.oportunidades_titulo")}
           </h2>
 
           <p className="text-sm text-gray-500 mt-1">
-            Acompanhe os processos seletivos em que você foi convidado.
+            {t("dash_candidato.oportunidades_descricao")}
           </p>
         </div>
 
-        <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-xl">
+        <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-xl shrink-0">
           💼
         </div>
       </div>
 
-      <div className="space-y-4">
-        {opportunities.map((opportunity) => {
-          const status = statusConfig[opportunity.status];
+      {oportunidades.length > 0 ? (
+        <div className="space-y-3">
+          {oportunidades.map((oportunidade) => (
+            <OpportunityCard
+              key={oportunidade.id}
+              oportunidade={oportunidade}
+              onVer={() => handleVerOportunidade(oportunidade)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="py-8 text-center">
+          <p className="text-sm text-gray-500">
+            {t("dash_candidato.sem_oportunidades")}
+          </p>
+        </div>
+      )}
 
-          return (
-            <div
-              key={opportunity.id}
-              className="rounded-2xl border border-gray-100 p-4 sm:p-5 hover:border-gray-200 transition-all"
-            >
-              <div className="flex flex-col xl:flex-row xl:items-center gap-5">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-semibold text-gray-900">
-                      {opportunity.vaga}
-                    </h3>
-
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${status.className}`}
-                    >
-                      {status.label}
-                    </span>
-                  </div>
-
-                  <p className="text-sm text-gray-500 mt-1">
-                    {opportunity.empresa}
-                  </p>
-
-                  <div className="mt-4">
-                    <ProcessProgress currentStatus={opportunity.status} />
-                  </div>
-                </div>
-
-                <div className="flex flex-row xl:flex-col items-center xl:items-end justify-between xl:justify-center gap-3 xl:min-w-[130px]">
-                  {opportunity.match != null && (
-                    <div className="text-left xl:text-right">
-                      <p className="text-xs text-gray-400">Compatibilidade</p>
-
-                      <p className="text-xl font-bold text-green-600 mt-0.5">
-                        {opportunity.match}%
-                      </p>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    className="text-sm font-medium text-green-600 hover:text-green-700 whitespace-nowrap"
-                  >
-                    Ver processo →
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-400">
-                  Última atualização: {opportunity.atualizadoEm}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {oportunidades.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-100 text-right">
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/dashboard/candidato/oportunidades?perfil=candidato")
+            }
+            className="text-sm font-medium text-green-600 hover:text-green-700 cursor-pointer"
+          >
+            {t("dash_candidato.ver_todas_oportunidades")} →
+          </button>
+        </div>
+      )}
     </section>
   );
 }
 
-function ProcessProgress({
-  currentStatus,
+function OpportunityCard({
+  oportunidade,
+  onVer,
 }: {
-  currentStatus: OpportunityStatus;
+  oportunidade: DashboardOportunidade;
+  onVer: () => void;
 }) {
-  const steps: {
-    key: OpportunityStatus;
-    label: string;
-  }[] = [
-    {
-      key: "convite",
-      label: "Convite",
-    },
-    {
-      key: "questionario",
-      label: "Questionário",
-    },
-    {
-      key: "entrevista",
-      label: "Entrevista",
-    },
-    {
-      key: "avaliacao",
-      label: "Avaliação",
-    },
-    {
-      key: "finalizado",
-      label: "Resultado",
-    },
-  ];
+  const { t, i18n } = useTranslation("common");
 
-  const currentIndex = steps.findIndex((step) => step.key === currentStatus);
+  const tipoLabel = getTipoLabel(oportunidade.tipo, t);
+  const statusConfig = getStatusConfig(oportunidade.status, t);
+
+  const dataAtualizacao =
+    oportunidade.agenda?.data_hora ??
+    oportunidade.data_aceite ??
+    oportunidade.data_convite;
+
+  const dataFormatada = new Intl.DateTimeFormat(
+    i18n.language?.startsWith("en") ? "en-US" : "pt-BR",
+    {
+      day: "2-digit",
+      month: "short",
+    },
+  )
+    .format(new Date(dataAtualizacao))
+    .replace(".", "");
+
+  const isVaga = oportunidade.tipo === "VAGA";
 
   return (
-    <div className="overflow-x-auto pb-1">
-      <div className="flex items-center min-w-[520px]">
-        {steps.map((step, index) => {
-          const completed = index < currentIndex;
-          const current = index === currentIndex;
+    <div className="rounded-2xl border border-gray-100 p-4 sm:p-5 hover:border-gray-200 transition-all">
+      <div className="flex flex-col xl:flex-row xl:items-center gap-5">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="font-semibold text-gray-900">
+              {oportunidade.titulo}
+            </h3>
 
-          return (
-            <div
-              key={step.key}
-              className="flex items-center flex-1 last:flex-none"
+            <span
+              className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${statusConfig.className}`}
             >
-              <div className="flex flex-col items-center">
-                <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold ${
-                    completed
-                      ? "bg-green-500 text-white"
-                      : current
-                        ? "bg-green-100 text-green-700 ring-4 ring-green-50"
-                        : "bg-gray-100 text-gray-400"
-                  }`}
-                >
-                  {completed ? "✓" : index + 1}
-                </div>
+              {statusConfig.label}
+            </span>
+          </div>
 
-                <span
-                  className={`text-[11px] mt-2 whitespace-nowrap ${
-                    current ? "font-semibold text-green-700" : "text-gray-400"
-                  }`}
-                >
-                  {step.label}
-                </span>
-              </div>
+          {oportunidade.empresa && (
+            <p className="text-sm text-gray-500 mt-1">
+              {oportunidade.empresa.nome_empresa}
+            </p>
+          )}
 
-              {index < steps.length - 1 && (
-                <div
-                  className={`h-[2px] flex-1 mx-2 mb-5 ${
-                    index < currentIndex ? "bg-green-400" : "bg-gray-100"
-                  }`}
-                />
-              )}
+          <div className="flex flex-wrap items-center gap-2 mt-3">
+            <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-600">
+              {tipoLabel}
+            </span>
+
+            {oportunidade.agenda?.status === "ACEITO" && (
+              <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
+                📅 {t("dash_candidato.oportunidade_agendada")}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-row xl:flex-col items-center xl:items-end justify-between xl:justify-center gap-3 xl:min-w-[150px]">
+          {isVaga && oportunidade.compatibilidade != null && (
+            <div className="text-left xl:text-right">
+              <p className="text-xs text-gray-400">
+                {t("dash_candidato.compatibilidade")}
+              </p>
+
+              <p className="text-xl font-bold text-green-600 mt-0.5">
+                {oportunidade.compatibilidade}%
+              </p>
             </div>
-          );
-        })}
+          )}
+
+          <button
+            type="button"
+            onClick={onVer}
+            className="text-sm font-medium text-green-600 hover:text-green-700 whitespace-nowrap cursor-pointer"
+          >
+            {isVaga
+              ? t("dash_candidato.ver_processo")
+              : t("dash_candidato.ver_oportunidade")}{" "}
+            →
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-4 pt-3 border-t border-gray-100">
+        <p className="text-xs text-gray-400">
+          {t("dash_candidato.ultima_atualizacao")}: {dataFormatada}
+        </p>
       </div>
     </div>
   );
+}
+
+function getTipoLabel(
+  tipo: DashboardOportunidade["tipo"],
+  t: (key: string) => string,
+) {
+  switch (tipo) {
+    case "VAGA":
+      return t("dash_candidato.tipo_vaga");
+
+    case "PALESTRA_EVENTO":
+      return t("dash_candidato.tipo_palestra_evento");
+
+    case "MENTORIA":
+      return t("dash_candidato.tipo_mentoria");
+
+    case "PROJETO_CONSULTORIA":
+      return t("dash_candidato.tipo_projeto_consultoria");
+
+    case "NETWORKING":
+      return t("dash_candidato.tipo_networking");
+
+    default:
+      return t("dash_candidato.tipo_outro");
+  }
+}
+
+function getStatusConfig(
+  status: DashboardOportunidade["status"],
+  t: (key: string) => string,
+) {
+  switch (status) {
+    case "CONVITE_ACEITO":
+      return {
+        label: t("dash_candidato.status_convite_aceito"),
+        className: "bg-purple-50 text-purple-700",
+      };
+
+    case "AGENDA_ENVIADA":
+      return {
+        label: t("dash_candidato.status_agenda_enviada"),
+        className: "bg-yellow-50 text-yellow-700",
+      };
+
+    case "AGENDADO":
+      return {
+        label: t("dash_candidato.status_agendado"),
+        className: "bg-green-50 text-green-700",
+      };
+
+    case "ENTREVISTA_REALIZADA":
+      return {
+        label: t("dash_candidato.status_entrevista_realizada"),
+        className: "bg-blue-50 text-blue-700",
+      };
+
+    default:
+      return {
+        label: status,
+        className: "bg-gray-100 text-gray-600",
+      };
+  }
 }
