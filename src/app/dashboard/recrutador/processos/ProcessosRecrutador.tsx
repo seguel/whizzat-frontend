@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-type Aba = "andamento" | "finalizados" | "recusados";
+type Aba = "convites" | "andamento" | "finalizados" | "recusados";
 
 type StatusProcesso =
   | "CONVITE_ACEITO"
@@ -81,9 +81,11 @@ interface Processo {
 export default function ProcessosRecrutador() {
   const { t, i18n } = useTranslation("common");
 
-  const [aba, setAba] = useState<Aba>("andamento");
+  const [aba, setAba] = useState<Aba>("convites");
   const [processoAgenda, setProcessoAgenda] = useState<Processo | null>(null);
   const [salvandoAgenda, setSalvandoAgenda] = useState(false);
+  const [convites, setConvites] = useState<Processo[]>([]);
+  const [loadingConvites, setLoadingConvites] = useState(true);
   const [erroAgenda, setErroAgenda] = useState("");
 
   const [dataEntrevista, setDataEntrevista] = useState("");
@@ -132,6 +134,33 @@ export default function ProcessosRecrutador() {
       processos.filter((processo) => processo.status === "CONVITE_RECUSADO"),
     [processos],
   );
+
+  async function carregarConvites() {
+    try {
+      setLoadingConvites(true);
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/recrutador/convites`,
+        {
+          credentials: "include",
+          cache: "no-store",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao carregar convites");
+      }
+
+      const data = await response.json();
+
+      setConvites(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Erro ao carregar convites:", error);
+      setConvites([]);
+    } finally {
+      setLoadingConvites(false);
+    }
+  }
 
   async function marcarEntrevistaRealizada(processoId: number) {
     if (processoRealizando !== null) {
@@ -335,15 +364,19 @@ export default function ProcessosRecrutador() {
   }
 
   useEffect(() => {
+    carregarConvites();
     carregarProcessos();
   }, []);
 
   function trocarAba(novaAba: Aba) {
     setAba(novaAba);
 
-    void carregarProcessos({
-      mostrarLoading: false,
-    });
+    if (novaAba === "convites") {
+      void carregarConvites();
+      return;
+    }
+
+    void carregarProcessos({ mostrarLoading: false });
   }
 
   async function confirmarAgenda() {
@@ -639,10 +672,10 @@ export default function ProcessosRecrutador() {
         </p>
       </div>
 
-      {loadingProcessos && (
+      {loadingConvites && (
         <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
           <p className="text-sm text-gray-500">
-            {t("processos_recrutador.carregando")}
+            {t("processos_recrutador.carregando_convites")}
           </p>
         </div>
       )}
@@ -655,6 +688,14 @@ export default function ProcessosRecrutador() {
       {!loadingProcessos && !erroProcessos && (
         <>
           <div className="mb-6 flex flex-wrap gap-2 border-b border-gray-200">
+            <TabButton
+              ativo={aba === "convites"}
+              onClick={() => trocarAba("convites")}
+              //   icon={<Clock3 className="h-4 w-4" />}
+              label={t("processos_recrutador.convites")}
+              quantidade={convites.length}
+            />
+
             <TabButton
               ativo={aba === "andamento"}
               label={t("processos_recrutador.em_andamento")}
@@ -676,6 +717,82 @@ export default function ProcessosRecrutador() {
               onClick={() => trocarAba("recusados")}
             />
           </div>
+
+          {aba === "convites" && (
+            <>
+              {loadingConvites ? (
+                <div className="rounded-xl border border-gray-200 bg-white px-6 py-10 text-center">
+                  <p className="text-sm text-gray-500">
+                    {t("processos_recrutador.carregando_convites")}
+                  </p>
+                </div>
+              ) : convites.length === 0 ? (
+                <div className="rounded-xl border border-gray-200 bg-white px-6 py-10 text-center">
+                  <Clock3 className="mx-auto h-8 w-8 text-gray-300" />
+
+                  <p className="mt-3 text-sm font-semibold text-gray-700">
+                    {t("processos_recrutador.sem_convites")}
+                  </p>
+
+                  <p className="mt-1 text-sm text-gray-500">
+                    {t("processos_recrutador.sem_convites_descricao")}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {convites.map((convite) => (
+                    <div
+                      key={convite.id}
+                      className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <UserRound className="h-5 w-5 shrink-0 text-purple-600" />
+
+                            <p className="truncate font-semibold text-gray-900">
+                              {convite.candidato.nome}
+                            </p>
+                          </div>
+
+                          <p className="mt-2 text-sm font-semibold text-gray-800">
+                            {convite.titulo}
+                          </p>
+
+                          {convite.empresa?.nome_empresa && (
+                            <p className="mt-1 text-sm text-gray-500">
+                              {convite.empresa.nome_empresa}
+                            </p>
+                          )}
+
+                          <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-2.5 py-1 text-xs font-semibold text-yellow-700">
+                              <Clock3 className="h-3.5 w-3.5" />
+                              {t("processos_recrutador.aguardando_resposta")}
+                            </span>
+
+                            <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
+                              {convite.tipo}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="shrink-0 text-left sm:text-right">
+                          <p className="text-xs text-gray-400">
+                            {t("processos_recrutador.enviado_em")}
+                          </p>
+
+                          <p className="mt-1 text-sm font-medium text-gray-600">
+                            {formatarData(convite.data_convite)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
 
           {aba === "andamento" && (
             <div className="space-y-4">
