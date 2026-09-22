@@ -18,6 +18,12 @@ export default function DashboardStats({ resumo }: Props) {
       icon: "💼",
     },
     {
+      label: t("dash_candidato.stats_oportunidades"),
+      value: resumo.outras_oportunidades,
+      description: t("dash_candidato.stats_oportunidades_msg"),
+      icon: "🤝",
+    },
+    {
       label: t("dash_candidato.stats_agendada"),
       value: resumo.entrevistas_agendadas,
       description: t("dash_candidato.stats_agendada_msg"),
@@ -38,7 +44,7 @@ export default function DashboardStats({ resumo }: Props) {
   ];
 
   return (
-    <section className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+    <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
       {stats.map((stat) => (
         <div
           key={stat.label}

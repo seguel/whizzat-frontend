@@ -45,9 +45,9 @@ export default function CandidateDashboard() {
         <UpcomingInterviews entrevistas={data.entrevistas_agendadas} />
       </div>
 
-      <CandidateOpportunities />
+      <CandidateOpportunities oportunidades={data.oportunidades} />
 
-      <ProcessTimeline />
+      <ProcessTimeline movimentacoes={data.movimentacoes_recentes} />
     </div>
   );
 }

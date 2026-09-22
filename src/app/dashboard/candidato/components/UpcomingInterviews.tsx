@@ -19,7 +19,7 @@ export default function UpcomingInterviews({ entrevistas }: Props) {
           </h2>
 
           <p className="text-sm text-gray-500 mt-1">
-            {t("dash_candidato.avaliacao_confirmada")}
+            {t("dash_candidato.agenda_descricao")}
           </p>
         </div>
 
@@ -46,6 +46,32 @@ export default function UpcomingInterviews({ entrevistas }: Props) {
 function InterviewCard({ entrevista }: { entrevista: DashboardEntrevista }) {
   const { t } = useTranslation("common");
   const data = new Date(entrevista.data_hora);
+
+  const getTipoEntrevista = () => {
+    if (entrevista.tipo === "AVALIACAO_SKILL") {
+      return t("dash_candidato.agenda_skill");
+    }
+
+    switch (entrevista.tipo_convite) {
+      case "VAGA":
+        return t("dash_candidato.agenda_vaga");
+
+      case "PALESTRA_EVENTO":
+        return t("dash_candidato.agenda_palestra_evento");
+
+      case "MENTORIA":
+        return t("dash_candidato.agenda_mentoria");
+
+      case "PROJETO_CONSULTORIA":
+        return t("dash_candidato.agenda_projeto_consultoria");
+
+      case "NETWORKING":
+        return t("dash_candidato.agenda_networking");
+
+      default:
+        return t("dash_candidato.agenda_outro");
+    }
+  };
 
   const dataFormatada = new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
@@ -87,12 +113,14 @@ function InterviewCard({ entrevista }: { entrevista: DashboardEntrevista }) {
 
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-sm text-gray-900">
-            {entrevista.skill}
+            {entrevista.titulo}
           </p>
 
-          <p className="text-xs text-gray-500 mt-1">
-            {t("dash_candidato.agenda_skill")}
-          </p>
+          <p className="text-xs text-gray-500 mt-1">{getTipoEntrevista()}</p>
+
+          {entrevista.subtitulo && (
+            <p className="text-xs text-gray-400 mt-1">{entrevista.subtitulo}</p>
+          )}
 
           <div className="mt-2">
             {entrevista.atrasada ? (
