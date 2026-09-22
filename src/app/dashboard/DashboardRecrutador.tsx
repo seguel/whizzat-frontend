@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // App Route
 import Sidebar from "../components/perfil/Sidebar";
 import TopBar from "../components/perfil/TopBar";
-import JobList from "../components/perfil/JobList";
-import TalentPoolPanel from "../components/perfil/TalentPoolPanel";
+import RecruiterDashboard from "./recrutador/components/RecruiterDashboard";
 import { ProfileType } from "../components/perfil/ProfileContext";
 
 import LoadingOverlay from "../components/LoadingOverlay";
@@ -50,13 +49,8 @@ export default function DashboardRecrutador({ perfil }: Props) {
           <SemDados tipo="empresa" perfil={perfil} />
         ) : (
           <>
-            <main className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2 space-y-6">
-                <JobList title="Vagas da empresa" jobs={[]} perfil={perfil} />
-              </div>
-              <div className="md:col-span-1">
-                <TalentPoolPanel />
-              </div>
+            <main className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-6">
+              <RecruiterDashboard />
             </main>
           </>
         )}
