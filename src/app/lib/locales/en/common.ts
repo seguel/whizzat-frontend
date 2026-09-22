@@ -1323,6 +1323,14 @@ const en = {
       sucesso: "Process finalized successfully.",
       erro: "Unable to finalize the process.",
     },
+    convites: "Invitations",
+    carregando_convites: "Loading invitations...",
+    sem_convites: "No invitations awaiting response",
+    sem_convites_descricao:
+      "Sent invitations that are still awaiting a response from the candidate will appear here.",
+    aguardando_resposta: "Awaiting response",
+    enviado_em: "Sent on",
+    erro_carregar_convites: "Unable to load invitations.",
   },
 };
 

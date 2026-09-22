@@ -1303,6 +1303,14 @@ const pt = {
       sucesso: "Processo finalizado com sucesso.",
       erro: "Não foi possível finalizar o processo.",
     },
+    convites: "Convites",
+    carregando_convites: "Carregando convites...",
+    sem_convites: "Nenhum convite aguardando resposta",
+    sem_convites_descricao:
+      "Os convites enviados que ainda aguardam resposta do candidato aparecerão aqui.",
+    aguardando_resposta: "Aguardando resposta",
+    enviado_em: "Enviado em",
+    erro_carregar_convites: "Não foi possível carregar os convites.",
   },
 };
 
