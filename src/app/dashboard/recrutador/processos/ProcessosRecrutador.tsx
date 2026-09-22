@@ -13,6 +13,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Aba = "convites" | "andamento" | "finalizados" | "recusados";
 
@@ -78,8 +79,21 @@ interface Processo {
   data_finalizacao: string | null;
 }
 
-export default function ProcessosRecrutador() {
+interface Props {
+  processoId?: string;
+}
+
+export default function ProcessosRecrutador({ processoId }: Props) {
   const { t, i18n } = useTranslation("common");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const processoIdInicial =
+    processoId && !Number.isNaN(Number(processoId)) ? Number(processoId) : null;
+
+  const [processoIdSelecionado, setProcessoIdSelecionado] = useState<
+    number | null
+  >(processoIdInicial);
 
   const [aba, setAba] = useState<Aba>("convites");
   const [processoAgenda, setProcessoAgenda] = useState<Processo | null>(null);
@@ -368,6 +382,91 @@ export default function ProcessosRecrutador() {
     carregarProcessos();
   }, []);
 
+  useEffect(() => {
+    if (!processoIdSelecionado || loadingProcessos) {
+      return;
+    }
+
+    const processo = processos.find(
+      (item) => item.id === processoIdSelecionado,
+    );
+
+    if (!processo) {
+      return;
+    }
+
+    if (
+      [
+        "CONVITE_ACEITO",
+        "AGENDA_ENVIADA",
+        "AGENDADO",
+        "ENTREVISTA_REALIZADA",
+      ].includes(processo.status)
+    ) {
+      setAba("andamento");
+      return;
+    }
+
+    if (processo.status === "FINALIZADO") {
+      setAba("finalizados");
+      return;
+    }
+
+    if (processo.status === "CONVITE_RECUSADO") {
+      setAba("recusados");
+    }
+  }, [processoIdSelecionado, processos, loadingProcessos]);
+
+  useEffect(() => {
+    if (!processoIdSelecionado || loadingProcessos) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      const elemento = document.getElementById(
+        `processo-${processoIdSelecionado}`,
+      );
+
+      if (!elemento) {
+        return;
+      }
+
+      elemento.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      const params = new URLSearchParams(searchParams.toString());
+
+      params.delete("processo");
+
+      const query = params.toString();
+
+      router.replace(
+        query
+          ? `/dashboard/recrutador/processos?${query}`
+          : "/dashboard/recrutador/processos",
+        {
+          scroll: false,
+        },
+      );
+    }, 150);
+
+    return () => window.clearTimeout(timeout);
+  }, [processoIdSelecionado, aba, loadingProcessos, router, searchParams]);
+
+  useEffect(() => {
+    if (!processoIdSelecionado) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setProcessoIdSelecionado(null);
+    }, 4000);
+
+    return () => window.clearTimeout(timeout);
+  }, [processoIdSelecionado]);
+
   function trocarAba(novaAba: Aba) {
     setAba(novaAba);
 
@@ -536,7 +635,14 @@ export default function ProcessosRecrutador() {
       processo.agenda?.status === "RECUSADO";
 
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-5">
+      <div
+        id={`processo-${processo.id}`}
+        className={`rounded-xl border bg-white p-5 transition-all ${
+          processo.id === processoIdSelecionado
+            ? "border-purple-400 ring-2 ring-purple-100"
+            : "border-gray-200"
+        }`}
+      >
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0 flex-1">
             <Candidato processo={processo} />
@@ -807,7 +913,12 @@ export default function ProcessosRecrutador() {
               {processosFinalizados.map((processo) => (
                 <div
                   key={processo.id}
-                  className="rounded-xl border border-gray-200 bg-white p-5"
+                  id={`processo-${processo.id}`}
+                  className={`rounded-xl border bg-white p-5 transition-all ${
+                    processo.id === processoIdSelecionado
+                      ? "border-purple-400 ring-2 ring-purple-100"
+                      : "border-gray-200"
+                  }`}
                 >
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -866,7 +977,12 @@ export default function ProcessosRecrutador() {
               {processosRecusados.map((processo) => (
                 <div
                   key={processo.id}
-                  className="rounded-xl border border-gray-200 bg-white p-5"
+                  id={`processo-${processo.id}`}
+                  className={`rounded-xl border bg-white p-5 transition-all ${
+                    processo.id === processoIdSelecionado
+                      ? "border-purple-400 ring-2 ring-purple-100"
+                      : "border-gray-200"
+                  }`}
                 >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>

@@ -14,9 +14,10 @@ import ProcessosRecrutador from "./ProcessosRecrutador";
 
 interface Props {
   perfil: ProfileType;
+  processoId?: string;
 }
 
-export default function DashboardProcessos({ perfil }: Props) {
+export default function DashboardProcessos({ perfil, processoId }: Props) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const { hasPerfilRecrutador, loading } = useRecrutadorEmpresa(perfil);
@@ -40,7 +41,7 @@ export default function DashboardProcessos({ perfil }: Props) {
           <SemDados tipo="perfil" perfil={perfil} />
         ) : (
           <main className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-6">
-            <ProcessosRecrutador />
+            <ProcessosRecrutador processoId={processoId} />
           </main>
         )}
       </div>

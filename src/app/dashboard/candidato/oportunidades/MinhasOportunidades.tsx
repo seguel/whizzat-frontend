@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   BriefcaseBusiness,
   CalendarDays,
@@ -112,7 +113,26 @@ interface Processo {
 export default function MinhasOportunidadesPage() {
   const { t, i18n } = useTranslation("common");
 
-  const [aba, setAba] = useState<Aba>("convites");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const processoParam = searchParams.get("processo");
+  const tabParam = searchParams.get("tab");
+
+  const processoDestacadoId = processoParam ? Number(processoParam) : null;
+
+  const deepLinkProcessadoRef = useRef(false);
+
+  const [processoDestacado, setProcessoDestacado] = useState<number | null>(
+    null,
+  );
+
+  const abaInicial: Aba =
+    tabParam === "entrevistas" || tabParam === "finalizados"
+      ? tabParam
+      : "convites";
+
+  const [aba, setAba] = useState<Aba>(abaInicial);
   const [convites, setConvites] = useState<Convite[]>([]);
   const [loadingConvites, setLoadingConvites] = useState(true);
   const [erroConvites, setErroConvites] = useState(false);
@@ -174,6 +194,54 @@ export default function MinhasOportunidadesPage() {
     carregarProcessos();
     carregarFinalizados();
   }, []);
+
+  useEffect(() => {
+    if (
+      deepLinkProcessadoRef.current ||
+      tabParam !== "entrevistas" ||
+      !processoDestacadoId ||
+      loadingProcessos
+    ) {
+      return;
+    }
+
+    const processoExiste = processos.some(
+      (processo) => processo.id === processoDestacadoId,
+    );
+
+    if (!processoExiste) {
+      return;
+    }
+
+    deepLinkProcessadoRef.current = true;
+
+    setAba("entrevistas");
+    setProcessoDestacado(processoDestacadoId);
+
+    const scrollTimer = window.setTimeout(() => {
+      const elemento = document.getElementById(
+        `processo-${processoDestacadoId}`,
+      );
+
+      elemento?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 150);
+
+    const destaqueTimer = window.setTimeout(() => {
+      setProcessoDestacado(null);
+
+      router.replace("/dashboard/candidato/oportunidades?perfil=candidato", {
+        scroll: false,
+      });
+    }, 3000);
+
+    return () => {
+      window.clearTimeout(scrollTimer);
+      window.clearTimeout(destaqueTimer);
+    };
+  }, [tabParam, processoDestacadoId, loadingProcessos, processos, router]);
 
   async function trocarAba(novaAba: Aba) {
     setAba(novaAba);
@@ -518,122 +586,137 @@ export default function MinhasOportunidadesPage() {
               </p>
             </div>
           ) : (
-            processos.map((entrevista) => (
-              <div
-                key={entrevista.id}
-                className="rounded-xl border border-gray-200 bg-white p-5"
-              >
-                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="min-w-0">
-                    <TipoConviteBadge tipo={entrevista.tipo} />
+            processos.map((entrevista) => {
+              const destacado = processoDestacado === entrevista.id;
 
-                    <h2 className="mt-3 text-base font-semibold text-gray-900">
-                      {entrevista.titulo}
-                    </h2>
+              return (
+                <div
+                  key={entrevista.id}
+                  id={`processo-${entrevista.id}`}
+                  className={`rounded-xl border bg-white p-5 transition-all duration-500 ${
+                    destacado
+                      ? "border-purple-400 ring-4 ring-purple-100 shadow-md"
+                      : "border-gray-200"
+                  }`}
+                >
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                      <TipoConviteBadge tipo={entrevista.tipo} />
 
-                    {entrevista.empresa && (
-                      <p className="mt-1 text-sm text-gray-600">
-                        {entrevista.empresa.nome_empresa}
-                      </p>
-                    )}
+                      <h2 className="mt-3 text-base font-semibold text-gray-900">
+                        {entrevista.titulo}
+                      </h2>
 
-                    {/* Entrevista já realizada */}
-                    {entrevista.status === "ENTREVISTA_REALIZADA" ? (
-                      <div className="mt-4">
-                        <div className="inline-flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-semibold text-green-700">
-                          <CheckCircle2 className="h-4 w-4" />
-
-                          {t("oportunidades_candidato.entrevista_realizada")}
-                        </div>
-
-                        <p className="mt-2 text-xs text-gray-500">
-                          {t("oportunidades_candidato.aguardando_finalizacao")}
+                      {entrevista.empresa && (
+                        <p className="mt-1 text-sm text-gray-600">
+                          {entrevista.empresa.nome_empresa}
                         </p>
-                      </div>
-                    ) : /* Horário recusado pelo candidato */
-                    entrevista.agenda?.status === "RECUSADO" ? (
-                      <div className="mt-4">
-                        <div className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-700">
-                          <XCircle className="h-4 w-4" />
+                      )}
 
-                          {t("oportunidades_candidato.horario_recusado")}
+                      {/* Entrevista já realizada */}
+                      {entrevista.status === "ENTREVISTA_REALIZADA" ? (
+                        <div className="mt-4">
+                          <div className="inline-flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-semibold text-green-700">
+                            <CheckCircle2 className="h-4 w-4" />
+
+                            {t("oportunidades_candidato.entrevista_realizada")}
+                          </div>
+
+                          <p className="mt-2 text-xs text-gray-500">
+                            {t(
+                              "oportunidades_candidato.aguardando_finalizacao",
+                            )}
+                          </p>
                         </div>
+                      ) : /* Horário recusado pelo candidato */
+                      entrevista.agenda?.status === "RECUSADO" ? (
+                        <div className="mt-4">
+                          <div className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-700">
+                            <XCircle className="h-4 w-4" />
 
-                        <p className="mt-2 text-xs text-gray-500">
-                          {t("oportunidades_candidato.aguardando_nova_agenda")}
+                            {t("oportunidades_candidato.horario_recusado")}
+                          </div>
+
+                          <p className="mt-2 text-xs text-gray-500">
+                            {t(
+                              "oportunidades_candidato.aguardando_nova_agenda",
+                            )}
+                          </p>
+                        </div>
+                      ) : /* Existe uma agenda */
+                      entrevista.agenda ? (
+                        <>
+                          <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-700">
+                            <CalendarDays className="h-4 w-4" />
+
+                            {formatarDataHora(
+                              entrevista.agenda.data_hora_agenda,
+                            )}
+                          </div>
+
+                          {/* Aguardando candidato responder */}
+                          {entrevista.status === "AGENDA_ENVIADA" &&
+                            entrevista.agenda.status === "PENDENTE" && (
+                              <p className="mt-2 text-xs text-amber-600">
+                                {t(
+                                  "oportunidades_candidato.aguardando_resposta_agenda",
+                                )}
+                              </p>
+                            )}
+
+                          {/* Agenda aceita */}
+                          {entrevista.status === "AGENDADO" &&
+                            entrevista.agenda.status === "ACEITO" && (
+                              <p className="mt-2 text-xs font-medium text-green-600">
+                                {t(
+                                  "oportunidades_candidato.entrevista_confirmada",
+                                )}
+                              </p>
+                            )}
+                        </>
+                      ) : (
+                        /* Convite aceito, mas recrutador ainda não enviou agenda */
+                        <p className="mt-4 text-sm text-gray-500">
+                          {t("oportunidades_candidato.aguardando_agenda")}
                         </p>
-                      </div>
-                    ) : /* Existe uma agenda */
-                    entrevista.agenda ? (
-                      <>
-                        <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-700">
-                          <CalendarDays className="h-4 w-4" />
+                      )}
+                    </div>
 
-                          {formatarDataHora(entrevista.agenda.data_hora_agenda)}
+                    {/* Botões aparecem somente enquanto a agenda aguarda resposta */}
+                    {entrevista.status === "AGENDA_ENVIADA" &&
+                      entrevista.agenda?.status === "PENDENTE" && (
+                        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              responderAgenda(entrevista.id, "RECUSAR")
+                            }
+                            disabled={agendaProcessando === entrevista.id}
+                            className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <XCircle className="h-4 w-4" />
+
+                            {t("oportunidades_candidato.btn_recusar_horario")}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              responderAgenda(entrevista.id, "ACEITAR")
+                            }
+                            disabled={agendaProcessando === entrevista.id}
+                            className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            <CheckCircle2 className="h-4 w-4" />
+
+                            {t("oportunidades_candidato.btn_aceitar_horario")}
+                          </button>
                         </div>
-
-                        {/* Aguardando candidato responder */}
-                        {entrevista.status === "AGENDA_ENVIADA" &&
-                          entrevista.agenda.status === "PENDENTE" && (
-                            <p className="mt-2 text-xs text-amber-600">
-                              {t(
-                                "oportunidades_candidato.aguardando_resposta_agenda",
-                              )}
-                            </p>
-                          )}
-
-                        {/* Agenda aceita */}
-                        {entrevista.status === "AGENDADO" &&
-                          entrevista.agenda.status === "ACEITO" && (
-                            <p className="mt-2 text-xs font-medium text-green-600">
-                              {t(
-                                "oportunidades_candidato.entrevista_confirmada",
-                              )}
-                            </p>
-                          )}
-                      </>
-                    ) : (
-                      /* Convite aceito, mas recrutador ainda não enviou agenda */
-                      <p className="mt-4 text-sm text-gray-500">
-                        {t("oportunidades_candidato.aguardando_agenda")}
-                      </p>
-                    )}
+                      )}
                   </div>
-
-                  {/* Botões aparecem somente enquanto a agenda aguarda resposta */}
-                  {entrevista.status === "AGENDA_ENVIADA" &&
-                    entrevista.agenda?.status === "PENDENTE" && (
-                      <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            responderAgenda(entrevista.id, "RECUSAR")
-                          }
-                          disabled={agendaProcessando === entrevista.id}
-                          className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <XCircle className="h-4 w-4" />
-
-                          {t("oportunidades_candidato.btn_recusar_horario")}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            responderAgenda(entrevista.id, "ACEITAR")
-                          }
-                          disabled={agendaProcessando === entrevista.id}
-                          className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          <CheckCircle2 className="h-4 w-4" />
-
-                          {t("oportunidades_candidato.btn_aceitar_horario")}
-                        </button>
-                      </div>
-                    )}
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
