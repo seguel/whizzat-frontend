@@ -5,7 +5,14 @@ import { format, isToday, isTomorrow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import AgendaCard from "./AgendaCard";
 import { AgendaItemDTO } from "../dto/AgendaItemDTO";
+import { AgendaRecrutadorItemDTO } from "../dto/AgendaRecrutadorItemDTO";
+import { AgendaCandidatoItemDTO } from "../dto/AgendaCandidatoItemDTO";
 import { useTranslation } from "react-i18next";
+
+type AgendaDTO =
+  | AgendaItemDTO
+  | AgendaRecrutadorItemDTO
+  | AgendaCandidatoItemDTO;
 
 function getTituloGrupo(data: Date, t: (key: string) => string) {
   if (isToday(data)) {
@@ -22,7 +29,7 @@ function getTituloGrupo(data: Date, t: (key: string) => string) {
 }
 
 interface Props {
-  agenda: AgendaItemDTO[];
+  agenda: AgendaDTO[];
   selectedDate: string | null;
   perfil: string;
 }
@@ -32,7 +39,7 @@ export default function AgendaCardList({
   selectedDate,
   perfil,
 }: Props) {
-  const refs = useRef<Record<number, HTMLDivElement | null>>({});
+  const refs = useRef<Record<string | number, HTMLDivElement | null>>({});
   const { t } = useTranslation("common");
 
   const grupos = agenda.reduce(
@@ -47,7 +54,7 @@ export default function AgendaCardList({
 
       return acc;
     },
-    {} as Record<string, AgendaItemDTO[]>,
+    {} as Record<string, AgendaDTO[]>,
   );
 
   useEffect(() => {
