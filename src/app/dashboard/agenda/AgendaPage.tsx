@@ -11,10 +11,17 @@ import { useTranslation } from "react-i18next";
 import AgendaCalendar from "./components/AgendaCalendar";
 import AgendaCardList from "./components/AgendaCardList";
 import { AgendaItemDTO } from "./dto/AgendaItemDTO";
+import { AgendaRecrutadorItemDTO } from "./dto/AgendaRecrutadorItemDTO";
+import { AgendaCandidatoItemDTO } from "./dto/AgendaCandidatoItemDTO";
 
 interface Props {
   perfil: ProfileType;
 }
+
+type AgendaDTO =
+  | AgendaItemDTO
+  | AgendaRecrutadorItemDTO
+  | AgendaCandidatoItemDTO;
 
 // export interface AgendaItem {
 //   id: number;
@@ -27,7 +34,7 @@ export default function AgendaPage({ perfil }: Props) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const [loading, setLoading] = useState(true);
-  const [agenda, setAgenda] = useState<AgendaItemDTO[]>([]);
+  const [agenda, setAgenda] = useState<AgendaDTO[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   async function fetchAgenda() {
@@ -45,12 +52,11 @@ export default function AgendaPage({ perfil }: Props) {
         throw new Error("Erro ao carregar agenda");
       }
 
-      const data = await res.json();
-      // console.log(data);
+      const data: AgendaDTO[] = await res.json();
 
       setAgenda(data);
 
-      if (data.length == 1) {
+      if (data.length === 1) {
         setSelectedDate(data[0].data_hora.slice(0, 10));
       }
     } catch (error) {

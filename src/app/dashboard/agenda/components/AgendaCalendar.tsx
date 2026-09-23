@@ -16,14 +16,13 @@ import { ptBR } from "date-fns/locale";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-interface AgendaItem {
-  id: number;
-  skill: string;
+interface AgendaCalendarItem {
+  id: number | string;
   data_hora: string;
 }
 
 interface Props {
-  agenda: AgendaItem[];
+  agenda: AgendaCalendarItem[];
   selectedDate: string | null;
   onSelectDate: (date: string | null) => void;
 }
@@ -107,7 +106,7 @@ export default function AgendaCalendar({
               !isCurrentMonth
                 ? "text-gray-300 cursor-default"
                 : hasAgenda
-                  ? "cursor-pointer hover:bg-blue-50"
+                  ? "cursor-pointer hover:bg-blue-300"
                   : "cursor-default text-gray-700"
             }
 

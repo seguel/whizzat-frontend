@@ -2,15 +2,38 @@
 
 import { useTranslation } from "react-i18next";
 import { AgendaItemDTO } from "../dto/AgendaItemDTO";
+import { AgendaRecrutadorItemDTO } from "../dto/AgendaRecrutadorItemDTO";
+import { AgendaCandidatoItemDTO } from "../dto/AgendaCandidatoItemDTO";
 
 interface Props {
-  agenda: AgendaItemDTO;
+  agenda: AgendaItemDTO | AgendaRecrutadorItemDTO | AgendaCandidatoItemDTO;
+
   selected: boolean;
   perfil: string;
 }
 
+type AgendaDTO =
+  | AgendaItemDTO
+  | AgendaRecrutadorItemDTO
+  | AgendaCandidatoItemDTO;
+
+function isAgendaRecrutador(
+  agenda: AgendaDTO,
+): agenda is AgendaRecrutadorItemDTO {
+  return "conviteId" in agenda;
+}
+
+function isAgendaCandidato(
+  agenda: AgendaDTO,
+): agenda is AgendaCandidatoItemDTO {
+  return "origem" in agenda;
+}
+
 export default function AgendaCard({ agenda, selected, perfil }: Props) {
   const { t } = useTranslation("common");
+
+  // const isRecrutador = isAgendaRecrutador(agenda);
+
   const dataCompara = new Date(agenda.data_hora);
   const [data] = agenda.data_hora.split("T");
   const hora = agenda.data_hora.substring(11, 16);
@@ -25,45 +48,108 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
   return (
     <div
       className={`
-    bg-white
-    rounded-xl
-    border
-    shadow-sm
-    transition-all
-    duration-200
-    p-4
+      bg-white
+      rounded-xl
+      border
+      shadow-sm
+      transition-all
+      duration-200
+      p-4
 
-    ${
-      selected
-        ? perfil === "avaliador"
-          ? agenda.status === "PENDENTE" || atrasada
-            ? "border-orange-500 ring-2 ring-orange-100"
-            : "border-blue-600 ring-2 ring-blue-100"
-          : atrasada
-            ? "border-orange-600 ring-2 ring-orange-100"
-            : "border-blue-600 ring-2 ring-blue-100"
-        : "border-gray-200 hover:border-blue-200"
-    }
-  `}
+      ${
+        selected
+          ? perfil === "avaliador"
+            ? agenda.status === "PENDENTE" || atrasada
+              ? "border-orange-500 ring-2 ring-orange-100"
+              : "border-blue-600 ring-2 ring-blue-100"
+            : perfil === "recrutador"
+              ? agenda.status === "PENDENTE" || atrasada
+                ? "border-orange-500 ring-2 ring-orange-100"
+                : "border-blue-600 ring-2 ring-blue-100"
+              : atrasada
+                ? "border-orange-600 ring-2 ring-orange-100"
+                : "border-blue-600 ring-2 ring-blue-100"
+          : "border-gray-200 hover:border-blue-200"
+      }
+    `}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          {/* Skill */}
-          <span className="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
-            {agenda.skill}
-          </span>
+          {isAgendaRecrutador(agenda) ? (
+            <>
+              {/* Recrutador */}
+              <span className="inline-flex px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-medium">
+                {agenda.tipo.replaceAll("_", " ")}
+              </span>
 
-          {/* Dados do candidato */}
-          {perfil === "avaliador" && (
-            <div className="mt-3">
-              <p className="font-semibold text-gray-900 truncate">
-                {agenda.nome}
-              </p>
+              <div className="mt-3">
+                <p className="font-semibold text-gray-900">{agenda.titulo}</p>
 
-              <p className="text-sm text-gray-500">
-                {agenda.cidade}/{agenda.estado}
-              </p>
-            </div>
+                {agenda.empresa && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    {agenda.empresa.nome_empresa}
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-3">
+                <p className="text-sm font-medium text-gray-800">
+                  {agenda.candidato.nome}
+                </p>
+
+                <p className="text-sm text-gray-500">
+                  {agenda.candidato.cidade}/{agenda.candidato.estado}
+                </p>
+              </div>
+            </>
+          ) : isAgendaCandidato(agenda) ? (
+            <>
+              {/* Candidato */}
+              {agenda.origem === "AVALIACAO" ? (
+                <>
+                  <span className="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
+                    {agenda.skill}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="inline-flex px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-sm font-medium">
+                    {agenda.tipo.replaceAll("_", " ")}
+                  </span>
+
+                  <div className="mt-3">
+                    <p className="font-semibold text-gray-900">
+                      {agenda.titulo}
+                    </p>
+
+                    {agenda.empresa && (
+                      <p className="mt-1 text-sm text-gray-500">
+                        {agenda.empresa.nome_empresa}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Formato antigo - candidato/avaliador */}
+              <span className="inline-flex px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
+                {agenda.skill}
+              </span>
+
+              {perfil === "avaliador" && (
+                <div className="mt-3">
+                  <p className="font-semibold text-gray-900 truncate">
+                    {agenda.nome}
+                  </p>
+
+                  <p className="text-sm text-gray-500">
+                    {agenda.cidade}/{agenda.estado}
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           {/* Data/Hora */}
@@ -83,7 +169,7 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
         {/* Status */}
         <span
           className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${
-            perfil === "avaliador"
+            perfil === "avaliador" || perfil === "recrutador"
               ? agenda.status === "PENDENTE" || atrasada
                 ? "bg-orange-100 text-orange-700"
                 : "bg-blue-100 text-blue-700"
@@ -92,7 +178,7 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
                 : "bg-blue-100 text-blue-700"
           }`}
         >
-          {perfil === "avaliador"
+          {perfil === "avaliador" || perfil === "recrutador"
             ? agenda.status === "PENDENTE"
               ? t("agenda.status_aguardando")
               : atrasada

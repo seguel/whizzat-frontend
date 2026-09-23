@@ -153,7 +153,7 @@ export function useNavItems(
         {
           icon: <Calendar size={20} />,
           label: t("sidebar.menu_agenda"),
-          route: "/agenda",
+          route: `/dashboard/agenda?perfil=${profile}`,
           activeRoutes: ["/dashboard/agenda"],
         },
         {
