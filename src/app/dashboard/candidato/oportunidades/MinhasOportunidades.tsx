@@ -243,6 +243,54 @@ export default function MinhasOportunidadesPage() {
     };
   }, [tabParam, processoDestacadoId, loadingProcessos, processos, router]);
 
+  useEffect(() => {
+    if (
+      deepLinkProcessadoRef.current ||
+      tabParam !== "finalizados" ||
+      !processoDestacadoId ||
+      loadingFinalizados
+    ) {
+      return;
+    }
+
+    const processoExiste = finalizados.some(
+      (processo) => processo.id === processoDestacadoId,
+    );
+
+    if (!processoExiste) {
+      return;
+    }
+
+    deepLinkProcessadoRef.current = true;
+
+    setAba("finalizados");
+    setProcessoDestacado(processoDestacadoId);
+
+    const scrollTimer = window.setTimeout(() => {
+      const elemento = document.getElementById(
+        `processo-finalizado-${processoDestacadoId}`,
+      );
+
+      elemento?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 150);
+
+    const destaqueTimer = window.setTimeout(() => {
+      setProcessoDestacado(null);
+
+      router.replace("/dashboard/candidato/oportunidades?perfil=candidato", {
+        scroll: false,
+      });
+    }, 3000);
+
+    return () => {
+      window.clearTimeout(scrollTimer);
+      window.clearTimeout(destaqueTimer);
+    };
+  }, [tabParam, processoDestacadoId, loadingFinalizados, finalizados, router]);
+
   async function trocarAba(novaAba: Aba) {
     setAba(novaAba);
 
@@ -752,7 +800,12 @@ export default function MinhasOportunidadesPage() {
             finalizados.map((processo) => (
               <div
                 key={processo.id}
-                className="rounded-xl border border-gray-200 bg-white p-5"
+                id={`processo-finalizado-${processo.id}`}
+                className={`rounded-xl border bg-white p-5 transition-all duration-500 ${
+                  processoDestacado === processo.id
+                    ? "border-purple-400 ring-4 ring-purple-100 shadow-md"
+                    : "border-gray-200"
+                }`}
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
