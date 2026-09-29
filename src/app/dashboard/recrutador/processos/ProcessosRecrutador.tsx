@@ -149,6 +149,8 @@ export default function ProcessosRecrutador({ processoId }: Props) {
     [processos],
   );
 
+  const ANTECEDENCIA_MINIMA_AGENDA_MINUTOS = 30;
+
   async function carregarConvites() {
     try {
       setLoadingConvites(true);
@@ -567,7 +569,11 @@ export default function ProcessosRecrutador({ processoId }: Props) {
       `${dataEntrevista}T${horaEntrevista}:00`,
     );
 
-    return dataHoraSelecionada.getTime() > Date.now();
+    const horarioMinimo = new Date(
+      Date.now() + ANTECEDENCIA_MINIMA_AGENDA_MINUTOS * 60 * 1000,
+    );
+
+    return dataHoraSelecionada.getTime() >= horarioMinimo.getTime();
   }
 
   function formatarDataHora(data: string) {
