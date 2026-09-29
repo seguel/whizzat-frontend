@@ -1314,12 +1314,13 @@ const pt = {
       data: "Data da entrevista",
       hora: "Horário",
       aviso:
-        "O candidato receberá a sugestão e poderá aceitar ou recusar o horário.",
+        "O candidato receberá este horário para confirmação. O agendamento deve ser feito com pelo menos 30 minutos de antecedência.",
       horario_anterior_recusado: "Horário anterior recusado pelo candidato",
       btn_cancelar: "Cancelar",
       btn_enviar: "Enviar sugestão",
       btn_novo: "Enviar novo horário",
-      data_invalida: "Selecione uma data e horário futuros.",
+      data_invalida:
+        "Escolha um horário com pelo menos 30 minutos de antecedência.",
       btn_enviando: "Enviando...",
       erro: "Não foi possível enviar a sugestão de entrevista.",
     },
