@@ -14,6 +14,7 @@ interface Props {
 const statusStyle: Record<RecrutadorDashboardAcao, string> = {
   AGENDA: "bg-blue-50 text-blue-700",
   FINALIZAR: "bg-purple-50 text-purple-700",
+  ENVIAR_LINK: "bg-green-50 text-purple-700",
 };
 
 export default function RecruiterPendingProcesses({ pendencias }: Props) {
