@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { format, isToday, isTomorrow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+// import { format, isToday, isTomorrow } from "date-fns";
+// import { ptBR } from "date-fns/locale";
 import AgendaCard from "./AgendaCard";
 import { AgendaItemDTO } from "../dto/AgendaItemDTO";
 import { AgendaRecrutadorItemDTO } from "../dto/AgendaRecrutadorItemDTO";
