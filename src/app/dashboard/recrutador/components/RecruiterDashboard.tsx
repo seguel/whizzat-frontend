@@ -6,6 +6,7 @@ import RecruiterAgenda from "./RecruiterAgenda";
 import RecruiterPendingProcesses from "./RecruiterPendingProcesses";
 import LoadingOverlay from "../../../components/LoadingOverlay";
 import { useRecrutadorDashboard } from "../../../lib/hooks/useRecrutadorDashboard";
+import { Clock3 } from "lucide-react";
 
 export default function RecruiterDashboard() {
   const { t } = useTranslation("common");
@@ -30,9 +31,17 @@ export default function RecruiterDashboard() {
           {t("dash_recrutador.header")}
         </h1>
 
-        <p className="text-sm text-gray-500 mt-1">
-          {t("dash_recrutador.sub_header")}
-        </p>
+        <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-gray-500">
+            {t("dash_recrutador.sub_header")}
+          </p>
+
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+            <span>{t("dash_recrutador.fuso_brasilia_exibicao")}</span>
+          </div>
+        </div>
       </div>
 
       <RecruiterStats resumo={data.resumo} />

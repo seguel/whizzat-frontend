@@ -88,13 +88,18 @@ function OpportunityCard({
     oportunidade.data_aceite ??
     oportunidade.data_convite;
 
-  const dataFormatada = new Intl.DateTimeFormat(
-    i18n.language?.startsWith("en") ? "en-US" : "pt-BR",
-    {
-      day: "2-digit",
-      month: "short",
-    },
-  )
+  const locale =
+    i18n.language === "en"
+      ? "en-US"
+      : i18n.language === "es"
+        ? "es-ES"
+        : "pt-BR";
+
+  const dataFormatada = new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "short",
+    timeZone: "America/Sao_Paulo",
+  })
     .format(new Date(dataAtualizacao))
     .replace(".", "");
 
@@ -127,11 +132,19 @@ function OpportunityCard({
               {tipoLabel}
             </span>
 
-            {oportunidade.agenda?.status === "ACEITO" && (
-              <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
-                📅 {t("dash_candidato.oportunidade_agendada")}
-              </span>
-            )}
+            {oportunidade.agenda?.status === "ACEITO" &&
+              oportunidade.status === "AGENDADO" && (
+                <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
+                  📅 {t("dash_candidato.oportunidade_agendada_aguardando_link")}
+                </span>
+              )}
+
+            {oportunidade.agenda?.status === "ACEITO" &&
+              oportunidade.status === "ENTREVISTA_CONFIRMADA" && (
+                <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
+                  📅 {t("dash_candidato.oportunidade_entrevista_confirmada")}
+                </span>
+              )}
           </div>
         </div>
 
@@ -214,7 +227,13 @@ function getStatusConfig(
 
     case "AGENDADO":
       return {
-        label: t("dash_candidato.status_agendado"),
+        label: t("dash_candidato.status_aguardando_link"),
+        className: "bg-amber-50 text-amber-700",
+      };
+
+    case "ENTREVISTA_CONFIRMADA":
+      return {
+        label: t("dash_candidato.status_entrevista_confirmada"),
         className: "bg-green-50 text-green-700",
       };
 

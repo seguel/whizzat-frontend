@@ -1030,6 +1030,20 @@ const pt = {
     sexta: "Sex",
     sabado: "Sáb",
     sem: "sem",
+    fuso_brasilia_exibicao: "Horários exibidos no fuso de Brasília (BRT).",
+    status_aguardando_link: "Aguardando link da entrevista",
+    status_entrevista_confirmada: "Entrevista confirmada",
+    btn_entrar_entrevista: "Entrar na entrevista",
+    plataforma_google_meet: "Google Meet",
+    plataforma_microsoft_teams: "Microsoft Teams",
+    plataforma_zoom: "Zoom",
+    plataforma_link_externo: "Link externo",
+    status_aguardando_aceite: "Aguardando aceite do candidato",
+    status_horario_confirmado: "Horário confirmado",
+    status_aguardando_envio_link: "Aguardando envio do link",
+
+    btn_enviar_link: "Enviar link da entrevista",
+    btn_abrir_reuniao: "Abrir reunião",
   },
   dash_candidato: {
     header: "Meu Dashboard",
@@ -1097,8 +1111,22 @@ const pt = {
     movimentacao_convite_recebido: "Convite recebido",
     movimentacao_convite_aceito: "Convite aceito",
     movimentacao_agenda_enviada: "Novo horário recebido",
-    movimentacao_agenda_confirmada: "Horário confirmado",
     movimentacao_processo_finalizado: "Processo finalizado",
+    fuso_brasilia_exibicao: "Horários exibidos no fuso de Brasília (BRT).",
+    agenda_aguardando_link: "Aguardando envio do link",
+    btn_entrar_entrevista: "Entrar na entrevista",
+    plataforma_google_meet: "Google Meet",
+    plataforma_microsoft_teams: "Microsoft Teams",
+    plataforma_zoom: "Zoom",
+    plataforma_link_externo: "Link externo",
+    status_aguardando_link: "Aguardando link da entrevista",
+    status_entrevista_confirmada: "Entrevista confirmada",
+
+    oportunidade_agendada_aguardando_link: "Horário confirmado",
+    oportunidade_entrevista_confirmada: "Link da entrevista disponível",
+    movimentacao_agenda_confirmada:
+      "Horário confirmado — aguardando link da entrevista",
+    movimentacao_link_entrevista_disponivel: "Link da entrevista disponível",
   },
   dash_avaliador: {
     stats_pendente: "Avaliações pendentes",
@@ -1136,6 +1164,7 @@ const pt = {
     ranking_pontos: "pontos",
     ranking_posicao: "Posição no ranking",
     ranking_avaliadores: "avaliadores",
+    fuso_brasilia_exibicao: "Horários exibidos no fuso de Brasília (BRT).",
   },
   perfil_candidato: {
     sobre: "Sobre",
@@ -1232,7 +1261,7 @@ const pt = {
     aprovado: "Aprovado",
     nao_aprovado: "Não aprovado",
     parecer: "Feedback do recrutador",
-    tipo_vaga: "Vaga",
+    tipo_vaga: "Vaga em aberto",
     tipo_oportunidade: "Oportunidade",
     tipo_evento: "Palestra / Evento",
     tipo_mentoria: "Mentoria",
@@ -1248,7 +1277,9 @@ const pt = {
     aguardando_nova_agenda:
       "Aguardando uma nova sugestão de horário do recrutador.",
     aguardando_agenda: "Aguardando o recrutador sugerir um horário.",
-    entrevista_confirmada: "Entrevista confirmada",
+    entrevista_confirmada_link:
+      "Entrevista confirmada. Aguardando envio do link da entrevista",
+    entrevista_confirmada: "Entrevista confirmada.",
     entrevista_realizada: "Entrevista realizada",
     aguardando_finalizacao:
       "Entrevista concluída. Aguardando a finalização do processo pelo recrutador.",
@@ -1262,6 +1293,10 @@ const pt = {
     sem_entrevistas: "Nenhuma entrevista em andamento",
     sem_entrevistas_msg:
       "Quando você aceitar um convite, o andamento do processo aparecerá aqui.",
+    fuso_brasilia_exibicao: "Horários exibidos no fuso de Brasília (BRT).",
+    acessar_entrevista: "Acessar entrevista",
+    link_externo: "Link externo",
+    acesso_liberado_as: "Acesso liberado às",
   },
   processos_recrutador: {
     titulo: "Processos",
@@ -1272,7 +1307,7 @@ const pt = {
     finalizados: "Finalizados",
     recusados: "Recusados",
 
-    tipo_vaga: "Vaga",
+    tipo_vaga: "Vaga em aberto",
     tipo_oportunidade: "Oportunidade",
     tipo_evento: "Palestra / Evento",
     tipo_mentoria: "Mentoria",
@@ -1290,7 +1325,7 @@ const pt = {
       "O candidato recusou o horário sugerido. Envie uma nova opção.",
 
     aguardando_confirmacao_candidato: "Aguardando confirmação do candidato",
-    entrevista_confirmada: "Entrevista confirmada",
+    entrevista_confirmada: "Entrevista confirmada. ",
     entrevista_realizada: "Entrevista realizada",
     finalizar_processo_msg:
       "A entrevista foi realizada. O processo já pode ser finalizado.",
@@ -1323,6 +1358,7 @@ const pt = {
         "Escolha um horário com pelo menos 30 minutos de antecedência.",
       btn_enviando: "Enviando...",
       erro: "Não foi possível enviar a sugestão de entrevista.",
+      fuso_brasilia: "Data e horário considerados no fuso de Brasília (BRT).",
     },
     sucesso_marcar_realizada: "Entrevista marcada como realizada com sucesso.",
     erro_marcar_realizada:
@@ -1353,6 +1389,45 @@ const pt = {
     aguardando_resposta: "Aguardando resposta",
     enviado_em: "Enviado em",
     erro_carregar_convites: "Não foi possível carregar os convites.",
+    fuso_brasilia_exibicao: "Horários exibidos no fuso de Brasília (BRT).",
+    aguardando_envio_link:
+      "Horário confirmado. Aguardando envio do link da entrevista.",
+    btn_enviar_link: "Enviar link da entrevista",
+
+    plataforma_google_meet: "Google Meet",
+    plataforma_microsoft_teams: "Microsoft Teams",
+    plataforma_zoom: "Zoom",
+    plataforma_link_externo: "Link externo",
+    btn_acessar_entrevista: "Acessar entrevista",
+    modal_link_entrevista: {
+      titulo: "Enviar link da entrevista",
+      descricao:
+        "Informe a plataforma e o link que será utilizado na entrevista.",
+      plataforma: "Plataforma da entrevista",
+      link: "Link da reunião",
+      link_placeholder: "https://...",
+      link_descricao:
+        "O candidato receberá este link para acessar a entrevista.",
+      aviso:
+        "Após o envio, o candidato será notificado e o acesso à entrevista ficará disponível para ele.",
+
+      btn_cancelar: "Cancelar",
+      btn_enviar: "Enviar link",
+      btn_enviando: "Enviando...",
+      sucesso: "Link da entrevista enviado com sucesso.",
+      erro: "Não foi possível enviar o link da entrevista.",
+      tipo_meet: "Como deseja criar a reunião?",
+      meet_automatico: "Gerar reunião automaticamente",
+      meet_automatico_descricao:
+        "O Whizzat criará uma sala no Google Meet e disponibilizará o link para o candidato.",
+      meet_manual: "Informar link existente",
+      meet_manual_descricao:
+        "Utilize o link de uma reunião do Google Meet que você já criou.",
+      zoom_automatico_descricao:
+        "O Whizzat criará uma reunião no Zoom e disponibilizará o link para o candidato.",
+      zoom_manual_descricao:
+        "Utilize o link de uma reunião Zoom que você já criou.",
+    },
   },
   dash_recrutador: {
     header: "Meu Dashboard",
@@ -1380,6 +1455,50 @@ const pt = {
     stats_vagas: "Vagas abertas",
     stats_vagas_msg: "Disponíveis para candidatos",
     erro: "Não foi possível carregar o dashboard.",
+    fuso_brasilia_exibicao: "Horários exibidos no fuso de Brasília (BRT).",
+    agenda_aguardando_link: "Aguardando envio do link",
+    btn_enviar_link: "Enviar link da entrevista",
+    btn_abrir_reuniao: "Abrir reunião",
+    plataforma_google_meet: "Google Meet",
+    plataforma_microsoft_teams: "Microsoft Teams",
+    plataforma_zoom: "Zoom",
+    plataforma_link_externo: "Link externo",
+  },
+  tela_buscar_candidatos: {
+    titulo: "Buscar candidatos",
+    descricao: "Encontre candidatos pelas competências desejadas.",
+    hard_skills: "Hard Skills",
+    hard_skills_descricao:
+      "Selecione as competências técnicas desejadas e defina o nível esperado.",
+    soft_skills: "Soft Skills",
+    soft_skills_descricao:
+      "Selecione as competências comportamentais desejadas e defina o nível esperado.",
+    selecione_skill: "Selecione pelo menos uma skill para realizar a busca.",
+    skill_selecionada: "skill selecionada",
+    skills_selecionadas: "skills selecionadas",
+    resultado_busca: "Resultado da busca",
+    resultado_busca_descricao:
+      "Defina o nível de compatibilidade e a quantidade de candidatos que deseja visualizar.",
+    quantidade_candidatos: "Quantidade de candidatos",
+    buscando: "Buscando...",
+    buscar_candidatos: "Buscar candidatos",
+    resultados: "Resultados",
+    resultados_descricao:
+      "Candidatos encontrados com base nas skills selecionadas.",
+    candidato_encontrado: "candidato encontrado",
+    candidatos_encontrados: "candidatos encontrados",
+    selecionados: "selecionado(s)",
+    convidar_selecionados: "Convidar selecionados",
+    selecionar_todos: "Selecionar todos",
+    maximo: "máximo de {{quantidade}}",
+    nenhum_candidato: "Nenhum candidato encontrado.",
+    nenhum_candidato_descricao:
+      "Tente alterar as skills, os níveis desejados ou a faixa de compatibilidade.",
+    selecionar_skill: "Selecione uma {{skill}}",
+    nenhuma_skill_disponivel: "Nenhuma skill disponível",
+    adicionar: "Adicionar",
+    remover_skill: "Remover skill",
+    nivel: "Nível",
   },
 };
 
