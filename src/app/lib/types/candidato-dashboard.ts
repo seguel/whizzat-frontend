@@ -15,6 +15,12 @@ export type DashboardSkill = {
   peso_avaliador?: number | null;
 };
 
+export type DashboardPlataformaEntrevista =
+  | "GOOGLE_MEET"
+  | "MICROSOFT_TEAMS"
+  | "ZOOM"
+  | "LINK_EXTERNO";
+
 export type DashboardTipoConvite =
   | "VAGA"
   | "PALESTRA_EVENTO"
@@ -36,6 +42,10 @@ export type DashboardEntrevista = {
   data_hora: string;
   agenda_status: string;
   status: string;
+
+  plataforma: DashboardPlataformaEntrevista | null;
+  link_reuniao: string | null;
+  data_envio_link: string | null;
 
   empresa: {
     id: number;
@@ -61,6 +71,7 @@ export type DashboardOportunidade = {
     | "CONVITE_ACEITO"
     | "AGENDA_ENVIADA"
     | "AGENDADO"
+    | "ENTREVISTA_CONFIRMADA"
     | "ENTREVISTA_REALIZADA";
 
   compatibilidade: number | null;
@@ -93,6 +104,7 @@ export type DashboardMovimentacao = {
     | "CONVITE_ACEITO"
     | "AGENDA_ENVIADA"
     | "AGENDA_CONFIRMADA"
+    | "LINK_ENTREVISTA_DISPONIVEL"
     | "PROCESSO_FINALIZADO";
 
   origem: "RECRUTADOR";

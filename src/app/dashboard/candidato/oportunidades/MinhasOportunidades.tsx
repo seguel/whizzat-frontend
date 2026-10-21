@@ -12,6 +12,8 @@ import {
   Network,
   Presentation,
   XCircle,
+  Lock,
+  Video,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -72,6 +74,7 @@ type StatusProcesso =
   | "CONVITE_ACEITO"
   | "AGENDA_ENVIADA"
   | "AGENDADO"
+  | "ENTREVISTA_CONFIRMADA"
   | "ENTREVISTA_REALIZADA";
 
 type StatusAgenda =
@@ -107,6 +110,10 @@ interface Processo {
     status: StatusAgenda;
     data_criacao: string;
     data_resposta: string | null;
+
+    plataforma: string | null;
+    link_reuniao: string | null;
+    data_envio_link: string | null;
   } | null;
 }
 
@@ -150,6 +157,8 @@ export default function MinhasOportunidadesPage() {
   const [loadingFinalizados, setLoadingFinalizados] = useState(true);
   const [erroFinalizados, setErroFinalizados] = useState(false);
 
+  const [agora, setAgora] = useState(() => Date.now());
+
   const quantidade = useMemo(
     () => ({
       convites: convites.length,
@@ -158,6 +167,45 @@ export default function MinhasOportunidadesPage() {
     }),
     [convites, processos, finalizados],
   );
+
+  function nomePlataforma(plataforma?: string | null) {
+    switch (plataforma) {
+      case "GOOGLE_MEET":
+        return "Google Meet";
+
+      case "MICROSOFT_TEAMS":
+        return "Microsoft Teams";
+
+      case "ZOOM":
+        return "Zoom";
+
+      default:
+        return "Link externo";
+    }
+  }
+
+  function verificarAcessoEntrevista(
+    dataHoraAgenda: string | Date,
+    agora: number,
+  ) {
+    const dataEntrevista = new Date(dataHoraAgenda);
+
+    if (Number.isNaN(dataEntrevista.getTime())) {
+      return {
+        liberado: false,
+        horarioLiberacao: null,
+      };
+    }
+
+    const horarioLiberacao = new Date(
+      dataEntrevista.getTime() - 15 * 60 * 1000,
+    );
+
+    return {
+      liberado: agora >= horarioLiberacao.getTime(),
+      horarioLiberacao,
+    };
+  }
 
   async function carregarConvites() {
     try {
@@ -193,6 +241,14 @@ export default function MinhasOportunidadesPage() {
     carregarConvites();
     carregarProcessos();
     carregarFinalizados();
+  }, []);
+
+  useEffect(() => {
+    const intervalo = window.setInterval(() => {
+      setAgora(Date.now());
+    }, 15000);
+
+    return () => window.clearInterval(intervalo);
   }, []);
 
   useEffect(() => {
@@ -470,14 +526,22 @@ export default function MinhasOportunidadesPage() {
   return (
     <div className="w-full space-y-6">
       {/* Header */}
-      <div>
+      <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">
           {t("oportunidades_candidato.titulo")}
         </h1>
 
-        <p className="mt-1 text-sm text-gray-500">
-          {t("oportunidades_candidato.descricao")}
-        </p>
+        <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="mt-1 text-sm text-gray-500">
+            {t("oportunidades_candidato.descricao")}
+          </p>
+
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+            <span>{t("oportunidades_candidato.fuso_brasilia_exibicao")}</span>
+          </div>
+        </div>
       </div>
 
       {/* Abas */}
@@ -515,6 +579,11 @@ export default function MinhasOportunidadesPage() {
       {/* CONVITES */}
       {aba === "convites" && (
         <div className="space-y-4">
+          <div className="mb-3 flex items-center gap-1.5 text-xs text-gray-500">
+            <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+            <span>{t("oportunidades_candidato.fuso_brasilia_exibicao")}</span>
+          </div>
           {loadingConvites ? (
             <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
               <p className="text-sm text-gray-500">
@@ -609,6 +678,11 @@ export default function MinhasOportunidadesPage() {
       {/* ENTREVISTAS */}
       {aba === "entrevistas" && (
         <div className="space-y-4">
+          <div className="mb-3 flex items-center gap-1.5 text-xs text-gray-500">
+            <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+            <span>{t("oportunidades_candidato.fuso_brasilia_exibicao")}</span>
+          </div>
           {loadingProcessos ? (
             <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
               <p className="text-sm text-gray-500">
@@ -648,7 +722,8 @@ export default function MinhasOportunidadesPage() {
                   }`}
                 >
                   <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="min-w-0">
+                    {/* LADO ESQUERDO */}
+                    <div className="min-w-0 flex-1">
                       <TipoConviteBadge tipo={entrevista.tipo} />
 
                       <h2 className="mt-3 text-base font-semibold text-gray-900">
@@ -676,8 +751,8 @@ export default function MinhasOportunidadesPage() {
                             )}
                           </p>
                         </div>
-                      ) : /* Horário recusado pelo candidato */
-                      entrevista.agenda?.status === "RECUSADO" ? (
+                      ) : entrevista.agenda?.status === "RECUSADO" ? (
+                        /* Horário recusado pelo candidato */
                         <div className="mt-4">
                           <div className="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-700">
                             <XCircle className="h-4 w-4" />
@@ -691,8 +766,8 @@ export default function MinhasOportunidadesPage() {
                             )}
                           </p>
                         </div>
-                      ) : /* Existe uma agenda */
-                      entrevista.agenda ? (
+                      ) : entrevista.agenda ? (
+                        /* Existe uma agenda */
                         <>
                           <div className="mt-4 inline-flex items-center gap-2 rounded-lg bg-purple-50 px-3 py-2 text-sm font-semibold text-purple-700">
                             <CalendarDays className="h-4 w-4" />
@@ -712,8 +787,18 @@ export default function MinhasOportunidadesPage() {
                               </p>
                             )}
 
-                          {/* Agenda aceita */}
+                          {/* Agenda aceita, aguardando link */}
                           {entrevista.status === "AGENDADO" &&
+                            entrevista.agenda.status === "ACEITO" && (
+                              <p className="mt-2 text-xs font-medium text-green-600">
+                                {t(
+                                  "oportunidades_candidato.entrevista_confirmada",
+                                )}
+                              </p>
+                            )}
+
+                          {/* Link já enviado */}
+                          {entrevista.status === "ENTREVISTA_CONFIRMADA" &&
                             entrevista.agenda.status === "ACEITO" && (
                               <p className="mt-2 text-xs font-medium text-green-600">
                                 {t(
@@ -730,7 +815,9 @@ export default function MinhasOportunidadesPage() {
                       )}
                     </div>
 
-                    {/* Botões aparecem somente enquanto a agenda aguarda resposta */}
+                    {/* LADO DIREITO */}
+
+                    {/* Aguardando resposta da agenda */}
                     {entrevista.status === "AGENDA_ENVIADA" &&
                       entrevista.agenda?.status === "PENDENTE" && (
                         <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
@@ -761,6 +848,72 @@ export default function MinhasOportunidadesPage() {
                           </button>
                         </div>
                       )}
+
+                    {/* Entrevista confirmada - plataforma + acesso */}
+                    {entrevista.status === "ENTREVISTA_CONFIRMADA" &&
+                      entrevista.agenda?.status === "ACEITO" &&
+                      entrevista.agenda.link_reuniao &&
+                      (() => {
+                        const { liberado, horarioLiberacao } =
+                          verificarAcessoEntrevista(
+                            entrevista.agenda.data_hora_agenda,
+                            agora,
+                          );
+
+                        return (
+                          <div className="flex shrink-0 flex-col items-start gap-1.5 lg:items-end">
+                            {entrevista.agenda.plataforma && (
+                              <span className="text-xs font-medium text-gray-500">
+                                {nomePlataforma(entrevista.agenda.plataforma)}
+                              </span>
+                            )}
+
+                            {liberado ? (
+                              <a
+                                href={entrevista.agenda.link_reuniao}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700"
+                              >
+                                <Video className="h-4 w-4 shrink-0" />
+
+                                {t(
+                                  "oportunidades_candidato.acessar_entrevista",
+                                )}
+                              </a>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="inline-flex min-h-10 cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-500"
+                                >
+                                  <Lock className="h-4 w-4" />
+
+                                  {t(
+                                    "oportunidades_candidato.acessar_entrevista",
+                                  )}
+                                </button>
+
+                                {horarioLiberacao && (
+                                  <span className="text-xs text-gray-500 lg:text-right">
+                                    {t(
+                                      "oportunidades_candidato.acesso_liberado_as",
+                                    )}{" "}
+                                    {horarioLiberacao.toLocaleTimeString(
+                                      "pt-BR",
+                                      {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      },
+                                    )}
+                                  </span>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        );
+                      })()}
                   </div>
                 </div>
               );
@@ -772,6 +925,11 @@ export default function MinhasOportunidadesPage() {
       {/* FINALIZADOS */}
       {aba === "finalizados" && (
         <div className="space-y-4">
+          <div className="mb-3 flex items-center gap-1.5 text-xs text-gray-500">
+            <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+            <span>{t("oportunidades_candidato.fuso_brasilia_exibicao")}</span>
+          </div>
           {loadingFinalizados ? (
             <div className="rounded-xl border border-gray-200 bg-white p-8 text-center">
               <p className="text-sm text-gray-500">

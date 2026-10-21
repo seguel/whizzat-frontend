@@ -13,6 +13,8 @@ import AgendaCardList from "./components/AgendaCardList";
 import { AgendaItemDTO } from "./dto/AgendaItemDTO";
 import { AgendaRecrutadorItemDTO } from "./dto/AgendaRecrutadorItemDTO";
 import { AgendaCandidatoItemDTO } from "./dto/AgendaCandidatoItemDTO";
+import { getAgendaDateKey } from "./components/agendaDate";
+import { Clock3 } from "lucide-react";
 
 interface Props {
   perfil: ProfileType;
@@ -57,7 +59,7 @@ export default function AgendaPage({ perfil }: Props) {
       setAgenda(data);
 
       if (data.length === 1) {
-        setSelectedDate(data[0].data_hora.slice(0, 10));
+        setSelectedDate(getAgendaDateKey(data[0].data_hora));
       }
     } catch (error) {
       console.error(error);
@@ -89,11 +91,21 @@ export default function AgendaPage({ perfil }: Props) {
           <PageContainer>
             <div className="space-y-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-900">
                   {t("agenda.titulo_um")}
                 </h1>
 
-                <p className="mt-2 text-gray-500">{t("agenda.titulo_dois")}</p>
+                <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="mt-2 text-gray-500">
+                    {t("agenda.titulo_dois")}
+                  </p>
+
+                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                    <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+                    <span>{t("agenda.fuso_brasilia_exibicao")}</span>
+                  </div>
+                </div>
               </div>
 
               <div

@@ -1043,6 +1043,20 @@ const en = {
     quinta: "Thu",
     sexta: "Fri",
     sabado: "Sat",
+    fuso_brasilia_exibicao: "Times are displayed in Brasília time (BRT).",
+    status_aguardando_link: "Waiting for interview link",
+    status_entrevista_confirmada: "Interview confirmed",
+    btn_entrar_entrevista: "Join interview",
+    plataforma_google_meet: "Google Meet",
+    plataforma_microsoft_teams: "Microsoft Teams",
+    plataforma_zoom: "Zoom",
+    plataforma_link_externo: "External link",
+    status_aguardando_aceite: "Waiting for candidate acceptance",
+    status_horario_confirmado: "Time confirmed",
+    status_aguardando_envio_link: "Waiting for interview link to be sent",
+
+    btn_enviar_link: "Send interview link",
+    btn_abrir_reuniao: "Open meeting",
   },
   dash_candidato: {
     header: "My Dashboard",
@@ -1110,8 +1124,23 @@ const en = {
     movimentacao_convite_recebido: "Invitation received",
     movimentacao_convite_aceito: "Invitation accepted",
     movimentacao_agenda_enviada: "New schedule received",
-    movimentacao_agenda_confirmada: "Schedule confirmed",
     movimentacao_processo_finalizado: "Process completed",
+    fuso_brasilia_exibicao: "Times are displayed in Brasília time (BRT).",
+    agenda_aguardando_link: "Waiting for interview link",
+    btn_entrar_entrevista: "Join interview",
+    plataforma_google_meet: "Google Meet",
+    plataforma_microsoft_teams: "Microsoft Teams",
+    plataforma_zoom: "Zoom",
+    plataforma_link_externo: "External link",
+    status_aguardando_link: "Waiting for interview link",
+    status_entrevista_confirmada: "Interview confirmed",
+
+    oportunidade_agendada_aguardando_link: "Time confirmed",
+    oportunidade_entrevista_confirmada: "Interview link available",
+    movimentacao_agenda_confirmada:
+      "Time confirmed — waiting for interview link",
+
+    movimentacao_link_entrevista_disponivel: "Interview link available",
   },
   dash_avaliador: {
     stats_pendente: "Pending Evaluations",
@@ -1256,7 +1285,7 @@ const en = {
     nao_aprovado: "Not approved",
     parecer: "Recruiter feedback",
 
-    tipo_vaga: "Job",
+    tipo_vaga: "Open Position",
     tipo_oportunidade: "Opportunity",
     tipo_evento: "Talk / Event",
     tipo_mentoria: "Mentorship",
@@ -1271,7 +1300,9 @@ const en = {
     aguardando_nova_agenda:
       "Waiting for a new time suggestion from the recruiter.",
     aguardando_agenda: "Waiting for the recruiter to suggest a time.",
-    entrevista_confirmada: "Interview confirmed",
+    entrevista_confirmada_link:
+      "Interview confirmed. Waiting for the interview link.",
+    entrevista_confirmada: "Interview confirmed.",
     entrevista_realizada: "Interview completed",
     aguardando_finalizacao:
       "Interview completed. Waiting for the recruiter to finalize the process.",
@@ -1285,26 +1316,26 @@ const en = {
     sem_entrevistas: "No interviews in progress",
     sem_entrevistas_msg:
       "When you accept an invitation, the process progress will appear here.",
+    fuso_brasilia_exibicao: "Times are displayed in Brasília time (BRT).",
+    acessar_entrevista: "Join interview",
+    link_externo: "External link",
+    acesso_liberado_as: "Access available at",
   },
   processos_recrutador: {
     titulo: "Processes",
     descricao: "Manage invitations, interviews, and candidate processes.",
-
     em_andamento: "In progress",
     finalizados: "Completed",
     recusados: "Declined",
-
-    tipo_vaga: "Job",
+    tipo_vaga: "Open Position",
     tipo_oportunidade: "Opportunity",
     tipo_evento: "Talk / Event",
     tipo_mentoria: "Mentorship",
     tipo_projeto: "Project / Consulting",
     tipo_networking: "Networking",
     tipo_outro: "Other",
-
     convite_aceito: "Invitation accepted",
     convite_recusado: "Invitation declined",
-
     sugerir_entrevista_msg:
       "The candidate accepted the invitation. Suggest an interview date and time.",
     horario_recusado: "Time declined",
@@ -1312,20 +1343,18 @@ const en = {
       "The candidate declined the suggested time. Send a new option.",
 
     aguardando_confirmacao_candidato: "Awaiting candidate confirmation",
-    entrevista_confirmada: "Interview confirmed",
+    entrevista_confirmada:
+      "Interview confirmed. Waiting for the interview link.",
     entrevista_realizada: "Interview completed",
     finalizar_processo_msg:
       "The interview has been completed. The process can now be finalized.",
-
     btn_sugerir_entrevista: "Suggest interview",
     btn_novo_horario: "Suggest new time",
     btn_realizada: "Mark as completed",
     btn_finalizar: "Finalize process",
-
     aprovado: "Approved",
     nao_aprovado: "Not approved",
     parecer: "Feedback for the candidate",
-
     finalizado_em: "Completed on",
     recusado_em: "Declined on",
     modal_agenda: {
@@ -1343,6 +1372,7 @@ const en = {
       data_invalida: "Choose a time at least 30 minutes in advance.",
       btn_enviando: "Sending...",
       erro: "Unable to send the interview suggestion.",
+      fuso_brasilia_exibicao: "Times are displayed in Brasília time (BRT).",
     },
     sucesso_marcar_realizada: "Interview marked as completed successfully.",
     erro_marcar_realizada: "Unable to mark the interview as completed.",
@@ -1372,6 +1402,42 @@ const en = {
     aguardando_resposta: "Awaiting response",
     enviado_em: "Sent on",
     erro_carregar_convites: "Unable to load invitations.",
+    aguardando_envio_link: "Time confirmed. Waiting for the interview link.",
+    btn_enviar_link: "Send interview link",
+    plataforma_google_meet: "Google Meet",
+    plataforma_microsoft_teams: "Microsoft Teams",
+    plataforma_zoom: "Zoom",
+    plataforma_link_externo: "External link",
+    btn_acessar_entrevista: "Join interview",
+    modal_link_entrevista: {
+      titulo: "Send interview link",
+      descricao:
+        "Select the platform and enter the link that will be used for the interview.",
+      plataforma: "Interview platform",
+      link: "Meeting link",
+      link_placeholder: "https://...",
+      link_descricao:
+        "The candidate will receive this link to join the interview.",
+      aviso:
+        "After sending the link, the candidate will be notified and the interview access will become available to them.",
+
+      btn_cancelar: "Cancel",
+      btn_enviar: "Send link",
+      btn_enviando: "Sending...",
+      sucesso: "Interview link sent successfully.",
+      erro: "Unable to send the interview link.",
+      tipo_meet: "How would you like to create the meeting?",
+      meet_automatico: "Generate meeting automatically",
+      meet_automatico_descricao:
+        "Whizzat will create a Google Meet meeting and make the link available to the candidate.",
+      meet_manual: "Enter an existing link",
+      meet_manual_descricao:
+        "Use the link to a Google Meet meeting you've already created.",
+      zoom_automatico_descricao:
+        "Whizzat will create a Zoom meeting and provide the link to the candidate.",
+      zoom_manual_descricao:
+        "Use the link to an existing Zoom meeting you created.",
+    },
   },
   dash_recrutador: {
     header: "My Dashboard",
@@ -1399,6 +1465,49 @@ const en = {
     stats_vagas: "Open positions",
     stats_vagas_msg: "Available to candidates",
     erro: "Unable to load the dashboard.",
+    fuso_brasilia_exibicao: "Times are displayed in Brasília time (BRT).",
+    agenda_aguardando_link: "Waiting for interview link",
+    btn_enviar_link: "Send interview link",
+    btn_abrir_reuniao: "Open meeting",
+    plataforma_google_meet: "Google Meet",
+    plataforma_microsoft_teams: "Microsoft Teams",
+    plataforma_zoom: "Zoom",
+    plataforma_link_externo: "External link",
+  },
+  tela_buscar_candidatos: {
+    titulo: "Search candidates",
+    descricao: "Find candidates based on the desired skills.",
+    hard_skills: "Hard Skills",
+    hard_skills_descricao:
+      "Select the desired technical skills and define the expected level.",
+    soft_skills: "Soft Skills",
+    soft_skills_descricao:
+      "Select the desired behavioral skills and define the expected level.",
+    selecione_skill: "Select at least one skill to perform the search.",
+    skill_selecionada: "skill selected",
+    skills_selecionadas: "skills selected",
+    resultado_busca: "Search results",
+    resultado_busca_descricao:
+      "Define the compatibility level and the number of candidates you want to view.",
+    quantidade_candidatos: "Number of candidates",
+    buscando: "Searching...",
+    buscar_candidatos: "Search candidates",
+    resultados: "Results",
+    resultados_descricao: "Candidates found based on the selected skills.",
+    candidato_encontrado: "candidate found",
+    candidatos_encontrados: "candidates found",
+    selecionados: "selected",
+    convidar_selecionados: "Invite selected",
+    selecionar_todos: "Select all",
+    maximo: "maximum of {{quantidade}}",
+    nenhum_candidato: "No candidates found.",
+    nenhum_candidato_descricao:
+      "Try changing the skills, desired levels, or compatibility range.",
+    selecionar_skill: "Select a {{skill}}",
+    nenhuma_skill_disponivel: "No skills available",
+    adicionar: "Add",
+    remover_skill: "Remove skill",
+    nivel: "Level",
   },
 };
 

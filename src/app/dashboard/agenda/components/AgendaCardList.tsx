@@ -8,25 +8,17 @@ import { AgendaItemDTO } from "../dto/AgendaItemDTO";
 import { AgendaRecrutadorItemDTO } from "../dto/AgendaRecrutadorItemDTO";
 import { AgendaCandidatoItemDTO } from "../dto/AgendaCandidatoItemDTO";
 import { useTranslation } from "react-i18next";
+import {
+  getAgendaDateKey,
+  getAgendaTomorrowKey,
+  formatAgendaLongDate,
+  getAgendaTodayKey,
+} from "./agendaDate";
 
 type AgendaDTO =
   | AgendaItemDTO
   | AgendaRecrutadorItemDTO
   | AgendaCandidatoItemDTO;
-
-function getTituloGrupo(data: Date, t: (key: string) => string) {
-  if (isToday(data)) {
-    return t("agenda.hoje");
-  }
-
-  if (isTomorrow(data)) {
-    return t("agenda.amanha");
-  }
-
-  return format(data, "dd 'de' MMMM 'de' yyyy", {
-    locale: ptBR,
-  });
-}
 
 interface Props {
   agenda: AgendaDTO[];
@@ -40,11 +32,36 @@ export default function AgendaCardList({
   perfil,
 }: Props) {
   const refs = useRef<Record<string | number, HTMLDivElement | null>>({});
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
+
+  const locale =
+    i18n.language === "en"
+      ? "en-US"
+      : i18n.language === "es"
+        ? "es-ES"
+        : "pt-BR";
+
+  function getTituloGrupo(
+    data: string,
+    locale: string,
+    t: (key: string) => string,
+  ) {
+    const dateKey = getAgendaDateKey(data);
+
+    if (dateKey === getAgendaTodayKey()) {
+      return t("agenda.hoje");
+    }
+
+    if (dateKey === getAgendaTomorrowKey()) {
+      return t("agenda.amanha");
+    }
+
+    return formatAgendaLongDate(data, locale);
+  }
 
   const grupos = agenda.reduce(
     (acc, item) => {
-      const titulo = getTituloGrupo(new Date(item.data_hora), t);
+      const titulo = getTituloGrupo(item.data_hora, locale, t);
 
       if (!acc[titulo]) {
         acc[titulo] = [];
@@ -60,7 +77,9 @@ export default function AgendaCardList({
   useEffect(() => {
     if (!selectedDate) return;
 
-    const item = agenda.find((a) => a.data_hora.slice(0, 10) === selectedDate);
+    const item = agenda.find(
+      (a) => getAgendaDateKey(a.data_hora) === selectedDate,
+    );
 
     if (!item) return;
 
@@ -103,7 +122,7 @@ export default function AgendaCardList({
       <div className="p-6">
         {Object.entries(grupos).map(([titulo, itens]) => {
           const grupoSelecionado = itens.some(
-            (item) => selectedDate === item.data_hora.slice(0, 10),
+            (item) => selectedDate === getAgendaDateKey(item.data_hora),
           );
 
           return (
@@ -129,7 +148,7 @@ export default function AgendaCardList({
                   <AgendaCard
                     key={item.id}
                     agenda={item}
-                    selected={selectedDate === item.data_hora.slice(0, 10)}
+                    selected={selectedDate === getAgendaDateKey(item.data_hora)}
                     perfil={perfil}
                   />
                 ))}
