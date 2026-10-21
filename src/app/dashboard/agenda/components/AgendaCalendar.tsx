@@ -15,6 +15,7 @@ import {
 import { ptBR } from "date-fns/locale";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { getAgendaDateKey, getAgendaTodayKey } from "./agendaDate";
 
 interface AgendaCalendarItem {
   id: number | string;
@@ -41,8 +42,8 @@ export default function AgendaCalendar({
     return new Date();
   });
 
-  const agendaMap = useMemo(() => {
-    return new Map(agenda.map((item) => [item.data_hora.slice(0, 10), item]));
+  const agendaDates = useMemo(() => {
+    return new Set(agenda.map((item) => getAgendaDateKey(item.data_hora)));
   }, [agenda]);
 
   const monthStart = startOfMonth(currentMonth);
@@ -60,8 +61,7 @@ export default function AgendaCalendar({
 
   let day = calendarStart;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const todayKey = getAgendaTodayKey();
 
   while (day <= calendarEnd) {
     const days = [];
@@ -71,14 +71,9 @@ export default function AgendaCalendar({
 
       const dayString = format(currentDay, "yyyy-MM-dd");
 
-      const agendaInfo = agendaMap.get(dayString);
+      const hasAgenda = agendaDates.has(dayString);
 
-      const hasAgenda = !!agendaInfo;
-
-      const atrasada =
-        hasAgenda &&
-        new Date(agendaInfo.data_hora).setHours(0, 0, 0, 0) < today.getTime();
-
+      const atrasada = hasAgenda && dayString < todayKey;
       const isSelected = selectedDate === dayString;
 
       const isCurrentMonth = isSameMonth(currentDay, currentMonth);

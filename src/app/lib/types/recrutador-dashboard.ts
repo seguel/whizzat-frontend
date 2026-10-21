@@ -6,6 +6,12 @@ export interface RecrutadorDashboardResumo {
   processos_finalizados: number;
 }
 
+export type PlataformaEntrevista =
+  | "GOOGLE_MEET"
+  | "MICROSOFT_TEAMS"
+  | "ZOOM"
+  | "LINK_EXTERNO";
+
 export interface RecrutadorDashboardAgenda {
   id: number;
   convite_id: number;
@@ -29,11 +35,19 @@ export interface RecrutadorDashboardAgenda {
   } | null;
 
   data_hora: string;
+
   status: string;
+
+  status_processo: "AGENDADO" | "ENTREVISTA_CONFIRMADA";
+
+  plataforma: PlataformaEntrevista | null;
+  link_reuniao: string | null;
+  data_envio_link: string | null;
+
   atrasada: boolean;
 }
 
-export type RecrutadorDashboardAcao = "AGENDA" | "FINALIZAR";
+export type RecrutadorDashboardAcao = "AGENDA" | "ENVIAR_LINK" | "FINALIZAR";
 
 export interface RecrutadorDashboardPendencia {
   id: number;
