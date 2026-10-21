@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CheckCircle2,
   MailCheck,
+  Video,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
@@ -20,7 +21,12 @@ export default function ProcessTimeline({ movimentacoes }: Props) {
   const { t, i18n } = useTranslation("common");
   const router = useRouter();
 
-  const locale = i18n.language?.startsWith("en") ? "en-US" : "pt-BR";
+  const locale =
+    i18n.language === "en"
+      ? "en-US"
+      : i18n.language === "es"
+        ? "es-ES"
+        : "pt-BR";
 
   function abrirMovimentacao(movimentacao: DashboardMovimentacao) {
     const tab =
@@ -37,6 +43,7 @@ export default function ProcessTimeline({ movimentacoes }: Props) {
     return new Intl.DateTimeFormat(locale, {
       day: "2-digit",
       month: "short",
+      timeZone: "America/Sao_Paulo",
     }).format(new Date(data));
   }
 
@@ -125,6 +132,13 @@ function TimelineRow({
       dot: "bg-green-500",
       ring: "ring-green-100",
       titulo: t("dash_candidato.movimentacao_agenda_confirmada"),
+    },
+
+    LINK_ENTREVISTA_DISPONIVEL: {
+      icon: <Video className="h-3.5 w-3.5 text-white" />,
+      dot: "bg-emerald-500",
+      ring: "ring-emerald-100",
+      titulo: t("dash_candidato.movimentacao_link_entrevista_disponivel"),
     },
 
     PROCESSO_FINALIZADO: {

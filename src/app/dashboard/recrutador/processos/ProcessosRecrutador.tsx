@@ -11,6 +11,7 @@ import {
   UserRound,
   X,
   XCircle,
+  Video,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -21,6 +22,7 @@ type StatusProcesso =
   | "CONVITE_ACEITO"
   | "AGENDA_ENVIADA"
   | "AGENDADO"
+  | "ENTREVISTA_CONFIRMADA"
   | "ENTREVISTA_REALIZADA"
   | "FINALIZADO"
   | "CONVITE_RECUSADO";
@@ -40,6 +42,12 @@ type TipoConvite =
   | "PROJETO_CONSULTORIA"
   | "NETWORKING"
   | "OUTRO";
+
+type PlataformaEntrevista =
+  | "GOOGLE_MEET"
+  | "MICROSOFT_TEAMS"
+  | "ZOOM"
+  | "LINK_EXTERNO";
 
 interface Processo {
   id: number;
@@ -68,6 +76,9 @@ interface Processo {
     id: number;
     data_hora_agenda: string;
     status: StatusAgenda;
+    plataforma: PlataformaEntrevista | null;
+    link_reuniao: string | null;
+    data_envio_link: string | null;
   } | null;
 
   data_convite: string;
@@ -119,9 +130,30 @@ export default function ProcessosRecrutador({ processoId }: Props) {
     boolean | null
   >(null);
 
+  const [processoLinkEntrevista, setProcessoLinkEntrevista] =
+    useState<Processo | null>(null);
+
+  const [plataformaEntrevista, setPlataformaEntrevista] = useState<
+    PlataformaEntrevista | ""
+  >("");
+
+  const [linkEntrevista, setLinkEntrevista] = useState("");
+
+  const [salvandoLinkEntrevista, setSalvandoLinkEntrevista] = useState(false);
+
+  const [erroLinkEntrevista, setErroLinkEntrevista] = useState("");
+
   const [parecerFinalizacao, setParecerFinalizacao] = useState("");
 
   const [salvandoFinalizacao, setSalvandoFinalizacao] = useState(false);
+
+  const [gerarReuniaoAutomaticamente, setGerarReuniaoAutomaticamente] =
+    useState(true);
+
+  const permiteGeracaoAutomatica =
+    plataformaEntrevista === "GOOGLE_MEET" || plataformaEntrevista === "ZOOM";
+
+  const automatico = permiteGeracaoAutomatica && gerarReuniaoAutomaticamente;
 
   const locale = i18n.language?.startsWith("en") ? "en-US" : "pt-BR";
 
@@ -132,6 +164,7 @@ export default function ProcessosRecrutador({ processoId }: Props) {
           "CONVITE_ACEITO",
           "AGENDA_ENVIADA",
           "AGENDADO",
+          "ENTREVISTA_CONFIRMADA",
           "ENTREVISTA_REALIZADA",
         ].includes(processo.status),
       ),
@@ -262,6 +295,24 @@ export default function ProcessosRecrutador({ processoId }: Props) {
     setDataEntrevista("");
     setHoraEntrevista("");
     setErroAgenda("");
+  }
+
+  function abrirModalLinkEntrevista(processo: Processo) {
+    setProcessoLinkEntrevista(processo);
+    setPlataformaEntrevista("");
+    setLinkEntrevista("");
+    setErroLinkEntrevista("");
+    setGerarReuniaoAutomaticamente(true);
+  }
+
+  function fecharModalLinkEntrevista() {
+    if (salvandoLinkEntrevista) return;
+
+    setProcessoLinkEntrevista(null);
+    setPlataformaEntrevista("");
+    setLinkEntrevista("");
+    setErroLinkEntrevista("");
+    setGerarReuniaoAutomaticamente(true);
   }
 
   async function finalizarProcesso() {
@@ -402,6 +453,7 @@ export default function ProcessosRecrutador({ processoId }: Props) {
         "CONVITE_ACEITO",
         "AGENDA_ENVIADA",
         "AGENDADO",
+        "ENTREVISTA_CONFIRMADA",
         "ENTREVISTA_REALIZADA",
       ].includes(processo.status)
     ) {
@@ -485,6 +537,12 @@ export default function ProcessosRecrutador({ processoId }: Props) {
       return;
     }
 
+    const dataHoraSelecionada = getDataHoraEntrevista();
+
+    if (!dataHoraSelecionada) {
+      return;
+    }
+
     try {
       setSalvandoAgenda(true);
       setErroAgenda("");
@@ -498,7 +556,7 @@ export default function ProcessosRecrutador({ processoId }: Props) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            data_hora_agenda: `${dataEntrevista}T${horaEntrevista}:00`,
+            data_hora_agenda: dataHoraSelecionada.toISOString(),
           }),
         },
       );
@@ -526,6 +584,10 @@ export default function ProcessosRecrutador({ processoId }: Props) {
               id: data.agenda.id,
               data_hora_agenda: data.agenda.data_hora_agenda,
               status: data.agenda.status,
+
+              plataforma: null,
+              link_reuniao: null,
+              data_envio_link: null,
             },
           };
         }),
@@ -551,40 +613,73 @@ export default function ProcessosRecrutador({ processoId }: Props) {
   }
 
   function getDataHoje() {
-    const agora = new Date();
+    const partes = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date());
 
-    const ano = agora.getFullYear();
-    const mes = String(agora.getMonth() + 1).padStart(2, "0");
-    const dia = String(agora.getDate()).padStart(2, "0");
+    const ano = partes.find((parte) => parte.type === "year")?.value;
+    const mes = partes.find((parte) => parte.type === "month")?.value;
+    const dia = partes.find((parte) => parte.type === "day")?.value;
 
     return `${ano}-${mes}-${dia}`;
   }
 
   function horarioEntrevistaValido() {
-    if (!dataEntrevista || !horaEntrevista) {
+    const dataHoraSelecionada = getDataHoraEntrevista();
+
+    if (!dataHoraSelecionada) {
       return false;
     }
 
-    const dataHoraSelecionada = new Date(
-      `${dataEntrevista}T${horaEntrevista}:00`,
-    );
+    const horarioMinimo =
+      Date.now() + ANTECEDENCIA_MINIMA_AGENDA_MINUTOS * 60 * 1000;
 
-    const horarioMinimo = new Date(
-      Date.now() + ANTECEDENCIA_MINIMA_AGENDA_MINUTOS * 60 * 1000,
-    );
+    return dataHoraSelecionada.getTime() >= horarioMinimo;
+  }
 
-    return dataHoraSelecionada.getTime() >= horarioMinimo.getTime();
+  function getDataHoraEntrevista() {
+    if (!dataEntrevista || !horaEntrevista) {
+      return null;
+    }
+
+    const [ano, mes, dia] = dataEntrevista.split("-").map(Number);
+    const [hora, minuto] = horaEntrevista.split(":").map(Number);
+
+    if (!ano || !mes || !dia || Number.isNaN(hora) || Number.isNaN(minuto)) {
+      return null;
+    }
+
+    /*
+     * O horário informado no formulário é sempre horário de Brasília.
+     *
+     * Brasília = UTC-03:00
+     * Portanto:
+     * 20:30 Brasília = 23:30 UTC
+     */
+    const data = new Date(Date.UTC(ano, mes - 1, dia, hora + 3, minuto, 0, 0));
+
+    if (Number.isNaN(data.getTime())) {
+      return null;
+    }
+
+    return data;
   }
 
   function formatarDataHora(data: string) {
     return new Date(data).toLocaleString(locale, {
       dateStyle: "short",
       timeStyle: "short",
+      timeZone: "America/Sao_Paulo",
     });
   }
 
   function formatarData(data: string) {
-    return new Date(data).toLocaleDateString(locale);
+    return new Date(data).toLocaleDateString(locale, {
+      timeZone: "America/Sao_Paulo",
+    });
   }
 
   function TipoBadge({ tipo }: { tipo: TipoConvite }) {
@@ -603,6 +698,103 @@ export default function ProcessosRecrutador({ processoId }: Props) {
         {labels[tipo]}
       </span>
     );
+  }
+
+  async function enviarLinkEntrevista() {
+    if (
+      !processoLinkEntrevista ||
+      !plataformaEntrevista ||
+      (!automatico && !linkEntrevista.trim()) ||
+      salvandoLinkEntrevista
+    ) {
+      return;
+    }
+
+    try {
+      setSalvandoLinkEntrevista(true);
+      setErroLinkEntrevista("");
+
+      // Payload conforme plataforma e forma de criação
+      const payload = automatico
+        ? {
+            plataforma: plataformaEntrevista,
+            gerar_automaticamente: true,
+          }
+        : {
+            plataforma: plataformaEntrevista,
+            link_reuniao: linkEntrevista.trim(),
+            gerar_automaticamente: false,
+          };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/candidate-match/recrutador/processos/${processoLinkEntrevista.id}/link-entrevista`,
+        {
+          method: "PATCH",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        const mensagem = Array.isArray(data?.message)
+          ? data.message
+              .map((erro: any) =>
+                typeof erro === "string"
+                  ? erro
+                  : Object.values(erro.constraints || {}).join(", "),
+              )
+              .join("; ")
+          : data?.message;
+
+        throw new Error(
+          mensagem || t("processos_recrutador.modal_link_entrevista.erro"),
+        );
+      }
+
+      setProcessos((processosAtuais) =>
+        processosAtuais.map((processo) => {
+          if (processo.id !== processoLinkEntrevista.id) {
+            return processo;
+          }
+
+          return {
+            ...processo,
+            status: "ENTREVISTA_CONFIRMADA",
+            agenda: processo.agenda
+              ? {
+                  ...processo.agenda,
+                  plataforma: data.agenda.plataforma,
+                  link_reuniao: data.agenda.link_reuniao,
+                  data_envio_link: data.agenda.data_envio_link,
+                }
+              : null,
+          };
+        }),
+      );
+
+      toast.success(t("processos_recrutador.modal_link_entrevista.sucesso"));
+
+      setProcessoLinkEntrevista(null);
+      setPlataformaEntrevista("");
+      setLinkEntrevista("");
+      setGerarReuniaoAutomaticamente(true);
+      setErroLinkEntrevista("");
+    } catch (error) {
+      console.error("Erro ao enviar link da entrevista:", error);
+
+      setErroLinkEntrevista(
+        error instanceof Error
+          ? error.message
+          : t("processos_recrutador.modal_link_entrevista.erro"),
+      );
+    } finally {
+      setSalvandoLinkEntrevista(false);
+    }
   }
 
   function Candidato({ processo }: { processo: Processo }) {
@@ -703,13 +895,36 @@ export default function ProcessosRecrutador({ processoId }: Props) {
             {processo.status === "AGENDADO" && processo.agenda && (
               <div className="mt-4">
                 <div className="inline-flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-semibold text-green-700">
-                  <CalendarDays className="h-4 w-4" />
+                  <CalendarDays className="h-4 w-4 shrink-0" />
+
+                  {formatarDataHora(processo.agenda.data_hora_agenda)}
+                </div>
+
+                <p className="mt-2 text-xs font-medium text-amber-600">
+                  {t("processos_recrutador.aguardando_envio_link")}
+                </p>
+              </div>
+            )}
+
+            {processo.status === "ENTREVISTA_CONFIRMADA" && processo.agenda && (
+              <div className="mt-4">
+                <div className="inline-flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm font-semibold text-green-700">
+                  <CheckCircle2 className="h-4 w-4 shrink-0" />
+
                   {formatarDataHora(processo.agenda.data_hora_agenda)}
                 </div>
 
                 <p className="mt-2 text-xs font-medium text-green-600">
                   {t("processos_recrutador.entrevista_confirmada")}
                 </p>
+
+                {processo.agenda.plataforma && (
+                  <p className="mt-1 break-all text-xs text-gray-500">
+                    {t(
+                      `processos_recrutador.plataforma_${processo.agenda.plataforma.toLowerCase()}`,
+                    )}
+                  </p>
+                )}
               </div>
             )}
 
@@ -745,17 +960,47 @@ export default function ProcessosRecrutador({ processoId }: Props) {
             {processo.status === "AGENDADO" && (
               <button
                 type="button"
-                onClick={() => marcarEntrevistaRealizada(processo.id)}
-                disabled={processoRealizando === processo.id}
-                className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => abrirModalLinkEntrevista(processo)}
+                className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 sm:w-auto"
               >
-                <CheckCircle2 className="h-4 w-4" />
+                <CalendarDays className="h-4 w-4" />
 
-                {processoRealizando === processo.id
-                  ? t("processos_recrutador.btn_marcando_realizada")
-                  : t("processos_recrutador.btn_realizada")}
+                {t("processos_recrutador.btn_enviar_link")}
               </button>
             )}
+
+            {processo.status === "ENTREVISTA_CONFIRMADA" && (
+              <>
+                {/* Acessar entrevista */}
+                {processo.agenda?.link_reuniao && (
+                  <a
+                    href={processo.agenda.link_reuniao}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 sm:w-auto"
+                  >
+                    <Video className="h-4 w-4" />
+
+                    {t("processos_recrutador.btn_acessar_entrevista")}
+                  </a>
+                )}
+
+                {/* Marcar como realizada */}
+                <button
+                  type="button"
+                  onClick={() => marcarEntrevistaRealizada(processo.id)}
+                  disabled={processoRealizando === processo.id}
+                  className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+
+                  {processoRealizando === processo.id
+                    ? t("processos_recrutador.btn_marcando_realizada")
+                    : t("processos_recrutador.btn_realizada")}
+                </button>
+              </>
+            )}
+
             {processo.status === "ENTREVISTA_REALIZADA" && (
               <button
                 type="button"
@@ -775,13 +1020,21 @@ export default function ProcessosRecrutador({ processoId }: Props) {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900">
           {t("processos_recrutador.titulo")}
         </h1>
 
-        <p className="mt-1 text-sm text-gray-500">
-          {t("processos_recrutador.descricao")}
-        </p>
+        <div className="mt-1 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="mt-1 text-sm text-gray-500">
+            {t("processos_recrutador.descricao")}
+          </p>
+
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+            <span>{t("processos_recrutador.fuso_brasilia_exibicao")}</span>
+          </div>
+        </div>
       </div>
 
       {loadingConvites && (
@@ -1131,6 +1384,14 @@ export default function ProcessosRecrutador({ processoId }: Props) {
                 </div>
               </div>
 
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
+                <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+                <span>
+                  {t("processos_recrutador.modal_agenda.fuso_brasilia")}
+                </span>
+              </div>
+
               {/* AQUI */}
               {dataEntrevista &&
                 horaEntrevista &&
@@ -1185,6 +1446,316 @@ export default function ProcessosRecrutador({ processoId }: Props) {
           </div>
         </div>
       )}
+
+      {processoLinkEntrevista && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4">
+          <div className="flex max-h-[calc(100dvh-24px)] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-xl sm:max-h-[calc(100dvh-32px)]">
+            {/* Header */}
+
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-gray-100 px-4 py-4 sm:px-6 sm:py-5">
+              <div className="min-w-0">
+                <h2 className="text-lg font-bold text-gray-900">
+                  {t("processos_recrutador.modal_link_entrevista.titulo")}
+                </h2>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  {t("processos_recrutador.modal_link_entrevista.descricao")}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={fecharModalLinkEntrevista}
+                disabled={salvandoLinkEntrevista}
+                className="shrink-0 cursor-pointer rounded-lg p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 disabled:cursor-not-allowed"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Conteúdo com scroll no mobile */}
+
+            <div className="overflow-y-auto px-4 py-5 sm:px-6">
+              {/* Candidato */}
+
+              <div className="mb-5 rounded-xl bg-gray-50 p-4">
+                <Candidato processo={processoLinkEntrevista} />
+
+                <p className="mt-3 text-sm font-medium text-gray-700">
+                  {processoLinkEntrevista.titulo}
+                </p>
+
+                {processoLinkEntrevista.agenda && (
+                  <div className="mt-3 flex items-start gap-2 text-sm text-gray-600">
+                    <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-purple-600" />
+
+                    <span>
+                      {formatarDataHora(
+                        processoLinkEntrevista.agenda.data_hora_agenda,
+                      )}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Plataforma */}
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-gray-700">
+                  {t("processos_recrutador.modal_link_entrevista.plataforma")}
+                </label>
+
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {(
+                    [
+                      "GOOGLE_MEET",
+                      "MICROSOFT_TEAMS",
+                      "ZOOM",
+                      "LINK_EXTERNO",
+                    ] as PlataformaEntrevista[]
+                  ).map((plataforma) => {
+                    const selecionada = plataformaEntrevista === plataforma;
+
+                    return (
+                      <button
+                        key={plataforma}
+                        type="button"
+                        disabled={salvandoLinkEntrevista}
+                        onClick={() => {
+                          setPlataformaEntrevista(plataforma);
+
+                          setGerarReuniaoAutomaticamente(
+                            plataforma === "GOOGLE_MEET" ||
+                              plataforma === "ZOOM",
+                          );
+
+                          setLinkEntrevista("");
+                          setErroLinkEntrevista("");
+                        }}
+                        className={`cursor-pointer rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${
+                          selecionada
+                            ? "border-purple-500 bg-purple-50 text-purple-700"
+                            : "border-gray-200 bg-white text-gray-600 hover:border-purple-300"
+                        } disabled:cursor-not-allowed disabled:opacity-50`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                              selecionada
+                                ? "border-purple-600"
+                                : "border-gray-300"
+                            }`}
+                          >
+                            {selecionada && (
+                              <span className="h-2 w-2 rounded-full bg-purple-600" />
+                            )}
+                          </span>
+
+                          <span>
+                            {t(
+                              `processos_recrutador.plataforma_${plataforma.toLowerCase()}`,
+                            )}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Opções de geração automática / link existente */}
+              {permiteGeracaoAutomatica && (
+                <div className="mt-5">
+                  <label className="mb-2 block text-sm font-semibold text-gray-700">
+                    {t("processos_recrutador.modal_link_entrevista.tipo_meet")}
+                  </label>
+
+                  <div className="space-y-2">
+                    {/* Gerar automaticamente */}
+                    <button
+                      type="button"
+                      disabled={salvandoLinkEntrevista}
+                      onClick={() => {
+                        setGerarReuniaoAutomaticamente(true);
+                        setLinkEntrevista("");
+                        setErroLinkEntrevista("");
+                      }}
+                      className={`w-full cursor-pointer rounded-xl border px-4 py-3 text-left transition ${
+                        gerarReuniaoAutomaticamente
+                          ? "border-purple-500 bg-purple-50"
+                          : "border-gray-200 bg-white hover:border-purple-300"
+                      } disabled:cursor-not-allowed disabled:opacity-50`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span
+                          className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                            gerarReuniaoAutomaticamente
+                              ? "border-purple-600"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          {gerarReuniaoAutomaticamente && (
+                            <span className="h-2 w-2 rounded-full bg-purple-600" />
+                          )}
+                        </span>
+
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {t(
+                              "processos_recrutador.modal_link_entrevista.meet_automatico",
+                            )}
+                          </p>
+
+                          <p className="mt-1 text-xs leading-5 text-gray-500">
+                            {plataformaEntrevista === "ZOOM"
+                              ? t(
+                                  "processos_recrutador.modal_link_entrevista.zoom_automatico_descricao",
+                                )
+                              : t(
+                                  "processos_recrutador.modal_link_entrevista.meet_automatico_descricao",
+                                )}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Informar link existente */}
+                    <button
+                      type="button"
+                      disabled={salvandoLinkEntrevista}
+                      onClick={() => {
+                        setGerarReuniaoAutomaticamente(false);
+                        setErroLinkEntrevista("");
+                      }}
+                      className={`w-full cursor-pointer rounded-xl border px-4 py-3 text-left transition ${
+                        !gerarReuniaoAutomaticamente
+                          ? "border-purple-500 bg-purple-50"
+                          : "border-gray-200 bg-white hover:border-purple-300"
+                      } disabled:cursor-not-allowed disabled:opacity-50`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span
+                          className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                            !gerarReuniaoAutomaticamente
+                              ? "border-purple-600"
+                              : "border-gray-300"
+                          }`}
+                        >
+                          {!gerarReuniaoAutomaticamente && (
+                            <span className="h-2 w-2 rounded-full bg-purple-600" />
+                          )}
+                        </span>
+
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {t(
+                              "processos_recrutador.modal_link_entrevista.meet_manual",
+                            )}
+                          </p>
+
+                          <p className="mt-1 text-xs leading-5 text-gray-500">
+                            {plataformaEntrevista === "ZOOM"
+                              ? t(
+                                  "processos_recrutador.modal_link_entrevista.zoom_manual_descricao",
+                                )
+                              : t(
+                                  "processos_recrutador.modal_link_entrevista.meet_manual_descricao",
+                                )}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Campo de link: somente quando necessário */}
+
+              {!automatico && (
+                <div className="mt-5">
+                  <label className="mb-1.5 block text-sm font-semibold text-gray-700">
+                    {t("processos_recrutador.modal_link_entrevista.link")}
+                  </label>
+
+                  <input
+                    type="url"
+                    value={linkEntrevista}
+                    onChange={(e) => {
+                      setLinkEntrevista(e.target.value);
+
+                      if (erroLinkEntrevista) {
+                        setErroLinkEntrevista("");
+                      }
+                    }}
+                    disabled={salvandoLinkEntrevista}
+                    placeholder={t(
+                      "processos_recrutador.modal_link_entrevista.link_placeholder",
+                    )}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 disabled:bg-gray-50"
+                  />
+
+                  <p className="mt-1.5 text-xs leading-5 text-gray-400">
+                    {t(
+                      "processos_recrutador.modal_link_entrevista.link_descricao",
+                    )}
+                  </p>
+                </div>
+              )}
+
+              {/* Erro */}
+
+              {erroLinkEntrevista && (
+                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2">
+                  <p className="text-xs font-medium text-red-600">
+                    {erroLinkEntrevista}
+                  </p>
+                </div>
+              )}
+
+              {/* Aviso */}
+
+              <div className="mt-5 flex items-start gap-2 rounded-lg bg-blue-50 p-3">
+                <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
+
+                <p className="text-xs leading-5 text-blue-700">
+                  {t("processos_recrutador.modal_link_entrevista.aviso")}
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+
+            <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-gray-100 px-4 py-4 sm:flex-row sm:justify-end sm:px-6">
+              <button
+                type="button"
+                onClick={fecharModalLinkEntrevista}
+                disabled={salvandoLinkEntrevista}
+                className="w-full cursor-pointer rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              >
+                {t("processos_recrutador.modal_link_entrevista.btn_cancelar")}
+              </button>
+
+              <button
+                type="button"
+                onClick={enviarLinkEntrevista}
+                disabled={
+                  !plataformaEntrevista ||
+                  salvandoLinkEntrevista ||
+                  (!automatico && !linkEntrevista.trim())
+                }
+                className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              >
+                <CalendarDays className="h-4 w-4" />
+
+                {salvandoLinkEntrevista
+                  ? t("processos_recrutador.modal_link_entrevista.btn_enviando")
+                  : t("processos_recrutador.modal_link_entrevista.btn_enviar")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {processoFinalizacao && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="w-full max-w-lg rounded-2xl bg-white shadow-xl">

@@ -632,27 +632,29 @@ export default function BuscarCandidatosPage() {
 
           <div className="flex-1 overflow-y-auto">
             <PageContainer>
-              <div className="w-full py-4 sm:py-6">
+              <div className="w-full">
                 {/* Cabeçalho */}
 
                 <div className="mb-6">
                   <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
-                    Buscar candidatos
+                    {t("tela_buscar_candidatos.titulo")}
                   </h1>
 
                   <p className="mt-1 text-sm text-gray-500">
-                    Encontre candidatos pelas competências desejadas.
+                    {t("tela_buscar_candidatos.descricao")}
                   </p>
                 </div>
 
                 {/* =====================================================
-                    Hard / Soft lado a lado
-                   ===================================================== */}
+                  Hard / Soft lado a lado
+                 ===================================================== */}
 
                 <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                   <SkillSection
-                    title="Hard Skills"
-                    description="Selecione as competências técnicas desejadas e defina o nível esperado."
+                    title={t("tela_buscar_candidatos.hard_skills")}
+                    description={t(
+                      "tela_buscar_candidatos.hard_skills_descricao",
+                    )}
                     icon="⚙️"
                     skills={hardSkills}
                     selecionadas={hardSkillsSelecionadas}
@@ -663,8 +665,10 @@ export default function BuscarCandidatosPage() {
                   />
 
                   <SkillSection
-                    title="Soft Skills"
-                    description="Selecione as competências comportamentais desejadas e defina o nível esperado."
+                    title={t("tela_buscar_candidatos.soft_skills")}
+                    description={t(
+                      "tela_buscar_candidatos.soft_skills_descricao",
+                    )}
                     icon="🤝"
                     skills={softSkills}
                     selecionadas={softSkillsSelecionadas}
@@ -680,32 +684,31 @@ export default function BuscarCandidatosPage() {
                 <div className="mt-3 text-xs">
                   {skillsSelecionadas.length === 0 ? (
                     <span className="text-gray-500">
-                      Selecione pelo menos uma skill para realizar a busca.
+                      {t("tela_buscar_candidatos.selecione_skill")}
                     </span>
                   ) : (
                     <span className="flex items-center gap-1.5 text-green-600">
                       <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                       {skillsSelecionadas.length}{" "}
                       {skillsSelecionadas.length === 1
-                        ? "skill selecionada"
-                        : "skills selecionadas"}
+                        ? t("tela_buscar_candidatos.skill_selecionada")
+                        : t("tela_buscar_candidatos.skills_selecionadas")}
                     </span>
                   )}
                 </div>
 
                 {/* =====================================================
-                    Configuração
-                   ===================================================== */}
+                  Configuração
+                 ===================================================== */}
 
                 <section className="mt-5 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5">
                   <div>
                     <h2 className="text-base font-semibold text-gray-900">
-                      Resultado da busca
+                      {t("tela_buscar_candidatos.resultado_busca")}
                     </h2>
 
                     <p className="mt-1 text-xs text-gray-500 sm:text-sm">
-                      Defina o nível de compatibilidade e a quantidade de
-                      candidatos que deseja visualizar.
+                      {t("tela_buscar_candidatos.resultado_busca_descricao")}
                     </p>
                   </div>
 
@@ -756,7 +759,8 @@ export default function BuscarCandidatosPage() {
                     {/* Limite */}
 
                     <label className="flex flex-col gap-1 text-sm text-gray-700">
-                      Quantidade de candidatos
+                      {t("tela_buscar_candidatos.quantidade_candidatos")}
+
                       <select
                         value={limite}
                         onChange={(event) => {
@@ -776,8 +780,8 @@ export default function BuscarCandidatosPage() {
                 </section>
 
                 {/* =====================================================
-                    Botão buscar
-                   ===================================================== */}
+                  Botão buscar
+                 ===================================================== */}
 
                 <div className="mt-6 flex justify-end">
                   <button
@@ -788,13 +792,15 @@ export default function BuscarCandidatosPage() {
                   >
                     <Search className="h-4 w-4" />
 
-                    {buscando ? "Buscando..." : "Buscar candidatos"}
+                    {buscando
+                      ? t("tela_buscar_candidatos.buscando")
+                      : t("tela_buscar_candidatos.buscar_candidatos")}
                   </button>
                 </div>
 
                 {/* =====================================================
-                    Resultados
-                   ===================================================== */}
+                  Resultados
+                 ===================================================== */}
 
                 {pesquisou && (
                   <section
@@ -806,12 +812,11 @@ export default function BuscarCandidatosPage() {
                     <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                       <div>
                         <h2 className="text-base font-semibold text-gray-900">
-                          Resultados
+                          {t("tela_buscar_candidatos.resultados")}
                         </h2>
 
                         <p className="mt-1 text-xs text-gray-500 sm:text-sm">
-                          Candidatos encontrados com base nas skills
-                          selecionadas.
+                          {t("tela_buscar_candidatos.resultados_descricao")}
                         </p>
                       </div>
 
@@ -822,8 +827,10 @@ export default function BuscarCandidatosPage() {
                           <Users className="h-4 w-4" />
                           {resultados.length}{" "}
                           {resultados.length === 1
-                            ? "candidato encontrado"
-                            : "candidatos encontrados"}
+                            ? t("tela_buscar_candidatos.candidato_encontrado")
+                            : t(
+                                "tela_buscar_candidatos.candidatos_encontrados",
+                              )}
                         </div>
 
                         {/* Selecionados */}
@@ -831,7 +838,8 @@ export default function BuscarCandidatosPage() {
                         {selecionados.length > 0 && (
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                             <span className="text-xs text-gray-500">
-                              {selecionados.length} selecionado(s)
+                              {selecionados.length}{" "}
+                              {t("tela_buscar_candidatos.selecionados")}
                             </span>
 
                             <button
@@ -840,7 +848,10 @@ export default function BuscarCandidatosPage() {
                               className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-purple-700"
                             >
                               <Send className="h-3.5 w-3.5" />
-                              Convidar selecionados
+
+                              {t(
+                                "tela_buscar_candidatos.convidar_selecionados",
+                              )}
                             </button>
                           </div>
                         )}
@@ -859,12 +870,16 @@ export default function BuscarCandidatosPage() {
                         />
 
                         <span className="text-xs text-gray-500">
-                          Selecionar todos
+                          {t("tela_buscar_candidatos.selecionar_todos")}
                         </span>
 
                         {resultados.length > LIMITE_CONVITES && (
                           <span className="text-xs text-gray-400">
-                            (máximo de {LIMITE_CONVITES})
+                            (
+                            {t("tela_buscar_candidatos.maximo", {
+                              quantidade: LIMITE_CONVITES,
+                            })}
+                            )
                           </span>
                         )}
                       </div>
@@ -901,12 +916,13 @@ export default function BuscarCandidatosPage() {
                         <Users className="mx-auto h-8 w-8 text-gray-300" />
 
                         <p className="mt-3 text-sm font-medium text-gray-700">
-                          Nenhum candidato encontrado.
+                          {t("tela_buscar_candidatos.nenhum_candidato")}
                         </p>
 
                         <p className="mt-1 text-xs text-gray-500">
-                          Tente alterar as skills, os níveis desejados ou a
-                          faixa de compatibilidade.
+                          {t(
+                            "tela_buscar_candidatos.nenhum_candidato_descricao",
+                          )}
                         </p>
                       </div>
                     )}
@@ -919,8 +935,8 @@ export default function BuscarCandidatosPage() {
       </div>
 
       {/* ===================================================
-          Modal ignorar candidato
-         =================================================== */}
+        Modal ignorar candidato
+       =================================================== */}
 
       {candidatoIgnorar && (
         <IgnoreCandidateModal
@@ -934,8 +950,8 @@ export default function BuscarCandidatosPage() {
       )}
 
       {/* ===================================================
-          Modal perfil candidato
-         =================================================== */}
+        Modal perfil candidato
+       =================================================== */}
 
       <PerfilCandidatoModal
         candidatoId={perfilCandidatoId}
@@ -996,6 +1012,8 @@ function SkillSection({
   onRemover,
   onAlterarNivel,
 }: SkillSectionProps) {
+  const { t } = useTranslation("common");
+
   const [selectedSkill, setSelectedSkill] = useState<SelectOption | null>(null);
 
   /*
@@ -1012,7 +1030,6 @@ function SkillSection({
     )
     .map((skill) => ({
       value: String(skill.skill_id),
-
       label: skill.skill,
     }));
 
@@ -1046,11 +1063,15 @@ function SkillSection({
         <div className="min-w-0 flex-1">
           <Select
             isClearable
-            placeholder={`Selecione uma ${title}`}
+            placeholder={t("tela_buscar_candidatos.selecionar_skill", {
+              skill: title,
+            })}
             value={selectedSkill}
             onChange={(value) => setSelectedSkill(value as SelectOption | null)}
             options={options}
-            noOptionsMessage={() => "Nenhuma skill disponível"}
+            noOptionsMessage={() =>
+              t("tela_buscar_candidatos.nenhuma_skill_disponivel")
+            }
           />
         </div>
 
@@ -1060,7 +1081,7 @@ function SkillSection({
           disabled={!selectedSkill}
           className="cursor-pointer rounded-lg bg-purple-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Adicionar
+          {t("tela_buscar_candidatos.adicionar")}
         </button>
       </div>
 
@@ -1085,7 +1106,7 @@ function SkillSection({
                     type="button"
                     onClick={() => onRemover(skill.skill_id)}
                     className="shrink-0 cursor-pointer rounded-lg p-2 text-red-500 hover:bg-red-50"
-                    aria-label="Remover skill"
+                    aria-label={t("tela_buscar_candidatos.remover_skill")}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -1095,7 +1116,7 @@ function SkillSection({
 
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-medium text-gray-600">
-                    Nível
+                    {t("tela_buscar_candidatos.nivel")}
                   </span>
 
                   <input
