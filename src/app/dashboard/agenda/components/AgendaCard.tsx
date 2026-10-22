@@ -63,7 +63,7 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
   const dataEntrevista = new Date(agenda.data_hora).getTime();
 
   const horarioLiberacao = Number.isFinite(dataEntrevista)
-    ? dataEntrevista - 15 * 60 * 1000
+    ? dataEntrevista - 5 * 60 * 1000
     : null;
 
   const acessoLiberado =
