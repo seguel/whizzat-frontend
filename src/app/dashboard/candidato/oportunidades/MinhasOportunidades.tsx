@@ -197,9 +197,7 @@ export default function MinhasOportunidadesPage() {
       };
     }
 
-    const horarioLiberacao = new Date(
-      dataEntrevista.getTime() - 15 * 60 * 1000,
-    );
+    const horarioLiberacao = new Date(dataEntrevista.getTime() - 5 * 60 * 1000);
 
     return {
       liberado: agora >= horarioLiberacao.getTime(),

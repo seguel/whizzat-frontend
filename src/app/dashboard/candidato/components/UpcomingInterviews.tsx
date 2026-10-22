@@ -20,7 +20,7 @@ function verificarAcessoEntrevista(dataHora: string, agora: number) {
     };
   }
 
-  const horarioLiberacao = dataEntrevista - 15 * 60 * 1000;
+  const horarioLiberacao = dataEntrevista - 5 * 60 * 1000;
 
   return {
     liberado: agora >= horarioLiberacao,
