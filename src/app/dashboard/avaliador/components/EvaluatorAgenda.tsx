@@ -55,6 +55,7 @@ function AgendaCard({
   locale: string;
 }) {
   const { t } = useTranslation("common");
+  const linkEnviado = Boolean(agenda.link_reuniao);
 
   const data = new Date(agenda.data_hora);
 
@@ -104,18 +105,33 @@ function AgendaCard({
 
           <p className="text-xs text-gray-500 mt-1">{agenda.candidato}</p>
 
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <span
               className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium ${
                 agenda.atrasada
                   ? "bg-red-100 text-red-700"
-                  : "bg-green-50 text-green-700"
+                  : linkEnviado
+                    ? "bg-green-50 text-green-700"
+                    : "bg-amber-50 text-amber-700"
               }`}
             >
               {agenda.atrasada
                 ? t("dash_avaliador.agenda_atrasada")
-                : t("dash_avaliador.agenda_confirmada")}
+                : linkEnviado
+                  ? t("dash_avaliador.agenda_confirmada")
+                  : t("dash_avaliador.agenda_aguardando_link")}
             </span>
+
+            {linkEnviado && (
+              <a
+                href={agenda.link_reuniao!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-purple-700"
+              >
+                {t("dash_avaliador.acessar_entrevista")}
+              </a>
+            )}
           </div>
         </div>
       </div>

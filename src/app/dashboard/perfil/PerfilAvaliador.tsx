@@ -802,11 +802,12 @@ export default function PerfilAvaliador({
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 6));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, publicarAgora = false) => {
+    const publicarNaEdicao = publicarAgora && !!avaliadorId;
     e.preventDefault();
     setShowErrors(true);
 
-    if (step === 1) {
+    if (step === 1 && !publicarNaEdicao) {
       if (
         !form.primeiro_nome ||
         !form.ultimo_nome ||
@@ -829,21 +830,21 @@ export default function PerfilAvaliador({
       return;
     }
 
-    if (step === 2) {
+    if (step === 2 && !publicarNaEdicao) {
       // if (form.lista_formacao.length <= 0) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 3) {
+    if (step === 3 && !publicarNaEdicao) {
       // if (form.lista_certificado.length <= 0) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 4) {
+    if (step === 4 && !publicarNaEdicao) {
       if (form.lista_skills.filter((s) => s.tipo_skill_id == 1).length < 0)
         return;
       setShowErrors(false);
@@ -851,14 +852,15 @@ export default function PerfilAvaliador({
       return;
     }
 
-    if (step === 5) {
+    if (step === 5 && !publicarNaEdicao) {
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 6) {
+    if (step === 6 || publicarNaEdicao) {
       if (!isFormValid(form)) return;
+      if (form.trabalha_empresa === "SIM" && !form.empresa_id) return;
 
       if (certificadoFiles || certificacaoFiles) {
       }
@@ -1441,6 +1443,14 @@ export default function PerfilAvaliador({
           )}
 
           <PageContainer>
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">
+                {t("tela_perfil_avaliador.titulo_pagina")}
+              </h1>
+              <p className="mt-1 text-sm text-gray-500">
+                {t("tela_perfil_avaliador.subtitulo_pagina")}
+              </p>
+            </div>
             <div className="flex flex-col flex-1 w-full min-h-[500px] ">
               {step === 1 && (
                 <form
@@ -1961,20 +1971,30 @@ export default function PerfilAvaliador({
                     <button
                       type="button" // evita submit acidental
                       onClick={handleCancel}
-                      className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
+                      className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                     >
                       {t("tela_perfil_avaliador.item_botao_cancelar")}
                     </button>
                     <button
                       type="submit"
-                      className="w-full md:w-32 py-2  font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
+                      className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                     >
                       {t("tela_perfil_avaliador.item_botao_avancar")}
                     </button>
+                    {avaliadorId && (
+                      <button
+                        type="button"
+                        disabled={isSubmitting}
+                        onClick={(e) => handleSubmit(e, true)}
+                        className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? (
+                          <ImSpinner2 className="animate-spin" />
+                        ) : (
+                          t("tela_perfil_avaliador.item_botao_publicar")
+                        )}
+                      </button>
+                    )}
                   </div>
                 </form>
               )}
@@ -2180,9 +2200,7 @@ export default function PerfilAvaliador({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2  font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_voltar")}
                         </button>
@@ -2192,20 +2210,30 @@ export default function PerfilAvaliador({
                         <button
                           type="button"
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2  font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`w-full md:w-32 py-2  font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer`}
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_avancar")}
                         </button>
+                        {avaliadorId && (
+                          <button
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={(e) => handleSubmit(e, true)}
+                            className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_perfil_avaliador.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -2416,9 +2444,7 @@ export default function PerfilAvaliador({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_voltar")}
                         </button>
@@ -2429,20 +2455,30 @@ export default function PerfilAvaliador({
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer`}
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_avancar")}
                         </button>
+                        {avaliadorId && (
+                          <button
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={(e) => handleSubmit(e, true)}
+                            className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_perfil_avaliador.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -2692,9 +2728,7 @@ export default function PerfilAvaliador({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_voltar")}
                         </button>
@@ -2705,26 +2739,31 @@ export default function PerfilAvaliador({
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
                           disabled={form.lista_skills.length < 3} // só habilita se >= 3
-                          className={`w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900
-                      border border-transparent 
-                      
-                      ${
-                        form.lista_skills.length < 3
-                          ? "bg-gray-300 cursor-not-allowed"
-                          : "bg-blue-100 hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
-                      }`}
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                         >
                           {t("tela_perfil_avaliador.item_botao_avancar")}
                         </button>
+                        {avaliadorId && (
+                          <button
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={(e) => handleSubmit(e, true)}
+                            className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_perfil_avaliador.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -2965,9 +3004,7 @@ export default function PerfilAvaliador({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_voltar")}
                         </button>
@@ -2978,20 +3015,30 @@ export default function PerfilAvaliador({
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`w-full md:w-32 py-2  font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer`}
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_avancar")}
                         </button>
+                        {avaliadorId && (
+                          <button
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={(e) => handleSubmit(e, true)}
+                            className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_perfil_avaliador.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -3331,9 +3378,7 @@ export default function PerfilAvaliador({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_voltar")}
                         </button>
@@ -3344,19 +3389,13 @@ export default function PerfilAvaliador({
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 font-semibold rounded-lg text-indigo-900 bg-blue-100 
-                      border border-transparent 
-                      hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-white text-blue-600 font-semibold hover:bg-blue-50 transition-colors cursor-pointer"
                         >
                           {t("tela_perfil_avaliador.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`px-6 py-2 font-semibold flex items-center justify-center gap-2 ${
-                            isFormValid(form)
-                              ? "rounded-lg text-indigo-900 bg-blue-100 border border-transparent hover:bg-blue-200 hover:border-blue-300 cursor-pointer"
-                              : "bg-gray-300 cursor-not-allowed"
-                          }`}
+                          className="w-full sm:w-auto min-w-32 px-5 py-2.5 rounded-lg border border-blue-600 bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors cursor-pointer disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
                         >
                           {isSubmitting ? (
                             <ImSpinner2 className="animate-spin" />

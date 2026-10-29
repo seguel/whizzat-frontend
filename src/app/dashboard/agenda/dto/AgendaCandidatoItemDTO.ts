@@ -11,6 +11,7 @@ export type AgendaCandidatoTipo =
 export type AgendaCandidatoStatus =
   | "ACEITO"
   | "PENDENTE"
+  | "AGENDA_ENVIADA"
   | "AGENDADO"
   | "ENTREVISTA_CONFIRMADA";
 
