@@ -99,7 +99,7 @@ function InterviewCard({
 
   const data = new Date(entrevista.data_hora);
 
-  const entrevistaRecrutador = entrevista.tipo === "RECRUTADOR";
+  //const entrevistaRecrutador = entrevista.tipo === "RECRUTADOR";
 
   const aguardandoLink =
     entrevista.status === "AGENDADO" && !entrevista.link_reuniao;
