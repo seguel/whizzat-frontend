@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+//import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Video, Lock } from "lucide-react";
@@ -38,15 +38,15 @@ function isAgendaCandidato(
   return "origem" in agenda;
 }
 
-function isAgendaCandidatoRecrutador(
-  agenda: AgendaDTO,
-): agenda is AgendaCandidatoItemDTO {
-  return isAgendaCandidato(agenda) && agenda.origem === "RECRUTADOR";
-}
+// function isAgendaCandidatoRecrutador(
+//   agenda: AgendaDTO,
+// ): agenda is AgendaCandidatoItemDTO {
+//   return isAgendaCandidato(agenda) && agenda.origem === "RECRUTADOR";
+// }
 
 export default function AgendaCard({ agenda, selected, perfil }: Props) {
   const { t } = useTranslation("common");
-  const router = useRouter();
+  //const router = useRouter();
 
   const [agora, setAgora] = useState<number | null>(null);
 
@@ -82,13 +82,13 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
   // CANDIDATO / RECRUTADOR
   // =========================================================
 
-  const candidatoRecrutador =
-    perfil === "candidato" && isAgendaCandidatoRecrutador(agenda);
+  // const candidatoRecrutador =
+  //   perfil === "candidato" && isAgendaCandidatoRecrutador(agenda);
 
-  const candidatoAvaliacao =
-    perfil === "candidato" &&
-    isAgendaCandidato(agenda) &&
-    agenda.origem === "AVALIACAO";
+  // const candidatoAvaliacao =
+  //   perfil === "candidato" &&
+  //   isAgendaCandidato(agenda) &&
+  //   agenda.origem === "AVALIACAO";
 
   const avaliadorAgenda =
     perfil === "avaliador" &&
@@ -180,13 +180,13 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
   // NAVEGAÇÃO
   // =========================================================
 
-  function abrirProcessoRecrutador() {
-    if (!isAgendaRecrutador(agenda)) return;
+  // function abrirProcessoRecrutador() {
+  //   if (!isAgendaRecrutador(agenda)) return;
 
-    router.push(
-      `/dashboard/recrutador/processos?perfil=recrutador&processo=${agenda.conviteId}`,
-    );
-  }
+  //   router.push(
+  //     `/dashboard/recrutador/processos?perfil=recrutador&processo=${agenda.conviteId}`,
+  //   );
+  // }
 
   return (
     <div
