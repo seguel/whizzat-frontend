@@ -314,6 +314,9 @@ const pt = {
       "- Pode ser selecionado até 6 skills para ser um avaliador.",
     item_tooltip_favorite_passo2: "- Os Skills marcados serão assumidos ",
     item_tooltip_favorite_passo2_1: " para avaliações de candidatos.",
+    titulo_pagina: "Meu Perfil",
+    subtitulo_pagina:
+      "Mantenha seus dados atualizados e personalize sua apresentação profissional.",
   },
   tela_perfil_recrutador: {
     item_ativo: "Ativo",
@@ -351,6 +354,9 @@ const pt = {
       "Envie apenas arquivos de imagem (JPG, PNG, SVG, etc.)",
     item_alerta_erro_tamanho_arq: "O arquivo deve ter no máximo 1MB.",
     item_alerta_erro_salvar: "Erro ao salvar recrutador.",
+    titulo_pagina: "Meu Perfil",
+    subtitulo_pagina:
+      "Mantenha seus dados atualizados e personalize sua apresentação profissional.",
   },
   tela_perfil_candidato: {
     item_ativo: "Ativo",
@@ -482,6 +488,9 @@ const pt = {
       "Modalidades de trabalho que você aceita para novas oportunidades.",
     modalidade_nenhuma_selecionada:
       "Nenhuma modalidade de trabalho foi selecionada.",
+    titulo_pagina: "Meu Perfil",
+    subtitulo_pagina:
+      "Mantenha seus dados atualizados e personalize sua apresentação profissional.",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Avaliadores Aguardando Confirmação",
@@ -494,6 +503,9 @@ const pt = {
     item_alerta_sucesso: "Avaliador atualizado com sucesso!",
     item_alerta_erro_buscar_dados: "Erro ao buscar Avaliador",
     item_alerta_erro_salvar: "Problemas ao tentar executar a operação!",
+    titulo_pagina: "Meus Avaliadores",
+    subtitulo_pagina:
+      "Gerencie os avaliadores vinculados às suas empresas e acompanhe as solicitações de aprovação.",
   },
   tela_lista_empresas: {
     item_ativo: "Ativa",
@@ -503,6 +515,9 @@ const pt = {
     item_alerta_erro_buscar_dados: "Erro ao buscar Empresas",
     item_msg_sem_email: "Sem email",
     item_msg_sem_telefone: "Sem telefone",
+    titulo_pagina: "Minhas Empresas",
+    subtitulo_pagina:
+      "Gerencie as empresas cadastradas e acompanhe suas informações em um só lugar.",
   },
   tela_empresa_dados: {
     item_ativo: "Ativa",
@@ -571,6 +586,9 @@ const pt = {
     item_msg_sem_vagas_filtro:
       "Tente ajustar os filtros ou limpar a seleção para ver mais resultados.",
     item_msg_item_mulher: "Mulheres",
+    titulo_pagina: "Vagas Abertas",
+    subtitulo_pagina:
+      "Gerencie e acompanhe as vagas cadastradas pelas suas empresas.",
   },
   tela_vaga_dados: {
     item_ativo: "Ativa",
@@ -822,6 +840,9 @@ const pt = {
     msg_exclusao: "Notificação excluída com sucesso",
     msg_erro: "Erro ao excluir notificação",
     carregando: "Carregando mais...",
+    titulo_pagina: "Notificações",
+    subtitulo_pagina:
+      "Acompanhe suas notificações e fique por dentro das novidades e atualizações importantes.",
   },
   minha_avaliacao: {
     recebido: "Convites Recebidos",
@@ -921,7 +942,7 @@ const pt = {
       btn_aceitar: "Aceitar",
       peso: "Peso:",
       entrevista_em: "Entrevista",
-      questionario_pendente: "Aguardando Resposta",
+      questionario_pendente: "Responder",
       formulario_enviado: "Questionário Recebido:",
       entrevista_recusada: "Data Recusada, aguardar nova data.",
       resultado_avaliacao: "Resultado da Avaliação",
@@ -934,6 +955,17 @@ const pt = {
       comentario_msg:
         "Abaixo estão os comentários compartilhados pelo avaliador sobre sua entrevista.",
     },
+    btn_iniciar_avaliacao: "Iniciar avaliação",
+    btn_agendar_entrevista: "Agendar entrevista",
+    btn_enviar_link: "Enviar link da entrevista",
+    btn_finalizar_avaliacao: "Finalizar avaliação",
+    btn_ver_avaliacao: "Ver avaliação",
+    btn_acessar_entrevista: "Acessar entrevista",
+    aguardando_link: "Aguardando envio do link da entrevista",
+    aguardando_data: "Aguardando confirmação da data",
+    titulo_pagina: "Minhas Avaliações",
+    subtitulo_pagina:
+      "Gerencie seus convites, acompanhe as entrevistas agendadas e consulte suas avaliações finalizadas.",
   },
   questionario: {
     titulo_pagina: "Criação de Questionário",
@@ -1006,6 +1038,9 @@ const pt = {
         "Preencha todas as perguntas obrigatórias para enviar o questionário.",
       finalizar_sem_entrevista: "Permitir Finalizar Sem Entrevista.",
     },
+    lista_titulo_pagina: "Meus Questionários",
+    lista_subtitulo_pagina:
+      "Gerencie os questionários criados por você e acompanhe os materiais utilizados nas avaliações.",
   },
   agenda: {
     titulo_um: "Agenda de Entrevistas",
@@ -1165,6 +1200,8 @@ const pt = {
     ranking_posicao: "Posição no ranking",
     ranking_avaliadores: "avaliadores",
     fuso_brasilia_exibicao: "Horários exibidos no fuso de Brasília (BRT).",
+    agenda_aguardando_link: "Confirmada - Aguardando o envio do link",
+    acessar_entrevista: "Acessar entrevista",
   },
   perfil_candidato: {
     sobre: "Sobre",

@@ -928,11 +928,11 @@ export default function PerfilCandidato({
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 6));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, publicarDireto = false) => {
     e.preventDefault();
     setShowErrors(true);
 
-    if (step === 1) {
+    if (step === 1 && !publicarDireto) {
       if (
         !form.primeiro_nome ||
         !form.ultimo_nome ||
@@ -949,21 +949,21 @@ export default function PerfilCandidato({
       return;
     }
 
-    if (step === 2) {
+    if (step === 2 && !publicarDireto) {
       // if (form.lista_formacao.length <= 0) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 3) {
+    if (step === 3 && !publicarDireto) {
       // if (form.lista_certificado.length <= 0) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 4) {
+    if (step === 4 && !publicarDireto) {
       if (form.lista_skills.filter((s) => s.tipo_skill_id == 1).length < 0)
         return;
       setShowErrors(false);
@@ -971,13 +971,13 @@ export default function PerfilCandidato({
       return;
     }
 
-    if (step === 5) {
+    if (step === 5 && !publicarDireto) {
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 6) {
+    if (step === 6 || (candidatoId && publicarDireto)) {
       if (!isFormValid(form)) return;
 
       if (certificadoFiles || certificacaoFiles) {
@@ -1569,6 +1569,14 @@ export default function PerfilCandidato({
           )}
 
           <PageContainer>
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">
+                {t("tela_perfil_candidato.titulo_pagina")}
+              </h1>
+              <p className="mt-1 text-sm text-gray-500">
+                {t("tela_perfil_candidato.subtitulo_pagina")}
+              </p>
+            </div>
             <div className="flex flex-col flex-1 w-full min-h-[500px] ">
               {step === 1 && (
                 <form
@@ -2014,16 +2022,34 @@ export default function PerfilCandidato({
                     <button
                       type="button" // evita submit acidental
                       onClick={handleCancel}
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                      className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer"
                     >
                       {t("tela_perfil_candidato.item_botao_cancelar")}
                     </button>
                     <button
                       type="submit"
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                      className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer"
                     >
                       {t("tela_perfil_candidato.item_botao_avancar")}
                     </button>
+                    {candidatoId && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleSubmit(e, true)}
+                        disabled={isSubmitting || !isFormValid(form)}
+                        className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                          isSubmitting || !isFormValid(form)
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <ImSpinner2 className="animate-spin" />
+                        ) : (
+                          t("tela_perfil_candidato.item_botao_publicar")
+                        )}
+                      </button>
+                    )}
                   </div>
                 </form>
               )}
@@ -2229,26 +2255,44 @@ export default function PerfilCandidato({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer text-center"
                         >
                           {t("tela_perfil_candidato.item_botao_voltar")}
                         </button>
                       </div>
 
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           type="button"
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer"
                         >
                           {t("tela_perfil_candidato.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
+                          className={`w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer`}
                         >
                           {t("tela_perfil_candidato.item_botao_avancar")}
                         </button>
+                        {candidatoId && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleSubmit(e, true)}
+                            disabled={isSubmitting || !isFormValid(form)}
+                            className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              isSubmitting || !isFormValid(form)
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                            }`}
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_perfil_candidato.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -2459,27 +2503,45 @@ export default function PerfilCandidato({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer text-center"
                         >
                           {t("tela_perfil_candidato.item_botao_voltar")}
                         </button>
                       </div>
 
                       {/* Direita: botões cadastrar e editar */}
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer"
                         >
                           {t("tela_perfil_candidato.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
+                          className={`w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer`}
                         >
                           {t("tela_perfil_candidato.item_botao_avancar")}
                         </button>
+                        {candidatoId && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleSubmit(e, true)}
+                            disabled={isSubmitting || !isFormValid(form)}
+                            className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              isSubmitting || !isFormValid(form)
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                            }`}
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_perfil_candidato.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -2747,33 +2809,51 @@ export default function PerfilCandidato({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer text-center"
                         >
                           {t("tela_perfil_candidato.item_botao_voltar")}
                         </button>
                       </div>
 
                       {/* Direita: botões cadastrar e editar */}
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer"
                         >
                           {t("tela_perfil_candidato.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
                           disabled={form.lista_skills.length < 3} // só habilita se >= 3
-                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
+                          className={`w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition
                       ${
                         form.lista_skills.length < 3
                           ? "bg-gray-300 cursor-not-allowed"
-                          : "bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                          : "bg-green-100 hover:bg-green-50 cursor-pointer"
                       }`}
                         >
                           {t("tela_perfil_candidato.item_botao_avancar")}
                         </button>
+                        {candidatoId && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleSubmit(e, true)}
+                            disabled={isSubmitting || !isFormValid(form)}
+                            className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              isSubmitting || !isFormValid(form)
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                            }`}
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_perfil_candidato.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -3030,27 +3110,45 @@ export default function PerfilCandidato({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer text-center"
                         >
                           {t("tela_perfil_candidato.item_botao_voltar")}
                         </button>
                       </div>
 
                       {/* Direita: botões cadastrar e editar */}
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer"
                         >
                           {t("tela_perfil_candidato.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer`}
+                          className={`w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer`}
                         >
                           {t("tela_perfil_candidato.item_botao_avancar")}
                         </button>
+                        {candidatoId && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleSubmit(e, true)}
+                            disabled={isSubmitting || !isFormValid(form)}
+                            className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              isSubmitting || !isFormValid(form)
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                            }`}
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_perfil_candidato.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -3500,27 +3598,27 @@ export default function PerfilCandidato({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 text-center cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer text-center"
                         >
                           {t("tela_perfil_candidato.item_botao_voltar")}
                         </button>
                       </div>
 
                       {/* Direita: botões cadastrar e editar */}
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-2">
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
+                          className="w-full sm:w-auto min-w-28 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 transition hover:bg-green-50 cursor-pointer"
                         >
                           {t("tela_perfil_candidato.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
+                          className={`min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
                             isFormValid(form)
-                              ? "text-indigo-900 bg-blue-100 hover:bg-blue-200 cursor-pointer"
-                              : "bg-gray-300 cursor-not-allowed"
+                              ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
                           }`}
                         >
                           {isSubmitting ? (

@@ -102,10 +102,11 @@ function InterviewCard({
   const entrevistaRecrutador = entrevista.tipo === "RECRUTADOR";
 
   const aguardandoLink =
-    entrevistaRecrutador && entrevista.status === "AGENDADO";
+    entrevista.status === "AGENDADO" && !entrevista.link_reuniao;
 
   const entrevistaConfirmada =
-    entrevistaRecrutador && entrevista.status === "ENTREVISTA_CONFIRMADA";
+    entrevista.status === "ENTREVISTA_CONFIRMADA" &&
+    Boolean(entrevista.link_reuniao);
 
   // Controle individual de acesso à entrevista
   const { liberado: acessoLiberado, horarioLiberacao } =
@@ -216,78 +217,67 @@ function InterviewCard({
             </p>
           )}
 
-          {/* ENTREVISTA DE SKILL */}
-          {!entrevistaRecrutador && (
-            <div className="mt-3">
-              <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
-                {t("dash_candidato.agenda_confirmada")}
-              </span>
-            </div>
-          )}
+          {/* STATUS E ACESSO À ENTREVISTA */}
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0">
+              {aguardandoLink && (
+                <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
+                  {t("dash_candidato.agenda_aguardando_link")}
+                </span>
+              )}
 
-          {/* ENTREVISTA COM RECRUTADOR */}
-          {entrevistaRecrutador && (
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div className="min-w-0">
-                {aguardandoLink && (
-                  <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
-                    {t("dash_candidato.agenda_aguardando_link")}
+              {entrevistaConfirmada && (
+                <>
+                  <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
+                    {t("dash_candidato.agenda_confirmada")}
                   </span>
-                )}
 
-                {entrevistaConfirmada && (
+                  {entrevista.plataforma && (
+                    <p className="mt-1 text-[11px] font-medium text-gray-500">
+                      {getPlataformaLabel()}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* BOTÃO DE ACESSO À ENTREVISTA */}
+            {entrevistaConfirmada && entrevista.link_reuniao && (
+              <div className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end">
+                {acessoLiberado && agora !== null ? (
+                  <a
+                    href={entrevista.link_reuniao}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 sm:w-auto"
+                  >
+                    <Video className="h-4 w-4" />
+
+                    {t("oportunidades_candidato.acessar_entrevista")}
+                  </a>
+                ) : (
                   <>
-                    <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
-                      {t("dash_candidato.agenda_confirmada")}
-                    </span>
+                    <button
+                      type="button"
+                      disabled
+                      className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 sm:w-auto"
+                    >
+                      <Lock className="h-4 w-4" />
 
-                    {entrevista.plataforma && (
-                      <p className="mt-1 text-[11px] font-medium text-gray-500">
-                        {getPlataformaLabel()}
-                      </p>
+                      {t("oportunidades_candidato.acessar_entrevista")}
+                    </button>
+
+                    {horaLiberacaoFormatada && (
+                      <span className="text-xs text-gray-500 sm:text-right">
+                        {t("oportunidades_candidato.acesso_liberado_as")}{" "}
+                        {horaLiberacaoFormatada}
+                      </span>
                     )}
                   </>
                 )}
               </div>
-
-              {/* BOTÃO DE ACESSO À ENTREVISTA */}
-              {entrevistaConfirmada && entrevista.link_reuniao && (
-                <div className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end">
-                  {acessoLiberado && agora !== null ? (
-                    <a
-                      href={entrevista.link_reuniao}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 sm:w-auto"
-                    >
-                      <Video className="h-4 w-4" />
-
-                      {t("oportunidades_candidato.acessar_entrevista")}
-                    </a>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        disabled
-                        className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 sm:w-auto"
-                      >
-                        <Lock className="h-4 w-4" />
-
-                        {t("oportunidades_candidato.acessar_entrevista")}
-                      </button>
-
-                      {horaLiberacaoFormatada && (
-                        <span className="text-xs text-gray-500 sm:text-right">
-                          {t("oportunidades_candidato.acesso_liberado_as")}{" "}
-                          {horaLiberacaoFormatada}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

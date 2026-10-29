@@ -551,7 +551,7 @@ export default function PerfilRecrutador({
     e.preventDefault();
     setShowErrors(true);
 
-    if (step === 1) {
+    if (step === 1 && !recrutadorId) {
       if (
         !form.primeiro_nome ||
         !form.ultimo_nome ||
@@ -569,8 +569,11 @@ export default function PerfilRecrutador({
       return;
     }
 
-    if (step === 2) {
-      if (!isFormValid(form)) return;
+    if (step === 2 || (step === 1 && !!recrutadorId)) {
+      if (!isFormValid(form)) {
+        setShowErrors(true);
+        return;
+      }
 
       setIsSubmitting(true);
 
@@ -704,6 +707,14 @@ export default function PerfilRecrutador({
           )}
 
           <PageContainer>
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">
+                {t("tela_perfil_recrutador.titulo_pagina")}
+              </h1>
+              <p className="mt-1 text-sm text-gray-500">
+                {t("tela_perfil_recrutador.subtitulo_pagina")}
+              </p>
+            </div>
             <div className="flex flex-col flex-1 w-full min-h-[500px] ">
               {step === 1 && (
                 <form
@@ -1023,15 +1034,36 @@ export default function PerfilRecrutador({
                     <button
                       type="button" // evita submit acidental
                       onClick={handleCancel}
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      className="w-full md:w-32 rounded-lg border border-purple-300 bg-white px-4 py-2 text-sm font-semibold text-purple-700 transition hover:bg-purple-50 cursor-pointer"
                     >
                       {t("tela_perfil_recrutador.item_botao_cancelar")}
                     </button>
+                    {recrutadorId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowErrors(true);
+                          if (!isFormValid(form)) return;
+                          setShowErrors(false);
+                          nextStep();
+                        }}
+                        className="w-full md:w-32 rounded-lg border border-purple-300 bg-white px-4 py-2 text-sm font-semibold text-purple-700 transition hover:bg-purple-50 cursor-pointer"
+                      >
+                        {t("tela_perfil_recrutador.item_botao_avancar")}
+                      </button>
+                    )}
                     <button
                       type="submit"
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      disabled={isSubmitting}
+                      className="w-full md:w-32 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                     >
-                      {t("tela_perfil_recrutador.item_botao_avancar")}
+                      {isSubmitting ? (
+                        <ImSpinner2 className="mx-auto animate-spin" />
+                      ) : recrutadorId ? (
+                        t("tela_perfil_recrutador.item_botao_publicar")
+                      ) : (
+                        t("tela_perfil_recrutador.item_botao_avancar")
+                      )}
                     </button>
                   </div>
                 </form>
@@ -1309,7 +1341,7 @@ export default function PerfilRecrutador({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                          className="w-full md:w-32 rounded-lg border border-purple-300 bg-white px-4 py-2 text-sm font-semibold text-purple-700 transition hover:bg-purple-50 text-center cursor-pointer"
                         >
                           {t("tela_perfil_recrutador.item_botao_voltar")}
                         </button>
@@ -1320,17 +1352,14 @@ export default function PerfilRecrutador({
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg border border-purple-300 bg-white px-4 py-2 text-sm font-semibold text-purple-700 transition hover:bg-purple-50 cursor-pointer"
                         >
                           {t("tela_perfil_recrutador.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
-                            isFormValid(form)
-                              ? " bg-purple-100 hover:bg-purple-200 cursor-pointer"
-                              : "bg-gray-300 cursor-not-allowed"
-                          }`}
+                          disabled={isSubmitting}
+                          className="flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
                         >
                           {isSubmitting ? (
                             <ImSpinner2 className="animate-spin" />
