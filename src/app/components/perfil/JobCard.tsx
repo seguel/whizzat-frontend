@@ -91,9 +91,9 @@ export default function JobCard({
           ? `/dashboard/candidato/vagas?perfil=${perfil}&vg=${vaga_id}&emp=${empresa_id}`
           : `/dashboard/vagas?perfil=${perfil}&vagaid=${vaga_id}&id=${empresa_id}`
       }
-      className="block w-full"
+      className="block h-full w-full"
     >
-      <div className="flex flex-col lg:min-h-[150px] justify-between rounded-lg p-3 sm:p-2 bg-white shadow-sm border border-gray-100 cursor-pointer hover:shadow-md hover:border-purple-200 transition w-full">
+      <div className="flex h-full w-full flex-col justify-between rounded-lg border border-gray-100 bg-white p-3 shadow-sm transition hover:border-purple-200 hover:shadow-md sm:p-2">
         {/* Linha superior: logo e informações */}
         <div className="flex flex-row justify-start items-start w-full">
           {/* Logo */}
@@ -117,13 +117,23 @@ export default function JobCard({
           </div>
 
           {/* Infos */}
+          {/* Infos */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm break-words">{nome_vaga}</h3>
-            <p className="text-xs text-gray-500 break-words">{nome_empresa}</p>
-            <p className="text-xs text-gray-500 break-words">
-              {cidade_label}/{estado_sigla}
-            </p>
-            <p className="flex items-center justify-center text-xs px-2 py-1 rounded-lg bg-purple-100 mt-2 sm:mt-4 max-w-full">
+            {/* Área superior com altura reservada para 4 linhas */}
+            <div className="min-h-[76px]">
+              <h3 className="font-semibold text-sm break-words">{nome_vaga}</h3>
+
+              <p className="text-xs text-gray-500 break-words">
+                {nome_empresa}
+              </p>
+
+              <p className="text-xs text-gray-500 break-words">
+                {cidade_label}/{estado_sigla}
+              </p>
+            </div>
+
+            {/* Prazo alinhado entre os cards */}
+            <p className="flex items-center justify-center rounded-lg bg-purple-100 px-2 py-1 text-xs max-w-full mt-2">
               <strong>
                 {t("tela_lista_vagas.item_item_periodo")} {prazo}
               </strong>

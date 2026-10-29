@@ -11,6 +11,14 @@ import { useTranslation } from "react-i18next";
 import { TFunction } from "i18next";
 import PageContainer from "@/app/components/PageContainer";
 import { useRouter } from "next/navigation";
+import { CalendarDays, Clock3, Video, CheckCircle2, Eye } from "lucide-react";
+
+type Aba = "questionarios" | "entrevistas" | "finalizadas";
+type PlataformaEntrevista =
+  | "GOOGLE_MEET"
+  | "MICROSOFT_TEAMS"
+  | "ZOOM"
+  | "LINK_EXTERNO";
 
 interface Props {
   perfil: ProfileType;
@@ -18,24 +26,24 @@ interface Props {
 
 interface Avaliacao {
   id: number;
-  avaliador_nome: string;
-  localizacao: string;
+  avaliador_nome: string | null;
+  localizacao: string | null;
   skill: string;
   nota?: number;
-  logo?: string;
+  logo?: string | null;
   data_agenda?: string | null;
-  agenda_status?: string;
+  agenda_status?: string | null;
   status: string;
   criado_em: string | null;
   data_avaliacao: string | null;
-  peso_avaliador?: number;
+  peso_avaliador?: number | null;
   data_envio_formulario: string | null;
   data_agenda_criacao: string | null;
+  plataforma?: PlataformaEntrevista | null;
+  link_reuniao?: string | null;
+  provider_meeting_id?: string | null;
+  data_envio_link?: string | null;
 }
-
-/* ======================================================
-   CARD
-====================================================== */
 
 function AvaliacaoCard({
   avaliacao,
@@ -43,342 +51,318 @@ function AvaliacaoCard({
   onAceitarAgenda,
   onRecusarAgenda,
   t,
-  perfil,
+  agora,
 }: {
   avaliacao: Avaliacao;
-  tipo: string;
+  tipo: Aba;
   onAceitarAgenda?: (id: number) => void;
   onRecusarAgenda?: (id: number) => void;
   t: TFunction;
-  perfil: ProfileType;
+  agora: number;
 }) {
-  console.log(perfil);
   const { i18n } = useTranslation("common");
   const router = useRouter();
+  const locale = i18n.language?.startsWith("en")
+    ? "en-US"
+    : i18n.language?.startsWith("es")
+      ? "es-ES"
+      : "pt-BR";
 
-  const currentLocale =
-    i18n.language === "en"
-      ? "en-US"
-      : i18n.language === "es"
-        ? "es-ES"
-        : "pt-BR";
+  const formatarData = (data?: string | null) =>
+    data && !Number.isNaN(new Date(data).getTime())
+      ? new Date(data).toLocaleDateString(locale, {
+          timeZone: "America/Sao_Paulo",
+        })
+      : "-";
 
-  const formatarData = (data?: string | null) => {
-    if (!data) return "-";
+  const formatarDataHora = (data?: string | null) =>
+    data && !Number.isNaN(new Date(data).getTime())
+      ? new Date(data).toLocaleString(locale, {
+          dateStyle: "short",
+          timeStyle: "short",
+          timeZone: "America/Sao_Paulo",
+        })
+      : "-";
 
-    return new Intl.DateTimeFormat(currentLocale, {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(new Date(data));
-  };
+  const agendaRecusada = avaliacao.agenda_status === "RECUSADO";
+  const agendaAceita = avaliacao.agenda_status === "ACEITO";
+  const linkValido = (() => {
+    if (!avaliacao.link_reuniao) return false;
+    try {
+      const url = new URL(avaliacao.link_reuniao);
+      return url.protocol === "https:" || url.protocol === "http:";
+    } catch {
+      return false;
+    }
+  })();
+  const horario = avaliacao.data_agenda
+    ? new Date(avaliacao.data_agenda).getTime()
+    : NaN;
+  const entrevistaConfirmada = avaliacao.status === "ENTREVISTA_CONFIRMADA";
+  const podeAcessar =
+    entrevistaConfirmada &&
+    agendaAceita &&
+    linkValido &&
+    Number.isFinite(horario) &&
+    agora >= horario - 5 * 60 * 1000;
 
-  const formatarDataHora = (data?: string | null) => {
-    if (!data) return "-";
-
-    const dt = new Date(data);
-
-    const dataFormatada = new Intl.DateTimeFormat(currentLocale, {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(dt);
-
-    const horaFormatada = new Intl.DateTimeFormat(currentLocale, {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(dt);
-
-    return `${dataFormatada} • ${horaFormatada}`;
-  };
-
-  const getStatusColor = () => {
-    switch (tipo) {
-      case "QUESTIONARIO_ENVIADO":
-        return "bg-blue-500";
-
-      case "AGENDADO":
-      case "AGENDA_ENVIADA":
-      case "ENTREVISTA_REALIZADA":
-        return "bg-yellow-500";
-
-      case "FINALIZADO":
-        return "bg-green-500";
-
-      default:
-        return "bg-gray-300";
+  const abrirDetalhe = () => {
+    if (tipo === "questionarios") {
+      router.push(
+        `/dashboard/avaliacao/candidato/${avaliacao.id}/questionario?perfil=candidato`,
+      );
+    } else if (tipo === "finalizadas") {
+      router.push(
+        `/dashboard/avaliacao/candidato/${avaliacao.id}?perfil=candidato`,
+      );
     }
   };
 
   return (
-    <div
-      onClick={() => {
-        if (avaliacao.status === "QUESTIONARIO_ENVIADO") {
-          router.push(
-            `/dashboard/avaliacao/candidato/${avaliacao.id}/questionario?perfil=candidato`,
-          );
-          return;
-        } else if (avaliacao.status === "FINALIZADO") {
-          router.push(
-            `/dashboard/avaliacao/candidato/${avaliacao.id}?perfil=candidato`,
-          );
-        }
-      }}
-      className="
-      relative bg-white rounded-xl border shadow-sm mt-1
-      w-full max-w-[260px] min-h-[130px]
-      flex flex-col
-      hover:shadow-md hover:-translate-y-0.5
-      transition-all duration-300
-      overflow-hidden
-      cursor-pointer
-    "
-    >
-      {/* Barra lateral */}
-      <div
-        className={`absolute left-0 top-0 h-full w-1.5 ${getStatusColor()}`}
-      />
-
-      <div className="p-4 pl-5 flex flex-col h-full">
-        {/* CONTEÚDO */}
-        <div className="flex-1">
-          {/* Skill + Nota */}
-          <div className="flex items-start justify-between gap-2">
-            <div
-              className="
-              px-2 py-1 rounded-md
-              bg-indigo-100 text-indigo-700
-              text-xs font-medium
-              max-w-[75%]
-              truncate
-            "
-              title={avaliacao.skill}
-            >
+    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
               {avaliacao.skill}
-            </div>
-
-            {avaliacao.peso_avaliador && (
-              <div
-                className="
-                px-2 py-1 rounded-md
-                bg-green-100 text-green-700
-                text-xs font-semibold
-                whitespace-nowrap
-              "
-              >
+            </span>
+            {avaliacao.peso_avaliador != null && (
+              <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
                 {avaliacao.peso_avaliador / 10}/10
-              </div>
+              </span>
             )}
           </div>
+          {avaliacao.avaliador_nome && (
+            <p className="mt-3 text-sm font-semibold text-gray-900">
+              {avaliacao.avaliador_nome}
+            </p>
+          )}
+          {avaliacao.localizacao && (
+            <p className="mt-1 text-xs text-gray-500">
+              {avaliacao.localizacao}
+            </p>
+          )}
 
-          {tipo === "QUESTIONARIO_ENVIADO" && (
-            <div className="mt-3 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
-              <p className="text-[11px] text-blue-700 font-medium">
-                📅 {t("minha_avaliacao.candidato.formulario_enviado")}
-              </p>
-
-              <p className="text-xs font-semibold text-blue-800 mt-1">
-                {formatarData(avaliacao.data_envio_formulario ?? null)}
-              </p>
+          {tipo === "questionarios" && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-blue-700">
+              <CalendarDays className="h-4 w-4" />
+              <span>
+                {t("minha_avaliacao.candidato.formulario_enviado")}:{" "}
+                {formatarData(avaliacao.data_envio_formulario)}
+              </span>
             </div>
           )}
 
-          {/* Data entrevista */}
-          {(tipo === "AGENDADO" || tipo === "AGENDA_ENVIADA") &&
-            avaliacao.data_agenda && (
-              <div className="mt-3 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
-                <p className="text-[11px] text-blue-700 font-medium">
-                  📅 {t("minha_avaliacao.candidato.entrevista_em")}
+          {tipo === "entrevistas" && (
+            <div className="mt-3 space-y-2">
+              {avaliacao.data_agenda && (
+                <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-gray-700">
+                  <CalendarDays className="h-4 w-4 text-purple-600" />
+                  <span>
+                    {t("minha_avaliacao.candidato.entrevista_em")}:{" "}
+                    {formatarDataHora(avaliacao.data_agenda)}
+                  </span>
+                  <span className="text-xs font-normal text-gray-400">
+                    (Brasília)
+                  </span>
+                </div>
+              )}
+              {agendaRecusada ? (
+                <p className="text-xs font-medium text-red-600">
+                  {t("minha_avaliacao.candidato.entrevista_recusada")}
                 </p>
+              ) : entrevistaConfirmada && agendaAceita ? (
+                <>
+                  <p className="flex items-center gap-1.5 text-xs font-medium text-green-700">
+                    <CheckCircle2 className="h-4 w-4" />
+                    {t("minha_avaliacao.candidato.entrevista_confirmada")}
+                  </p>
+                  {avaliacao.plataforma && (
+                    <p className="text-xs text-gray-500">
+                      {avaliacao.plataforma === "GOOGLE_MEET"
+                        ? "Google Meet"
+                        : avaliacao.plataforma === "MICROSOFT_TEAMS"
+                          ? "Microsoft Teams"
+                          : avaliacao.plataforma === "ZOOM"
+                            ? "Zoom"
+                            : "Link externo"}
+                    </p>
+                  )}
+                </>
+              ) : avaliacao.status === "AGENDADO" && agendaAceita ? (
+                <p className="flex items-center gap-1.5 text-xs font-medium text-amber-600">
+                  <Clock3 className="h-4 w-4" />
+                  {t("minha_avaliacao.candidato.entrevista_confirmada")}
+                  {" · "}
+                  {t("minha_avaliacao.aguardando_link")}
+                </p>
+              ) : !agendaRecusada ? (
+                <p className="text-xs font-medium text-amber-600">
+                  {t("minha_avaliacao.aguardando_data")}
+                </p>
+              ) : null}
+            </div>
+          )}
 
-                <p className="text-xs font-semibold text-blue-800 mt-1">
-                  {formatarDataHora(avaliacao.data_agenda)}
-                </p>
-              </div>
+          {tipo === "finalizadas" && (
+            <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-green-700">
+              <CheckCircle2 className="h-4 w-4" />
+              {t("minha_avaliacao.candidato.avaliacao_finalizada")}
+            </p>
+          )}
+
+          <p className="mt-3 text-xs text-gray-400">
+            {t("minha_avaliacao.candidato.atualizado_em")}{" "}
+            {formatarData(
+              tipo === "questionarios"
+                ? avaliacao.data_envio_formulario
+                : tipo === "entrevistas"
+                  ? avaliacao.data_envio_link ||
+                    avaliacao.data_agenda_criacao ||
+                    avaliacao.data_agenda
+                  : avaliacao.data_avaliacao,
             )}
+          </p>
         </div>
 
-        {/* RODAPÉ */}
-        <div className="mt-auto">
-          {/* QUESTIONÁRIO */}
-          {tipo === "QUESTIONARIO_ENVIADO" && (
-            <div className="mt-4 pt-3 border-t">
-              <div
-                className="
-                w-full py-2 rounded-lg text-center
-                text-xs font-semibold
-                bg-blue-50 text-blue-700
-              "
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:max-w-[360px]">
+          {tipo === "questionarios" && (
+            <button
+              type="button"
+              onClick={abrirDetalhe}
+              className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700"
+            >
+              {t("minha_avaliacao.candidato.questionario_pendente")}
+            </button>
+          )}
+          {tipo === "entrevistas" &&
+            avaliacao.status === "AGENDA_ENVIADA" &&
+            !agendaRecusada && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => onRecusarAgenda?.(avaliacao.id)}
+                  className="min-h-10 cursor-pointer rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                >
+                  {t("minha_avaliacao.candidato.btn_recusar")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onAceitarAgenda?.(avaliacao.id)}
+                  className="min-h-10 cursor-pointer rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                >
+                  {t("minha_avaliacao.candidato.btn_aceitar")}
+                </button>
+              </>
+            )}
+          {tipo === "entrevistas" &&
+            entrevistaConfirmada &&
+            agendaAceita &&
+            (podeAcessar ? (
+              <a
+                href={avaliacao.link_reuniao!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
               >
-                📝 {t("minha_avaliacao.candidato.questionario_pendente")}
+                <Video className="h-4 w-4" />{" "}
+                {t("minha_avaliacao.btn_acessar_entrevista")}
+              </a>
+            ) : (
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  type="button"
+                  disabled
+                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-500 disabled:cursor-not-allowed"
+                >
+                  <Video className="h-4 w-4" />{" "}
+                  {t("minha_avaliacao.btn_acessar_entrevista")}
+                </button>
+                <span className="text-center text-xs text-gray-500">
+                  {!linkValido
+                    ? "Aguardando link válido"
+                    : !Number.isFinite(horario)
+                      ? "Aguardando horário"
+                      : "Disponível 5 minutos antes"}
+                </span>
               </div>
-            </div>
+            ))}
+          {tipo === "finalizadas" && (
+            <button
+              type="button"
+              onClick={abrirDetalhe}
+              className="inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-lg border border-purple-600 bg-white px-4 py-2 text-sm font-semibold text-purple-700 transition hover:bg-purple-50"
+            >
+              <Eye className="h-4 w-4" />
+              {t("minha_avaliacao.btn_ver_avaliacao")}
+            </button>
           )}
-
-          {/* AGENDA */}
-          {(tipo === "AGENDADO" || tipo === "AGENDA_ENVIADA") && (
-            <>
-              {tipo === "AGENDADO" && (
-                <div className="mt-4 pt-3 border-t">
-                  <div
-                    className="
-                    w-full py-2 rounded-lg text-center
-                    text-xs font-semibold
-                    bg-green-50 text-green-700
-                  "
-                  >
-                    ✅ {t("minha_avaliacao.candidato.entrevista_confirmada")}
-                  </div>
-                </div>
-              )}
-
-              {tipo === "AGENDA_ENVIADA" &&
-                avaliacao.agenda_status != "RECUSADO" && (
-                  <div className="flex gap-2 mt-4 pt-3 border-t">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRecusarAgenda?.(avaliacao.id);
-                      }}
-                      className="
-                    flex-1 py-2 rounded-lg border
-                    text-xs font-semibold cursor-pointer
-                    text-red-600 border-red-200
-                    hover:bg-red-50 transition
-                  "
-                    >
-                      {t("minha_avaliacao.candidato.btn_recusar")}
-                    </button>
-
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAceitarAgenda?.(avaliacao.id);
-                      }}
-                      className="
-                    flex-1 py-2 rounded-lg
-                    text-xs font-semibold cursor-pointer
-                    bg-green-600 text-white
-                    hover:bg-green-700 transition
-                  "
-                    >
-                      {t("minha_avaliacao.candidato.btn_aceitar")}
-                    </button>
-                  </div>
-                )}
-
-              {avaliacao.agenda_status === "RECUSADO" && (
-                <div className="mt-4 pt-3 border-t">
-                  <div
-                    className="
-                    w-full py-2 rounded-lg text-center
-                    text-xs font-semibold
-                    bg-red-50 text-red-700
-                  "
-                  >
-                    ❌ {t("minha_avaliacao.candidato.entrevista_recusada")}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-
-          {/* FINALIZADO */}
-          {tipo === "FINALIZADO" && (
-            <div className="mt-4 pt-3 border-t">
-              <div
-                className="
-                w-full py-2 rounded-lg text-center
-                text-xs font-semibold
-                bg-green-50 text-green-700
-              "
-              >
-                ✅ {t("minha_avaliacao.candidato.avaliacao_finalizada")}
-              </div>
-            </div>
-          )}
-
-          <p className="text-[10px] text-gray-400 mt-2 text-center">
-            {t("minha_avaliacao.candidato.atualizado_em")}{" "}
-            {tipo === "QUESTIONARIO_ENVIADO"
-              ? formatarData(avaliacao.data_envio_formulario)
-              : tipo === "AGENDA_ENVIADA"
-                ? formatarData(avaliacao.data_agenda_criacao)
-                : tipo === "AGENDADO"
-                  ? formatarData(avaliacao.data_agenda)
-                  : formatarData(avaliacao.data_avaliacao)}
-          </p>
         </div>
       </div>
     </div>
   );
 }
 
-/* ======================================================
-   PAGE
-====================================================== */
-
 export default function AvaliacaoLista({ perfil }: Props) {
   const { hasPerfilCandidato, loading } = useCandidato(perfil);
-
   const { t } = useTranslation("common");
-
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
-
+  const [aba, setAba] = useState<Aba>("questionarios");
+  const [agora, setAgora] = useState(0);
   const [avaliacoesQuestionario, setAvaliacoesQuestionario] = useState<
     Avaliacao[]
   >([]);
-
   const [avaliacoesAgendadas, setAvaliacoesAgendadas] = useState<Avaliacao[]>(
     [],
   );
-
   const [avaliacoesFinalizadas, setAvaliacoesFinalizadas] = useState<
     Avaliacao[]
   >([]);
 
   useEffect(() => {
-    fetchAvaliacoes();
+    setAgora(Date.now());
+    const timer = window.setInterval(() => setAgora(Date.now()), 15000);
+    return () => window.clearInterval(timer);
   }, []);
 
-  const fetchAvaliacoes = async () => {
-    try {
-      setIsLoading(true);
+  useEffect(() => {
+    void fetchAvaliacoes();
+  }, []);
 
+  const fetchAvaliacoes = async (mostrarLoading = true) => {
+    try {
+      if (mostrarLoading) setIsLoading(true);
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/${perfil}/avaliacoes`,
         {
           credentials: "include",
+          cache: "no-store",
         },
       );
-
+      if (!res.ok) throw new Error("Erro ao carregar avaliações");
       const data = await res.json();
-
       setAvaliacoesQuestionario(data.aguardando_questionario || []);
-
       setAvaliacoesAgendadas(data.agendadas || []);
-
       setAvaliacoesFinalizadas(data.finalizadas || []);
     } catch (error) {
       console.error("Erro ao buscar avaliações", error);
     } finally {
-      setIsLoading(false);
+      if (mostrarLoading) setIsLoading(false);
     }
   };
 
   const handleAceitarAgenda = async (id: number) => {
     try {
-      await fetch(
+      const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/${perfil}/agenda/${id}/aceitar`,
         {
           method: "PATCH",
           credentials: "include",
         },
       );
-
-      await fetchAvaliacoes();
+      if (!res.ok) throw new Error("Erro ao aceitar agenda");
+      await fetchAvaliacoes(false);
     } catch (error) {
       console.error("Erro ao aceitar agenda", error);
     }
@@ -386,21 +370,44 @@ export default function AvaliacaoLista({ perfil }: Props) {
 
   const handleRecusarAgenda = async (id: number) => {
     try {
-      await fetch(
+      const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/${perfil}/agenda/${id}/recusar`,
         {
           method: "PATCH",
           credentials: "include",
         },
       );
-
-      await fetchAvaliacoes();
+      if (!res.ok) throw new Error("Erro ao recusar agenda");
+      await fetchAvaliacoes(false);
     } catch (error) {
       console.error("Erro ao recusar agenda", error);
     }
   };
 
   if (isLoading || loading) return <LoadingOverlay />;
+
+  const abas: { id: Aba; label: string; items: Avaliacao[]; vazio: string }[] =
+    [
+      {
+        id: "questionarios",
+        label: t("minha_avaliacao.candidato.questionarios_pendentes"),
+        items: avaliacoesQuestionario,
+        vazio: t("minha_avaliacao.candidato.sem_questionario"),
+      },
+      {
+        id: "entrevistas",
+        label: t("minha_avaliacao.candidato.entrevistas"),
+        items: avaliacoesAgendadas,
+        vazio: t("minha_avaliacao.candidato.sem_entrevista"),
+      },
+      {
+        id: "finalizadas",
+        label: t("minha_avaliacao.candidato.finalizadas"),
+        items: avaliacoesFinalizadas,
+        vazio: t("minha_avaliacao.candidato.sem_finalizacao"),
+      },
+    ];
+  const atual = abas.find((item) => item.id === aba)!;
 
   return (
     <div className="flex">
@@ -409,136 +416,82 @@ export default function AvaliacaoLista({ perfil }: Props) {
         setIsDrawerOpen={setIsDrawerOpen}
         profile={perfil}
       />
-
-      <div className="flex flex-col flex-1 bg-[#F5F6F6]">
+      <div className="flex min-w-0 flex-1 flex-col bg-[#F5F6F6]">
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
-
         {!hasPerfilCandidato ? (
           <SemDados tipo="perfil" perfil={perfil} />
         ) : (
           <PageContainer>
-            <div
-              className="grid grid-cols-1 md:grid-cols-2
-              xl:grid-cols-3 gap-2"
-            >
-              {/* QUESTIONÁRIO */}
-              <div
-                className="
-                  flex flex-col
-                  bg-white
-                  rounded-2xl
-                  border border-gray-200
-                  shadow-sm
-                  p-4
-                  min-h-[80vh]
-                "
-              >
-                <h2
-                  className="font-semibold text-gray-800 mb-4
-                  text-center border-b pb-2"
-                >
-                  {t("minha_avaliacao.candidato.questionarios_pendentes")} (
-                  {avaliacoesQuestionario.length})
-                </h2>
+            <div className="w-full">
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {t("minha_avaliacao.titulo_pagina")}
+                </h1>
+                <p className="mt-1 text-sm text-gray-500">
+                  {t("minha_avaliacao.subtitulo_pagina")}
+                </p>
+              </div>
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-gray-200">
+                {/* Abas */}
+                <div className="flex flex-wrap gap-2">
+                  {abas.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setAba(item.id);
+                        void fetchAvaliacoes(false);
+                      }}
+                      className={`cursor-pointer border-b-2 px-4 py-3 text-sm font-semibold transition ${
+                        aba === item.id
+                          ? "border-purple-600 text-purple-700"
+                          : "border-transparent text-gray-500 hover:text-gray-800"
+                      }`}
+                    >
+                      {item.label}
 
-                <div className="flex flex-col gap-3 pr-1">
-                  {avaliacoesQuestionario.length === 0 && (
-                    <p className="text-sm text-gray-400 text-center">
-                      {t("minha_avaliacao.candidato.sem_questionario")}
-                    </p>
-                  )}
-
-                  {avaliacoesQuestionario.map((avaliacao) => (
-                    <AvaliacaoCard
-                      key={avaliacao.id}
-                      avaliacao={avaliacao}
-                      tipo={avaliacao.status}
-                      t={t}
-                      perfil={perfil}
-                    />
+                      <span
+                        className={`ml-1 rounded-full px-2 py-0.5 text-xs ${
+                          aba === item.id
+                            ? "bg-purple-100 text-purple-700"
+                            : "bg-gray-200 text-gray-600"
+                        }`}
+                      >
+                        {item.items.length}
+                      </span>
+                    </button>
                   ))}
+                </div>
+
+                {/* Fuso horário à direita */}
+                <div className="mb-3 ml-auto flex items-center gap-1.5 whitespace-nowrap text-xs text-gray-500">
+                  <Clock3 className="h-3.5 w-3.5 shrink-0" />
+
+                  <span>
+                    {t("oportunidades_candidato.fuso_brasilia_exibicao")}
+                  </span>
                 </div>
               </div>
 
-              {/* AGENDADAS */}
-              <div
-                className="
-                  flex flex-col
-                  bg-white
-                  rounded-2xl
-                  border border-gray-200
-                  shadow-sm
-                  p-4
-                  min-h-[80vh]
-                "
-              >
-                <h2
-                  className="font-semibold text-gray-800 mb-4
-                  text-center border-b pb-2"
-                >
-                  {t("minha_avaliacao.candidato.entrevistas")} (
-                  {avaliacoesAgendadas.length})
-                </h2>
-
-                <div className="flex flex-col gap-3 pr-1">
-                  {avaliacoesAgendadas.length === 0 && (
-                    <p className="text-sm text-gray-400 text-center">
-                      {t("minha_avaliacao.candidato.sem_entrevista")}
-                    </p>
-                  )}
-
-                  {avaliacoesAgendadas.map((avaliacao) => (
+              {atual.items.length === 0 ? (
+                <div className="rounded-xl border border-gray-200 bg-white px-6 py-12 text-center text-sm text-gray-500">
+                  {atual.vazio}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {atual.items.map((avaliacao) => (
                     <AvaliacaoCard
                       key={avaliacao.id}
                       avaliacao={avaliacao}
-                      tipo={avaliacao.status}
+                      tipo={aba}
                       onAceitarAgenda={handleAceitarAgenda}
                       onRecusarAgenda={handleRecusarAgenda}
                       t={t}
-                      perfil={perfil}
+                      agora={agora}
                     />
                   ))}
                 </div>
-              </div>
-
-              {/* FINALIZADAS */}
-              <div
-                className="
-                  flex flex-col
-                  bg-white
-                  rounded-2xl
-                  border border-gray-200
-                  shadow-sm
-                  p-4
-                  min-h-[80vh]
-                "
-              >
-                <h2
-                  className="font-semibold text-gray-800 mb-4
-                  text-center border-b pb-2"
-                >
-                  {t("minha_avaliacao.candidato.finalizadas")} (
-                  {avaliacoesFinalizadas.length})
-                </h2>
-
-                <div className="flex flex-col gap-3 pr-1">
-                  {avaliacoesFinalizadas.length === 0 && (
-                    <p className="text-sm text-gray-400 text-center">
-                      {t("minha_avaliacao.candidato.sem_finalizacao")}
-                    </p>
-                  )}
-
-                  {avaliacoesFinalizadas.map((avaliacao) => (
-                    <AvaliacaoCard
-                      key={avaliacao.id}
-                      avaliacao={avaliacao}
-                      tipo={avaliacao.status}
-                      t={t}
-                      perfil={perfil}
-                    />
-                  ))}
-                </div>
-              </div>
+              )}
             </div>
           </PageContainer>
         )}

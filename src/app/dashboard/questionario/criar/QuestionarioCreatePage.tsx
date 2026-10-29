@@ -84,13 +84,13 @@ export default function CriarQuestionarioPage({ perfil }: Props) {
         pergunta: p.pergunta.trim(),
         resposta_base: p.resposta_base?.trim() || null,
         tipo_pergunta: "CAIXA_TEXTO",
-        ativo: p.ativo,
+        ativo: p.ativo ?? true,
         ordem: index + 1,
-        obrigatorio: p.obrigatorio,
+        obrigatorio: p.obrigatorio ?? false,
       })),
     };
 
-    // console.log("payload", payload);
+    console.log("payload", payload);
 
     /* const url = !id
       ? `${process.env.NEXT_PUBLIC_API_URL}/questionario/create`

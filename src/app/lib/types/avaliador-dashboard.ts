@@ -7,6 +7,7 @@ export type AvaliadorDashboardAgenda = {
   agenda_status: string;
   status_avaliacao: string;
   atrasada: boolean;
+  link_reuniao?: string | null;
 };
 
 export type AvaliadorDashboardResumo = {

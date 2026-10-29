@@ -20,10 +20,8 @@ interface Job {
   data_cadastro: string;
   qtde_dias_aberta: number;
   prazo: string;
-
   tipo_oportunidade: TipoOportunidade;
   publicos_afirmativos: PublicoAfirmativo[];
-
   cidade_label: string;
   estado_sigla: string;
 }
@@ -32,7 +30,7 @@ interface JobListProps {
   title: string;
   perfil: string;
   jobs: Job[];
-  colorClass?: string; // cor da faixa
+  colorClass?: string;
 }
 
 export default function JobList({
@@ -42,28 +40,12 @@ export default function JobList({
   colorClass,
 }: JobListProps) {
   return (
-    <section>
-      {title.trim().length > 0 && (
-        <div
-          className={`px-4 py-1 rounded-full font-semibold text-sm ${colorClass}`}
-        >
-          {title}
-        </div>
-      )}
-
-      {perfil == "candidato" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-2">
-          {jobs.map((job, idx) => (
-            <JobCard key={idx} {...job} perfil={perfil} />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-3 mt-2">
-          {jobs.map((job, idx) => (
-            <JobCard key={idx} {...job} perfil={perfil} />
-          ))}
-        </div>
-      )}
+    <section className="w-full min-w-0">
+      <div className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-2">
+        {jobs.map((job) => (
+          <JobCard key={job.vaga_id} {...job} perfil={perfil} />
+        ))}
+      </div>
     </section>
   );
 }
