@@ -2636,42 +2636,16 @@ export default function PerfilAvaliador({
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        const totalFavoritos =
-                                          form.lista_skills.filter(
-                                            (s) => s.favorito,
-                                          ).length;
-
-                                        // Se já tem 6 favoritos e este não é favorito → não deixa clicar
-                                        if (
-                                          totalFavoritos >= 6 &&
-                                          !item.favorito
-                                        ) {
-                                          return;
-                                        }
-
                                         handleSkillChange(
                                           item.skill_id,
                                           "favorito",
                                           !item.favorito,
                                         );
                                       }}
-                                      className={`flex items-center ${
-                                        form.lista_skills.filter(
-                                          (s) => s.favorito,
-                                        ).length >= 6 && !item.favorito
-                                          ? "cursor-not-allowed opacity-50"
-                                          : "cursor-pointer"
-                                      }`}
-                                      disabled={
-                                        form.lista_skills.filter(
-                                          (s) => s.favorito,
-                                        ).length >= 6 && !item.favorito
-                                      }
+                                      className="flex items-center cursor-pointer"
                                     >
                                       <TooltipIcon
                                         message={`${t(
-                                          "tela_perfil_avaliador.item_tooltip_favorite_passo1",
-                                        )}\n${t(
                                           "tela_perfil_avaliador.item_tooltip_favorite_passo2",
                                         )}\n${t(
                                           "tela_perfil_avaliador.item_tooltip_favorite_passo2_1",
@@ -2912,42 +2886,16 @@ export default function PerfilAvaliador({
                                     <button
                                       type="button"
                                       onClick={() => {
-                                        const totalFavoritos =
-                                          form.lista_skills.filter(
-                                            (s) => s.favorito,
-                                          ).length;
-
-                                        // Se já tem 5 favoritos e este não é favorito → não deixa clicar
-                                        if (
-                                          totalFavoritos >= 6 &&
-                                          !item.favorito
-                                        ) {
-                                          return;
-                                        }
-
                                         handleSkillChange(
                                           item.skill_id,
                                           "favorito",
                                           !item.favorito,
                                         );
                                       }}
-                                      className={`flex items-center ${
-                                        form.lista_skills.filter(
-                                          (s) => s.favorito,
-                                        ).length >= 6 && !item.favorito
-                                          ? "cursor-not-allowed opacity-50"
-                                          : "cursor-pointer"
-                                      }`}
-                                      disabled={
-                                        form.lista_skills.filter(
-                                          (s) => s.favorito,
-                                        ).length >= 6 && !item.favorito
-                                      }
+                                      className="flex items-center cursor-pointer"
                                     >
                                       <TooltipIcon
                                         message={`${t(
-                                          "tela_perfil_avaliador.item_tooltip_favorite_passo1",
-                                        )}\n${t(
                                           "tela_perfil_avaliador.item_tooltip_favorite_passo2",
                                         )}\n${t(
                                           "tela_perfil_avaliador.item_tooltip_favorite_passo2_1",
