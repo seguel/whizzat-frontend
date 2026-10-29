@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+import { usePathname } from "next/navigation";
 import { useProfile } from "./ProfileContext";
 
 interface NotificationContextType {
@@ -16,13 +23,19 @@ export function NotificationProvider({
   children: React.ReactNode;
 }) {
   const { profile } = useProfile();
+  const pathname = usePathname();
   const [count, setCount] = useState(0);
 
-  async function fetchUnreadCount() {
+  const fetchUnreadCount = useCallback(async () => {
+    if (!profile) return;
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/${profile}/notificacoes/unread-count`,
-        { credentials: "include" },
+        {
+          credentials: "include",
+          cache: "no-store",
+        },
       );
 
       if (res.ok) {
@@ -32,13 +45,11 @@ export function NotificationProvider({
     } catch (err) {
       console.error("Erro ao buscar notificações", err);
     }
-  }
+  }, [profile]);
 
   useEffect(() => {
-    if (profile) {
-      fetchUnreadCount();
-    }
-  }, [profile]);
+    fetchUnreadCount();
+  }, [fetchUnreadCount, pathname]);
 
   return (
     <NotificationContext.Provider value={{ count, refresh: fetchUnreadCount }}>
@@ -49,10 +60,12 @@ export function NotificationProvider({
 
 export function useNotifications() {
   const context = useContext(NotificationContext);
+
   if (!context) {
     throw new Error(
       "useNotifications must be used within NotificationProvider",
     );
   }
+
   return context;
 }
