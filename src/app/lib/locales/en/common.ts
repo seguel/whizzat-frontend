@@ -313,6 +313,9 @@ const en = {
       "- You can select up to 6 skills to be an evaluator.",
     item_tooltip_favorite_passo2: "- The selected skills will be considered ",
     item_tooltip_favorite_passo2_1: "as preferred for candidate evaluations.",
+    titulo_pagina: "My Profile",
+    subtitulo_pagina:
+      "Keep your information up to date and personalize your professional introduction.",
   },
   tela_perfil_recrutador: {
     item_ativo: "Active",
@@ -349,6 +352,9 @@ const en = {
     item_alerta_erro_tipo_arq: "Upload image files only (JPG, PNG, SVG, etc.)",
     item_alerta_erro_tamanho_arq: "File must be at most 1MB.",
     item_alerta_erro_salvar: "Error saving recruiter.",
+    titulo_pagina: "My Profile",
+    subtitulo_pagina:
+      "Keep your information up to date and personalize your professional introduction.",
   },
   tela_perfil_candidato: {
     item_ativo: "Active",
@@ -506,6 +512,9 @@ const en = {
     modalidade_visualizacao_msg:
       "Work arrangements you are willing to consider for new opportunities.",
     modalidade_nenhuma_selecionada: "No work arrangement has been selected.",
+    titulo_pagina: "My Profile",
+    subtitulo_pagina:
+      "Keep your information up to date and personalize your professional introduction.",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Evaluators Awaiting Confirmation",
@@ -518,6 +527,9 @@ const en = {
     item_alerta_sucesso: "Evaluator successfully updated!",
     item_alerta_erro_buscar_dados: "Error fetching evaluator data",
     item_alerta_erro_salvar: "Error performing operation!",
+    titulo_pagina: "My Evaluators",
+    subtitulo_pagina:
+      "Manage evaluators associated with your companies and track approval requests.",
   },
   tela_lista_empresas: {
     item_ativo: "Active",
@@ -527,6 +539,9 @@ const en = {
     item_alerta_erro_buscar_dados: "Error fetching companies",
     item_msg_sem_email: "No email",
     item_msg_sem_telefone: "No phone",
+    titulo_pagina: "My Companies",
+    subtitulo_pagina:
+      "Manage your registered companies and keep track of their information in one place.",
   },
   tela_empresa_dados: {
     item_ativo: "Active",
@@ -594,6 +609,8 @@ const en = {
     item_msg_sem_vagas_filtro:
       "Try adjusting the filters or clearing the selection to see more results.",
     item_msg_item_mulher: "Women",
+    titulo_pagina: "Open Positions",
+    subtitulo_pagina: "Manage and track job openings posted by your companies.",
   },
   tela_vaga_dados: {
     item_ativo: "Active",
@@ -837,6 +854,9 @@ const en = {
     msg_exclusao: "Notification successfully deleted",
     msg_erro: "Error deleting notification",
     carregando: "Loading more...",
+    titulo_pagina: "Notifications",
+    subtitulo_pagina:
+      "Stay on top of your notifications, news, and important updates.",
   },
   minha_avaliacao: {
     recebido: "Received Invitations",
@@ -936,7 +956,7 @@ const en = {
       btn_aceitar: "Accept",
       peso: "Level:",
       entrevista_em: "Interview",
-      questionario_pendente: "Awaiting Response",
+      questionario_pendente: "Response",
       formulario_enviado: "Questionnaire Received:",
       entrevista_recusada: "Date declined. Waiting for a new proposed date.",
       resultado_avaliacao: "Evaluation Result",
@@ -949,6 +969,17 @@ const en = {
       comentario_msg:
         "Below is the feedback provided by the evaluator regarding your interview.",
     },
+    btn_iniciar_avaliacao: "Start evaluation",
+    btn_agendar_entrevista: "Schedule interview",
+    btn_enviar_link: "Send Interview Link",
+    btn_finalizar_avaliacao: "Finalize evaluation",
+    btn_ver_avaliacao: "View evaluation",
+    btn_acessar_entrevista: "Join interview",
+    aguardando_link: "Awaiting Interview Link",
+    aguardando_data: "Awaiting Date Confirmation",
+    titulo_pagina: "My Evaluations",
+    subtitulo_pagina:
+      "Manage your invitations, track scheduled interviews, and review your completed evaluations.",
   },
   questionario: {
     titulo_pagina: "Questionnaire Creation",
@@ -1021,6 +1052,9 @@ const en = {
         "Please complete all required questions before submitting the questionnaire.",
       finalizar_sem_entrevista: "Allow Completion Without Interview",
     },
+    lista_titulo_pagina: "My Questionnaires",
+    lista_subtitulo_pagina:
+      "Manage the questionnaires you've created and keep track of the materials used in evaluations.",
   },
   agenda: {
     titulo_um: "Interview Schedule",
@@ -1183,6 +1217,8 @@ const en = {
     ranking_pontos: "points",
     ranking_posicao: "Ranking Position",
     ranking_avaliadores: "evaluators",
+    agenda_aguardando_link: "Confirmed - Awaiting interview link",
+    acessar_entrevista: "Join interview",
   },
   perfil_candidato: {
     sobre: "About",

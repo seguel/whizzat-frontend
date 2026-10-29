@@ -85,10 +85,39 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
   const candidatoRecrutador =
     perfil === "candidato" && isAgendaCandidatoRecrutador(agenda);
 
-  const aguardandoLink = candidatoRecrutador && agenda.status === "AGENDADO";
+  const candidatoAvaliacao =
+    perfil === "candidato" &&
+    isAgendaCandidato(agenda) &&
+    agenda.origem === "AVALIACAO";
+
+  const avaliadorAgenda =
+    perfil === "avaliador" &&
+    !isAgendaCandidato(agenda) &&
+    !isAgendaRecrutador(agenda);
+
+  const aguardandoLink =
+    perfil === "candidato" &&
+    isAgendaCandidato(agenda) &&
+    agenda.status === "AGENDADO" &&
+    !agenda.link_reuniao;
 
   const entrevistaConfirmada =
-    candidatoRecrutador && agenda.status === "ENTREVISTA_CONFIRMADA";
+    perfil === "candidato" &&
+    isAgendaCandidato(agenda) &&
+    agenda.status === "ENTREVISTA_CONFIRMADA" &&
+    Boolean(agenda.link_reuniao);
+
+  const avaliadorAguardandoLink =
+    avaliadorAgenda &&
+    agenda.status === "ACEITO" &&
+    agenda.status_avaliacao === "AGENDADO" &&
+    !agenda.link_reuniao;
+
+  const avaliadorEntrevistaConfirmada =
+    avaliadorAgenda &&
+    agenda.status === "ACEITO" &&
+    agenda.status_avaliacao === "ENTREVISTA_CONFIRMADA" &&
+    Boolean(agenda.link_reuniao);
 
   // =========================================================
   // RECRUTADOR
@@ -125,10 +154,7 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
   // =========================================================
 
   const getPlataformaLabel = () => {
-    const agendaComPlataforma =
-      isAgendaCandidatoRecrutador(agenda) || isAgendaRecrutador(agenda);
-
-    if (!agendaComPlataforma || !agenda.plataforma) {
+    if (!("plataforma" in agenda) || !agenda.plataforma) {
       return "";
     }
 
@@ -306,19 +332,39 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
                   </span>
                 )}
               </>
+            ) : avaliadorAguardandoLink ? (
+              <>
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                  {t("agenda.status_horario_confirmado")}
+                </span>
+
+                <span className="text-[11px] font-medium text-gray-500">
+                  {t("agenda.status_aguardando_envio_link")}
+                </span>
+              </>
+            ) : avaliadorEntrevistaConfirmada ? (
+              <>
+                <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+                  {t("agenda.status_entrevista_confirmada")}
+                </span>
+
+                {agenda.plataforma && (
+                  <span className="text-[11px] font-medium text-gray-500">
+                    {getPlataformaLabel()}
+                  </span>
+                )}
+              </>
             ) : aguardandoLink ? (
-              /* Candidato - aguardando link */
               <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
                 {t("agenda.status_aguardando_link")}
               </span>
             ) : entrevistaConfirmada ? (
               <>
-                {/* Candidato - entrevista confirmada */}
                 <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
                   {t("agenda.status_entrevista_confirmada")}
                 </span>
 
-                {isAgendaCandidatoRecrutador(agenda) && agenda.plataforma && (
+                {isAgendaCandidato(agenda) && agenda.plataforma && (
                   <span className="text-[11px] font-medium text-gray-500">
                     {getPlataformaLabel()}
                   </span>
@@ -368,15 +414,18 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
             <span>{hora}</span>
           </div>
 
-          {/* Recrutador - enviar link */}
-          {recrutadorAguardandoLink && (
-            <button
-              type="button"
-              onClick={abrirProcessoRecrutador}
-              className="inline-flex min-h-8 cursor-pointer items-center justify-center self-start rounded-lg bg-purple-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-purple-700 sm:self-auto"
+          {/* Avaliador - acessar entrevista */}
+          {avaliadorEntrevistaConfirmada && agenda.link_reuniao && (
+            <a
+              href={agenda.link_reuniao}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-700 sm:w-auto"
             >
-              {t("agenda.btn_enviar_link")}
-            </button>
+              <Video className="h-4 w-4 shrink-0" />
+
+              {t("processos_recrutador.btn_acessar_entrevista")}
+            </a>
           )}
 
           {/* Recrutador - acessar entrevista */}
@@ -397,7 +446,7 @@ export default function AgendaCard({ agenda, selected, perfil }: Props) {
 
           {/* Candidato - acessar entrevista */}
           {entrevistaConfirmada &&
-            isAgendaCandidatoRecrutador(agenda) &&
+            isAgendaCandidato(agenda) &&
             agenda.link_reuniao && (
               <div className="flex shrink-0 flex-col items-start gap-1.5 sm:items-end">
                 {acessoLiberado ? (

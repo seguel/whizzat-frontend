@@ -63,8 +63,6 @@ export default function ListaVagas({
   const [hasVagas, setHasVaga] = useState<boolean>(false);
 
   const [sugeridos, setSugeridos] = useState<Job[]>([]);
-  const [escolhidos, setEscolhidos] = useState<Job[]>([]);
-  const [avaliacao, setAvaliacao] = useState<Job[]>([]);
 
   const [empresas, setEmpresas] = useState<
     { id: number; nome_empresa: string }[]
@@ -99,8 +97,6 @@ export default function ListaVagas({
       const data = await res.json();
 
       setSugeridos(data);
-      setEscolhidos(data);
-      setAvaliacao(data);
       setHasVagasFiltro(data.length > 0);
     } catch (error) {
       console.error(t("tela_lista_vagas.item_alerta_erro_buscar_dados"), error);
@@ -150,8 +146,6 @@ export default function ListaVagas({
         setEmpresas(empresasData.empresas);
         setSkills(skillsData);
         setSugeridos(sugeridosData);
-        setEscolhidos(sugeridosData);
-        setAvaliacao(sugeridosData);
         setHasVaga(sugeridosData.length > 0);
       } catch (error) {
         console.error(
@@ -187,6 +181,14 @@ export default function ListaVagas({
             {hasVagas ? (
               <>
                 <PageContainer>
+                  <div className="mb-6">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {t("tela_lista_vagas.titulo_pagina")}
+                    </h1>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {t("tela_lista_vagas.subtitulo_pagina")}
+                    </p>
+                  </div>
                   {/* Filtros */}
                   <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 w-full">
                     {/* Grupo de filtros à esquerda */}
@@ -297,38 +299,13 @@ export default function ListaVagas({
                   </div>
 
                   {hasVagasFiltro || hasVagasFiltro === null ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                      {sugeridos.length > 0 && (
-                        <JobList
-                          title={`${t(
-                            "tela_lista_vagas.item_titulo_sugeridos",
-                          )} ${sugeridos.length}`}
-                          jobs={sugeridos}
-                          perfil={perfil}
-                          colorClass="bg-purple-100 text-purple-700"
-                        />
-                      )}
-
-                      {escolhidos.length > 0 && (
-                        <JobList
-                          title={`${t(
-                            "tela_lista_vagas.item_titulo_escolhidos",
-                          )} ${escolhidos.length}`}
-                          jobs={escolhidos}
-                          perfil={perfil}
-                          colorClass="bg-purple-200 text-purple-800"
-                        />
-                      )}
-                      {avaliacao.length > 0 && (
-                        <JobList
-                          title={`${t(
-                            "tela_lista_vagas.item_titulo_avaliacao",
-                          )} ${avaliacao.length}`}
-                          jobs={avaliacao}
-                          perfil={perfil}
-                          colorClass="bg-purple-300 text-purple-900"
-                        />
-                      )}
+                    <div className="w-full">
+                      <JobList
+                        title={`${t("tela_lista_vagas.item_titulo_sugeridos")} ${sugeridos.length}`}
+                        jobs={sugeridos}
+                        perfil={perfil}
+                        colorClass="bg-purple-100 text-purple-700"
+                      />
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-10 text-center">

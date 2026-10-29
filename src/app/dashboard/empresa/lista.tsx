@@ -98,19 +98,33 @@ export default function EmpresaListar({
             <>
               <div className="flex-1 overflow-y-auto">
                 <PageContainer>
-                  <div className="pt-1 px-1 flex justify-end w-full">
-                    {/* Botão cadastrar (direita) */}
+                  <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    {/* Título e subtítulo */}
+                    <div className="min-w-0">
+                      <h1 className="text-2xl font-bold text-gray-900">
+                        {t("tela_lista_empresas.titulo_pagina")}
+                      </h1>
+
+                      <p className="mt-1 text-sm text-gray-500">
+                        {t("tela_lista_empresas.subtitulo_pagina")}
+                      </p>
+                    </div>
+
+                    {/* Botão cadastrar empresa */}
                     <button
+                      type="button"
                       onClick={() =>
                         router.push(
                           `/dashboard/empresa/criar?perfil=${perfil}&op=N`,
                         )
                       }
-                      className="px-4 py-2 text-sm font-semibold rounded-full text-indigo-900 bg-purple-100 hover:bg-purple-200 transition cursor-pointer"
+                      className="w-full shrink-0 cursor-pointer rounded-full bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 sm:w-auto"
                     >
                       {t("tela_lista_empresas.item_botao_cadastrar")}
                     </button>
                   </div>
+
+                  {/* Restante do conteúdo da página */}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {empresas.map((empresa) => (
