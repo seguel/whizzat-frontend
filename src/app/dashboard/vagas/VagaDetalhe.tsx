@@ -521,7 +521,11 @@ export default function VagaDetalhes({ perfil, empresaId, vagaId }: Props) {
 
                 {/* Match de candidatos - somente recrutador */}
                 {perfil === "recrutador" && vaga?.ativo && (
-                  <VagaMatchCandidates vagaId={vagaId} empresaId={empresaId} />
+                  <VagaMatchCandidates
+                    vagaId={String(vaga.vaga_id)}
+                    empresaId={String(vaga.empresa_id)}
+                    modalidadeCodigo={vaga.modalidade_trabalho.modalidade}
+                  />
                 )}
               </div>
             </div>
