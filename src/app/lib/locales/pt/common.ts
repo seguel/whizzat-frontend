@@ -794,6 +794,8 @@ const pt = {
     confirmar_convite_fechar: "Fechar",
     ja_convidado: "Já convidado",
     ja_convidado_anteriormente: "Já recebeu convite seu",
+    raio_localizacao: "Raio de localização",
+    sem_filtro_raio: "Sem filtro de distância",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",

@@ -20,22 +20,33 @@ import ConfirmInviteCandidatesModal from "../candidate-match/ConfirmInviteCandid
 
 type FaixaMatch = "ALTA" | "BOA" | "COMPATIVEL" | "TODOS";
 
+type RaioKm = 50 | 85 | 100 | 120;
+
 interface MatchConfig {
   limite: number;
   faixa: FaixaMatch;
+  raio_km: RaioKm;
 }
 
 interface Props {
   vagaId: string;
   empresaId: string;
+  modalidadeCodigo: string;
 }
 
-export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
+export default function VagaMatchCandidates({
+  vagaId,
+  empresaId,
+  modalidadeCodigo,
+}: Props) {
   const { t } = useTranslation("common");
+
+  const vagaRemota = modalidadeCodigo.trim().toUpperCase() === "REMOTO";
 
   const [config, setConfig] = useState<MatchConfig>({
     limite: 15,
     faixa: "ALTA",
+    raio_km: 100,
   });
 
   const [pesquisou, setPesquisou] = useState(false);
@@ -102,6 +113,7 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
             empresa_id: Number(empresaId),
             limite: config.limite,
             faixa: config.faixa,
+            raio_km: vagaRemota ? null : config.raio_km,
           }),
         },
       );
@@ -341,8 +353,8 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
       >
         {/* Busca */}
         <div>
-          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-5">
-            <div className="flex items-start gap-3 min-w-0 xl:max-w-[360px]">
+          <div className="flex flex-col gap-5">
+            <div className="flex items-start gap-3 min-w-0 w-full">
               <div className="w-10 h-10 shrink-0 rounded-xl bg-purple-100 flex items-center justify-center">
                 <Search className="w-5 h-5 text-purple-700" />
               </div>
@@ -362,8 +374,8 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-3 xl:items-start">
-              <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-3 lg:gap-4">
+              <div className="flex flex-col gap-1.5 w-full sm:w-[260px]">
                 <label className="text-xs font-medium text-gray-600">
                   {t("vaga_match.compatibilidade")}
                 </label>
@@ -406,7 +418,7 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 w-full sm:w-[150px]">
                 <label className="text-xs font-medium text-gray-600">
                   {t("vaga_match.quantidade")}
                 </label>
@@ -427,11 +439,35 @@ export default function VagaMatchCandidates({ vagaId, empresaId }: Props) {
                 </select>
               </div>
 
+              {!vagaRemota && (
+                <div className="flex flex-col gap-1.5 w-full sm:w-[190px]">
+                  <label className="text-xs font-medium text-gray-600">
+                    {t("vaga_match.raio_localizacao")}
+                  </label>
+
+                  <select
+                    value={config.raio_km}
+                    onChange={(e) =>
+                      setConfig((prev) => ({
+                        ...prev,
+                        raio_km: Number(e.target.value) as RaioKm,
+                      }))
+                    }
+                    className="w-full sm:min-w-[150px] rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
+                  >
+                    <option value={50}>50 km</option>
+                    <option value={85}>85 km</option>
+                    <option value={100}>100 km</option>
+                    <option value={120}>120 km</option>
+                  </select>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={handleBuscar}
                 disabled={buscando}
-                className="sm:col-span-2 xl:col-span-1 xl:mt-[22px] inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-60 transition cursor-pointer"
+                className="w-full sm:w-auto sm:mt-[22px] min-w-[130px] whitespace-nowrap inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-60 transition cursor-pointer"
               >
                 <Search className="w-4 h-4" />
 
