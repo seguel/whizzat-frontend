@@ -808,6 +808,8 @@ const en = {
     confirmar_convite_fechar: "Close",
     ja_convidado: "Already invited",
     ja_convidado_anteriormente: "Previously invited by you",
+    raio_localizacao: "Location radius",
+    sem_filtro_raio: "No distance filter",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
