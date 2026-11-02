@@ -26,6 +26,7 @@ interface MatchConfig {
   limite: number;
   faixa: FaixaMatch;
   raio_km: RaioKm;
+  incluir_fora_raio: boolean;
 }
 
 interface Props {
@@ -47,6 +48,7 @@ export default function VagaMatchCandidates({
     limite: 15,
     faixa: "ALTA",
     raio_km: 100,
+    incluir_fora_raio: false,
   });
 
   const [pesquisou, setPesquisou] = useState(false);
@@ -114,6 +116,7 @@ export default function VagaMatchCandidates({
             limite: config.limite,
             faixa: config.faixa,
             raio_km: vagaRemota ? null : config.raio_km,
+            incluir_fora_raio: vagaRemota ? false : config.incluir_fora_raio,
           }),
         },
       );
@@ -374,8 +377,15 @@ export default function VagaMatchCandidates({
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-3 lg:gap-4">
-              <div className="flex flex-col gap-1.5 w-full sm:w-[260px]">
+            <div
+              className={`grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4 items-start w-full ${
+                vagaRemota
+                  ? "xl:grid-cols-[minmax(0,200px)_minmax(0,110px)_190px]"
+                  : "xl:grid-cols-[minmax(0,190px)_minmax(0,100px)_minmax(0,1fr)_minmax(0,130px)_190px]"
+              }`}
+            >
+              {/* Compatibilidade */}
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-medium text-gray-600">
                   {t("vaga_match.compatibilidade")}
                 </label>
@@ -388,7 +398,7 @@ export default function VagaMatchCandidates({
                       faixa: e.target.value as FaixaMatch,
                     }))
                   }
-                  className="w-full sm:min-w-[190px] rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
+                  className="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
                 >
                   <option value="ALTA">
                     {t("vaga_match.compatibilidade_alta")}
@@ -407,8 +417,8 @@ export default function VagaMatchCandidates({
                   </option>
                 </select>
 
-                <div className="flex items-center gap-1.5 mt-0.5 text-[11px] font-medium text-purple-600">
-                  <Info className="w-3.5 h-3.5 shrink-0" />
+                <div className="flex items-start gap-1.5 mt-0.5 text-[11px] font-medium text-purple-600">
+                  <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
 
                   <span>
                     {t(
@@ -418,7 +428,8 @@ export default function VagaMatchCandidates({
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5 w-full sm:w-[150px]">
+              {/* Quantidade de resultados */}
+              <div className="flex flex-col gap-1.5 min-w-0">
                 <label className="text-xs font-medium text-gray-600">
                   {t("vaga_match.quantidade")}
                 </label>
@@ -431,7 +442,7 @@ export default function VagaMatchCandidates({
                       limite: Number(e.target.value),
                     }))
                   }
-                  className="w-full sm:min-w-[130px] rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
+                  className="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
                 >
                   <option value={10}>10</option>
                   <option value={15}>15</option>
@@ -440,39 +451,66 @@ export default function VagaMatchCandidates({
               </div>
 
               {!vagaRemota && (
-                <div className="flex flex-col gap-1.5 w-full sm:w-[190px]">
-                  <label className="text-xs font-medium text-gray-600">
-                    {t("vaga_match.raio_localizacao")}
-                  </label>
+                <>
+                  {/* Incluir candidatos fora do raio */}
+                  <div className="flex flex-col gap-1.5 min-w-0">
+                    <label className="text-xs font-medium text-gray-600 truncate">
+                      {t("vaga_match.incluir_fora_raio")}
+                    </label>
 
-                  <select
-                    value={config.raio_km}
-                    onChange={(e) =>
-                      setConfig((prev) => ({
-                        ...prev,
-                        raio_km: Number(e.target.value) as RaioKm,
-                      }))
-                    }
-                    className="w-full sm:min-w-[150px] rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
-                  >
-                    <option value={50}>50 km</option>
-                    <option value={85}>85 km</option>
-                    <option value={100}>100 km</option>
-                    <option value={120}>120 km</option>
-                  </select>
-                </div>
+                    <select
+                      value={config.incluir_fora_raio ? "true" : "false"}
+                      onChange={(e) =>
+                        setConfig((prev) => ({
+                          ...prev,
+                          incluir_fora_raio: e.target.value === "true",
+                        }))
+                      }
+                      className="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
+                    >
+                      <option value="false">{t("vaga_match.nao")}</option>
+                      <option value="true">{t("vaga_match.sim")}</option>
+                    </select>
+                  </div>
+
+                  {/* Raio de localização */}
+                  <div className="flex flex-col gap-1.5 min-w-0">
+                    <label className="text-xs font-medium text-gray-600">
+                      {t("vaga_match.raio_localizacao")}
+                    </label>
+
+                    <select
+                      value={config.raio_km}
+                      onChange={(e) =>
+                        setConfig((prev) => ({
+                          ...prev,
+                          raio_km: Number(e.target.value) as RaioKm,
+                        }))
+                      }
+                      className="w-full min-w-0 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-purple-400"
+                    >
+                      <option value={50}>50 km</option>
+                      <option value={85}>85 km</option>
+                      <option value={100}>100 km</option>
+                      <option value={120}>120 km</option>
+                    </select>
+                  </div>
+                </>
               )}
 
-              <button
-                type="button"
-                onClick={handleBuscar}
-                disabled={buscando}
-                className="w-full sm:w-auto sm:mt-[22px] min-w-[130px] whitespace-nowrap inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-60 transition cursor-pointer"
-              >
-                <Search className="w-4 h-4" />
+              {/* Botão Buscar */}
+              <div className="flex flex-col min-w-0 sm:col-span-2 xl:col-span-1 xl:pt-[20px] xl:self-start">
+                <button
+                  type="button"
+                  onClick={handleBuscar}
+                  disabled={buscando}
+                  className="w-full xl:w-auto h-[42px] whitespace-nowrap inline-flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 text-sm font-semibold text-white hover:bg-purple-700 disabled:opacity-60 transition cursor-pointer"
+                >
+                  <Search className="w-4 h-4 shrink-0" />
 
-                {buscando ? t("vaga_match.buscando") : t("vaga_match.buscar")}
-              </button>
+                  {buscando ? t("vaga_match.buscando") : t("vaga_match.buscar")}
+                </button>
+              </div>
             </div>
           </div>
 

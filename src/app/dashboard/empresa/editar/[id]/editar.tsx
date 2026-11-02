@@ -353,11 +353,11 @@ export default function EmpresaEditar({
   const nextStep = () => setStep((prev) => Math.min(prev + 1, 5));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, publicarDireto = false) => {
     e.preventDefault();
     setShowErrors(true);
 
-    if (step === 1) {
+    if (step === 1 && !publicarDireto) {
       if (
         !form.nome ||
         !form.site ||
@@ -371,21 +371,21 @@ export default function EmpresaEditar({
       return;
     }
 
-    if (step === 2) {
+    if (step === 2 && !publicarDireto) {
       if (form.cidade_id == 0) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 3) {
+    if (step === 3 && !publicarDireto) {
       if (!form.apresentacao) return;
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 4) {
+    if (step === 4 || (empresaId && publicarDireto)) {
       if (!isFormValid(form)) return;
 
       setIsSubmitting(true);
@@ -681,16 +681,34 @@ export default function EmpresaEditar({
                     <button
                       type="button" // evita submit acidental
                       onClick={handleCancel}
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                     >
                       {t("tela_empresa_dados.item_botao_cancelar")}
                     </button>
                     <button
                       type="submit"
-                      className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                      className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                     >
                       {t("tela_empresa_dados.item_botao_avancar")}
                     </button>
+                    {empresaId && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleSubmit(e, true)}
+                        disabled={isSubmitting || !isFormValid(form)}
+                        className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                          isSubmitting || !isFormValid(form)
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-purple-100 text-indigo-900 hover:bg-purple-200 cursor-pointer"
+                        }`}
+                      >
+                        {isSubmitting ? (
+                          <ImSpinner2 className="animate-spin" />
+                        ) : (
+                          t("tela_vaga_dados.item_botao_publicar")
+                        )}
+                      </button>
+                    )}
                   </div>
                 </form>
               )}
@@ -765,7 +783,7 @@ export default function EmpresaEditar({
                       <button
                         onClick={prevStep}
                         type="button"
-                        className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                        className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                       >
                         {t("tela_empresa_dados.item_botao_voltar")}
                       </button>
@@ -775,17 +793,35 @@ export default function EmpresaEditar({
                         <button
                           type="button"
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_cancelar")}
                         </button>
 
                         <button
                           type="submit"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_avancar")}
                         </button>
+                        {empresaId && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleSubmit(e, true)}
+                            disabled={isSubmitting || !isFormValid(form)}
+                            className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              isSubmitting || !isFormValid(form)
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-purple-100 text-indigo-900 hover:bg-purple-200 cursor-pointer"
+                            }`}
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_vaga_dados.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -877,7 +913,7 @@ export default function EmpresaEditar({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_voltar")}
                         </button>
@@ -888,16 +924,34 @@ export default function EmpresaEditar({
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_avancar")}
                         </button>
+                        {empresaId && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleSubmit(e, true)}
+                            disabled={isSubmitting || !isFormValid(form)}
+                            className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              isSubmitting || !isFormValid(form)
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-purple-100 text-indigo-900 hover:bg-purple-200 cursor-pointer"
+                            }`}
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_vaga_dados.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </form>
@@ -1112,7 +1166,7 @@ export default function EmpresaEditar({
                         <button
                           onClick={prevStep}
                           type="button"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_voltar")}
                         </button>
@@ -1123,13 +1177,13 @@ export default function EmpresaEditar({
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
+                          className={`w-full md:w-32 rounded-lg px-4 py-2 text-sm font-semibold text-indigo-900 transition text-center ${
                             isFormValid(form)
                               ? " bg-purple-100 hover:bg-purple-200 cursor-pointer"
                               : "bg-gray-300 cursor-not-allowed"
