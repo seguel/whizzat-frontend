@@ -79,6 +79,7 @@ interface CandidatoForm {
   cidade_id: number;
   cidade_label: string;
   aberto_oportunidades: boolean;
+  aceita_mudanca_cidade: boolean;
 
   // Oportunidades inclusivas / afirmativas
   oportunidade_pcd: boolean;
@@ -114,6 +115,7 @@ interface CandidatoData {
   cidade_id: number;
   cidade_label: string;
   aberto_oportunidades: boolean;
+  aceita_mudanca_cidade: boolean;
 
   oportunidade_pcd?: boolean;
   oportunidade_afirmativa_racial?: boolean;
@@ -316,6 +318,7 @@ export default function PerfilCandidato({
       aceita_presencial: true,
       aceita_hibrido: true,
       aceita_remoto: true,
+      aceita_mudanca_cidade: false,
     },
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -482,6 +485,7 @@ export default function PerfilCandidato({
           aceita_presencial: true,
           aceita_hibrido: true,
           aceita_remoto: true,
+          aceita_mudanca_cidade: false,
         };
 
         // console.log("passei aqui sem idrecrutador");
@@ -561,6 +565,7 @@ export default function PerfilCandidato({
           oportunidade_lgbtqia: data.oportunidade_lgbtqia ?? false,
           oportunidade_50mais: data.oportunidade_50mais ?? false,
           oportunidade_diversidade: data.oportunidade_diversidade ?? false,
+          aceita_mudanca_cidade: data.aceita_mudanca_cidade ?? false,
 
           aceita_presencial:
             data.candidatoModalidadeTrabalhos?.some(
@@ -1033,6 +1038,11 @@ export default function PerfilCandidato({
         formData.append(
           "oportunidade_diversidade",
           form.oportunidade_diversidade ? "true" : "false",
+        );
+
+        formData.append(
+          "aceita_mudanca_cidade",
+          form.aceita_mudanca_cidade ? "true" : "false",
         );
 
         const modalidadesSelecionadas: number[] = [];
@@ -1583,10 +1593,12 @@ export default function PerfilCandidato({
                   onSubmit={handleSubmit}
                   className="flex flex-col flex-1 w-full gap-4"
                 >
-                  {candidatoId && (
-                    <div className="flex items-center justify-between w-full">
+                  {/* Preferências de oportunidades */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                    {/* Aberto a oportunidades */}
+                    {candidatoId && (
                       <label className="flex items-center cursor-pointer">
-                        <div className="relative">
+                        <div className="relative shrink-0">
                           <input
                             type="checkbox"
                             name="aberto_oportunidades"
@@ -1594,9 +1606,7 @@ export default function PerfilCandidato({
                             onChange={handleChange}
                             className="sr-only peer"
                           />
-
-                          <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-colors" />
-
+                          <div className="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 transition-colors" />
                           <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5" />
                         </div>
 
@@ -1604,9 +1614,8 @@ export default function PerfilCandidato({
                           <span className="block text-sm font-medium text-gray-700">
                             {t("tela_perfil_candidato.aberto_oportunidades")}
                           </span>
-
                           <span className="block text-xs text-gray-500 mt-0.5">
-                            {(form.aberto_oportunidades ?? true)
+                            {form.aberto_oportunidades
                               ? t(
                                   "tela_perfil_candidato.disponivel_oportunidades",
                                 )
@@ -1616,8 +1625,34 @@ export default function PerfilCandidato({
                           </span>
                         </div>
                       </label>
-                    </div>
-                  )}
+                    )}
+
+                    {/* Aceita mudança de cidade */}
+                    <label className="flex items-center cursor-pointer">
+                      <div className="relative shrink-0">
+                        <input
+                          type="checkbox"
+                          name="aceita_mudanca_cidade"
+                          checked={form.aceita_mudanca_cidade ?? false}
+                          onChange={handleChange}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 transition-colors" />
+                        <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-all peer-checked:translate-x-5" />
+                      </div>
+
+                      <div className="ml-3">
+                        <span className="block text-sm font-medium text-gray-700">
+                          {t("tela_perfil_candidato.aceita_mudanca_cidade")}
+                        </span>
+                        <span className="block text-xs text-gray-500 mt-0.5">
+                          {form.aceita_mudanca_cidade
+                            ? t("tela_perfil_candidato.mudanca_disponivel")
+                            : t("tela_perfil_candidato.mudanca_indisponivel")}
+                        </span>
+                      </div>
+                    </label>
+                  </div>
 
                   <div>
                     <label className="text-sm font-medium mb-1">

@@ -515,6 +515,9 @@ const en = {
     titulo_pagina: "My Profile",
     subtitulo_pagina:
       "Keep your information up to date and personalize your professional introduction.",
+    aceita_mudanca_cidade: "Willing to relocate",
+    mudanca_disponivel: "Available to relocate",
+    mudanca_indisponivel: "Not available to relocate",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Evaluators Awaiting Confirmation",
@@ -810,6 +813,12 @@ const en = {
     ja_convidado_anteriormente: "Previously invited by you",
     raio_localizacao: "Location radius",
     sem_filtro_raio: "No distance filter",
+    incluir_fora_raio:
+      "Include candidates outside the radius willing to relocate",
+    fora_do_raio: "Outside search radius",
+    aceita_mudanca_cidade: "Willing to relocate",
+    sim: "Yes",
+    nao: "No",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
