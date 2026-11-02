@@ -580,13 +580,13 @@ export default function EmpresaCriar({
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_empresa_dados.item_botao_avancar")}
                         </button>
@@ -666,7 +666,7 @@ export default function EmpresaCriar({
                           <button
                             onClick={prevStep}
                             type="button"
-                            className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                            className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                           >
                             {t("tela_empresa_dados.item_botao_voltar")}
                           </button>
@@ -676,14 +676,14 @@ export default function EmpresaCriar({
                             <button
                               type="button"
                               onClick={handleCancel}
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_empresa_dados.item_botao_cancelar")}
                             </button>
 
                             <button
                               type="submit"
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_empresa_dados.item_botao_avancar")}
                             </button>
@@ -778,7 +778,7 @@ export default function EmpresaCriar({
                             <button
                               onClick={prevStep}
                               type="button"
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_empresa_dados.item_botao_voltar")}
                             </button>
@@ -789,13 +789,13 @@ export default function EmpresaCriar({
                             <button
                               type="button" // evita submit acidental
                               onClick={handleCancel}
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_empresa_dados.item_botao_cancelar")}
                             </button>
                             <button
                               type="submit"
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_empresa_dados.item_botao_avancar")}
                             </button>
@@ -1014,7 +1014,7 @@ export default function EmpresaCriar({
                             <button
                               onClick={prevStep}
                               type="button"
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_empresa_dados.item_botao_voltar")}
                             </button>
@@ -1025,13 +1025,13 @@ export default function EmpresaCriar({
                             <button
                               type="button" // evita submit acidental
                               onClick={handleCancel}
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_empresa_dados.item_botao_cancelar")}
                             </button>
                             <button
                               type="submit"
-                              className={`px-6 py-2 rounded-full font-semibold text-indigo-900 flex items-center gap-2 ${
+                              className={`w-full md:w-32 rounded-lg px-4 py-2 text-sm font-semibold text-indigo-900 transition text-center ${
                                 isFormValid(form)
                                   ? " bg-purple-100 hover:bg-purple-200 cursor-pointer"
                                   : "bg-gray-300 cursor-not-allowed"

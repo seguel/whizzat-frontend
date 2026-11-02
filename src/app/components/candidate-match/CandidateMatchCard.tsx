@@ -15,6 +15,11 @@ export interface MatchCandidato {
   candidato_id: number;
   nome: string;
   localizacao: string | null;
+
+  distancia_km?: number | null;
+  fora_do_raio?: boolean;
+  aceita_mudanca_cidade?: boolean;
+
   score: number;
   hard_skills: number;
   soft_skills: number;
@@ -100,8 +105,32 @@ export default function CandidateMatchCard({
             <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
               <MapPin className="w-3.5 h-3.5 shrink-0" />
 
-              <span className="truncate">{candidato.localizacao || "-"}</span>
+              <span className="truncate">
+                {candidato.localizacao || "-"}
+
+                {candidato.distancia_km != null && (
+                  <>
+                    {" - "}
+                    {Math.round(candidato.distancia_km)} km
+                  </>
+                )}
+              </span>
             </div>
+            {/* Candidato fora do raio com disponibilidade para mudança */}
+            {candidato.fora_do_raio && (
+              <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                  {t("vaga_match.fora_do_raio")}
+                </span>
+
+                {candidato.aceita_mudanca_cidade && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {t("vaga_match.aceita_mudanca_cidade")}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Menu mobile */}
