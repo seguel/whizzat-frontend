@@ -485,11 +485,11 @@ export default function VagaDados({
     router.push(url);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, publicarDireto = false) => {
     e.preventDefault();
     setShowErrors(true);
 
-    if (step === 1) {
+    if (step === 1 && !publicarDireto) {
       if (
         !form.empresa_id ||
         !form.nome_vaga ||
@@ -510,7 +510,7 @@ export default function VagaDados({
       return;
     }
 
-    if (step === 2) {
+    if (step === 2 && !publicarDireto) {
       if (form.lista_skills.filter((s) => s.tipo_skill_id == 1).length < 0)
         return;
       setShowErrors(false);
@@ -518,13 +518,13 @@ export default function VagaDados({
       return;
     }
 
-    if (step === 3) {
+    if (step === 3 && !publicarDireto) {
       setShowErrors(false);
       nextStep();
       return;
     }
 
-    if (step === 4) {
+    if (step === 4 || (vagaId && publicarDireto)) {
       if (!isFormValid(form)) return;
 
       setIsSubmitting(true);
@@ -1374,20 +1374,38 @@ export default function VagaDados({
                         </div>
                       </div>
 
-                      <div className="col-span-1 mt-4 md:col-span-2 flex justify-center md:justify-end">
+                      <div className="col-span-1 mt-4 md:col-span-2 flex justify-center md:justify-end gap-2">
                         <button
                           type="button" // evita submit acidental
                           onClick={handleCancel}
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_vaga_dados.item_botao_cancelar")}
                         </button>
                         <button
                           type="submit"
-                          className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                          className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                         >
                           {t("tela_vaga_dados.item_botao_avancar")}
                         </button>
+                        {vagaId && (
+                          <button
+                            type="button"
+                            onClick={(e) => handleSubmit(e, true)}
+                            disabled={isSubmitting || !isFormValid(form)}
+                            className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                              isSubmitting || !isFormValid(form)
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                : "bg-purple-100 text-indigo-900 hover:bg-purple-200 cursor-pointer"
+                            }`}
+                          >
+                            {isSubmitting ? (
+                              <ImSpinner2 className="animate-spin" />
+                            ) : (
+                              t("tela_vaga_dados.item_botao_publicar")
+                            )}
+                          </button>
+                        )}
                       </div>
                     </form>
                   )}
@@ -1638,7 +1656,7 @@ export default function VagaDados({
                             <button
                               onClick={prevStep}
                               type="button"
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_vaga_dados.item_botao_voltar")}
                             </button>
@@ -1649,14 +1667,14 @@ export default function VagaDados({
                             <button
                               type="button" // evita submit acidental
                               onClick={handleCancel}
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_vaga_dados.item_botao_cancelar")}
                             </button>
                             <button
                               type="submit"
                               disabled={form.lista_skills.length < 3} // só habilita se >= 3
-                              className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 
+                              className={`w-full md:w-32 rounded-lg px-4 py-2 text-sm font-semibold text-indigo-900 transition text-center 
                           ${
                             form.lista_skills.length < 3
                               ? "bg-gray-300 cursor-not-allowed"
@@ -1665,6 +1683,24 @@ export default function VagaDados({
                             >
                               {t("tela_vaga_dados.item_botao_avancar")}
                             </button>
+                            {vagaId && (
+                              <button
+                                type="button"
+                                onClick={(e) => handleSubmit(e, true)}
+                                disabled={isSubmitting || !isFormValid(form)}
+                                className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                                  isSubmitting || !isFormValid(form)
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-purple-100 text-indigo-900 hover:bg-purple-200 cursor-pointer"
+                                }`}
+                              >
+                                {isSubmitting ? (
+                                  <ImSpinner2 className="animate-spin" />
+                                ) : (
+                                  t("tela_vaga_dados.item_botao_publicar")
+                                )}
+                              </button>
+                            )}
                           </div>
                         </div>
                       </form>
@@ -1907,7 +1943,7 @@ export default function VagaDados({
                             <button
                               onClick={prevStep}
                               type="button"
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_vaga_dados.item_botao_voltar")}
                             </button>
@@ -1918,16 +1954,34 @@ export default function VagaDados({
                             <button
                               type="button" // evita submit acidental
                               onClick={handleCancel}
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_vaga_dados.item_botao_cancelar")}
                             </button>
                             <button
                               type="submit"
-                              className={`w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer`}
+                              className={`w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer`}
                             >
                               {t("tela_vaga_dados.item_botao_avancar")}
                             </button>
+                            {vagaId && (
+                              <button
+                                type="button"
+                                onClick={(e) => handleSubmit(e, true)}
+                                disabled={isSubmitting || !isFormValid(form)}
+                                className={`w-full sm:w-auto min-w-28 rounded-lg px-4 py-2 text-sm font-semibold transition flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60 ${
+                                  isSubmitting || !isFormValid(form)
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-purple-100 text-indigo-900 hover:bg-purple-200 cursor-pointer"
+                                }`}
+                              >
+                                {isSubmitting ? (
+                                  <ImSpinner2 className="animate-spin" />
+                                ) : (
+                                  t("tela_vaga_dados.item_botao_publicar")
+                                )}
+                              </button>
+                            )}
                           </div>
                         </div>
                       </form>
@@ -2189,7 +2243,7 @@ export default function VagaDados({
                             <button
                               onClick={prevStep}
                               type="button"
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 text-center cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_vaga_dados.item_botao_voltar")}
                             </button>
@@ -2200,13 +2254,13 @@ export default function VagaDados({
                             <button
                               type="button" // evita submit acidental
                               onClick={handleCancel}
-                              className="w-full md:w-32 py-2 rounded-full font-semibold text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
+                              className="w-full md:w-32 rounded-lg bg-purple-100 px-4 py-2 text-sm font-semibold text-indigo-900 transition hover:bg-purple-200 text-center cursor-pointer"
                             >
                               {t("tela_vaga_dados.item_botao_cancelar")}
                             </button>
                             <button
                               type="submit"
-                              className={`px-6 py-2 rounded-full  font-semibold flex items-center justify-center gap-2 ${
+                              className={`className="w-full md:w-32 rounded-lg  px-4 py-2 text-sm font-semibold transition text-center ${
                                 isFormValid(form)
                                   ? "text-indigo-900 bg-purple-100 hover:bg-purple-200 cursor-pointer"
                                   : "bg-gray-300 cursor-not-allowed"

@@ -491,6 +491,9 @@ const pt = {
     titulo_pagina: "Meu Perfil",
     subtitulo_pagina:
       "Mantenha seus dados atualizados e personalize sua apresentação profissional.",
+    aceita_mudanca_cidade: "Aceita mudar de cidade",
+    mudanca_disponivel: "Disponível para mudança",
+    mudanca_indisponivel: "Não disponível para mudança",
   },
   tela_lista_avaliadores: {
     item_titulo_aguardando: "Avaliadores Aguardando Confirmação",
@@ -796,6 +799,11 @@ const pt = {
     ja_convidado_anteriormente: "Já recebeu convite seu",
     raio_localizacao: "Raio de localização",
     sem_filtro_raio: "Sem filtro de distância",
+    incluir_fora_raio: "Incluir quem aceita mudar de cidade?",
+    fora_do_raio: "Fora do raio",
+    aceita_mudanca_cidade: "Aceita mudança",
+    sim: "Sim",
+    nao: "Não",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
