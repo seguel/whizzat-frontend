@@ -58,7 +58,7 @@ interface SelectOption {
  */
 
 export default function BuscarCandidatosPage() {
-  const { t } = useTranslation("common");
+  const { t, i18n } = useTranslation("common");
 
   const LIMITE_CONVITES = 10;
 
@@ -98,7 +98,17 @@ export default function BuscarCandidatosPage() {
 
   const [faixa, setFaixa] = useState<FaixaMatch>("ALTA");
   const [limite, setLimite] = useState(15);
+  const [raioKm, setRaioKm] = useState<number | null>(null);
+  const [estadoId, setEstadoId] = useState("");
+  const [cidadeId, setCidadeId] = useState("");
 
+  const [estados, setEstados] = useState<
+    { id: number; sigla: string; estado: string }[]
+  >([]);
+
+  const [cidades, setCidades] = useState<{ id: number; cidade: string }[]>([]);
+
+  const [carregandoCidades, setCarregandoCidades] = useState(false);
   /*
    * -------------------------------------------------------
    * Resultado
@@ -212,7 +222,10 @@ export default function BuscarCandidatosPage() {
     (skill) => skill.tipo_skill_id === 2,
   );
 
-  const podeBuscar = skillsSelecionadas.length > 0 && !buscando;
+  const podeBuscar =
+    skillsSelecionadas.length > 0 &&
+    !buscando &&
+    (raioKm === null || (estadoId !== "" && cidadeId !== ""));
 
   /*
    * =======================================================
@@ -298,6 +311,77 @@ export default function BuscarCandidatosPage() {
     setSelecionados([]);
   };
 
+  const limparResultadosBusca = () => {
+    setPesquisou(false);
+    setResultados([]);
+    setSelecionados([]);
+  };
+
+  useEffect(() => {
+    if (raioKm === null) return;
+
+    const carregarEstados = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/estados/`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Accept-Language": i18n.language,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(t("cadastro.item_alerta_erro_buscar_dados"));
+        }
+
+        const data = await response.json();
+
+        setEstados(data);
+      } catch (error) {
+        console.error("Erro ao carregar estados:", error);
+        toast.error(t("cadastro.item_alerta_erro_buscar_dados"));
+      }
+    };
+
+    carregarEstados();
+  }, [raioKm, i18n.language, t]);
+
+  const handleEstadoChange = async (novoEstadoId: string) => {
+    setEstadoId(novoEstadoId);
+    setCidadeId("");
+    setCidades([]);
+    limparResultadosBusca();
+
+    if (!novoEstadoId) return;
+
+    setCarregandoCidades(true);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/cidades/estado-cidade/${novoEstadoId}`,
+        {
+          method: "GET",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(t("cadastro.item_alerta_erro_buscar_dados"));
+      }
+
+      const data = await response.json();
+
+      setCidades(data);
+    } catch (error) {
+      console.error("Erro ao carregar cidades:", error);
+      toast.error(t("cadastro.item_alerta_erro_buscar_dados"));
+    } finally {
+      setCarregandoCidades(false);
+    }
+  };
+
   /*
    * =======================================================
    * Buscar candidatos
@@ -308,6 +392,11 @@ export default function BuscarCandidatosPage() {
     if (skillsSelecionadas.length === 0) {
       toast.error("Selecione pelo menos uma skill para realizar a busca.");
 
+      return;
+    }
+
+    if (raioKm !== null && (!estadoId || !cidadeId)) {
+      toast.error(t("tela_buscar_candidatos.selecione_localizacao"));
       return;
     }
 
@@ -333,6 +422,8 @@ export default function BuscarCandidatosPage() {
             })),
             faixa,
             limite,
+            raio_km: raioKm,
+            cidade_id: raioKm !== null ? Number(cidadeId) : null,
           }),
         },
       );
@@ -712,7 +803,7 @@ export default function BuscarCandidatosPage() {
                     </p>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {/* Compatibilidade */}
 
                     <label className="flex flex-col gap-1 text-sm text-gray-700">
@@ -776,27 +867,112 @@ export default function BuscarCandidatosPage() {
                         <option value={25}>25</option>
                       </select>
                     </label>
+
+                    {/* Raio */}
+                    <label className="flex flex-col gap-1 text-sm text-gray-700">
+                      {t("tela_buscar_candidatos.raio_busca")}
+
+                      <select
+                        value={raioKm ?? ""}
+                        onChange={(e) => {
+                          const valor = e.target.value;
+
+                          setRaioKm(valor === "" ? null : Number(valor));
+
+                          if (valor === "") {
+                            setEstadoId("");
+                            setCidadeId("");
+                            setCidades([]);
+                          }
+
+                          limparResultadosBusca();
+                        }}
+                        className="rounded-lg border border-gray-200 bg-white px-3 py-2.5 outline-none focus:border-purple-400"
+                      >
+                        <option value="">
+                          {t("tela_buscar_candidatos.sem_raio")}
+                        </option>
+                        <option value="50">50 km</option>
+                        <option value="85">85 km</option>
+                        <option value="100">100 km</option>
+                        <option value="120">120 km</option>
+                      </select>
+                    </label>
+
+                    {raioKm === null && (
+                      <div className="flex items-start lg:items-start lg:pt-[21px]">
+                        <button
+                          type="button"
+                          disabled={!podeBuscar}
+                          onClick={handleBuscar}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <Search className="h-4 w-4" />
+                          {buscando
+                            ? t("tela_buscar_candidatos.buscando")
+                            : t("tela_buscar_candidatos.buscar_candidatos")}
+                        </button>
+                      </div>
+                    )}
                   </div>
+
+                  {raioKm !== null && (
+                    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]">
+                      <label className="flex flex-col gap-1 text-sm text-gray-700">
+                        {t("cadastro.estado")}
+                        <select
+                          value={estadoId}
+                          onChange={(e) => handleEstadoChange(e.target.value)}
+                          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 outline-none focus:border-purple-400"
+                        >
+                          <option value="">
+                            {t("cadastro.placehold_estado")}
+                          </option>
+
+                          {estados.map((estado) => (
+                            <option key={estado.id} value={estado.id}>
+                              {estado.estado}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="flex flex-col gap-1 text-sm text-gray-700">
+                        {t("cadastro.cidade")}
+                        <select
+                          value={cidadeId}
+                          disabled={!estadoId || carregandoCidades}
+                          onChange={(e) => {
+                            setCidadeId(e.target.value);
+                            limparResultadosBusca();
+                          }}
+                          className="rounded-lg border border-gray-200 bg-white px-3 py-2.5 outline-none focus:border-purple-400 disabled:cursor-not-allowed disabled:bg-gray-100"
+                        >
+                          <option value="">
+                            {t("cadastro.placehold_cidade")}
+                          </option>
+                          {cidades.map((cidade) => (
+                            <option key={cidade.id} value={cidade.id}>
+                              {cidade.cidade}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <div className="flex items-start sm:col-span-2 lg:col-span-1 lg:items-end">
+                        <button
+                          type="button"
+                          disabled={!podeBuscar}
+                          onClick={handleBuscar}
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <Search className="h-4 w-4" />
+                          {buscando
+                            ? t("tela_buscar_candidatos.buscando")
+                            : t("tela_buscar_candidatos.buscar_candidatos")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </section>
-
-                {/* =====================================================
-                  Botão buscar
-                 ===================================================== */}
-
-                <div className="mt-6 flex justify-end">
-                  <button
-                    type="button"
-                    disabled={!podeBuscar}
-                    onClick={handleBuscar}
-                    className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
-                  >
-                    <Search className="h-4 w-4" />
-
-                    {buscando
-                      ? t("tela_buscar_candidatos.buscando")
-                      : t("tela_buscar_candidatos.buscar_candidatos")}
-                  </button>
-                </div>
 
                 {/* =====================================================
                   Resultados
