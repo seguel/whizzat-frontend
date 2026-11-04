@@ -1546,6 +1546,10 @@ const pt = {
     adicionar: "Adicionar",
     remover_skill: "Remover skill",
     nivel: "Nível",
+    raio_busca: "Raio de busca",
+    sem_raio: "Sem raio",
+    selecione_localizacao:
+      "Selecione o estado e a cidade para realizar a busca por raio.",
   },
 };
 

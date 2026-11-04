@@ -1555,6 +1555,9 @@ const en = {
     adicionar: "Add",
     remover_skill: "Remove skill",
     nivel: "Level",
+    raio_busca: "Search radius",
+    sem_raio: "No radius limit",
+    selecione_localizacao: "Select a state and city to search by radius.",
   },
 };
 
