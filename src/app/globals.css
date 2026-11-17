@@ -53,3 +53,7 @@ body {
 .animate-scaleIn {
   animation: scaleIn 0.18s ease-out;
 }
+
+.swal2-container {
+  z-index: 99999 !important;
+}
