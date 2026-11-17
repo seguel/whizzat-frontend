@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
+import PerfilDiscCard from "./PerfilDiscCard";
 
 interface PerfilSkill {
   skill_id: number;
@@ -55,6 +56,21 @@ interface PerfilCandidato {
   soft_skills: PerfilSkill[];
   formacao: PerfilFormacao[];
   certificacoes: PerfilCertificacao[];
+  disc?: PerfilDisc | null;
+}
+
+interface PerfilDisc {
+  dominante: "D" | "I" | "S" | "C" | null;
+  secundaria: "D" | "I" | "S" | "C" | null;
+  blend_codigo: string | null;
+  blend_titulo: string | null;
+  scores: {
+    D: number | null;
+    I: number | null;
+    S: number | null;
+    C: number | null;
+  };
+  finalizado_em: string | null;
 }
 
 interface Props {
@@ -302,6 +318,9 @@ export default function PerfilCandidatoModal({
                   </p>
                 </div>
               </section>
+
+              {/* DISC */}
+              {perfil.disc && <PerfilDiscCard disc={perfil.disc} />}
 
               {/* MODALIDADES */}
               <section>
