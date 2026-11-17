@@ -819,6 +819,7 @@ const en = {
     aceita_mudanca_cidade: "Willing to relocate",
     sim: "Yes",
     nao: "No",
+    disc_disponivel: "DISC available",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
@@ -1250,6 +1251,15 @@ const en = {
     remover_selecao: "Remove selection",
     ver_perfil: "View profile",
     erro_carregar: "Unable to load the candidate profile.",
+    disc_titulo: "DISC behavioral profile",
+    disc_dominante: "Primary profile",
+    disc_secundaria: "Secondary profile",
+    disc_dimensao_d: "Dominance",
+    disc_dimensao_i: "Influence",
+    disc_dimensao_s: "Steadiness",
+    disc_dimensao_c: "Conscientiousness",
+    disc_compartilhado:
+      "Result voluntarily shared by the candidate. DISC describes behavioral tendencies and should not be used alone in hiring decisions.",
   },
   buscar_candidatos: {
     convite_titulo: "Invite candidates",
@@ -1558,6 +1568,118 @@ const en = {
     raio_busca: "Search radius",
     sem_raio: "No radius limit",
     selecione_localizacao: "Select a state and city to search by radius.",
+  },
+
+  disc: {
+    opcional: "Optional step",
+    concluido: "Completed",
+    em_andamento: "In progress",
+    titulo: "DISC Behavioral Assessment",
+    descricao:
+      "Learn more about your behavioral preferences in the workplace. DISC helps you reflect on communication, decision-making, collaboration, and organization.",
+    total_perguntas: "24 statement blocks",
+    tempo_estimado: "Approximately 10 to 15 minutes",
+    participacao_voluntaria: "Voluntary participation",
+    informacoes_titulo: "Before you begin",
+    informacoes_descricao:
+      "DISC is optional and does not affect how your skills match opportunities. Once completed, your answers cannot be changed. You can pause and resume later.",
+    consentimento:
+      "I voluntarily agree to participate in the DISC assessment and consent to the processing of my answers to generate my behavioral profile.",
+    privacidade:
+      "Your result is private by default. Sharing it with recruiters requires separate authorization.",
+    responder_questionario: "Start questionnaire",
+    continuar_questionario: "Resume questionnaire",
+    visualizar_resultado: "View my result",
+    continuar_cadastro: "Continue registration",
+    mensagem_concluido:
+      "You have completed your DISC assessment. Your answers have been saved and cannot be edited.",
+    aguarde: "Please wait...",
+    erro_carregar: "Unable to load DISC data.",
+    erro_iniciar: "Unable to start the DISC questionnaire.",
+    perfil_necessario: "Save your candidate profile before starting DISC.",
+    passo: "DISC",
+    apos_publicacao_titulo: "You can take DISC after publishing your profile",
+    apos_publicacao_descricao:
+      "Complete your registration as usual. After publishing, you can start DISC or take it later from your dashboard.",
+
+    modal_ja_concluido: "You have already completed DISC.",
+    modal_erro_salvar: "Unable to save your answer.",
+    modal_erro_finalizar: "Unable to complete the questionnaire.",
+    modal_sucesso: "DISC questionnaire completed successfully!",
+    modal_progresso: "Block {{atual}} of {{total}}",
+    modal_fechar: "Close questionnaire",
+    modal_instrucao:
+      "Choose one statement that describes you MOST and another that describes you LEAST.",
+    modal_mais: "Most",
+    modal_menos: "Least",
+    modal_respondidas: "{{quantidade}} of {{total}} blocks answered",
+    modal_anterior: "Previous",
+    modal_proximo: "Next",
+    modal_finalizar: "Complete DISC",
+    modal_confirmar_finalizacao:
+      "Do you want to complete DISC? Once submitted, your answers cannot be changed.",
+    modal_navegar_blocos: "Navigate between blocks",
+    modal_ir_bloco: "Go to block {{numero}}",
+    modal_respondido: "Answered",
+    modal_pendente: "Pending",
+    modal_salvar_resposta: "Save answer",
+    resultado_em_breve: "The DISC result view will be available soon.",
+
+    resultado_titulo: "My DISC behavioral profile",
+    resultado_subtitulo: "Your behavioral assessment results",
+    resultado_erro: "Unable to load your DISC results.",
+    resultado_indisponivel: "You do not have a completed DISC result yet.",
+    resultado_data: "Completed on",
+    resultado_perfil_predominante: "Predominant behavioral profile",
+    resultado_dominante: "Dominant dimension",
+    resultado_secundaria: "Secondary dimension",
+    resultado_grafico_titulo: "DISC dimension distribution",
+    resultado_grafico_descricao:
+      "View the scores calculated from your answers.",
+    resultado_escala: "Values represent behavioral scores, not percentages.",
+    resultado_dimensao_d: "Dominance",
+    resultado_dimensao_i: "Influence",
+    resultado_dimensao_s: "Steadiness",
+    resultado_dimensao_c: "Conscientiousness",
+    resultado_tempo_titulo: "Response time",
+    resultado_tempo_total: "Total time",
+    resultado_tempo_medio: "Average time per block",
+    resultado_privacidade_titulo: "Result privacy",
+    resultado_compartilhado:
+      "Your result is authorized to be shared with recruiters.",
+    resultado_privado:
+      "Your result is private and is not shared with recruiters.",
+    resultado_observacao:
+      "DISC describes behavioral tendencies and is not a psychological diagnosis or a definitive assessment of competencies.",
+    resultado_permitir_compartilhar: "Allow recruiters to view my DISC results",
+    resultado_salvando_compartilhamento: "Saving preference...",
+    resultado_compartilhar_erro: "Unable to update your sharing preference.",
+    modal_confirmar_titulo: "Finish the DISC assessment?",
+    modal_confirmar_sim: "Yes, finish",
+    modal_confirmar_cancelar: "Keep answering",
+    pos_publicacao_titulo: "Your profile has been published!",
+    pos_publicacao_descricao:
+      "How about discovering your behavioral profile? Take the DISC assessment and learn more about your behavioral tendencies.",
+    pos_publicacao_privacidade:
+      "The assessment is optional. Your results will remain private, and you can choose whether to share them with recruiters.",
+    pos_publicacao_responder: "Take the DISC assessment now",
+    pos_publicacao_depois: "Take it later",
+    dash_titulo: "My DISC",
+    dash_nao_iniciado: "Not started",
+    dash_andamento: "In progress",
+    dash_concluido: "Completed",
+    dash_responder: "Take DISC assessment",
+    dash_continuar: "Continue assessment",
+    dash_visualizar: "View results",
+    dash_carregando: "Loading...",
+    consentimento_titulo: "Before you begin",
+    consentimento_descricao:
+      "The DISC assessment is optional and helps you better understand your behavioral tendencies. Your results will be private by default.",
+    consentimento_aceite:
+      "I voluntarily agree to participate in the DISC assessment and authorize the processing of my answers to generate my behavioral profile.",
+    consentimento_iniciar: "Start DISC assessment",
+    dash_erro: "Unable to load",
+    dash_tentar_novamente: "Click to try again",
   },
 };
 

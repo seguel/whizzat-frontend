@@ -8,6 +8,7 @@ import {
   MoreVertical,
   UserRound,
   UserX,
+  BrainCircuit,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -29,6 +30,7 @@ export interface MatchCandidato {
   total_skills: number;
   publico_prioritario?: boolean;
   ja_convidado?: boolean;
+  disc_disponivel?: boolean;
 }
 
 interface CandidateMatchCardProps {
@@ -96,12 +98,6 @@ export default function CandidateMatchCard({
               </p>
             )}
 
-            {candidato.publico_prioritario && (
-              <span className="mt-1 inline-flex w-fit items-center rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-700">
-                {t("vaga_match.publico_prioritario")}
-              </span>
-            )}
-
             <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
               <MapPin className="w-3.5 h-3.5 shrink-0" />
 
@@ -116,6 +112,23 @@ export default function CandidateMatchCard({
                 )}
               </span>
             </div>
+            {(candidato.publico_prioritario || candidato.disc_disponivel) && (
+              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                {candidato.publico_prioritario && (
+                  <span className="inline-flex w-fit items-center rounded-full border border-purple-200 bg-purple-50 px-2 py-0.5 text-[10px] font-medium text-purple-700">
+                    {t("vaga_match.publico_prioritario")}
+                  </span>
+                )}
+
+                {candidato.disc_disponivel && (
+                  <span className="inline-flex w-fit items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 whitespace-nowrap">
+                    <BrainCircuit className="h-3 w-3 shrink-0" />
+                    {t("vaga_match.disc_disponivel")}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Candidato fora do raio com disponibilidade para mudança */}
             {candidato.fora_do_raio && (
               <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
