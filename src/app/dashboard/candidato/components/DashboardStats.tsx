@@ -1,6 +1,7 @@
 "use client";
 
 import { DashboardResumo } from "../../../lib/types/candidato-dashboard";
+import DiscDashboardCard from "./DiscDashboardCard";
 import { useTranslation } from "react-i18next";
 
 interface Props {
@@ -44,7 +45,7 @@ export default function DashboardStats({ resumo }: Props) {
   ];
 
   return (
-    <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+    <section className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
       {stats.map((stat) => (
         <div
           key={stat.label}
@@ -58,7 +59,9 @@ export default function DashboardStats({ resumo }: Props) {
                 {stat.value}
               </p>
 
-              <p className="text-xs text-gray-400 mt-1">{stat.description}</p>
+              <p className="text-xs text-gray-400 mt-1 whitespace-nowrap">
+                {stat.description}
+              </p>
             </div>
 
             <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 flex items-center justify-center rounded-xl bg-gray-50 text-xl">
@@ -67,6 +70,8 @@ export default function DashboardStats({ resumo }: Props) {
           </div>
         </div>
       ))}
+
+      <DiscDashboardCard />
     </section>
   );
 }

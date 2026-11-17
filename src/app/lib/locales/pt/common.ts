@@ -804,6 +804,7 @@ const pt = {
     aceita_mudanca_cidade: "Aceita mudança",
     sim: "Sim",
     nao: "Não",
+    disc_disponivel: "DISC disponível",
   },
   candidatos_ignorados: {
     titulo: "Candidatos ignorados",
@@ -1232,6 +1233,15 @@ const pt = {
     remover_selecao: "Remover seleção",
     ver_perfil: "Ver perfil",
     erro_carregar: "Não foi possível carregar o perfil do candidato.",
+    disc_titulo: "Perfil comportamental DISC",
+    disc_dominante: "Perfil predominante",
+    disc_secundaria: "Perfil secundário",
+    disc_dimensao_d: "Dominância",
+    disc_dimensao_i: "Influência",
+    disc_dimensao_s: "Estabilidade",
+    disc_dimensao_c: "Conformidade",
+    disc_compartilhado:
+      "Resultado compartilhado voluntariamente pelo candidato. O DISC descreve tendências comportamentais e não deve ser utilizado isoladamente em decisões de contratação.",
   },
   buscar_candidatos: {
     convite_titulo: "Convidar candidatos",
@@ -1550,6 +1560,123 @@ const pt = {
     sem_raio: "Sem raio",
     selecione_localizacao:
       "Selecione o estado e a cidade para realizar a busca por raio.",
+  },
+
+  disc: {
+    opcional: "Etapa opcional",
+    concluido: "Concluído",
+    em_andamento: "Em andamento",
+    titulo: "Mapeamento Comportamental DISC",
+    descricao:
+      "Conheça melhor suas preferências comportamentais no ambiente profissional. O DISC ajuda a refletir sobre sua comunicação, tomada de decisões, colaboração e organização.",
+    total_perguntas: "24 blocos de afirmações",
+    tempo_estimado: "Aproximadamente 10 a 15 minutos",
+    participacao_voluntaria: "Participação voluntária",
+    informacoes_titulo: "Antes de começar",
+    informacoes_descricao:
+      "O DISC não é obrigatório e não interfere na compatibilidade das suas Skills com oportunidades. Após a conclusão, as respostas não poderão ser alteradas. Você pode interromper o preenchimento e continuar mais tarde.",
+    consentimento:
+      "Concordo voluntariamente em participar do mapeamento DISC e autorizo o tratamento das minhas respostas para gerar meu perfil comportamental.",
+    privacidade:
+      "Seu resultado é privado por padrão. O compartilhamento com recrutadores dependerá de uma autorização separada.",
+    responder_questionario: "Responder questionário",
+    continuar_questionario: "Continuar questionário",
+    visualizar_resultado: "Visualizar meu resultado",
+    continuar_cadastro: "Continuar cadastro",
+    mensagem_concluido:
+      "Você já concluiu seu mapeamento DISC. Suas respostas estão registradas e não podem ser editadas.",
+    aguarde: "Aguarde...",
+    erro_carregar: "Não foi possível carregar os dados do DISC.",
+    erro_iniciar: "Não foi possível iniciar o questionário DISC.",
+    perfil_necessario: "Salve seu perfil de candidato antes de iniciar o DISC.",
+    passo: "DISC",
+    apos_publicacao_titulo: "Você poderá responder após publicar seu perfil",
+    apos_publicacao_descricao:
+      "Finalize seu cadastro normalmente. Depois da publicação, você poderá iniciar o DISC ou responder mais tarde pelo dashboard.",
+
+    modal_ja_concluido: "Você já concluiu o DISC.",
+    modal_erro_salvar: "Não foi possível salvar sua resposta.",
+    modal_erro_finalizar: "Não foi possível finalizar o questionário.",
+    modal_sucesso: "Questionário DISC concluído com sucesso!",
+    modal_progresso: "Bloco {{atual}} de {{total}}",
+    modal_fechar: "Fechar questionário",
+    modal_instrucao:
+      "Escolha uma afirmação que MAIS combina com você e outra que MENOS combina com você.",
+    modal_mais: "Mais",
+    modal_menos: "Menos",
+    modal_respondidas: "{{quantidade}} de {{total}} blocos respondidos",
+    modal_anterior: "Anterior",
+    modal_proximo: "Próximo",
+    modal_finalizar: "Finalizar DISC",
+    modal_confirmar_finalizacao:
+      "Deseja finalizar o DISC? Após a conclusão, suas respostas não poderão ser alteradas.",
+    modal_navegar_blocos: "Navegar entre os blocos",
+    modal_ir_bloco: "Ir para o bloco {{numero}}",
+    modal_respondido: "Respondido",
+    modal_pendente: "Pendente",
+    modal_salvar_resposta: "Salvar resposta",
+    resultado_em_breve:
+      "A visualização do resultado DISC estará disponível em breve.",
+
+    resultado_titulo: "Meu perfil comportamental DISC",
+    resultado_subtitulo: "Resultado da sua avaliação comportamental",
+    resultado_erro: "Não foi possível carregar seu resultado DISC.",
+    resultado_indisponivel:
+      "Você ainda não possui um resultado DISC concluído.",
+    resultado_data: "Concluído em",
+    resultado_perfil_predominante: "Perfil comportamental predominante",
+    resultado_dominante: "Dimensão dominante",
+    resultado_secundaria: "Dimensão secundária",
+    resultado_grafico_titulo: "Distribuição das dimensões DISC",
+    resultado_grafico_descricao:
+      "Visualize os scores calculados a partir das suas respostas.",
+    resultado_escala:
+      "Os valores representam scores comportamentais, não porcentagens.",
+    resultado_dimensao_d: "Dominância",
+    resultado_dimensao_i: "Influência",
+    resultado_dimensao_s: "Estabilidade",
+    resultado_dimensao_c: "Conformidade",
+    resultado_tempo_titulo: "Tempo de resposta",
+    resultado_tempo_total: "Tempo total",
+    resultado_tempo_medio: "Tempo médio por bloco",
+    resultado_privacidade_titulo: "Privacidade do resultado",
+    resultado_compartilhado:
+      "Seu resultado está autorizado para compartilhamento com recrutadores.",
+    resultado_privado:
+      "Seu resultado é privado e não está compartilhado com recrutadores.",
+    resultado_observacao:
+      "O DISC apresenta tendências comportamentais e não constitui diagnóstico psicológico ou avaliação definitiva de competências.",
+    resultado_permitir_compartilhar:
+      "Permitir que recrutadores visualizem meu resultado DISC",
+    resultado_salvando_compartilhamento: "Salvando preferência...",
+    resultado_compartilhar_erro:
+      "Não foi possível atualizar a preferência de compartilhamento.",
+    modal_confirmar_titulo: "Finalizar avaliação DISC?",
+    modal_confirmar_sim: "Sim, finalizar",
+    modal_confirmar_cancelar: "Continuar respondendo",
+    pos_publicacao_titulo: "Seu perfil foi publicado!",
+    pos_publicacao_descricao:
+      "Que tal descobrir seu perfil comportamental? Responda à avaliação DISC e conheça melhor suas tendências de comportamento.",
+    pos_publicacao_privacidade:
+      "A avaliação é opcional. Seu resultado será privado e você poderá escolher compartilhá-lo com recrutadores.",
+    pos_publicacao_responder: "Responder DISC agora",
+    pos_publicacao_depois: "Responder depois",
+    dash_titulo: "Meu DISC",
+    dash_nao_iniciado: "Não iniciado",
+    dash_andamento: "Em andamento",
+    dash_concluido: "Concluído",
+    dash_responder: "Responder avaliação DISC",
+    dash_continuar: "Continuar avaliação",
+    dash_visualizar: "Visualizar resultado",
+    dash_carregando: "Carregando...",
+    consentimento_titulo: "Antes de começar",
+    consentimento_descricao:
+      "A avaliação DISC é opcional e ajuda você a conhecer melhor suas tendências comportamentais. Seu resultado será privado por padrão.",
+    consentimento_aceite:
+      "Concordo em participar voluntariamente da avaliação DISC e autorizo o processamento das minhas respostas para gerar meu perfil comportamental.",
+    consentimento_iniciar: "Iniciar avaliação DISC",
+    dash_erro: "Não foi possível carregar",
+    dash_tentar_novamente: "Clique para tentar novamente",
   },
 };
 

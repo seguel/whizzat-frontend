@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Sidebar from "../../components/perfil/Sidebar";
 import TopBar from "../../components/perfil/TopBar";
@@ -8,7 +8,7 @@ import { ProfileType } from "../../components/perfil/ProfileContext";
 /* import { useAuthGuard } from "../../lib/hooks/useAuthGuard";*/
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { X, Star, FileText, Upload } from "lucide-react";
+import { X, Star, FileText, Upload, CheckCircle2 } from "lucide-react";
 import { ImSpinner2 } from "react-icons/im";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
@@ -17,6 +17,9 @@ import TooltipIcon from "../../components/TooltipIcon";
 import SkillsPanel from "../../components/perfil/SkillsPanel";
 import { useTranslation } from "react-i18next";
 import PageContainer from "@/app/components/PageContainer";
+import DiscStep from "../../components/perfil/DiscStep";
+import DiscQuestionarioModal from "../../components/perfil/DiscQuestionarioModal";
+import DiscResultadoModal from "../../components/perfil/DiscResultadoModal";
 
 const allowedTypes = [
   "image/",
@@ -221,6 +224,8 @@ type ModalidadeTrabalho = {
   linguagem: string;
 };
 
+type DiscStatus = "NAO_INICIADO" | "EM_ANDAMENTO" | "CONCLUIDO";
+
 interface WorkModeOptionProps {
   name: string;
   checked: boolean;
@@ -403,6 +408,121 @@ export default function PerfilCandidato({
   } | null>(null);
 
   const [modalidades, setModalidades] = useState<ModalidadeTrabalho[]>([]);
+  const [discStatus, setDiscStatus] = useState<DiscStatus>("NAO_INICIADO");
+  const [discLoading, setDiscLoading] = useState(false);
+  const [discModalAberto, setDiscModalAberto] = useState(false);
+  const [discResultadoAberto, setDiscResultadoAberto] = useState(false);
+  const [discPosPublicacaoAberto, setDiscPosPublicacaoAberto] = useState(false);
+
+  /*** fim certificaoes ***/
+
+  const atualizarStatusDisc = useCallback(async () => {
+    if (!candidatoId) {
+      setDiscStatus("NAO_INICIADO");
+      return;
+    }
+
+    setDiscLoading(true);
+
+    try {
+      const resultadoResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/disc/meu-resultado`,
+        { credentials: "include" },
+      );
+
+      if (!resultadoResponse.ok) {
+        throw new Error(
+          `Erro DISC meu-resultado: HTTP ${resultadoResponse.status}`,
+        );
+      }
+
+      const resultadoTexto = await resultadoResponse.text();
+
+      if (!resultadoTexto.trim()) {
+        throw new Error("GET /disc/meu-resultado retornou resposta vazia");
+      }
+
+      const resultado = JSON.parse(resultadoTexto);
+
+      if (resultado.possui_resultado) {
+        setDiscStatus("CONCLUIDO");
+        return;
+      }
+
+      const aplicacaoResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/disc/minha-aplicacao`,
+        { credentials: "include" },
+      );
+
+      if (!aplicacaoResponse.ok) {
+        throw new Error(
+          `Erro DISC minha-aplicacao: HTTP ${aplicacaoResponse.status}`,
+        );
+      }
+
+      const aplicacaoTexto = await aplicacaoResponse.text();
+
+      // Se ainda não existe aplicação, tratamos como não iniciado.
+      const aplicacao = aplicacaoTexto.trim()
+        ? JSON.parse(aplicacaoTexto)
+        : null;
+
+      setDiscStatus(
+        aplicacao?.status === "EM_ANDAMENTO" ? "EM_ANDAMENTO" : "NAO_INICIADO",
+      );
+    } catch (error) {
+      console.error("Erro ao carregar DISC:", error);
+      toast.error(t("disc.erro_carregar"));
+    } finally {
+      setDiscLoading(false);
+    }
+  }, [candidatoId, t]);
+
+  useEffect(() => {
+    if (step === 6 && candidatoId) {
+      void atualizarStatusDisc();
+    }
+  }, [step, candidatoId, atualizarStatusDisc]);
+
+  const handleResponderDisc = () => {
+    if (!candidatoId) return;
+
+    setDiscModalAberto(true);
+  };
+
+  const handleVisualizarResultadoDisc = () => {
+    setDiscResultadoAberto(true);
+  };
+
+  const handleFecharDiscModal = useCallback(() => {
+    setDiscModalAberto(false);
+    void atualizarStatusDisc();
+  }, [atualizarStatusDisc]);
+
+  const handleConcluirDisc = useCallback(() => {
+    setDiscStatus("CONCLUIDO");
+  }, []);
+
+  const handleDiscDepois = () => {
+    setDiscPosPublicacaoAberto(false);
+    router.push(`/dashboard?perfil=${perfil}`);
+  };
+
+  const handleDiscAgora = () => {
+    setDiscPosPublicacaoAberto(false);
+    setDiscModalAberto(true);
+  };
+
+  const handleFecharDiscPosPublicacao = () => {
+    setDiscModalAberto(false);
+    router.push(`/dashboard?perfil=${perfil}`);
+  };
+
+  const handleConcluirDiscPosPublicacao = () => {
+    setDiscStatus("CONCLUIDO");
+    setDiscModalAberto(false);
+    router.push(`/dashboard?perfil=${perfil}`);
+  };
 
   useEffect(() => {
     const fetchSelectData = async () => {
@@ -930,7 +1050,7 @@ export default function PerfilCandidato({
     }
   };
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 6));
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 7));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const handleSubmit = async (e: React.FormEvent, publicarDireto = false) => {
@@ -982,7 +1102,13 @@ export default function PerfilCandidato({
       return;
     }
 
-    if (step === 6 || (candidatoId && publicarDireto)) {
+    if (step === 6 && !publicarDireto) {
+      setShowErrors(false);
+      nextStep();
+      return;
+    }
+
+    if (step === 7 || (candidatoId && publicarDireto)) {
       if (!isFormValid(form)) return;
 
       if (certificadoFiles || certificacaoFiles) {
@@ -1166,11 +1292,20 @@ export default function PerfilCandidato({
         }
 
         localStorage.removeItem(`candidatoForm_${userId}`);
+
         toast.success(t("tela_perfil_candidato.item_alerta_sucesso"), {
           duration: 5000,
         });
+
         setIsSubmitting(false);
-        router.push(`/dashboard?perfil=${perfil}`);
+
+        if (!candidatoId) {
+          // Novo candidato: oferecer DISC após publicar.
+          setDiscPosPublicacaoAberto(true);
+        } else {
+          // Candidato existente: manter fluxo atual.
+          router.push(`/dashboard?perfil=${perfil}`);
+        }
       } catch (err: unknown) {
         console.error(t("tela_perfil_candidato.item_alerta_erro_salvar"), err);
 
@@ -1526,8 +1661,6 @@ export default function PerfilCandidato({
     }));
   };
 
-  /*** fim certificaoes ***/
-
   if (loadingCandidato) return <LoadingOverlay />;
 
   return (
@@ -1542,7 +1675,7 @@ export default function PerfilCandidato({
         <TopBar setIsDrawerOpen={setIsDrawerOpen} />
 
         <div className="flex-1 overflow-y-auto">
-          {step != 7 && (
+          {step <= 7 && (
             <div className="pt-3 pl-6 flex items-center justify-center">
               <div className="flex items-center justify-between w-full text-sm font-medium text-gray-500">
                 {[
@@ -1551,8 +1684,8 @@ export default function PerfilCandidato({
                   `3 ${t("tela_topo_passos.passo_certificacao")}`,
                   `4 ${t("tela_topo_passos.passo_hardskills")}`,
                   `5 ${t("tela_topo_passos.passo_softskills")}`,
-                  `6 ${t("tela_topo_passos.passo_visualizar")}`,
-                  `7 ${t("tela_topo_passos.passo_publicar")}`,
+                  `6 ${t("disc.passo")}`,
+                  `7 ${t("tela_topo_passos.passo_visualizar")}`,
                 ].map((etapa, index) => (
                   <div
                     key={index}
@@ -3191,6 +3324,18 @@ export default function PerfilCandidato({
               )}
 
               {step === 6 && (
+                <DiscStep
+                  candidatoExistente={Boolean(candidatoId)}
+                  status={discStatus}
+                  loading={discLoading}
+                  onVoltar={prevStep}
+                  onAvancar={nextStep}
+                  onResponder={handleResponderDisc}
+                  onVisualizarResultado={handleVisualizarResultadoDisc}
+                />
+              )}
+
+              {step === 7 && (
                 <div className="w-full flex flex-col flex-1">
                   <form
                     onSubmit={handleSubmit}
@@ -3667,6 +3812,75 @@ export default function PerfilCandidato({
                   </form>
                 </div>
               )}
+
+              {discPosPublicacaoAberto && (
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="disc-pos-publicacao-titulo"
+                  className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 p-4"
+                >
+                  <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl sm:p-8">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-50">
+                      <CheckCircle2 className="h-9 w-9 text-green-600" />
+                    </div>
+
+                    <h2
+                      id="disc-pos-publicacao-titulo"
+                      className="mt-5 text-center text-xl font-bold text-gray-900"
+                    >
+                      {t("disc.pos_publicacao_titulo")}
+                    </h2>
+
+                    <p className="mt-3 text-center text-sm leading-6 text-gray-600">
+                      {t("disc.pos_publicacao_descricao")}
+                    </p>
+
+                    <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                      <p className="text-sm leading-6 text-blue-900">
+                        {t("disc.pos_publicacao_privacidade")}
+                      </p>
+                    </div>
+
+                    <div className="mt-6 flex flex-col gap-3">
+                      <button
+                        type="button"
+                        onClick={handleDiscAgora}
+                        className="w-full rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+                      >
+                        {t("disc.pos_publicacao_responder")}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleDiscDepois}
+                        className="w-full rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                      >
+                        {t("disc.pos_publicacao_depois")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <DiscQuestionarioModal
+                aberto={discModalAberto}
+                onFechar={
+                  candidatoId
+                    ? handleFecharDiscModal
+                    : handleFecharDiscPosPublicacao
+                }
+                onConcluido={
+                  candidatoId
+                    ? handleConcluirDisc
+                    : handleConcluirDiscPosPublicacao
+                }
+              />
+
+              <DiscResultadoModal
+                aberto={discResultadoAberto}
+                onFechar={() => setDiscResultadoAberto(false)}
+              />
             </div>
           </PageContainer>
         </div>
